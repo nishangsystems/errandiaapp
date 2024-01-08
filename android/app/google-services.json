@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "795521533722",
+    "project_id": "errandia-phone-otp",
+    "storage_bucket": "errandia-phone-otp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795521533722:android:5a82203ca1956311e1cea3",
+        "android_client_info": {
+          "package_name": "com.example.errandia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6Of-1b1Woiid9pwZohN50XuHGkimHHJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

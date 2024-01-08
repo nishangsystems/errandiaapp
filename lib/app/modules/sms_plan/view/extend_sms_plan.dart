@@ -1,0 +1,516 @@
+import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
+import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/sms_plan/controller/sms_plan_controller.dart';
+import 'package:errandia/app/modules/sms_plan/view/extend_payment_successfull_view.dart';
+import 'package:errandia/app/modules/subscription/view/subscription_processing_view.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class extend_sms_plan_view extends StatelessWidget {
+  extend_sms_plan_view();
+  RxString payment_group_value = 'mtn'.obs;
+  RxString subscription_type_group_value = 'daily'.obs;
+  Widget build(BuildContext) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        title: Text(
+          'Extend SMS Plan',
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+        iconTheme: IconThemeData(
+          color: appcolor().mediumGreyColor,
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.settings,
+            ),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // subscription type
+            Container(
+              width: Get.width,
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 15,
+              ),
+              child: Text(
+                'SMS Plan',
+                style: TextStyle(
+                  color: appcolor().darkBlueColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            // Daily
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: appcolor().mediumGreyColor,
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 5,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    'Daily',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    '(50 SMS)',
+                    style: TextStyle(
+                      color: appcolor().greenColor,
+                       fontSize: 16,
+                    ),
+                  ),
+                  Spacer(),
+                  Obx(
+                    () => Radio(
+                      value: 'daily',
+                      activeColor: appcolor().mainColor,
+                      groupValue: subscription_type_group_value.value,
+                      onChanged: (val) {
+                        subscription_type_group_value.value = val.toString();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Weekly
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  bottom: BorderSide(
+                    color: appcolor().mediumGreyColor,
+                  ),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 5,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    'Weekly',
+                    style: TextStyle(
+                      // color: appcolor().mainColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    '(100 SMS)',
+                    style: TextStyle(
+                      color: appcolor().mediumGreyColor,
+                       fontSize: 16,
+                    ),
+                  ),
+                  Spacer(),
+                  Obx(
+                    () => Radio(
+                      activeColor: appcolor().mainColor,
+                      value: 'weekly',
+                      groupValue: subscription_type_group_value.value,
+                      onChanged: (val) {
+                        subscription_type_group_value.value = val.toString();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            //monthly
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  bottom: BorderSide(
+                    color: appcolor().mediumGreyColor,
+                  ),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 5,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    'Monthly',
+                    style: TextStyle(
+                      // color: appcolor().mainColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    '(100 SMS)',
+                    style: TextStyle(
+                      color: appcolor().mediumGreyColor,
+                       fontSize: 16,
+                    ),
+                  ),
+                  Spacer(),
+                  Obx(
+                    () => Radio(
+                      activeColor: appcolor().mainColor,
+                      value: 'monthly',
+                      groupValue: subscription_type_group_value.value,
+                      onChanged: (val) {
+                        subscription_type_group_value.value = val.toString();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(
+              height: 15,
+            ),
+
+            // Select Payment Method
+            Container(
+              width: Get.width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(
+                    color: appcolor().mediumGreyColor,
+                  ),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 15,
+              ),
+              child: Text(
+                'Select Payment Method',
+                style: TextStyle(
+                  color: appcolor().darkBlueColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            // MTN Mobile money
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: appcolor().mediumGreyColor,
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 5,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    height: 30,
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/icon-payment-mtnMomo.png',
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '  MTN Mobile money',
+                    style: TextStyle(
+                      // color: appcolor().mainColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Spacer(),
+                  Obx(
+                    () => Radio(
+                      activeColor: appcolor().mainColor,
+                      value: 'mtn',
+                      groupValue: payment_group_value.value,
+                      onChanged: (val) {
+                        payment_group_value.value = val.toString();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // mobile number container
+
+            Obx(
+              () => payment_group_value.value == 'mtn'
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: appcolor().skyblueColor,
+                        border: Border(
+                          bottom: BorderSide(
+                            color: appcolor().mediumGreyColor,
+                          ),
+                        ),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 5,
+                      ),
+                      child: TextFormField(
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.only(left: 38),
+                          border: InputBorder.none,
+                          hintText: 'Enter Mobile Money no.',
+                        ),
+                      ),
+                    )
+                  : Container(),
+            ),
+            // Orange Money
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  bottom: BorderSide(
+                    color: appcolor().mediumGreyColor,
+                  ),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 5,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    height: 30,
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/icon-payment-mtnMomoorange-money.png',
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '  Orange Money',
+                    style: TextStyle(
+                      // color: appcolor().mainColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Spacer(),
+                  Obx(
+                    () => Radio(
+                      activeColor: appcolor().mainColor,
+                      value: 'orange',
+                      groupValue: payment_group_value.value,
+                      onChanged: (val) {
+                        payment_group_value.value = val.toString();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // cash
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  bottom: BorderSide(
+                    color: appcolor().mediumGreyColor,
+                  ),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 5,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    height: 30,
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/icon-payment-cash.png',
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '  Cash',
+                    style: TextStyle(
+                      // color: appcolor().mainColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Spacer(),
+                  Obx(
+                    () => Radio(
+                      activeColor: appcolor().mainColor,
+                      value: 'cash',
+                      groupValue: payment_group_value.value,
+                      onChanged: (val) {
+                        payment_group_value.value = val.toString();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // cash renew
+            Obx(
+              () => payment_group_value.value == 'cash'
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: appcolor().skyblueColor,
+                        border: Border(
+                          bottom: BorderSide(
+                            color: appcolor().mediumGreyColor,
+                          ),
+                        ),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 8,
+                      ),
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: appcolor().mainColor,
+                            fontSize: 16,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Tap the ',
+                            ),
+                            TextSpan(
+                              text: 'Renew Subscription',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                                text:
+                                    ' button below and we\'ll contact you as soon as possible to complete the procedure of renewing your subscription.'),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Container(),
+            ),
+
+            // total subscription
+            SizedBox(
+              height: 15,
+            ),
+
+            Container(
+              width: Get.width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(
+                    color: appcolor().mediumGreyColor,
+                  ),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 15,
+              ),
+              child: Text(
+                'SMS Plan Cost',
+                style: TextStyle(
+                  color: appcolor().darkBlueColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            // Price
+
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: appcolor().mediumGreyColor,
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 15,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    'Price',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  Spacer(),
+                  Text(
+                    'XAF 6000',
+                    style: TextStyle(
+                      color: appcolor().mainColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(
+              height: Get.height * 0.05,
+            ),
+
+            blockButton(
+              title: Text(
+                'Extend Bundle',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              ontap: () {
+                Get.to(extend_sms_payment_success_view());
+              },
+              color: appcolor().mainColor,
+            ).paddingSymmetric(horizontal: 15, vertical: 30),
+          ],
+        ),
+      ),
+    );
+  }
+}
