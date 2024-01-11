@@ -39,7 +39,7 @@ class ErrandiaApp extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
     // print('Author=> Abhishek Gupta');
-    print('Errandia App is Online');
+    print('Errandia App is Online 👍');
     return GetMaterialApp(
       translations: Languages(),
       locale: Locale('en', 'US'),

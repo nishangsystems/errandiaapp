@@ -11,7 +11,7 @@ class register_signin_screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Author=> Abhishek Gupta');
+    print('Errandia App is Online 😊');
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 33, 97, 165),
       body: SafeArea(
