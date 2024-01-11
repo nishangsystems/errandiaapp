@@ -41,18 +41,23 @@ class _splash_screenState extends State<splash_screen> {
   }
   Future whertogo() async {
     var sharedpref = await SharedPreferences.getInstance();
+    var hasVisited = sharedpref.getBool('hasVisited') ?? false;
     var isLoggedIn = sharedpref.getString('token');
-    print(isLoggedIn);
-    Timer(Duration(seconds: 2,), () async {
-      if (isLoggedIn != null) {
-        if(isLoggedIn !=  ''){
-          Get.offAll(Home_view());
-        }else{
-          Get.offAll( get_started_screen(),);
-        }
+    print('Is logged in: $isLoggedIn');
+
+    Timer(const Duration(seconds: 2,), () async {
+     if (hasVisited) {
+       Get.offAll(Home_view());
+        // if (isLoggedIn != null && isLoggedIn.isNotEmpty) {
+        //   Get.offAll(Home_view());
+        // } else {
+        //   Get.offAll(const get_started_screen());
+        // }
       } else {
-        Get.offAll( get_started_screen(),);
-      }
+        // First time visit, show Get Started screen
+        sharedpref.setBool('hasVisited', true);
+        Get.off(const get_started_screen());
+     }
     });
   }
 }
