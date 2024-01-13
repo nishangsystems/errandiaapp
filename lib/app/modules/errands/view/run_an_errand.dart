@@ -1,9 +1,8 @@
-
 import 'dart:convert';
 import 'package:errandia/modal/Region.dart';
 import 'package:errandia/modal/Town.dart';
 import 'package:errandia/modal/category.dart';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/modules/errands/view/search_errand_prod.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
@@ -26,8 +25,6 @@ class _run_an_errandState extends State<run_an_errand> {
   var country;
   var regionCode;
   var town;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -167,13 +164,13 @@ class _run_an_errandState extends State<run_an_errand> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                height: Get.height * 0.66,
+              SizedBox(
+                height: Get.height * 0.5,
                 width: Get.width,
                 child: Stack(
                   children: [
                     Image(
-                      image: AssetImage(
+                      image: const AssetImage(
                         'assets/images/home_bg.png',
                       ),
                       fit: BoxFit.fill,
@@ -197,10 +194,10 @@ class _run_an_errandState extends State<run_an_errand> {
                         color: appcolor().mainColor,
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     TextButton(
                       onPressed: () {},
-                      child: Text('See All'),
+                      child: const Text('See All'),
                     ),
                   ],
                 ).paddingSymmetric(horizontal: 20),
@@ -213,6 +210,7 @@ class _run_an_errandState extends State<run_an_errand> {
       ),
     );
   }
+
   Widget Recently_posted_items_Widget() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14),
@@ -358,8 +356,8 @@ class _run_an_errandState extends State<run_an_errand> {
 
         // what are you looking container
         Container(
-          margin: EdgeInsets.symmetric(vertical: 10),
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           height: Get.height * 0.07,
           decoration: BoxDecoration(
             color: Colors.white,
@@ -367,39 +365,40 @@ class _run_an_errandState extends State<run_an_errand> {
           ),
           child: Center(
             child: TextFormField(
-              controller:  lookingyou,
-              style: TextStyle(),
-              decoration: InputDecoration.collapsed(
+              controller: lookingyou,
+              style: const TextStyle(),
+              decoration: const InputDecoration.collapsed(
                 hintText: 'what are you looking for....',
               ),
             ),
           ),
         ),
-        Container(
-            margin: EdgeInsets.symmetric(vertical: 10),
-             padding: EdgeInsets.symmetric(horizontal: 20),
-            height: Get.height * 0.07,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Center(
-              child: DropdownButtonFormField(
-                iconSize: 0.0,
-                decoration: InputDecoration.collapsed(
-                  hintText: 'Category',
-                ),
-                value: value,
-                onChanged: (value) {
-                  setState(() {
-                    country = value as int;
-                  });
-                  print(value);
-                },
-                items:categor.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 14),),value: e.id,)).toList(),
-
-              ),
-            )),
+        // Container(
+        //   margin: const EdgeInsets.symmetric(vertical: 10),
+        //   padding: const EdgeInsets.symmetric(horizontal: 20),
+        //   height: Get.height * 0.07,
+        //   decoration: BoxDecoration(
+        //     color: Colors.white,
+        //     borderRadius: BorderRadius.circular(5),
+        //   ),
+          // child: Center(
+          //   child: DropdownButtonFormField(
+          //     iconSize: 0.0,
+          //     decoration: InputDecoration.collapsed(
+          //       hintText: 'Category',
+          //     ),
+          //     value: value,
+          //     onChanged: (value) {
+          //       setState(() {
+          //         country = value as int;
+          //       });
+          //       print(value);
+          //     },
+          //     items:categor.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 14),),value: e.id,)).toList(),
+          //
+          //   ),
+          // )
+        // ),
 
         Row(
           children: [
@@ -424,7 +423,13 @@ class _run_an_errandState extends State<run_an_errand> {
                         regionCode = value as int;
                       });
                     },
-                    items:Regions.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 14),),value: e.id,)).toList(),
+                    items: Regions.Items.map((e) => DropdownMenuItem(
+                          child: Text(
+                            e.name.toString(),
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          value: e.id,
+                        )).toList(),
                   ),
                 )),
             Spacer(),
@@ -447,8 +452,13 @@ class _run_an_errandState extends State<run_an_errand> {
                     onChanged: (value) {
                       town = value as int;
                     },
-                    items:Towns.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 14),),value: e.id,)).toList(),
-
+                    items: Towns.Items.map((e) => DropdownMenuItem(
+                          child: Text(
+                            e.name.toString(),
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          value: e.id,
+                        )).toList(),
                   ),
                 )),
           ],
@@ -456,18 +466,17 @@ class _run_an_errandState extends State<run_an_errand> {
 
         GestureDetector(
           onTap: () {
-
             Get.to(search_errand_prod());
           },
           child: Container(
-            margin: EdgeInsets.symmetric(vertical: 10),
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             height: Get.height * 0.07,
             decoration: BoxDecoration(
               color: appcolor().mainColor,
               borderRadius: BorderRadius.circular(5),
             ),
-            child: Center(
+            child: const Center(
               child: Text(
                 'Search',
                 style: TextStyle(
@@ -479,49 +488,49 @@ class _run_an_errandState extends State<run_an_errand> {
           ),
         ),
 
-        Container(
-          margin: EdgeInsets.symmetric(vertical: 10),
-          padding: EdgeInsets.symmetric(horizontal: 0),
-          height: Get.height * 0.07,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'Top Searches',
-                style: TextStyle(color: Colors.white, fontSize: 15),
-              ),
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.all(5),
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {},
-                        hoverColor: Colors.blue,
-                        highlightColor: Colors.blue,
-                        child: Container(
-                          margin: EdgeInsets.all(5),
-                          width: Get.width * 0.2,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Hello',
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        // Container(
+        //   margin: EdgeInsets.symmetric(vertical: 10),
+        //   padding: EdgeInsets.symmetric(horizontal: 0),
+        //   height: Get.height * 0.07,
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: [
+        //       Text(
+        //         'Top Searches',
+        //         style: TextStyle(color: Colors.white, fontSize: 15),
+        //       ),
+        //       Expanded(
+        //         child: Container(
+        //           margin: EdgeInsets.all(5),
+        //           padding: EdgeInsets.symmetric(horizontal: 10),
+        //           child: ListView.builder(
+        //             scrollDirection: Axis.horizontal,
+        //             itemBuilder: (context, index) {
+        //               return InkWell(
+        //                 onTap: () {},
+        //                 hoverColor: Colors.blue,
+        //                 highlightColor: Colors.blue,
+        //                 child: Container(
+        //                   margin: EdgeInsets.all(5),
+        //                   width: Get.width * 0.2,
+        //                   decoration: BoxDecoration(
+        //                     color: Colors.white,
+        //                     borderRadius: BorderRadius.circular(5),
+        //                   ),
+        //                   child: Center(
+        //                     child: Text(
+        //                       'Hello',
+        //                     ),
+        //                   ),
+        //                 ),
+        //               );
+        //             },
+        //           ),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ],
     ).paddingOnly(
       left: 20,
@@ -531,5 +540,3 @@ class _run_an_errandState extends State<run_an_errand> {
     );
   }
 }
-
-

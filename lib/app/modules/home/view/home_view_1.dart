@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -242,7 +243,7 @@ class _home_view_1State extends State<home_view_1> {
                       Spacer(),
                       ElevatedButton(
                           onPressed: () {
-                            Get.to(run_an_errand());
+                            Get.to(New_Errand());
                           },
                           child: Text(
                             'Run an Errand',
