@@ -23,7 +23,7 @@ class _Profile_viewState extends State<Profile_view>
 
   @override
   Widget build(BuildContext context) {
-    String prod_list_size = profile_controller().product_list.length > 0
+    String prod_list_size = profile_controller().product_list.isNotEmpty
         ? profile_controller().product_list.length.toString()
         : "";
 
@@ -47,7 +47,7 @@ class _Profile_viewState extends State<Profile_view>
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Image(
+                child: const Image(
                   image: AssetImage(
                     'assets/images/profile_image.png',
                   ),
@@ -57,10 +57,10 @@ class _Profile_viewState extends State<Profile_view>
 
               // profile name container
               Container(
-                margin: EdgeInsets.only(
+                margin: const EdgeInsets.only(
                   top: 10,
                 ),
-                child: Text(
+                child: const Text(
                   'Profile Name',
                   style: TextStyle(
                     color: Colors.white,
@@ -72,8 +72,8 @@ class _Profile_viewState extends State<Profile_view>
 
               // profile location
               Container(
-                child: Text(
-                  'Buea, South West Region, Cameroo',
+                child: const Text(
+                  'Buea, South West Region, Cameroon',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 13,
@@ -82,11 +82,11 @@ class _Profile_viewState extends State<Profile_view>
               ),
               // details container
               Container(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 20,
                 ),
-                margin: EdgeInsets.only(top: 15, left: 15, right: 15),
+                margin: const EdgeInsets.only(top: 15, left: 15, right: 15),
                 height: Get.height * 0.15,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
@@ -122,7 +122,8 @@ class _Profile_viewState extends State<Profile_view>
 
               //
             ],
-          ).paddingSymmetric(vertical: 15),
+          ).
+          paddingSymmetric(vertical: 15),
         ),
 
         // tab bar
@@ -156,17 +157,18 @@ class _Profile_viewState extends State<Profile_view>
                   ),
                   controller: tabController,
                   labelColor: appcolor().darkBlueColor,
-                  tabs: [
+                  tabs: const [
                     Tab(
-                      text: tabController.index == 0
-                          ? "Product " + prod_list_size
-                          : "Product",
+                      text: "Products",
+                        // tabController.index == 0
+                        //     ? "Products ($prod_list_size)"
+                        //     : "Product
                     ),
                     Tab(
                       text: "Services",
                     ),
                     Tab(
-                      text: "Bussiness ",
+                      text: "Business",
                     ),
                   ],
                 ),
@@ -179,15 +181,15 @@ class _Profile_viewState extends State<Profile_view>
         Expanded(
           child: Container(
             color: Colors.white,
-            padding: EdgeInsets.symmetric(horizontal: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
             // height: Get.height * 0.2,
             child: TabBarView(
               controller: tabController,
               children: [
-                profile_controller().product_list.length < 0
+                profile_controller().product_list.isNotEmpty
                     ? product_item_list()
-                    : accoutSuspended(),
-                profile_controller().service_list.length > 0
+                    : noProductsFound(),
+                profile_controller().service_list.isNotEmpty
                     ? Service_item_list()
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -251,28 +253,26 @@ class _Profile_viewState extends State<Profile_view>
 
 Widget details_container_item_widget(
   String title,
-  String imagepath,
+  String imagePath,
   int count,
 ) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
+    mainAxisSize: MainAxisSize.min,
     children: [
-      Container(
-          child: Image(
-        image: AssetImage(imagepath),
+      Image(
+        image: AssetImage(imagePath),
         height: Get.height * 0.03,
         fit: BoxFit.fill,
         color: appcolor().mediumGreyColor,
-      )),
+      ),
       Container(
-        margin: EdgeInsets.symmetric(vertical: 5),
+        margin: const EdgeInsets.symmetric(vertical: 2),
         child: Text(
           title,
         ),
       ),
-      Container(
-        child: Text(count.toString()),
-      ),
+      Text(count.toString()),
     ],
   );
 }
@@ -319,7 +319,65 @@ Widget Buiseness_item_list() {
       });
 }
 
-Widget accoutSuspended() {
+Widget noProductsFound() {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+    margin: EdgeInsets.only(top: 10),
+    decoration: BoxDecoration(
+      color: Colors.grey[200],
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          height: Get.height * 0.07,
+          child: const Icon(
+            Icons.warning,
+            color: Colors.orange,
+            size: 40,
+          ),
+        ),
+        const Text(
+          'No Products Found',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          child: const Text(
+            'You have not added any product to your businesses yet.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+        RichText(
+          text: TextSpan(
+            style: const TextStyle(fontSize: 16, color: Colors.black),
+            children: [
+              TextSpan(
+                recognizer: TapGestureRecognizer()..onTap = () {},
+                text: 'Contact Us',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline,
+                  color: Colors.blue,
+                ),
+              ),
+              const TextSpan(
+                text: ' for assistance.',
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget accountSuspended() {
   return Container(
     // height: Get.height,
 
