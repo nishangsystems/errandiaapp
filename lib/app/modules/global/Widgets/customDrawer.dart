@@ -1,6 +1,7 @@
 import 'package:errandia/app/modules/Billing/view/Billing_history_view.dart';
 import 'package:errandia/app/modules/Dashboard/view/dashboard_view.dart';
 import 'package:errandia/app/modules/Enquiries/view/enquiries_view.dart';
+import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/following/view/following_view.dart';
 
@@ -17,13 +18,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../uis/getStartedScreen.dart';
 import '../../buiseness/view/add_business_view.dart';
+import '../../buiseness/view/businesses_view.dart';
 import '../../buiseness/view/manage_business_view.dart';
+import '../../home/controller/home_controller.dart';
 import '../../home/view/home_view.dart';
 import '../../products/view/add_product_view.dart';
 
 class customendDrawer extends StatelessWidget {
   customendDrawer({super.key});
+
   final padding = EdgeInsets.symmetric(horizontal: 10);
+  home_controller homeController = Get.put(home_controller());
 
   @override
   Widget build(BuildContext context) {
@@ -51,129 +56,138 @@ class customendDrawer extends StatelessWidget {
             SizedBox(
               height: Get.height * 0.01,
             ),
-            drawerItemWidget(
-              text: 'Create Shop',
-              imagePath: 'assets/images/sidebar_icon/create_shop.png',
-              callback: () {
-                Get.to(add_business_view());
-              },
-            ),
-            drawerItemWidget(
-              text: 'Add Products',
-              imagePath: 'assets/images/sidebar_icon/add_products.png',
-              callback: () {
-                Get.to(add_product_view());
-              },
-            ),
-            Divider(
-              color: appcolor().mediumGreyColor,
-            ),
-            drawerItemWidget(
-              text: 'My Dashboard',
-              imagePath: 'assets/images/sidebar_icon/dashboard.png',
-              callback: () {
-                Get.back();
-                Get.to(dashboard_view());
-              },
-            ),
+            Obx(() => homeController.loggedIn.value
+                ? drawerItemWidget(
+                    text: 'Create Business',
+                    imagePath: 'assets/images/sidebar_icon/create_shop.png',
+                    callback: () {
+                      Get.to(add_business_view());
+                    },
+                  )
+                : drawerItemWidget(
+                    text: 'Businesses',
+                    imagePath: 'assets/images/sidebar_icon/create_shop.png',
+                    callback: () {
+                      Get.to(Businesses_View());
+                    },
+                  )),
+            Obx(() => homeController.loggedIn.value
+                ? drawerItemWidget(
+                    text: 'My Dashboard',
+                    imagePath: 'assets/images/sidebar_icon/dashboard.png',
+                    callback: () {
+                      Get.back();
+                      Get.to(const dashboard_view());
+                    },
+                  )
+                : Container()),
+            Obx(() => homeController.loggedIn.value
+                ? Divider(
+                    color: appcolor().mediumGreyColor,
+                  )
+                : Container()),
+            Obx(() => homeController.loggedIn.value
+                ? Container()
+                : drawerItemWidget(
+                    text: 'Categories',
+                    imagePath:
+                        'assets/images/sidebar_icon/icon-profile-errands.png',
+                    callback: () {
+                      Get.back();
+                      Get.to(errand_view());
+                    },
+                  )),
             drawerItemWidget(
               text: 'Errands',
-              imagePath:
-                  'assets/images/sidebar_icon/icon-profile-errands.png',
+              imagePath: 'assets/images/sidebar_icon/icon-profile-errands.png',
               callback: () {
                 Get.back();
                 Get.to(errand_view());
               },
             ),
-            drawerItemWidget(
-              text: 'Manage Products',
-              imagePath: 'assets/images/sidebar_icon/icon-manage-products.png',
-              callback: () {
-                Get.back();
-                Get.to(()=>manage_product_view());
-              },
-            ),
-            drawerItemWidget(
-              text: 'Manage Services',
-              imagePath: 'assets/images/sidebar_icon/services.png',
-              callback: () {
-                Get.back();
-                Get.to(()=>manage_service_view());
-              },
-            ),
-            drawerItemWidget(
-              text: 'Manage Bussiness',
-              imagePath: 'assets/images/sidebar_icon/icon-company.png',
-              callback: () {
-                Get.back();
-                // Get.offAll(Home_view());
-                Get.to(()=>manage_business_view());
-              },
-            ),
-            drawerItemWidget(
-              text: 'Enquiries',
-              imagePath: 'assets/images/sidebar_icon/enquiry.png',
-              callback: () {
-                Get.back();
-                Get.to(()=>enquireis_view(), popGesture: true);
-              },
-            ),
-            drawerItemWidget(
-              text: 'Subscribers',
-              imagePath: 'assets/images/sidebar_icon/icon-profile-subscribers.png',
-              callback: () {
-                Get.back();
-                Get.to(subscriber_view());
-              },
-            ),
-            drawerItemWidget(
-              text: 'Following',
-              imagePath: 'assets/images/sidebar_icon/icon-profile-following.png',
-              callback: () {
-                Get.back();
-                Get.to(()=>following_view());
-              },
-            ),
-            drawerItemWidget(
-              text: 'Reviews',
-              imagePath: 'assets/images/sidebar_icon/icon-profile-reviews.png',
-              callback: () {
-                Get.back();
-                Get.to(()=>manage_review_view());
-              },
-            ),
-            drawerItemWidget(
-              text: 'Billing History',
-              imagePath: 'assets/images/sidebar_icon/icon-billing-history.png',
-              callback: () {
-                Get.back();
-                Get.to(()=>billing_history_view());
-              },
-            ),
-            SizedBox(
-              height: 5,
-            ),
+            Obx(() => homeController.loggedIn.value
+                ? drawerItemWidget(
+                    text: 'Enquiries',
+                    imagePath: 'assets/images/sidebar_icon/enquiry.png',
+                    callback: () {
+                      Get.back();
+                      Get.to(() => enquireis_view(), popGesture: true);
+                    },
+                  )
+                : Container()),
+            Obx(() => homeController.loggedIn.value
+                ? drawerItemWidget(
+                    text: 'Following',
+                    imagePath:
+                        'assets/images/sidebar_icon/icon-profile-following.png',
+                    callback: () {
+                      Get.back();
+                      Get.to(following_view());
+                    },
+                  )
+                : Container()),
+            Obx(() => homeController.loggedIn.value
+                ? drawerItemWidget(
+                    text: 'Reviews',
+                    imagePath:
+                        'assets/images/sidebar_icon/icon-profile-reviews.png',
+                    callback: () {
+                      Get.back();
+                      Get.to(() => manage_review_view());
+                    })
+                : Container()),
+            Obx(() => homeController.loggedIn.value
+                ? drawerItemWidget(
+                    text: 'Billing History',
+                    imagePath:
+                        'assets/images/sidebar_icon/icon-billing-history.png',
+                    callback: () {
+                      Get.back();
+                      Get.to(() => billing_history_view());
+                    },
+                  )
+                : Container()),
+            Obx(() => homeController.loggedIn.value
+                ? SizedBox(
+                    height: 5,
+                  )
+                : Container()),
             Divider(),
-            drawerItemWidget(
-              text: 'Settings',
-              imagePath: 'assets/images/sidebar_icon/icon-settings.png',
-              callback: () {
-                Get.back();
-                Get.to(setting_view());
-              },
-            ),
-            Divider(),
-            drawerItemWidget(
-              text: 'Logout',
-              imagePath: 'assets/images/sidebar_icon/icon-logout.png',
-              callback: ()async {
-                SharedPreferences preferences = await SharedPreferences.getInstance();
-                await preferences.remove('token');
+            Obx(() => homeController.loggedIn.value
+                ? drawerItemWidget(
+                    text: 'Settings',
+                    imagePath: 'assets/images/sidebar_icon/icon-settings.png',
+                    callback: () {
+                      Get.back();
+                      Get.to(setting_view());
+                    },
+                  )
+                : Container()),
+            Obx(() =>
+                homeController.loggedIn.value ? const Divider() : Container()),
+            Obx(() => homeController.loggedIn.value
+                ? drawerItemWidget(
+                    text: 'Logout',
+                    imagePath: 'assets/images/sidebar_icon/icon-logout.png',
+                    callback: () async {
+                      SharedPreferences preferences =
+                          await SharedPreferences.getInstance();
+                      await preferences.remove('token');
 
-                Get.offAll(get_started_screen());
+                      Get.offAll(get_started_screen());
+                    },
+                  )
+                : drawerItemWidget(
+              text: 'Register/Login',
+              imagePath: 'assets/images/sidebar_icon/icon-logout.png',
+              callback: () {
+                // Get.back();
+                Get.to(const signin_view());
               },
+            )),
+            SizedBox(
+              height: 60,
             ),
-            SizedBox(height: 60,),
           ],
         ),
       ),
