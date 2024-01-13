@@ -7,13 +7,15 @@ class Languages extends Translations {
         'en_US': {
           'appName': 'Errandia',
           'Business': 'Business',
-          'Update Buiseness Location':'Update Buiseness Location',
-          'Edit Profile': 'Edit Profile'
+          'Update Business Location':'Update Business Location',
+          'Edit Profile': 'Edit Profile',
+          'Update Location': 'Update Location',
         },
         'fr_CA': {
           'appName': 'Errandia',
           'Business': 'Entreprise',
-          'Update Buiseness Location':'Mettre à jour l\'emplacement de l\'entreprise'
+          'Update Business Location':'Mettre à jour la localisation de l\'entreprise',
+          'Update Location': 'Mettre à jour la localisation',
         },
       };
 }

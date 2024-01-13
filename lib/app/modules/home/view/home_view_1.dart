@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../modal/Country.dart';
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
@@ -37,6 +38,9 @@ class home_view_1 extends StatefulWidget {
 }
 
 class _home_view_1State extends State<home_view_1> {
+  String? isLoggedIn;
+  home_controller homeController = Get.put(home_controller());
+
   Country() async {
     try{
       final response =
@@ -149,6 +153,22 @@ class _home_view_1State extends State<home_view_1> {
       throw Exception(w.toString());
     }
   }
+
+  void loadIsLoggedIn() async {
+    isLoggedIn = await checkLogin();
+    homeController.loggedIn.value =
+        isLoggedIn != null && isLoggedIn!.isNotEmpty;
+
+    print('INIT: Is logged in: $isLoggedIn');
+  }
+
+  Future<String?> checkLogin() async {
+    var sharedpref = await SharedPreferences.getInstance();
+    var isLoggedIn = sharedpref.getString('token');
+    print('Is logged in: $isLoggedIn');
+    return isLoggedIn;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -204,7 +224,7 @@ class _home_view_1State extends State<home_view_1> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Welcome Kris',
+                            homeController.loggedIn.value ? 'Welcome Kris' : 'Welcome',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
@@ -253,7 +273,7 @@ class _home_view_1State extends State<home_view_1> {
                   Expanded(
                     child: Container(
                       child: Text(
-                        'Update Buiseness Location'.tr,
+                        homeController.loggedIn.value ? 'Update Business Location'.tr : 'Update Location'.tr,
                         style: TextStyle(
                             color: appcolor().mainColor, fontSize: 12),
                       ),

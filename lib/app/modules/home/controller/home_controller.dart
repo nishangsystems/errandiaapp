@@ -15,4 +15,19 @@ class home_controller extends GetxController {
   void closeDrawer() {
     scaffoldkey.currentState!.closeEndDrawer();
   }
+
+  void loadIsLoggedIn() async {
+    var isLoggedIn = await checkLogin();
+    loggedIn.value =
+        isLoggedIn != null && isLoggedIn.isNotEmpty;
+
+    print('INIT: Is logged in: $isLoggedIn');
+  }
+
+  Future<String?> checkLogin() async {
+    var sharedpref = await SharedPreferences.getInstance();
+    var isLoggedIn = sharedpref.getString('token');
+    print('Is logged in: $isLoggedIn');
+    return isLoggedIn;
+  }
 }
