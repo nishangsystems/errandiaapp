@@ -1,5 +1,6 @@
 import 'package:errandia/app/modules/auth/Register/register_signin_screen.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
+import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view_1.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
@@ -79,7 +80,7 @@ class _Home_viewState extends State<Home_view> {
       home_view_1(),
       run_an_errand(),
       Businesses_View(),
-      Obx(() => homecontroller.loggedIn.value ? Profile_view() : signin_view())
+      Obx(() => homecontroller.loggedIn.value ? Profile_view() : signin_view_1())
     ];
   }
 

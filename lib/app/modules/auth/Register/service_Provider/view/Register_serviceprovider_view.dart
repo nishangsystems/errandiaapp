@@ -123,6 +123,11 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
     
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: Image(
+          image: const AssetImage('assets/images/icon-errandia-logo-about.png'),
+          width: Get.width * 0.3,
+        ),
        // elevation: 0.8,
         leading: IconButton(
           onPressed: () {
@@ -668,52 +673,6 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                   ],
                 ),
               ),
-            ),
-      
-            SizedBox(
-              height: Get.height * 0.015,
-            ),
-             Center(
-              child:Text("OR",style: TextStyle(fontSize: 17),)
-             ),
-              SizedBox(
-              height: Get.height * 0.015,
-            ),
-            Center(child: Text("Register with your social account",style: TextStyle(fontSize: 16),)),
-            SizedBox(
-              height: Get.height * 0.015,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 50,
-                  child: ElevatedButton(onPressed:(){}, child: Text("f",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 24),),
-                  style: ElevatedButton.styleFrom(
-                    shape:CircleBorder(
-                    
-                    ),
-                   
-                  ),
-                  ),
-                ),
-                  Container(
-                    height: 50,
-                    child: ElevatedButton(onPressed:(){
-                      print("Hii");
-                    }, child: Icon(Icons.email),
-                                    style: ElevatedButton.styleFrom(
-                    shape:CircleBorder(
-                    
-                    )
-                                    ),
-                                    ),
-                  ),
-                // CircleAvatar(
-                //   radius: 25,
-                //   backgroundImage: AssetImage("assets/email.png"),
-                // )
-              ],
             ),
             SizedBox(
               height: Get.height * 0.015,

@@ -2,6 +2,8 @@ import 'package:errandia/app/modules/Billing/view/Billing_history_view.dart';
 import 'package:errandia/app/modules/Dashboard/view/dashboard_view.dart';
 import 'package:errandia/app/modules/Enquiries/view/enquiries_view.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
+import 'package:errandia/app/modules/categories/CategoryData.dart';
+import 'package:errandia/app/modules/categories/view/categories.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/following/view/following_view.dart';
 
@@ -94,7 +96,7 @@ class customendDrawer extends StatelessWidget {
                         'assets/images/sidebar_icon/icon-profile-errands.png',
                     callback: () {
                       Get.back();
-                      Get.to(errand_view());
+                      Get.to(const categories_view());
                     },
                   )),
             drawerItemWidget(
@@ -182,7 +184,7 @@ class customendDrawer extends StatelessWidget {
               imagePath: 'assets/images/sidebar_icon/icon-logout.png',
               callback: () {
                 // Get.back();
-                Get.to(const signin_view());
+                Get.to(() => const signin_view());
               },
             )),
             SizedBox(

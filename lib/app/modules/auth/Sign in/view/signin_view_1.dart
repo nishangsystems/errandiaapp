@@ -444,7 +444,57 @@ class _PhoneState extends State<Phone> {
         SizedBox(
           height: Get.height * 0.05,
         ),
-
+        Center(
+            child: Text(
+          "OR",
+          style: TextStyle(fontSize: 17),
+        )),
+        SizedBox(
+          height: Get.height * 0.015,
+        ),
+        Center(
+            child: Text(
+          "Register with your social account",
+          style: TextStyle(fontSize: 16),
+        )),
+        SizedBox(
+          height: Get.height * 0.01,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {},
+                child: Text(
+                  "f",
+                  style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24),
+                ),
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                ),
+              ),
+            ),
+            Container(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  print("Hii");
+                },
+                child: Icon(Icons.email),
+                style: ElevatedButton.styleFrom(shape: CircleBorder()),
+              ),
+            ),
+            // CircleAvatar(
+            //   radius: 25,
+            //   backgroundImage: AssetImage("assets/email.png"),
+            // )
+          ],
+        ),
         SizedBox(
           height: Get.height * 0.05,
         ),
@@ -632,7 +682,7 @@ class _EmailState extends State<Email> {
             ),
           ),
           SizedBox(
-            height: Get.height * 0.02,
+            height: Get.height * 0.03,
           ),
 
           Align(
@@ -646,7 +696,7 @@ class _EmailState extends State<Email> {
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           debugPrint('Register View');
-                          Get.off(Register_Ui());
+                          Get.off(register_serviceprovider_view());
                         },
                       text: 'Register',
                       style: TextStyle(
@@ -663,14 +713,14 @@ class _EmailState extends State<Email> {
   }
 }
 
-class signin_view extends StatefulWidget {
-  const signin_view({super.key});
+class signin_view_1 extends StatefulWidget {
+  const signin_view_1({super.key});
 
   @override
-  State<signin_view> createState() => _signin_viewState();
+  State<signin_view_1> createState() => _signin_viewState();
 }
 
-class _signin_viewState extends State<signin_view>
+class _signin_viewState extends State<signin_view_1>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
@@ -701,33 +751,12 @@ class _signin_viewState extends State<signin_view>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        elevation: 0.8,
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Color(0xff113d6b),
-          ),
-        ),
-        title: Image(
-          image: const AssetImage('assets/images/icon-errandia-logo-about.png'),
-          width: Get.width * 0.3,
-        ),
-      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 20,
-              ),
+              padding: EdgeInsets.only(top: 35, bottom: 20),
               child: Column(
                 children: [
                   Text(
@@ -846,8 +875,9 @@ class _signin_viewState extends State<signin_view>
                                       border: InputBorder.none,
                                     ),
                                     validator: (value) {
-                                      if (value!.length != 9)
+                                      if (value!.length != 9) {
                                         return "Invalid phone number";
+                                      }
                                       return null;
                                     },
                                   ),
@@ -977,7 +1007,7 @@ class _signin_viewState extends State<signin_view>
                         ),
                       ),
                       SizedBox(
-                        height: Get.height * 0.02,
+                        height: Get.height * 0.03,
                       ),
                       Align(
                         alignment: Alignment.center,
