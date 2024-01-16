@@ -165,7 +165,7 @@ class _run_an_errandState extends State<run_an_errand> {
           child: Column(
             children: [
               SizedBox(
-                height: Get.height * 0.5,
+                height: Get.height * 0.4,
                 width: Get.width,
                 child: Stack(
                   children: [
@@ -346,7 +346,7 @@ class _run_an_errandState extends State<run_an_errand> {
           ),
         ),
         Text(
-          'Search for Products and Services',
+          'Stay at home & Let Errandia do the search',
           style: TextStyle(color: Colors.white, fontSize: 13),
           textAlign: TextAlign.center,
         ),
@@ -357,7 +357,7 @@ class _run_an_errandState extends State<run_an_errand> {
         // what are you looking container
         Container(
           margin: const EdgeInsets.symmetric(vertical: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 5),
           height: Get.height * 0.07,
           decoration: BoxDecoration(
             color: Colors.white,
@@ -367,8 +367,10 @@ class _run_an_errandState extends State<run_an_errand> {
             child: TextFormField(
               controller: lookingyou,
               style: const TextStyle(),
-              decoration: const InputDecoration.collapsed(
+              decoration: const InputDecoration(
                 hintText: 'what are you looking for....',
+                prefixIcon: Icon(Icons.search, color: Colors.grey),
+                border: InputBorder.none,
               ),
             ),
           ),
@@ -400,69 +402,69 @@ class _run_an_errandState extends State<run_an_errand> {
           // )
         // ),
 
-        Row(
-          children: [
-            Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                height: Get.height * 0.07,
-                width: Get.width * 0.42,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Center(
-                  child: DropdownButtonFormField(
-                    iconSize: 0.0,
-                    decoration: InputDecoration.collapsed(
-                      hintText: 'Region',
-                    ),
-                    value: value,
-                    onChanged: (value) {
-                      setState(() {
-                        regionCode = value as int;
-                      });
-                    },
-                    items: Regions.Items.map((e) => DropdownMenuItem(
-                          child: Text(
-                            e.name.toString(),
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          value: e.id,
-                        )).toList(),
-                  ),
-                )),
-            Spacer(),
-            Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
-                padding: EdgeInsets.symmetric(horizontal: 2),
-                height: Get.height * 0.07,
-                width: Get.width * 0.42,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Center(
-                  child: DropdownButtonFormField(
-                    iconSize: 0.0,
-                    decoration: InputDecoration.collapsed(
-                      hintText: 'Town',
-                    ),
-                    value: value,
-                    onChanged: (value) {
-                      town = value as int;
-                    },
-                    items: Towns.Items.map((e) => DropdownMenuItem(
-                          child: Text(
-                            e.name.toString(),
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          value: e.id,
-                        )).toList(),
-                  ),
-                )),
-          ],
-        ),
+        // Row(
+        //   children: [
+        //     Container(
+        //         margin: EdgeInsets.symmetric(vertical: 10),
+        //         padding: EdgeInsets.symmetric(horizontal: 10),
+        //         height: Get.height * 0.07,
+        //         width: Get.width * 0.42,
+        //         decoration: BoxDecoration(
+        //           color: Colors.white,
+        //           borderRadius: BorderRadius.circular(5),
+        //         ),
+        //         child: Center(
+        //           child: DropdownButtonFormField(
+        //             iconSize: 0.0,
+        //             decoration: InputDecoration.collapsed(
+        //               hintText: 'Region',
+        //             ),
+        //             value: value,
+        //             onChanged: (value) {
+        //               setState(() {
+        //                 regionCode = value as int;
+        //               });
+        //             },
+        //             items: Regions.Items.map((e) => DropdownMenuItem(
+        //                   child: Text(
+        //                     e.name.toString(),
+        //                     style: TextStyle(fontSize: 14),
+        //                   ),
+        //                   value: e.id,
+        //                 )).toList(),
+        //           ),
+        //         )),
+        //     Spacer(),
+        //     Container(
+        //         margin: EdgeInsets.symmetric(vertical: 10),
+        //         padding: EdgeInsets.symmetric(horizontal: 2),
+        //         height: Get.height * 0.07,
+        //         width: Get.width * 0.42,
+        //         decoration: BoxDecoration(
+        //           color: Colors.white,
+        //           borderRadius: BorderRadius.circular(5),
+        //         ),
+        //         child: Center(
+        //           child: DropdownButtonFormField(
+        //             iconSize: 0.0,
+        //             decoration: InputDecoration.collapsed(
+        //               hintText: 'Town',
+        //             ),
+        //             value: value,
+        //             onChanged: (value) {
+        //               town = value as int;
+        //             },
+        //             items: Towns.Items.map((e) => DropdownMenuItem(
+        //                   child: Text(
+        //                     e.name.toString(),
+        //                     style: TextStyle(fontSize: 14),
+        //                   ),
+        //                   value: e.id,
+        //                 )).toList(),
+        //           ),
+        //         )),
+        //   ],
+        // ),
 
         GestureDetector(
           onTap: () {

@@ -106,14 +106,6 @@ class dashboard_view extends StatelessWidget {
                     },
                   ),
                   dashboard_widget(
-                    Imagepath: 'assets/images/sidebar_icon/enquiry.png',
-                    title: 'Enquiries',
-                    belowtext: '0 Enquiries',
-                    callback: () {
-                      Get.to(enquireis_view());
-                    },
-                  ),
-                  dashboard_widget(
                     Imagepath: 'assets/images/sidebar_icon/icon-reviews.png',
                     title: 'Reviews',
                     belowtext: '0 Reviews',

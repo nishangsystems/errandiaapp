@@ -31,8 +31,9 @@ class _SeeAllErandsState extends State<SeeAllErands> {
                       ),) ,
         actions: [
           IconButton(onPressed:() {
-            Navigator.pop(context);
-          }, icon:Icon(Icons.notifications,size: 30,),color: appcolor().mediumGreyColor,)
+            // Navigator.pop(context);
+            Get.back();
+          }, icon:const Icon(Icons.notifications,size: 30,),color: appcolor().mediumGreyColor,)
         ],
       ),
       body: ListView.builder(

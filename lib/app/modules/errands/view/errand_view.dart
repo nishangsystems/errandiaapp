@@ -1,26 +1,13 @@
-import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
-import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
-import 'package:errandia/app/modules/errands/view/run_an_errand.dart';
-import 'package:errandia/app/modules/home/view/home_view.dart';
-import 'package:errandia/app/modules/products/controller/manage_products_controller.dart';
-import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
 import 'package:errandia/app/modules/services/controller/manage_service_controller.dart';
-import 'package:errandia/app/modules/services/view/add_service_view.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../APi/apidomain & api.dart';
-import '../../auth/Register/register_signin_screen.dart';
-import '../../global/Widgets/account_suspended_widget.dart';
 import '../../global/Widgets/blockButton.dart';
-import '../../global/Widgets/bottomsheet_item.dart';
-import '../../global/Widgets/customDrawer.dart';
 import '../../global/constants/color.dart';
 import '../controller/errand_controller.dart';
 import 'New_Errand.dart';
@@ -153,7 +140,7 @@ class errand_view extends StatelessWidget {
             ),
             onPressed: () {
               Get.back();
-              Get.to(Home_view());
+              // Get.to(Home_view());
             },
           ),
          // automaticallyImplyLeading: false,

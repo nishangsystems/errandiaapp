@@ -5,6 +5,7 @@ import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/categories/view/categories.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
+import 'package:errandia/app/modules/errands/view/see_all_erands.dart';
 import 'package:errandia/app/modules/following/view/following_view.dart';
 
 import 'package:errandia/app/modules/global/constants/color.dart';
@@ -99,14 +100,26 @@ class customendDrawer extends StatelessWidget {
                       Get.to(const categories_view());
                     },
                   )),
-            drawerItemWidget(
-              text: 'Errands',
-              imagePath: 'assets/images/sidebar_icon/icon-profile-errands.png',
-              callback: () {
-                Get.back();
-                Get.to(errand_view());
-              },
-            ),
+            Obx(() => !homeController.loggedIn.value
+                ? drawerItemWidget(
+                    text: 'Recent Errands',
+                    imagePath: 'assets/images/sidebar_icon/icon-profile-errands.png',
+                    callback: () {
+                      Get.back();
+                      // Get.to(() => SeeAllErands());
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => SeeAllErands()));
+
+                    },
+                  )
+                : drawerItemWidget(
+                    text: 'Errands',
+                    imagePath:
+                        'assets/images/sidebar_icon/icon-profile-errands.png',
+                    callback: () {
+                      Get.back();
+                      Get.to(errand_view());
+                    },
+                  )),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
                     text: 'Enquiries',
@@ -180,13 +193,13 @@ class customendDrawer extends StatelessWidget {
                     },
                   )
                 : drawerItemWidget(
-              text: 'Register/Login',
-              imagePath: 'assets/images/sidebar_icon/icon-logout.png',
-              callback: () {
-                // Get.back();
-                Get.to(() => const signin_view());
-              },
-            )),
+                    text: 'Register/Login',
+                    imagePath: 'assets/images/sidebar_icon/icon-logout.png',
+                    callback: () {
+                      // Get.back();
+                      Get.to(() => const signin_view());
+                    },
+                  )),
             SizedBox(
               height: 60,
             ),
