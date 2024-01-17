@@ -5,10 +5,13 @@ import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/categories/view/categories.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
+import 'package:errandia/app/modules/errands/view/run_an_errand.dart';
+import 'package:errandia/app/modules/errands/view/run_an_errand_1.dart';
 import 'package:errandia/app/modules/errands/view/see_all_erands.dart';
 import 'package:errandia/app/modules/following/view/following_view.dart';
 
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/view/home_view_1.dart';
 import 'package:errandia/app/modules/manage_review/view/manage_review_view.dart';
 import 'package:errandia/app/modules/products/view/manage_products_view.dart';
 import 'package:errandia/app/modules/services/view/manage_service_view.dart';
@@ -74,6 +77,15 @@ class customendDrawer extends StatelessWidget {
                       Get.to(Businesses_View());
                     },
                   )),
+            Obx(() => !homeController.loggedIn.value
+                ? drawerItemWidget(
+              text: 'Search',
+              imagePath: 'assets/images/sidebar_icon/create_shop.png',
+              callback: () {
+                Get.to(() => const run_an_errand_1());
+              },
+            )
+                : Container()),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
                     text: 'My Dashboard',
@@ -100,18 +112,8 @@ class customendDrawer extends StatelessWidget {
                       Get.to(const categories_view());
                     },
                   )),
-            Obx(() => !homeController.loggedIn.value
+            Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
-                    text: 'Recent Errands',
-                    imagePath: 'assets/images/sidebar_icon/icon-profile-errands.png',
-                    callback: () {
-                      Get.back();
-                      // Get.to(() => SeeAllErands());
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => SeeAllErands()));
-
-                    },
-                  )
-                : drawerItemWidget(
                     text: 'Errands',
                     imagePath:
                         'assets/images/sidebar_icon/icon-profile-errands.png',
@@ -119,7 +121,7 @@ class customendDrawer extends StatelessWidget {
                       Get.back();
                       Get.to(errand_view());
                     },
-                  )),
+                  ): Container()),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
                     text: 'Enquiries',
@@ -188,8 +190,8 @@ class customendDrawer extends StatelessWidget {
                       SharedPreferences preferences =
                           await SharedPreferences.getInstance();
                       await preferences.remove('token');
-
-                      Get.offAll(get_started_screen());
+                      Get.back();
+                      Get.to(Home_view());
                     },
                   )
                 : drawerItemWidget(
