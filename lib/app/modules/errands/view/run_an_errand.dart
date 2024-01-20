@@ -182,28 +182,28 @@ class _run_an_errandState extends State<run_an_errand> {
               ),
 
               // recentaly posted errands
-              Container(
-                color: Colors.white,
-                child: Row(
-                  children: [
-                    Text(
-                      'Recently Posted Errands',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: appcolor().mainColor,
-                      ),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('See All'),
-                    ),
-                  ],
-                ).paddingSymmetric(horizontal: 20),
-              ),
+              // Container(
+              //   color: Colors.white,
+              //   child: Row(
+              //     children: [
+              //       Text(
+              //         'Recently Posted Errands',
+              //         style: TextStyle(
+              //           fontWeight: FontWeight.bold,
+              //           fontSize: 18,
+              //           color: appcolor().mainColor,
+              //         ),
+              //       ),
+              //       const Spacer(),
+              //       TextButton(
+              //         onPressed: () {},
+              //         child: const Text('See All'),
+              //       ),
+              //     ],
+              //   ).paddingSymmetric(horizontal: 20),
+              // ),
 
-              Recently_posted_items_Widget(),
+              // Recently_posted_items_Widget(),
             ],
           ),
         ),
@@ -383,23 +383,23 @@ class _run_an_errandState extends State<run_an_errand> {
         //     color: Colors.white,
         //     borderRadius: BorderRadius.circular(5),
         //   ),
-          // child: Center(
-          //   child: DropdownButtonFormField(
-          //     iconSize: 0.0,
-          //     decoration: InputDecoration.collapsed(
-          //       hintText: 'Category',
-          //     ),
-          //     value: value,
-          //     onChanged: (value) {
-          //       setState(() {
-          //         country = value as int;
-          //       });
-          //       print(value);
-          //     },
-          //     items:categor.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 14),),value: e.id,)).toList(),
-          //
-          //   ),
-          // )
+        // child: Center(
+        //   child: DropdownButtonFormField(
+        //     iconSize: 0.0,
+        //     decoration: InputDecoration.collapsed(
+        //       hintText: 'Category',
+        //     ),
+        //     value: value,
+        //     onChanged: (value) {
+        //       setState(() {
+        //         country = value as int;
+        //       });
+        //       print(value);
+        //     },
+        //     items:categor.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 14),),value: e.id,)).toList(),
+        //
+        //   ),
+        // )
         // ),
 
         // Row(

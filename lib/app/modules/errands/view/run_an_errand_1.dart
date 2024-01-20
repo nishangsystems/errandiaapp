@@ -182,28 +182,28 @@ class _run_an_errandState extends State<run_an_errand_1> {
               ),
 
               // recentaly posted errands
-              Container(
-                color: Colors.white,
-                child: Row(
-                  children: [
-                    Text(
-                      'Recently Posted Errands',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: appcolor().mainColor,
-                      ),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('See All'),
-                    ),
-                  ],
-                ).paddingSymmetric(horizontal: 20),
-              ),
-
-              Recently_posted_items_Widget(),
+              // Container(
+              //   color: Colors.white,
+              //   child: Row(
+              //     children: [
+              //       Text(
+              //         'Recently Posted Errands',
+              //         style: TextStyle(
+              //           fontWeight: FontWeight.bold,
+              //           fontSize: 18,
+              //           color: appcolor().mainColor,
+              //         ),
+              //       ),
+              //       const Spacer(),
+              //       TextButton(
+              //         onPressed: () {},
+              //         child: const Text('See All'),
+              //       ),
+              //     ],
+              //   ).paddingSymmetric(horizontal: 20),
+              // ),
+              //
+              // Recently_posted_items_Widget(),
             ],
           ),
         ),
