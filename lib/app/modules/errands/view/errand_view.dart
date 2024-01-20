@@ -19,6 +19,7 @@ class errand_view extends StatelessWidget {
   errand_view({super.key});
 
   errand_tab_controller tabController = Get.put(errand_tab_controller());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,7 +144,7 @@ class errand_view extends StatelessWidget {
               // Get.to(Home_view());
             },
           ),
-         // automaticallyImplyLeading: false,
+          // automaticallyImplyLeading: false,
           centerTitle: true,
           title: Text(
             'Errands',
@@ -176,7 +177,7 @@ class errand_view extends StatelessWidget {
                     dividerColor: appcolor().bluetextcolor,
                     isScrollable: false,
                     unselectedLabelColor: appcolor().mediumGreyColor,
-                    unselectedLabelStyle: TextStyle(
+                    unselectedLabelStyle: const TextStyle(
                       fontWeight: FontWeight.normal,
                       fontSize: 16,
                     ),
@@ -190,14 +191,14 @@ class errand_view extends StatelessWidget {
                     controller: tabController.tab_controller,
                     tabs: [
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text('Posted'),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        child: const Text('Posted'),
                       ),
-                      Container(
-                        child: Text('Received'),
+                      SizedBox(
                         width: Get.width * 0.26,
+                        child: const Text('Received'),
                       ),
-                      Text('Trashed'),
+                      const Text('Trashed'),
                     ],
                   ),
                 ),
@@ -219,21 +220,22 @@ class errand_view extends StatelessWidget {
 }
 
 Widget PostedErrands(BuildContext ctx) {
-  return
-  FutureBuilder(
-      future:api().productnew('errands',1),
-      builder: (context,snapshot){
-        if(snapshot.hasError){
-          return Center(child: Text('No data Fond'),);
-        } else if(snapshot.hasData){
-        var data = snapshot.data['errands'];
-          return   Column(
+  return FutureBuilder(
+      future: api().productnew('errands', 1),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('No data Fond'),
+          );
+        } else if (snapshot.hasData) {
+          var data = snapshot.data['errands'];
+          return Column(
             children: [
               filter_sort_container(
-                    () {
+                () {
                   Get.to(filter_product_view());
                 },
-                    () {
+                () {
                   Get.bottomSheet(
                     Container(
                       color: const Color.fromRGBO(255, 255, 255, 1),
@@ -272,12 +274,13 @@ Widget PostedErrands(BuildContext ctx) {
                               ),
                               const Spacer(),
                               Obx(
-                                    () => Radio(
+                                () => Radio(
                                   value: 'sort descending',
                                   groupValue: service_controller
                                       .manage_service_sort_group_value.value,
                                   onChanged: (val) {
-                                    service_controller.manage_service_sort_group_value
+                                    service_controller
+                                        .manage_service_sort_group_value
                                         .value = val.toString();
                                   },
                                 ),
@@ -309,12 +312,13 @@ Widget PostedErrands(BuildContext ctx) {
                               ),
                               Spacer(),
                               Obx(
-                                    () => Radio(
+                                () => Radio(
                                   value: 'sort ascending',
                                   groupValue: service_controller
                                       .manage_service_sort_group_value.value,
                                   onChanged: (val) {
-                                    service_controller.manage_service_sort_group_value
+                                    service_controller
+                                        .manage_service_sort_group_value
                                         .value = val.toString();
                                   },
                                 ),
@@ -329,26 +333,27 @@ Widget PostedErrands(BuildContext ctx) {
                                   text: TextSpan(
                                       style: TextStyle(fontSize: 16),
                                       children: [
-                                        TextSpan(
-                                          text: 'Date',
-                                          style: TextStyle(
-                                            color: appcolor().mainColor,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: 'Last Modified',
-                                        ),
-                                      ])),
+                                    TextSpan(
+                                      text: 'Date',
+                                      style: TextStyle(
+                                        color: appcolor().mainColor,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'Last Modified',
+                                    ),
+                                  ])),
                               Spacer(),
                               Obx(() => Radio(
-                                value: 'Date Last modified ',
-                                groupValue: service_controller
-                                    .manage_service_sort_group_value.value,
-                                onChanged: (val) {
-                                  service_controller.manage_service_sort_group_value
-                                      .value = val.toString();
-                                },
-                              ))
+                                    value: 'Date Last modified ',
+                                    groupValue: service_controller
+                                        .manage_service_sort_group_value.value,
+                                    onChanged: (val) {
+                                      service_controller
+                                          .manage_service_sort_group_value
+                                          .value = val.toString();
+                                    },
+                                  ))
                             ],
                           ),
 
@@ -367,12 +372,13 @@ Widget PostedErrands(BuildContext ctx) {
                               ),
                               Spacer(),
                               Obx(
-                                    () => Radio(
+                                () => Radio(
                                   value: 'Price',
                                   groupValue: service_controller
                                       .manage_service_sort_group_value.value,
                                   onChanged: (val) {
-                                    service_controller.manage_service_sort_group_value
+                                    service_controller
+                                        .manage_service_sort_group_value
                                         .value = val.toString();
                                     print(val.toString());
                                   },
@@ -388,7 +394,7 @@ Widget PostedErrands(BuildContext ctx) {
                     ),
                   );
                 },
-                    () {
+                () {
                   Scaffold.of(ctx).openEndDrawer();
                 },
               ),
@@ -397,9 +403,9 @@ Widget PostedErrands(BuildContext ctx) {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount:data.length,
+                  itemCount: data.length,
                   itemBuilder: (context, index) {
-                    var dataa= data[index];
+                    var dataa = data[index];
                     var date = dataa['created_at'].split('T');
                     var date1 = date[0].split('-');
                     return Container(
@@ -420,26 +426,23 @@ Widget PostedErrands(BuildContext ctx) {
                         children: [
                           // image container
                           Container(
-                            margin: EdgeInsets.only(
-                              right: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                8,
+                              margin: EdgeInsets.only(
+                                right: 10,
                               ),
-                            ),
-                            width: Get.width * 0.12,
-                            height: Get.height * 0.06,
-                            child:ListView.builder(
-                                itemCount: dataa['images'].length,
-                                itemBuilder:(context, index){
-                                  var image = dataa['images'][index];
-                                  return   Image.network('${image['url'].toString()}');
-                                })
-                            
-                            
-
-                          ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  8,
+                                ),
+                              ),
+                              width: Get.width * 0.12,
+                              height: Get.height * 0.06,
+                              child: ListView.builder(
+                                  itemCount: dataa['images'].length,
+                                  itemBuilder: (context, index) {
+                                    var image = dataa['images'][index];
+                                    return Image.network(
+                                        '${image['url'].toString()}');
+                                  })),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -494,7 +497,10 @@ Widget PostedErrands(BuildContext ctx) {
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Text(
-                                  dataa['description'].length >=30?'${dataa['description'] + '..'}'.substring(0,30):dataa['description'].toString(),
+                                  dataa['description'].length >= 30
+                                      ? '${dataa['description'] + '..'}'
+                                          .substring(0, 30)
+                                      : dataa['description'].toString(),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   softWrap: false,
@@ -516,7 +522,8 @@ Widget PostedErrands(BuildContext ctx) {
                                   padding: EdgeInsets.symmetric(horizontal: 20),
                                   color: Colors.white,
                                   child: Wrap(
-                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
                                     children: [
                                       Center(
                                         child: Icon(
@@ -538,7 +545,9 @@ Widget PostedErrands(BuildContext ctx) {
                                         icondata: FontAwesomeIcons.eye,
                                         callback: () {
                                           Get.back();
-                                          Get.to(errand_detail_view(data: dataa,));
+                                          Get.to(errand_detail_view(
+                                            data: dataa,
+                                          ));
                                         },
                                       ),
                                       managebottomSheetWidgetitem(
@@ -553,11 +562,12 @@ Widget PostedErrands(BuildContext ctx) {
                                           var value = {
                                             "errand_id": dataa['id']
                                           };
-                                          api().deleteUpdate('errand/delete', 1, value);
-                                          Future.delayed(Duration(seconds: 2),(){
+                                          api().deleteUpdate(
+                                              'errand/delete', 1, value);
+                                          Future.delayed(Duration(seconds: 2),
+                                              () {
                                             Get.offAll(errand_view());
                                           });
-
                                         },
                                       ),
                                     ],
@@ -578,7 +588,8 @@ Widget PostedErrands(BuildContext ctx) {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: appcolor().greyColor),
+                                    border:
+                                        Border.all(color: appcolor().greyColor),
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   child: Icon(
@@ -601,11 +612,10 @@ Widget PostedErrands(BuildContext ctx) {
             right: 10,
             top: 10,
           );
-        }else{
+        } else {
           return Center(child: CircularProgressIndicator());
         }
-  });
-
+      });
 }
 
 Widget RecievedErrands(BuildContext ctx) {

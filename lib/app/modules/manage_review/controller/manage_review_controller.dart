@@ -1,4 +1,5 @@
 import 'package:errandia/app/modules/manage_review/model/manage_review_model.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class manage_review_controller extends GetxController {
@@ -40,4 +41,20 @@ class manage_review_controller extends GetxController {
       rating: 4.5,
     ),
   ].obs;
+}
+
+class manage_review_tab_controller extends GetxController
+    with GetSingleTickerProviderStateMixin {
+  late TabController tab_controller;
+  @override
+  void onInit() {
+    tab_controller = TabController(length: 3, vsync: this);
+    super.onInit();
+  }
+
+  @override
+  void dispose() {
+    tab_controller.dispose();
+    super.dispose();
+  }
 }
