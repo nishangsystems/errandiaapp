@@ -18,7 +18,8 @@ import '../../global/constants/color.dart';
 class Product_view extends StatefulWidget {
   final item;
   final name;
-  Product_view({super.key,required this.item, this.name});
+
+  Product_view({super.key, required this.item, this.name});
 
   @override
   State<Product_view> createState() => _Product_viewState(item);
@@ -27,13 +28,15 @@ class Product_view extends StatefulWidget {
 class _Product_viewState extends State<Product_view>
     with TickerProviderStateMixin {
   late final TabController tabController =
-  TabController(length: 2, vsync: this);
-final item;
+      TabController(length: 2, vsync: this);
+  final item;
+
   _Product_viewState(this.item);
 
   @override
   Widget build(BuildContext context) {
-  //  print(widget.item.product_name);
+    //  print(widget.item.product_name);
+    print("product item: ${widget.item.id}");
     return Scaffold(
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -44,30 +47,29 @@ final item;
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               InkWell(
-                onTap: (){
-                  Get.to(Product_serivices());
+                onTap: () {
+                  Get.to(const Product_serivices());
                 },
-                child: Column(
+                child: const Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     FaIcon(FontAwesomeIcons.store),
                     Text(
                       'Store',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 10
-                      ),
+                      style: TextStyle(color: Colors.black, fontSize: 10),
                     ),
                   ],
                 ),
               ),
-              SizedBox(width: 10,),
+              const SizedBox(
+                width: 10,
+              ),
               SizedBox(
                 width: Get.width * 0.4,
                 height: 50,
                 child: blockButton(
-                  title: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  title: const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -77,10 +79,7 @@ final item;
                         ),
                         Text(
                           '  Chat on Whatsapp',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 9),
                         ),
                       ],
                     ),
@@ -103,7 +102,8 @@ final item;
                           color: appcolor().mainColor,
                         ),
                         Text(
-                          'Call ${widget.item['shop']['phone']}',
+                          // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
+                          'Call 673580194',
                           style: TextStyle(
                             fontSize: 9,
                             color: appcolor().mainColor,
@@ -132,7 +132,6 @@ final item;
           ),
           onPressed: () {
             Get.back();
-
           },
         ),
         title: Text(
@@ -152,7 +151,7 @@ final item;
           ),
           IconButton(
             onPressed: () {
-              Share.share('text',subject: 'hello share');
+              Share.share('text', subject: 'hello share');
             },
             icon: Icon(
               Icons.share,
@@ -169,7 +168,10 @@ final item;
           children: [
             Column(
               children: [
-                image_select_widget(widget.item['images']),
+                image_select_widget(
+                    // widget.item['images']
+                  widget.item.imagePath
+                ),
                 product_review_widget(widget.item),
                 // SizedBox(
                 //   height: Get.height * 0.03,
@@ -225,7 +227,7 @@ final item;
               top: 20,
             ),
 
-           // tab bar view
+            // tab bar view
             SizedBox(
               height: Get.height * 0.01,
             ),
@@ -236,8 +238,8 @@ final item;
               decoration: BoxDecoration(
                   border: Border.symmetric(
                       horizontal: BorderSide(
-                        color: appcolor().greyColor,
-                      ))),
+                color: appcolor().greyColor,
+              ))),
               child: Column(
                 children: [
                   Container(
@@ -272,33 +274,28 @@ final item;
                   ),
                   Container(
                     color: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
                     height: Get.height * 0.2,
                     child: TabBarView(
                       controller: tabController,
                       children: [
-                        Text(
-                          '${widget.item['description']}'
-                        ),
-                        Container(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                child: Text('supplier image'),
-                              ),
-                              SizedBox(
-                                width: Get.width * 0.08,
-                              ),
-                              Column(
-                                children: [
-                                  Text('supplier info  1'),
-                                  Text('supplier info  1'),
-                                  Text('supplier info  1'),
-                                ],
-                              )
-                            ],
-                          ),
+                        // Text('${widget.item['description']}'),
+                        const Text('Some description'),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('supplier image'),
+                            SizedBox(
+                              width: Get.width * 0.08,
+                            ),
+                            const Column(
+                              children: [
+                                Text('supplier info  1'),
+                                Text('supplier info  1'),
+                                Text('supplier info  1'),
+                              ],
+                            )
+                          ],
                         ),
                       ],
                     ),
@@ -404,9 +401,12 @@ final item;
                               height: Get.height * 0.05,
                               width: Get.width * 0.1,
                               color: Colors.white,
-                              child: Image.asset(widget.item['featured_image']),
+                              // child: Image.asset(widget.item['featured_image']),
+                              child: Image.asset(
+                                widget.item.imagePath,
+                              ),
                             ),
-                            Column(
+                            const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
@@ -450,13 +450,14 @@ final item;
                       itemBuilder: (context, index) {
                         return Container(
                           margin:
-                          EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                              EdgeInsets.only(right: 10, top: 10, bottom: 10),
                           height: Get.height * 0.2,
                           color: Colors.white,
                           width: Get.width * 0.2,
                           child: Center(
-                              child: Image.asset(Recently_item_List[index].imagePath.toString())
-                          ),
+                              child: Image.asset(Recently_item_List[index]
+                                  .imagePath
+                                  .toString())),
                         );
                       },
                     ),
@@ -474,11 +475,14 @@ final item;
             // add your Reviews
 
             InkWell(
-              onTap: (){
-                Get.to(add_review_view(review: item,));
+              onTap: () {
+                Get.to(add_review_view(
+                  review: item,
+                ));
               },
               child: Container(
-                margin: EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
+                margin:
+                    EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
                 height: Get.height * 0.05,
                 width: Get.width * 0.4,
                 decoration: BoxDecoration(
@@ -489,7 +493,9 @@ final item;
                   child: Text(
                     'Add Your Review',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white,fontSize: 12),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 12),
                   ),
                 ),
               ),
@@ -519,7 +525,8 @@ final item;
                         children: [
                           Container(
                             height: Get.height * 0.15,
-                            child: Image.asset(ui_23_item_list[index].imagePath.toString()),
+                            child: Image.asset(
+                                ui_23_item_list[index].imagePath.toString()),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -557,7 +564,7 @@ final item;
 
             Padding(
               padding:
-              EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
+                  EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
               child: Text(
                 'Services Offered by this Supplier',
                 style: TextStyle(
@@ -580,7 +587,8 @@ final item;
                         children: [
                           Container(
                             height: Get.height * 0.15,
-                            child: Image.asset(Recently_item_List[index].imagePath.toString()),
+                            child: Image.asset(
+                                Recently_item_List[index].imagePath.toString()),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -626,9 +634,7 @@ final item;
   }
 }
 
-Widget image_select_widget(
-    final item
-    ) {
+Widget image_select_widget(final item) {
   return Container(
     child: Column(
       children: [
@@ -646,8 +652,16 @@ Widget image_select_widget(
             ),
             itemCount: item.length,
             itemBuilder: (context, index, realIndex) {
-              var image = item[index];
-              return Image.network(image['url'].toString(),fit: BoxFit.cover,);
+              // var image = item[index];
+              // return Image.network(
+              //   image['url'].toString(),
+              //   fit: BoxFit.cover,
+              // );
+              print("image path: ${item}");
+              return Image.asset(
+                item.toString(),
+                fit: BoxFit.cover,
+              );
             },
           ),
         ),
@@ -659,13 +673,12 @@ Widget image_select_widget(
             itemBuilder: (context, index) {
               var image = item[index];
               return Container(
-                margin: EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                 height: Get.height * 0.2,
                 color: Colors.white,
                 width: Get.width * 0.2,
-                child: Center(
-                    child: Image.network(image['url'].toString())
-                ),
+                // child: Center(child: Image.network(image['url'].toString())),
+                child: Center(child: Image.network(image.toString())),
               );
             },
           ),
@@ -679,14 +692,14 @@ Widget product_review_widget(item) {
   return Container(
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
-        '${item['name']}',
+        '${item.name}',
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
         ),
       ),
       Text(
-        'XAF ${item['unit_price']}',
+        'XAF ${item.price}',
         style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -716,7 +729,8 @@ Widget product_review_widget(item) {
             width: Get.width * 0.01,
           ),
           Text(
-            '${item['reviews']} Supplier Reviews',
+            // '${item['reviews']} Supplier Reviews',
+            '{} Supplier Reviews',
             style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
           ),
         ],

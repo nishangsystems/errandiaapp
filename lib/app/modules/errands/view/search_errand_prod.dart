@@ -1,4 +1,3 @@
-
 import 'package:errandia/app/modules/products/controller/manage_products_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
@@ -14,12 +13,14 @@ import '../../global/constants/color.dart';
 import '../../products/view/product_view.dart';
 
 manage_product_controller manageProductController =
-Get.put(manage_product_controller());
+    Get.put(manage_product_controller());
 
 class search_errand_prod extends StatelessWidget {
   search_errand_prod({super.key});
+
   manage_product_tabController pcontroller =
-  Get.put(manage_product_tabController());
+      Get.put(manage_product_tabController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,7 +123,7 @@ class search_errand_prod extends StatelessWidget {
           title: Text(
             'Hair Products',
             style:
-            TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
+                TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
           ),
           iconTheme: IconThemeData(
             color: appcolor().mediumGreyColor,
@@ -149,7 +150,7 @@ class search_errand_prod extends StatelessWidget {
                     dividerColor: appcolor().bluetextcolor,
                     isScrollable: true,
                     unselectedLabelColor: appcolor().mediumGreyColor,
-                    unselectedLabelStyle: TextStyle(
+                    unselectedLabelStyle: const TextStyle(
                       fontWeight: FontWeight.normal,
                       fontSize: 16,
                     ),
@@ -163,16 +164,33 @@ class search_errand_prod extends StatelessWidget {
                     controller: pcontroller.tabController,
                     tabs: [
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text('All'),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        child: const Text('All'),
                       ),
-                      Container(
-                        child: Text('Product'),
+                      SizedBox(
                         width: Get.width * 0.26,
+                        child: const Text('Product'),
                       ),
-                      Text('Services'),
-                      Text('Bussiness'),
+                      const Text('Services'),
+                      const Text('Business'),
                     ],
+                  ),
+                ),
+                // a text saying Errandia Suggest the following businesses that might have your product
+                Container(
+                  margin: EdgeInsets.only(
+                    top: Get.height * 0.01,
+                    left: Get.width * 0.03,
+                  ),
+                  child: Expanded(
+                    child: Text(
+                      'Errandia Suggest the following businesses that might have your product',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: appcolor().mediumGreyColor,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -196,10 +214,10 @@ Widget allProducts(BuildContext ctx) {
   return Column(
     children: [
       filter_sort_container(
-            () {
+        () {
           Get.to(filter_product_view());
         },
-            () {
+        () {
           Get.bottomSheet(
             Container(
               color: const Color.fromRGBO(255, 255, 255, 1),
@@ -238,7 +256,7 @@ Widget allProducts(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(
-                            () => Radio(
+                        () => Radio(
                           value: 'sort descending',
                           groupValue: manageProductController
                               .allProducts_sort_group_value.value,
@@ -275,15 +293,15 @@ Widget allProducts(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(() => Radio(
-                        value: 'sort ascending',
-                        groupValue: manageProductController
-                            .allProducts_sort_group_value.value,
-                        onChanged: (val) {
-                          manageProductController
-                              .allProducts_sort_group_value
-                              .value = val.toString();
-                        },
-                      ))
+                            value: 'sort ascending',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController
+                                  .allProducts_sort_group_value
+                                  .value = val.toString();
+                            },
+                          ))
                     ],
                   ),
 
@@ -294,27 +312,27 @@ Widget allProducts(BuildContext ctx) {
                           text: TextSpan(
                               style: TextStyle(fontSize: 16),
                               children: [
-                                TextSpan(
-                                  text: 'Date',
-                                  style: TextStyle(
-                                    color: appcolor().mainColor,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'Last Modified',
-                                ),
-                              ])),
+                            TextSpan(
+                              text: 'Date',
+                              style: TextStyle(
+                                color: appcolor().mainColor,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Last Modified',
+                            ),
+                          ])),
                       Spacer(),
                       Obx(() => Radio(
-                        value: 'Date Last modified ',
-                        groupValue: manageProductController
-                            .allProducts_sort_group_value.value,
-                        onChanged: (val) {
-                          manageProductController
-                              .allProducts_sort_group_value
-                              .value = val.toString();
-                        },
-                      ))
+                            value: 'Date Last modified ',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController
+                                  .allProducts_sort_group_value
+                                  .value = val.toString();
+                            },
+                          ))
                     ],
                   ),
 
@@ -333,7 +351,7 @@ Widget allProducts(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(
-                            () => Radio(
+                        () => Radio(
                           value: 'Price',
                           groupValue: manageProductController
                               .allProducts_sort_group_value.value,
@@ -354,7 +372,7 @@ Widget allProducts(BuildContext ctx) {
             ),
           );
         },
-            () {
+        () {
           Scaffold.of(ctx).openEndDrawer();
         },
       ),
@@ -363,76 +381,67 @@ Widget allProducts(BuildContext ctx) {
       ),
       Expanded(
         child: Container(
-            margin: EdgeInsets.all(10),
-            color: Color.fromARGB(255, 255, 255, 255),
+            margin: const EdgeInsets.all(10),
+            color: const Color.fromARGB(255, 255, 255, 255),
             child: GridView.count(
               childAspectRatio: (1 / 1.4),
               crossAxisCount: 2,
               children: List.generate(ui_23_item_list.length, (index) {
                 return InkWell(
-                  onTap: (){
-                    Get.to(Product_view(item: Recently_item_List[0],));
+                  onTap: () {
+                    Get.to(Product_view(
+                      item: Recently_item_List[0],
+                    ));
                   },
                   child: Card(
                     child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 6),
+                      margin: const EdgeInsets.symmetric(horizontal: 6),
                       height: Get.height * 0.8,
                       // color: Colors.blue,
                       width: Get.width * 0.4,
-                      child: Container(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              // height: Get.height * 0.2,
-
-                              // decoration: BoxDecoration(
-                              //   color: Colors.black
-
-                              // ),
-                              child: Center(
-                                child: Image(
-                                  image: AssetImage(
-                                    ui_23_item_list[index].imagePath,
-                                  ),
-                                  height: Get.height * 0.12,
-                                ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: Image(
+                              image: AssetImage(
+                                ui_23_item_list[index].imagePath,
                               ),
+                              height: Get.height * 0.12,
                             ),
-                            SizedBox(
-                              height: Get.height * 0.01,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: appcolor().mediumGreyColor,
-                                ),
-                                Text(
-                                  ui_23_item_list[index].location.toString(),
-                                  style: TextStyle(
-                                      color: appcolor().mediumGreyColor,
-                                      fontSize: 12),
-                                )
-                              ],
-                            ),
-                            Text(
-                              ui_23_item_list[index].item_desc,
-                              style: TextStyle(
-                                  fontSize: 12, color: appcolor().mainColor),
-                              textAlign: TextAlign.center,
-                            ),
-                            Text(
-                              ui_23_item_list[index].itemname,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: appcolor().mainColor,
-                                  fontSize: 16
+                          ),
+                          SizedBox(
+                            height: Get.height * 0.01,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: appcolor().mediumGreyColor,
                               ),
-                            )
-                          ],
-                        ),
+                              Text(
+                                ui_23_item_list[index].location.toString(),
+                                style: TextStyle(
+                                    color: appcolor().mediumGreyColor,
+                                    fontSize: 12),
+                              )
+                            ],
+                          ),
+                          Text(
+                            ui_23_item_list[index].item_desc,
+                            style: TextStyle(
+                                fontSize: 12, color: appcolor().mainColor),
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            ui_23_item_list[index].itemname,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: appcolor().mainColor,
+                                fontSize: 16),
+                          )
+                        ],
                       ),
                     ),
                   ),
@@ -452,10 +461,10 @@ Widget Published(BuildContext ctx) {
   return Column(
     children: [
       filter_sort_container(
-            () {
+        () {
           Get.to(filter_product_view());
         },
-            () {
+        () {
           Get.bottomSheet(
             Container(
               color: const Color.fromRGBO(255, 255, 255, 1),
@@ -494,7 +503,7 @@ Widget Published(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(
-                            () => Radio(
+                        () => Radio(
                           value: 'sort descending',
                           groupValue: manageProductController
                               .allProducts_sort_group_value.value,
@@ -531,15 +540,15 @@ Widget Published(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(() => Radio(
-                        value: 'sort ascending',
-                        groupValue: manageProductController
-                            .allProducts_sort_group_value.value,
-                        onChanged: (val) {
-                          manageProductController
-                              .allProducts_sort_group_value
-                              .value = val.toString();
-                        },
-                      ))
+                            value: 'sort ascending',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController
+                                  .allProducts_sort_group_value
+                                  .value = val.toString();
+                            },
+                          ))
                     ],
                   ),
 
@@ -550,27 +559,27 @@ Widget Published(BuildContext ctx) {
                           text: TextSpan(
                               style: TextStyle(fontSize: 16),
                               children: [
-                                TextSpan(
-                                  text: 'Date',
-                                  style: TextStyle(
-                                    color: appcolor().mainColor,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'Last Modified',
-                                ),
-                              ])),
+                            TextSpan(
+                              text: 'Date',
+                              style: TextStyle(
+                                color: appcolor().mainColor,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Last Modified',
+                            ),
+                          ])),
                       Spacer(),
                       Obx(() => Radio(
-                        value: 'Date Last modified ',
-                        groupValue: manageProductController
-                            .allProducts_sort_group_value.value,
-                        onChanged: (val) {
-                          manageProductController
-                              .allProducts_sort_group_value
-                              .value = val.toString();
-                        },
-                      ))
+                            value: 'Date Last modified ',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController
+                                  .allProducts_sort_group_value
+                                  .value = val.toString();
+                            },
+                          ))
                     ],
                   ),
 
@@ -589,7 +598,7 @@ Widget Published(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(
-                            () => Radio(
+                        () => Radio(
                           value: 'Price',
                           groupValue: manageProductController
                               .allProducts_sort_group_value.value,
@@ -610,7 +619,7 @@ Widget Published(BuildContext ctx) {
             ),
           );
         },
-            () {
+        () {
           Scaffold.of(ctx).openEndDrawer();
         },
       ),
@@ -626,8 +635,10 @@ Widget Published(BuildContext ctx) {
               crossAxisCount: 2,
               children: List.generate(ui_23_item_list.length, (index) {
                 return InkWell(
-                  onTap: (){
-                    Get.to(Product_view(item: Recently_item_List[0],));
+                  onTap: () {
+                    Get.to(Product_view(
+                      item: Recently_item_List[0],
+                    ));
                   },
                   child: Card(
                     child: Container(
@@ -684,8 +695,7 @@ Widget Published(BuildContext ctx) {
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: appcolor().mainColor,
-                                  fontSize: 16
-                              ),
+                                  fontSize: 16),
                             )
                           ],
                         ),
@@ -708,10 +718,10 @@ Widget Drafts(BuildContext ctx) {
   return Column(
     children: [
       filter_sort_container(
-            () {
+        () {
           Get.to(filter_product_view());
         },
-            () {
+        () {
           Get.bottomSheet(
             Container(
               color: const Color.fromRGBO(255, 255, 255, 1),
@@ -750,7 +760,7 @@ Widget Drafts(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(
-                            () => Radio(
+                        () => Radio(
                           value: 'sort descending',
                           groupValue: manageProductController
                               .allProducts_sort_group_value.value,
@@ -787,15 +797,15 @@ Widget Drafts(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(() => Radio(
-                        value: 'sort ascending',
-                        groupValue: manageProductController
-                            .allProducts_sort_group_value.value,
-                        onChanged: (val) {
-                          manageProductController
-                              .allProducts_sort_group_value
-                              .value = val.toString();
-                        },
-                      ))
+                            value: 'sort ascending',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController
+                                  .allProducts_sort_group_value
+                                  .value = val.toString();
+                            },
+                          ))
                     ],
                   ),
 
@@ -806,27 +816,27 @@ Widget Drafts(BuildContext ctx) {
                           text: TextSpan(
                               style: TextStyle(fontSize: 16),
                               children: [
-                                TextSpan(
-                                  text: 'Date',
-                                  style: TextStyle(
-                                    color: appcolor().mainColor,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'Last Modified',
-                                ),
-                              ])),
+                            TextSpan(
+                              text: 'Date',
+                              style: TextStyle(
+                                color: appcolor().mainColor,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Last Modified',
+                            ),
+                          ])),
                       Spacer(),
                       Obx(() => Radio(
-                        value: 'Date Last modified ',
-                        groupValue: manageProductController
-                            .allProducts_sort_group_value.value,
-                        onChanged: (val) {
-                          manageProductController
-                              .allProducts_sort_group_value
-                              .value = val.toString();
-                        },
-                      ))
+                            value: 'Date Last modified ',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController
+                                  .allProducts_sort_group_value
+                                  .value = val.toString();
+                            },
+                          ))
                     ],
                   ),
 
@@ -845,7 +855,7 @@ Widget Drafts(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(
-                            () => Radio(
+                        () => Radio(
                           value: 'Price',
                           groupValue: manageProductController
                               .allProducts_sort_group_value.value,
@@ -866,7 +876,7 @@ Widget Drafts(BuildContext ctx) {
             ),
           );
         },
-            () {
+        () {
           Scaffold.of(ctx).openEndDrawer();
         },
       ),
@@ -882,8 +892,10 @@ Widget Drafts(BuildContext ctx) {
               crossAxisCount: 2,
               children: List.generate(ui_23_item_list.length, (index) {
                 return InkWell(
-                  onTap: (){
-                    Get.to(Product_view(item: Recently_item_List[0],));
+                  onTap: () {
+                    Get.to(Product_view(
+                      item: Recently_item_List[0],
+                    ));
                   },
                   child: Card(
                     child: Container(
@@ -940,8 +952,7 @@ Widget Drafts(BuildContext ctx) {
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: appcolor().mainColor,
-                                  fontSize: 16
-                              ),
+                                  fontSize: 16),
                             )
                           ],
                         ),
@@ -964,10 +975,10 @@ Widget Trashed(BuildContext ctx) {
   return Column(
     children: [
       filter_sort_container(
-            () {
+        () {
           Get.to(filter_product_view());
         },
-            () {
+        () {
           Get.bottomSheet(
             Container(
               color: const Color.fromRGBO(255, 255, 255, 1),
@@ -1006,7 +1017,7 @@ Widget Trashed(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(
-                            () => Radio(
+                        () => Radio(
                           value: 'sort descending',
                           groupValue: manageProductController
                               .allProducts_sort_group_value.value,
@@ -1043,15 +1054,15 @@ Widget Trashed(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(() => Radio(
-                        value: 'sort ascending',
-                        groupValue: manageProductController
-                            .allProducts_sort_group_value.value,
-                        onChanged: (val) {
-                          manageProductController
-                              .allProducts_sort_group_value
-                              .value = val.toString();
-                        },
-                      ))
+                            value: 'sort ascending',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController
+                                  .allProducts_sort_group_value
+                                  .value = val.toString();
+                            },
+                          ))
                     ],
                   ),
 
@@ -1062,27 +1073,27 @@ Widget Trashed(BuildContext ctx) {
                           text: TextSpan(
                               style: TextStyle(fontSize: 16),
                               children: [
-                                TextSpan(
-                                  text: 'Date',
-                                  style: TextStyle(
-                                    color: appcolor().mainColor,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'Last Modified',
-                                ),
-                              ])),
+                            TextSpan(
+                              text: 'Date',
+                              style: TextStyle(
+                                color: appcolor().mainColor,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Last Modified',
+                            ),
+                          ])),
                       Spacer(),
                       Obx(() => Radio(
-                        value: 'Date Last modified ',
-                        groupValue: manageProductController
-                            .allProducts_sort_group_value.value,
-                        onChanged: (val) {
-                          manageProductController
-                              .allProducts_sort_group_value
-                              .value = val.toString();
-                        },
-                      ))
+                            value: 'Date Last modified ',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController
+                                  .allProducts_sort_group_value
+                                  .value = val.toString();
+                            },
+                          ))
                     ],
                   ),
 
@@ -1101,7 +1112,7 @@ Widget Trashed(BuildContext ctx) {
                       ),
                       Spacer(),
                       Obx(
-                            () => Radio(
+                        () => Radio(
                           value: 'Price',
                           groupValue: manageProductController
                               .allProducts_sort_group_value.value,
@@ -1122,7 +1133,7 @@ Widget Trashed(BuildContext ctx) {
             ),
           );
         },
-            () {
+        () {
           Scaffold.of(ctx).openEndDrawer();
         },
       ),
@@ -1299,10 +1310,10 @@ Widget Trashed(BuildContext ctx) {
 }
 
 Widget filter_sort_container(
-    Callback filter_button,
-    Callback sort_button,
-    Callback search_button,
-    ) {
+  Callback filter_button,
+  Callback sort_button,
+  Callback search_button,
+) {
   return Container(
     // width: Get.width*0.4,
     child: Row(
@@ -1322,7 +1333,7 @@ Widget filter_sort_container(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(
+                const Text(
                   'Filter List',
                   style: TextStyle(fontSize: 16),
                 ),
@@ -1398,7 +1409,7 @@ Widget managebottomSheetWidgetitem({
   required String title,
   required IconData icondata,
   required Callback callback,
-  Color ?color,
+  Color? color,
 }) {
   return InkWell(
     // highlightColor: Colors.grey,
@@ -1414,7 +1425,7 @@ Widget managebottomSheetWidgetitem({
           height: 24,
           child: Icon(
             icondata,
-            color:color==null? Colors.black:color,
+            color: color == null ? Colors.black : color,
           ),
         ),
         SizedBox(
@@ -1424,7 +1435,7 @@ Widget managebottomSheetWidgetitem({
           title,
           style: TextStyle(
             fontSize: 16,
-            color: color==null? Colors.black:color,
+            color: color == null ? Colors.black : color,
           ),
         ),
       ],
