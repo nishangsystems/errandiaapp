@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
+import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,10 +29,9 @@ import '../../categories/CategoryData.dart';
 import '../../buiseness/featured_buiseness/view/featured_list_item.dart';
 import '../../errands/view/see_all_errands.dart';
 import '../../recently_posted_item.dart/view/recently_posted_list.dart';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
 
 class home_view_1 extends StatefulWidget {
-
   home_view_1({super.key});
 
   @override
@@ -43,46 +43,49 @@ class _home_view_1State extends State<home_view_1> {
   home_controller homeController = Get.put(home_controller());
 
   Country() async {
-    try{
-      final response =
-      await http.get(Uri.parse('${apiDomain().domain}countries'),);
-      if(response.statusCode ==200){
+    try {
+      final response = await http.get(
+        Uri.parse('${apiDomain().domain}countries'),
+      );
+      if (response.statusCode == 200) {
         final catalogJson = response.body;
         final decodedData = jsonDecode(catalogJson);
         var productsData = decodedData["data"];
         Countryy.Itemss = List.from(productsData)
             .map<CountryCode>((product) => CountryCode.fromJson(product))
             .toList();
-        setState(() {
-        });
+        setState(() {});
       }
-    }catch(w){
+    } catch (w) {
       throw Exception(w.toString());
     }
   }
+
   CountryData() async {
-    try{
-      final response =
-      await http.get(Uri.parse('${apiDomain().domain}categories'),);
-      if(response.statusCode ==200){
+    try {
+      final response = await http.get(
+        Uri.parse('${apiDomain().domain}categories'),
+      );
+      if (response.statusCode == 200) {
         final catalogJson = response.body;
         final decodedData = jsonDecode(catalogJson);
         var productsData = decodedData["data"];
         categor.Items = List.from(productsData)
             .map<Caegory>((product) => Caegory.fromJson(product))
             .toList();
-        setState(() {
-        });
+        setState(() {});
       }
-    }catch(w){
+    } catch (w) {
       throw Exception(w.toString());
     }
   }
+
   RegionData() async {
-    try{
-      final response =
-      await http.get(Uri.parse('${apiDomain().domain}regions'),);
-      if(response.statusCode ==200){
+    try {
+      final response = await http.get(
+        Uri.parse('${apiDomain().domain}regions'),
+      );
+      if (response.statusCode == 200) {
         final catalogJson = response.body;
         final decodedData = jsonDecode(catalogJson);
         var productsData = decodedData["data"];
@@ -90,18 +93,17 @@ class _home_view_1State extends State<home_view_1> {
         Regions.Items = List.from(productsData)
             .map<CountryRegion>((product) => CountryRegion.fromJson(product))
             .toList();
-        setState(() {
-        });
+        setState(() {});
       }
-    }catch(w){
+    } catch (w) {
       throw Exception(w.toString());
     }
   }
+
   TownData() async {
-    try{
-      final response =
-      await http.get(Uri.parse('${apiDomain().domain}towns'));
-      if(response.statusCode ==200){
+    try {
+      final response = await http.get(Uri.parse('${apiDomain().domain}towns'));
+      if (response.statusCode == 200) {
         final catalogJson = response.body;
         final decodedData = jsonDecode(catalogJson);
         var productsData = decodedData["data"];
@@ -109,18 +111,19 @@ class _home_view_1State extends State<home_view_1> {
         Towns.Items = List.from(productsData)
             .map<Town>((product) => Town.fromJson(product))
             .toList();
-        setState(() {
-        });
+        setState(() {});
       }
-    }catch(w){
+    } catch (w) {
       throw Exception(w.toString());
     }
   }
+
   street() async {
-    try{
-      final response =
-      await http.get(Uri.parse('${apiDomain().domain}streets'),);
-      if(response.statusCode ==200){
+    try {
+      final response = await http.get(
+        Uri.parse('${apiDomain().domain}streets'),
+      );
+      if (response.statusCode == 200) {
         final catalogJson = response.body;
         final decodedData = jsonDecode(catalogJson);
         var productsData = decodedData["data"];
@@ -128,18 +131,19 @@ class _home_view_1State extends State<home_view_1> {
         Street.Items = List.from(productsData)
             .map<Streetid>((product) => Streetid.fromJson(product))
             .toList();
-        setState(() {
-        });
+        setState(() {});
       }
-    }catch(w){
+    } catch (w) {
       throw Exception(w.toString());
     }
   }
+
   subcategorydat() async {
-    try{
-      final response =
-      await http.get(Uri.parse('${apiDomain().domain}streets'),);
-      if(response.statusCode ==200){
+    try {
+      final response = await http.get(
+        Uri.parse('${apiDomain().domain}streets'),
+      );
+      if (response.statusCode == 200) {
         final catalogJson = response.body;
         final decodedData = jsonDecode(catalogJson);
         var productsData = decodedData["data"];
@@ -147,10 +151,9 @@ class _home_view_1State extends State<home_view_1> {
         subCetegoryData.Items = List.from(productsData)
             .map<Sub>((product) => Sub.fromJson(product))
             .toList();
-        setState(() {
-        });
+        setState(() {});
       }
-    }catch(w){
+    } catch (w) {
       throw Exception(w.toString());
     }
   }
@@ -181,21 +184,23 @@ class _home_view_1State extends State<home_view_1> {
     street();
     subcategorydat();
   }
+
   @override
   Widget build(BuildContext context) {
-    Future<void> locationpermission()async{
+    Future<void> locationpermission() async {
       var status = await Permission.location.request();
-      if(status.isDenied){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Camera access denied')));
-      }else if(status.isPermanentlyDenied){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Camera access Permantly denied')));
-
-      }else if(status.isGranted){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Camera access granted')));
-
-
+      if (status.isDenied) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Camera access denied')));
+      } else if (status.isPermanentlyDenied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Camera access Permantly denied')));
+      } else if (status.isGranted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Camera access granted')));
       }
     }
+
     home_controller().atbusiness.value = false;
     return Stack(
       children: [
@@ -225,7 +230,9 @@ class _home_view_1State extends State<home_view_1> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            homeController.loggedIn.value ? 'Welcome Kris' : 'Welcome',
+                            homeController.loggedIn.value
+                                ? 'Welcome Kris'
+                                : 'Welcome',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
@@ -274,18 +281,21 @@ class _home_view_1State extends State<home_view_1> {
                   Expanded(
                     child: Container(
                       child: Text(
-                        homeController.loggedIn.value ? 'Update Business Location'.tr : 'Update Location'.tr,
+                        homeController.loggedIn.value
+                            ? 'Update Business Location'.tr
+                            : 'Update Location'.tr,
                         style: TextStyle(
                             color: appcolor().mainColor, fontSize: 12),
                       ),
                     ),
                   ),
                   TextButton(
-                    onPressed: ()async {
-                      var status = await  Permission.location.status;
-                      if(status.isGranted){
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Camera access Permantly denied')));
-                      }else{
+                    onPressed: () async {
+                      var status = await Permission.location.status;
+                      if (status.isGranted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Camera access Permantly denied')));
+                      } else {
                         locationpermission();
                       }
                     },
@@ -394,12 +404,14 @@ class _home_view_1State extends State<home_view_1> {
 Widget Categories_List_Widget() {
   return FutureBuilder(
       future: api().GetData('categories'),
-      builder: (context, snapshot){
-        if(snapshot.hasError){
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
           return Text('Server Error');
-        }else if(snapshot.connectionState == ConnectionState.waiting){
-          return Center(child: CircularProgressIndicator(),);
-        }else if(snapshot.hasData){
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasData) {
           return SafeArea(
             child: Container(
               height: Get.height * 0.17,
@@ -411,23 +423,31 @@ Widget Categories_List_Widget() {
                 itemBuilder: (context, index) {
                   var data = snapshot.data[index];
                   return InkWell(
-                    onTap: (){
-                      Get.to(CategoryData(name: data['name'].toString(),));
+                    onTap: () {
+                      Get.to(CategoryData(
+                        name: data['name'].toString(),
+                      ));
                     },
                     child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      margin:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                       width: Get.width * 0.2,
                       color: Colors.white,
                       child: Column(
                         children: [
                           Container(
-                              padding: EdgeInsets.all(5),
-                              color: appcolor().lightgreyColor,
-                              child: SvgPicture.network(
-                                  data['icon_url'],
-                                 // colorFilter: ColorFilter.mode( BlendMode.srcIn),
-                                  semanticsLabel: 'A red up arrow'
-                              ),
+                            padding: EdgeInsets.all(5),
+                            color: appcolor().lightgreyColor,
+                            child: data['icon_url'] != ''
+                                ? SvgPicture.network(data['icon_url'],
+                                    // colorFilter: ColorFilter.mode( BlendMode.srcIn),
+                                    semanticsLabel: 'A red up arrow')
+                                : Image(
+                                    image: const NetworkImage(
+                                        "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"),
+                                    height: Get.height * 0.05,
+                                    width: Get.width * 0.1,
+                                  ),
                           ),
                           SizedBox(
                             height: Get.height * 0.015,
@@ -445,228 +465,263 @@ Widget Categories_List_Widget() {
               ),
             ),
           );
-        }else{
-          return Center(child: CircularProgressIndicator(),);
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         }
         return CircularProgressIndicator();
       });
-    
-
 }
 
 Widget Featured_Businesses_List() {
-  return  FutureBuilder(
+  return FutureBuilder(
       future: api().bussiness('shops', 1),
-      builder: (context, snapshot){
-    if(snapshot.hasError){
-      return Center(child:Text('Data not found'),);
-    }else if(snapshot.hasData){
-      return  Container(
-        height: Get.height * 0.365,
-        color: Colors.white,
-        child: ListView.builder(
-          primary: false,
-          shrinkWrap: false,
-          scrollDirection: Axis.horizontal,
-          itemCount: 4,
-          itemBuilder: (context, index) {
-            var data = snapshot.data[index];
-            return InkWell(
-              onTap: (){
-                Get.to(errandia_business_view(index: index));
-              },
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                width: Get.width * 0.4,
-                color: Colors.white,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      color: appcolor().lightgreyColor,
-                      child: Image(
-                        image: NetworkImage(
-                          data['image'].toString(),
-                        ),fit: BoxFit.cover,
-                      ),
-                    ),
-                    SizedBox(
-                      height: Get.height * 0.009,
-                    ),
-                    Text(
-                      Featured_Businesses_Item_List[index].servicetype.toString(),
-                      style: TextStyle(
-                          fontSize: 12,
-                          // fontWeight: FontWeight.bold,
-                          color: appcolor().mediumGreyColor),
-                    ),
-                    SizedBox(
-                      height: Get.height * 0.001,
-                    ),
-                    Text(
-                     data['name'].toString(),
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: appcolor().mainColor),
-                    ),
-                    SizedBox(
-                      height: Get.height * 0.001,
-                    ),
-                    Row(
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Data not found'),
+          );
+        } else if (snapshot.hasData) {
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: 14),
+            height: Get.height * 0.365,
+            color: Colors.white,
+            child: ListView.builder(
+              primary: false,
+              shrinkWrap: false,
+              scrollDirection: Axis.horizontal,
+              itemCount: 4,
+              itemBuilder: (context, index) {
+                var data = snapshot.data[index];
+                return InkWell(
+                  onTap: () {
+                    Get.to(errandia_business_view(index: index));
+                  },
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    width: Get.width * 0.4,
+                    color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.location_on),
-                        Text(data['street'],style: TextStyle(fontSize: 12),)
+                        Container(
+                          height: Get.height * 0.09,
+                          color: appcolor().lightgreyColor,
+                          child: Image(
+                            image: NetworkImage(
+                              data['image'] != ''
+                                  ? data['image'].toString()
+                                  : Featured_Businesses_Item_List[index]
+                                      .imagePath
+                                      .toString(),
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(
+                          height: Get.height * 0.009,
+                        ),
+                        Text(
+                          Featured_Businesses_Item_List[index]
+                              .servicetype
+                              .toString(),
+                          style: TextStyle(
+                              fontSize: 12,
+                              // fontWeight: FontWeight.bold,
+                              color: appcolor().mediumGreyColor),
+                        ),
+                        SizedBox(
+                          height: Get.height * 0.001,
+                        ),
+                        Text(
+                          data['name'].toString(),
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: appcolor().mainColor),
+                        ),
+                        SizedBox(
+                          height: Get.height * 0.001,
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.location_on),
+                            Text(
+                              data['street'],
+                              style: TextStyle(fontSize: 12),
+                            )
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      );
-    }else{
-      return Center(child: CircularProgressIndicator(),);
-    }
-  });
+                  ),
+                );
+              },
+            ),
+          );
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      });
 }
-
 
 Widget Recently_posted_items_Widget() {
   return FutureBuilder(
       future: api().getProduct('products', 1),
-      builder: (context,snapshot){
-    if(snapshot.hasError){
-      return Center(child: Text('No data found'),);
-    }else if(snapshot.hasData){
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: 14),
-        height: Get.height * 0.47,
-        color: Colors.white,
-        child: ListView.builder(
-          primary: false,
-          shrinkWrap: false,
-          scrollDirection: Axis.horizontal,
-          itemCount: 5,
-          itemBuilder: (context, index) {
-            var data = snapshot.data[index];
-            return InkWell(onTap: (){
-              Get.to(Product_view(item: data,name: data['name'].toString(),));
-            },
-              child: Card(
-                child: Container(
-                  width: Get.width * 0.5,
-                  color: Colors.white,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: Get.height * 0.09,
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 25,
-                              backgroundImage: AssetImage(
-                                data['shop']['image'].toString(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('No data found'),
+          );
+        } else if (snapshot.hasData) {
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: 14),
+            height: Get.height * 0.45,
+            color: Colors.white,
+            child: ListView.builder(
+              primary: false,
+              shrinkWrap: false,
+              scrollDirection: Axis.horizontal,
+              itemCount: 5,
+              itemBuilder: (context, index) {
+                var data = snapshot.data[index];
+                print("data: $data");
+
+                return InkWell(
+                  onTap: () {
+                    // Get.to(Product_view(item: data,name: data['name'].toString(),));
+                    // Get.back();
+                    Get.to(errand_detail_view(
+                      data: data,
+                    ));
+                  },
+                  child: Card(
+                    child: Container(
+                      width: Get.width * 0.5,
+                      color: Colors.white,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: Get.height * 0.09,
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 25,
+                                  backgroundImage: AssetImage(
+                                    data['shop']['image'] != ''
+                                        ? data['shop']['image'].toString()
+                                        : Recently_item_List[index]
+                                            .avatarImage
+                                            .toString(),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: Get.width * 0.02,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      data['shop']['name'].toString(),
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    // Text(
+                                    //   Recently_item_List[index].date.toString(),
+                                    //   style: TextStyle(fontSize: 12),
+                                    // ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Divider(
+                            color: appcolor().mediumGreyColor,
+                          ),
+                          Container(
+                            height: Get.height * 0.2,
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 0),
+                            color: appcolor().lightgreyColor,
+                            child: Center(
+                              child: Image(
+                                image: NetworkImage(
+                                  data['featured_image'] != ''
+                                      ? data['featured_image'].toString()
+                                      : Featured_Businesses_Item_List[index]
+                                          .imagePath
+                                          .toString(),
+                                ),
+                                height: Get.height * 0.15,
                               ),
                             ),
-                            SizedBox(
-                              width: Get.width * 0.02,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  data['shop']['name'].toString(),
-                                  style: TextStyle(
-                                      fontSize: 13, fontWeight: FontWeight.bold),
-                                ),
-                                // Text(
-                                //   Recently_item_List[index].date.toString(),
-                                //   style: TextStyle(fontSize: 12),
-                                // ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Divider(
-                        color: appcolor().mediumGreyColor,
-                      ),
-                      Container(
-                        height: Get.height * 0.2,
-                        margin: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                        color: appcolor().lightgreyColor,
-                        child: Center(
-                          child: Image(
-                            image: NetworkImage(
-                                data['featured_image'].toString()),
-                            height: Get.height * 0.15,
                           ),
-                        ),
-                      ),
-                      Divider(
-                        color: appcolor().mediumGreyColor,
-                      ),
-                      SizedBox(
-                        height: Get.height * 0.009,
-                      ),
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          horizontal: 10,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Text(
-                            //   Featured_Businesses_Item_List[index]
-                            //       .servicetype
-                            //       .toString(),
-                            //   style: TextStyle(
-                            //       fontSize: 13,
-                            //       fontWeight: FontWeight.bold,
-                            //       color: appcolor().mediumGreyColor),
-                            // ),
-                            // SizedBox(
-                            //   height: Get.height * 0.001,
-                            // ),
-                            Text(
-                             data['name'].toString(),
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: appcolor().mainColor),
+                          Divider(
+                            color: appcolor().mediumGreyColor,
+                          ),
+                          SizedBox(
+                            height: Get.height * 0.009,
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                              horizontal: 10,
                             ),
-                            SizedBox(
-                              height: Get.height * 0.001,
-                            ),
-                            Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(Icons.location_on),
+                                // Text(
+                                //   Featured_Businesses_Item_List[index]
+                                //       .servicetype
+                                //       .toString(),
+                                //   style: TextStyle(
+                                //       fontSize: 13,
+                                //       fontWeight: FontWeight.bold,
+                                //       color: appcolor().mediumGreyColor),
+                                // ),
+                                // SizedBox(
+                                //   height: Get.height * 0.001,
+                                // ),
                                 Text(
-                                 data['shop']['street'].toString(),
-                                  style: TextStyle(color: appcolor().mainColor),
-                                )
+                                  data['name'].toString(),
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: appcolor().mainColor),
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.001,
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(Icons.location_on),
+                                    Text(
+                                      data['shop']['street'].toString(),
+                                      style: TextStyle(
+                                          color: appcolor().mainColor),
+                                    )
+                                  ],
+                                ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            );
-          },
-        ),
-      );
-    }else{
-      return Center(child: CircularProgressIndicator(),);
-    }
+                );
+              },
+            ),
+          );
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
       });
-    
-    
-
 }

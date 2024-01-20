@@ -8,11 +8,15 @@ import 'package:readmore/readmore.dart';
 
 class errand_detail_view extends StatelessWidget {
   final data;
+
   errand_detail_view({super.key, this.data});
+
   late errandia_detail_view_controller detailcontroller =
-  Get.put(errandia_detail_view_controller());
+      Get.put(errandia_detail_view_controller());
+
   @override
   Widget build(BuildContext context) {
+    print("errand details: $data");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -48,7 +52,7 @@ class errand_detail_view extends StatelessWidget {
               children: [
                 Container(
                   width: Get.width * 0.3,
-                  child: Text(
+                  child: const Text(
                     'Title',
                     style: TextStyle(
                       fontSize: 18,
@@ -212,7 +216,9 @@ class errand_detail_view extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${data['user']['name']}',
+                          data['user'] != null
+                              ? data['user']['name']
+                              : data['name'],
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
@@ -257,7 +263,7 @@ class errand_detail_view extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '+237 ${data['user']['phone']}',
+                        '${data['user'] != null ? '+237 ' + data['user']['phone'] : data['shop']['phone']}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w400,
@@ -351,7 +357,7 @@ class errand_detail_view extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${data['user']['email']}',
+                        '${data['user'] != null ? data['user']['email'] : data['shop']['email']}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w400,

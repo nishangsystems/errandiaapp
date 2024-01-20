@@ -253,7 +253,7 @@ Widget PostedErrands(BuildContext ctx) {
                             children: [
                               RichText(
                                 text: TextSpan(
-                                  style: TextStyle(fontSize: 16),
+                                  style: const TextStyle(fontSize: 16),
                                   children: [
                                     TextSpan(
                                       text: 'Errand Name : ',
@@ -270,7 +270,7 @@ Widget PostedErrands(BuildContext ctx) {
                                   ],
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                               Obx(
                                     () => Radio(
                                   value: 'sort descending',
@@ -403,7 +403,7 @@ Widget PostedErrands(BuildContext ctx) {
                     var date = dataa['created_at'].split('T');
                     var date1 = date[0].split('-');
                     return Container(
-                      padding: EdgeInsets.all(
+                      padding: const EdgeInsets.all(
                         10,
                       ),
                       decoration: BoxDecoration(
