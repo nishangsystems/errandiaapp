@@ -114,6 +114,16 @@ class customendDrawer extends StatelessWidget {
                   )),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
+              text: 'Manage Businesses',
+              imagePath: 'assets/images/sidebar_icon/icon-company.png',
+              callback: () {
+                Get.back();
+                Get.to(() => manage_business_view(), popGesture: true);
+              },
+            )
+                : Container()),
+            Obx(() => homeController.loggedIn.value
+                ? drawerItemWidget(
                     text: 'Errands',
                     imagePath:
                         'assets/images/sidebar_icon/icon-profile-errands.png',
@@ -122,16 +132,6 @@ class customendDrawer extends StatelessWidget {
                       Get.to(errand_view());
                     },
                   ): Container()),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Enquiries',
-                    imagePath: 'assets/images/sidebar_icon/enquiry.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(() => enquireis_view(), popGesture: true);
-                    },
-                  )
-                : Container()),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
                     text: 'Following',

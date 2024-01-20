@@ -22,7 +22,7 @@ class manage_business_view extends StatelessWidget {
         onTap: () {
           Get.off(add_business_view());
         },
-        child: new Container(
+        child: Container(
           width: Get.width * 0.47,
           padding: EdgeInsets.all(15),
           decoration: BoxDecoration(
@@ -50,7 +50,7 @@ class manage_business_view extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 2,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios,
             // size: 30,
           ),
@@ -60,8 +60,8 @@ class manage_business_view extends StatelessWidget {
         ),
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text(
-          'Manage Bussiness',
+        title: const Text(
+          'Manage Business',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
         ),
         iconTheme: IconThemeData(
@@ -85,7 +85,7 @@ class manage_business_view extends StatelessWidget {
               dividerColor: appcolor().bluetextcolor,
               isScrollable: true,
               unselectedLabelColor: appcolor().mediumGreyColor,
-              unselectedLabelStyle: TextStyle(
+              unselectedLabelStyle: const TextStyle(
                 fontWeight: FontWeight.normal,
                 fontSize: 16,
               ),
@@ -137,6 +137,7 @@ Widget allBusiness() {
         itemCount: snapshot.data.length,
         itemBuilder: (context, index) {
           var data = snapshot.data[index];
+          print("manage business : $data");
           return Container(
             margin: EdgeInsets.symmetric(
               horizontal: 10,
@@ -163,25 +164,27 @@ Widget allBusiness() {
                     fit: BoxFit.fill,
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${data['name']}',
-                      style: TextStyle(
-                        color: appcolor().mainColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${data['name']}',
+                        style: TextStyle(
+                          color: appcolor().mainColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${data['address']}',
-                      style: TextStyle(
-                        color: appcolor().mediumGreyColor,
-                        fontSize: 13,
+                      Text(
+                        '${data['address']}',
+                        style: TextStyle(
+                          color: appcolor().mediumGreyColor,
+                          fontSize: 13,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 Spacer(),
                 InkWell(
