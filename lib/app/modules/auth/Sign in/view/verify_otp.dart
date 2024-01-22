@@ -320,7 +320,7 @@ class _EmailState extends State<Email> {
                 var Email = widget.email.text.trim();
                 var Password = widget.password.text.trim();
                 if(Email == ''&& Password == ''){
-                  alertBoxdialogBox(context, 'Alert', 'Please Enter Fill Field');
+                  alertDialogBox(context, 'Alert', 'Please Enter Fill Field');
                 }else {
                   var value = {
                     "email":Email,

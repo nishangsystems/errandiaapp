@@ -191,47 +191,69 @@ class api {
     }
   }
 
-  // send sms with smsAPI
-  Future sendSms({required String phone}) async {
+  // login with phone
+  Future loginWithPhone(Object value, context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
-      Uri.parse('${apiDomain().domain}/auth/login_with_phone'),
-      body: jsonEncode({"phone": phone}),
-      headers: ({
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Accept': 'application/json',
-      }),
-    );
-    print("phone: $phone");
-    print("sms response: ${response.body}");
+        Uri.parse('${apiDomain().domain}/auth/login_with_phone'),
+        body: jsonEncode(value),
+        headers: ({'Content-Type': 'application/json; charset=UTF-8'}));
+    if (kDebugMode) {
+      print("login response: ${response.body}");
+    }
+    if (response.statusCode == 400) {
+      if (kDebugMode) {
+        print("status code: ${response.statusCode}");
+      }
+      var da = jsonDecode(response.body);
+      await alertDialogBox(context, 'Alert', '${da['message']}');
+    }
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print(data);
+      var data_ = data['data'];
+      if (kDebugMode) {
+        print("data uuid: ${data_['uuid']}");
+      }
+      prefs.setString('uuid', data_['uuid']);
+
       return data;
     } else {
-      return null;
+      var da = jsonDecode(response.body);
+        await alertDialogBox(context, 'Alert', '${da['data']['message']}');
     }
   }
 
-  // check if sms credit is available
-  Future checkSmsCredit() async {
+  // validate phone otp
+  Future validatePhoneOtp(Object value, context, navigator) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
-      Uri.parse('${apiDomain().domain}/smscredit'),
-      body: jsonEncode({
-        "user": "nishang@gmail.com",
-        "password": "test2371",
-      }),
-      headers: ({
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Accept': 'application/json',
-      }),
-    );
-
+        Uri.parse('${apiDomain().domain}/auth/validate_login_otp_code'),
+        body: jsonEncode(value),
+        headers: ({'Content-Type': 'application/json; charset=UTF-8'}));
+    if (kDebugMode) {
+      print("validate phone otp response: ${response.body}");
+    }
+    if (response.statusCode == 400) {
+      if (kDebugMode) {
+        print("status code: ${response.statusCode}");
+      }
+      var da = jsonDecode(response.body);
+      await alertDialogBox(context, 'Alert', '${da['message']}');
+    }
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print("sms credit: $data");
-      return data;
+      var data_ = data['data'];
+      if (kDebugMode) {
+        print("data: $data_");
+      }
+      prefs.setString('token', data_['token']);
+
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => navigator));
     } else {
-      return null;
+      var da = jsonDecode(response.body);
+      await alertDialogBox(context, 'Alert', '${da['data']['message']}');
     }
   }
+
 }

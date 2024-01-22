@@ -303,6 +303,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Phone extends StatefulWidget {
   Phone({super.key, required this.mobileno});
@@ -317,6 +318,7 @@ class Phone extends StatefulWidget {
 class _PhoneState extends State<Phone> {
   final _formKey = GlobalKey<FormState>();
   final _formKey1 = GlobalKey<FormState>();
+
   bool isLoading = false;
   var number;
 
@@ -663,20 +665,20 @@ class _EmailState extends State<Email> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: Color(0xffe0e6ec),
+                  color: const Color(0xffe0e6ec),
                 ),
-                color: Color(0xff113d6b),
+                color: const Color(0xff113d6b),
               ),
               child: Center(
                 child: isLoading == false
-                    ? Text(
+                    ? const Text(
                         'CONTINUE',
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: Colors.white),
                       )
-                    : Center(
+                    : const Center(
                         child: CircularProgressIndicator(
                           color: Colors.white,
                         ),
@@ -692,7 +694,8 @@ class _EmailState extends State<Email> {
             alignment: Alignment.center,
             child: RichText(
               text: TextSpan(
-                  style: const TextStyle(color: Color(0xff8ba0b7), fontSize: 17),
+                  style:
+                      const TextStyle(color: Color(0xff8ba0b7), fontSize: 17),
                   children: [
                     const TextSpan(text: 'Don\'t have an Errandia Account? '),
                     TextSpan(
@@ -727,7 +730,7 @@ class _signin_viewState extends State<signin_view_1>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
-  TextEditingController _phoneContoller = TextEditingController();
+  final TextEditingController _phoneContoller = TextEditingController();
   TextEditingController _otpContoller = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController email = TextEditingController();
@@ -752,6 +755,8 @@ class _signin_viewState extends State<signin_view_1>
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       body: SingleChildScrollView(
@@ -874,7 +879,7 @@ class _signin_viewState extends State<signin_view_1>
                                     keyboardType: TextInputType.phone,
                                     decoration: const InputDecoration(
                                       prefixText: "+237 ",
-                                      hintText: "Enter you phone number",
+                                      hintText: "Enter your phone number",
                                       border: InputBorder.none,
                                     ),
                                     validator: (value) {
@@ -894,111 +899,117 @@ class _signin_viewState extends State<signin_view_1>
                               height: 50,
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () {
+                                onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
-                                    AuthService.sentOtp(
-                                        phone: _phoneContoller.text,
-                                        errorStep: () =>
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                              content: Text(
-                                                "Error in sending OTP",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              backgroundColor: Colors.red,
-                                            )),
-                                        nextStep: () {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                    title: const Text(
-                                                        "OTP Verification"),
-                                                    content: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const Text(
-                                                            "Enter 6 digit OTP"),
-                                                        const SizedBox(
-                                                          height: 12,
-                                                        ),
-                                                        Form(
-                                                          key: _formKey1,
-                                                          child: TextFormField(
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .number,
-                                                            controller:
-                                                                _otpContoller,
-                                                            decoration: InputDecoration(
-                                                                labelText:
-                                                                    "Enter you phone number",
-                                                                border: OutlineInputBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            32))),
-                                                            validator: (value) {
-                                                              if (value!
-                                                                      .length !=
-                                                                  6) {
-                                                                return "Invalid OTP";
-                                                              }
-                                                              return null;
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    actions: [
-                                                      TextButton(
-                                                          onPressed: () {
-                                                            if (_formKey1
-                                                                .currentState!
-                                                                .validate()) {
-                                                              AuthService.loginWithOtp(
-                                                                      otp: _otpContoller
-                                                                          .text)
-                                                                  .then(
-                                                                      (value) {
-                                                                if (value ==
-                                                                    "Success") {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                  Navigator.pushReplacement(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                          builder: (context) =>
-                                                                              Home_view()));
-                                                                } else {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                  ScaffoldMessenger.of(
-                                                                          context)
-                                                                      .showSnackBar(
-                                                                          SnackBar(
-                                                                    content:
-                                                                        Text(
-                                                                      value,
-                                                                      style: const TextStyle(
-                                                                          color:
-                                                                              Colors.white),
+                                    var value = {"phone": _phoneContoller.text};
+                                    SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+
+                                    await api()
+                                        .loginWithPhone(value, _scaffoldKey.currentContext)
+                                        .then((response) => {
+                                              if (response['data']['uuid'] !=
+                                                      null ||
+                                                  response['data']['uuid'] !=
+                                                      "")
+                                                {
+                                                  print(
+                                                      "showing popup: $response"),
+                                                  showDialog(
+                                                      context: context,
+                                                      builder:
+                                                          (context) =>
+                                                              AlertDialog(
+                                                                title: const Text(
+                                                                    "OTP Verification"),
+                                                                content: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    const Text(
+                                                                        "Enter 4 digit code"),
+                                                                    const SizedBox(
+                                                                      height:
+                                                                          12,
                                                                     ),
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .red,
-                                                                  ));
-                                                                }
-                                                              });
-                                                            }
-                                                          },
-                                                          child: const Text("Submit"))
-                                                    ],
-                                                  ));
-                                        });
+                                                                    Form(
+                                                                      key:
+                                                                          _formKey1,
+                                                                      child:
+                                                                          TextFormField(
+                                                                        maxLength:
+                                                                            4,
+                                                                        keyboardType:
+                                                                            TextInputType.number,
+                                                                        controller:
+                                                                            _otpContoller,
+                                                                        decoration: InputDecoration(
+                                                                            labelText:
+                                                                                "Enter you phone number",
+                                                                            border:
+                                                                                OutlineInputBorder(borderRadius: BorderRadius.circular(32))),
+                                                                        validator:
+                                                                            (value) {
+                                                                          if (value!.length !=
+                                                                              4) {
+                                                                            return "Invalid OTP";
+                                                                          }
+                                                                          return null;
+                                                                        },
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                actions: [
+                                                                  TextButton(
+                                                                      onPressed:
+                                                                          () async {
+                                                                        if (_formKey1
+                                                                            .currentState!
+                                                                            .validate()) {
+                                                                          var value =
+                                                                              {
+                                                                            "code":
+                                                                                _otpContoller.text,
+                                                                            "uuid":
+                                                                                prefs.getString("uuid"),
+                                                                          };
+
+                                                                          Home_view
+                                                                              home =
+                                                                              Home_view();
+
+                                                                          await api().validatePhoneOtp(
+                                                                              value,
+                                                                              context,
+                                                                              home);
+                                                                        }
+                                                                      },
+                                                                      child: const Text(
+                                                                          "Submit"))
+                                                                ],
+                                                              ))
+                                                }
+                                              else
+                                                {
+                                                  ScaffoldMessenger.of(
+                                                          _scaffoldKey
+                                                              .currentContext!)
+                                                      .showSnackBar(
+                                                          const SnackBar(
+                                                    content: Text(
+                                                      "Error in sending OTP",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    backgroundColor: Colors.red,
+                                                  ))
+                                                }
+                                            });
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

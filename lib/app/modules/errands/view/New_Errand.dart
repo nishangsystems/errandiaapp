@@ -295,7 +295,7 @@ class _New_ErrandState extends State<New_Errand> {
                   if(product_controller.title.text != '' && product_controller.description.text != '' ){
                     Get.to(nd_screen(title: product_controller.title.text.toString(),description: product_controller.description.text.toString(),region: regionCode,street: street,town: town,));
                   }else{
-                    alertBoxdialogBox(context, 'Alert', 'Please Fill Fields');
+                    alertDialogBox(context, 'Alert', 'Please Fill Fields');
                   }
                   product_controller.title.clear();
                   product_controller.description.clear();

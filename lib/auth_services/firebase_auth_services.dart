@@ -13,24 +13,13 @@ class AuthService {
   static final apiInstance = api();
 
   static String verifyId = "";
+
   // to sent and otp to user
   static Future sentOtp({
     required String phone,
-    
     required Function errorStep,
     required Function nextStep,
   }) async {
-
-    final response = await apiInstance.sendSms(
-      phone: phone,
-    );
-    if (response != null) {
-      nextStep();
-    } else {
-      errorStep();
-    }
-
-
     // await _firebaseAuth
     //     .verifyPhoneNumber(
     //   timeout: const Duration(seconds: 30),
@@ -76,7 +65,7 @@ class AuthService {
   // to logout the user
   static Future logout() async {
     // await _firebaseAuth.signOut();
-  //  do normal logout by unsetting the token
+    //  do normal logout by unsetting the token
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
     Get.back();
