@@ -755,7 +755,7 @@ class _signin_viewState extends State<signin_view_1>
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -906,7 +906,7 @@ class _signin_viewState extends State<signin_view_1>
                                         await SharedPreferences.getInstance();
 
                                     await api()
-                                        .loginWithPhone(value, _scaffoldKey.currentContext)
+                                        .loginWithPhone(value, scaffoldKey.currentContext)
                                         .then((response) => {
                                               if (response['data']['uuid'] !=
                                                       null ||
@@ -997,7 +997,7 @@ class _signin_viewState extends State<signin_view_1>
                                               else
                                                 {
                                                   ScaffoldMessenger.of(
-                                                          _scaffoldKey
+                                                          scaffoldKey
                                                               .currentContext!)
                                                       .showSnackBar(
                                                           const SnackBar(
