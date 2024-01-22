@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -138,7 +139,7 @@ class _home_view_1State extends State<home_view_1> {
     }
   }
 
-  subcategorydat() async {
+  subCategoryData() async {
     try {
       final response = await http.get(
         Uri.parse('${apiDomain().domain}streets'),
@@ -182,22 +183,25 @@ class _home_view_1State extends State<home_view_1> {
     TownData();
     Country();
     street();
-    subcategorydat();
+    subCategoryData();
   }
 
   @override
   Widget build(BuildContext context) {
-    Future<void> locationpermission() async {
+    final GlobalKey<ScaffoldState> scaffoldKey =
+        GlobalKey<ScaffoldState>(); // ADD THIS LINE
+
+    Future<void> locationPermission() async {
       var status = await Permission.location.request();
       if (status.isDenied) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Camera access denied')));
+        ScaffoldMessenger.of(scaffoldKey.currentContext!)
+            .showSnackBar(const SnackBar(content: Text('Camera access denied')));
       } else if (status.isPermanentlyDenied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Camera access Permantly denied')));
+        ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
+            const SnackBar(content: Text('Camera access permanently denied')));
       } else if (status.isGranted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Camera access granted')));
+        ScaffoldMessenger.of(scaffoldKey.currentContext!)
+            .showSnackBar(const SnackBar(content: Text('Camera access granted')));
       }
     }
 
@@ -205,7 +209,7 @@ class _home_view_1State extends State<home_view_1> {
     return Stack(
       children: [
         Image(
-          image: AssetImage(
+          image: const AssetImage(
             'assets/images/home_bg.png',
           ),
           fit: BoxFit.fill,
@@ -218,7 +222,7 @@ class _home_view_1State extends State<home_view_1> {
             // welcome widget
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: Container(
+              child: SizedBox(
                 height: Get.height * 0.16,
                 width: Get.width,
                 child: Center(
@@ -233,12 +237,12 @@ class _home_view_1State extends State<home_view_1> {
                             homeController.loggedIn.value
                                 ? 'Welcome Kris'
                                 : 'Welcome',
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold),
                           ),
-                          Text(
+                          const Text(
                             'Start by running an errand',
                             style: TextStyle(
                                 color: Colors.white,
@@ -247,33 +251,33 @@ class _home_view_1State extends State<home_view_1> {
                           ),
                         ],
                       ),
-                      Spacer(),
+                      const Spacer(),
                       ElevatedButton(
                           onPressed: () {
                             Get.to(New_Errand());
                           },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white),
                           child: Text(
                             'Run an Errand',
                             style: TextStyle(
                                 color: appcolor().mainColor,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white)),
+                          )),
                     ],
                   ),
                 ),
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
               color: appcolor().skyblueColor,
               height: Get.height * 0.06,
               child: Row(
                 children: [
                   Image(
-                    image: AssetImage(
+                    image: const AssetImage(
                       'assets/images/refresh_location.png',
                     ),
                     color: appcolor().mainColor,
@@ -296,7 +300,7 @@ class _home_view_1State extends State<home_view_1> {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text('Camera access Permantly denied')));
                       } else {
-                        locationpermission();
+                        locationPermission();
                       }
                     },
                     child: Text(
@@ -326,12 +330,12 @@ class _home_view_1State extends State<home_view_1> {
                       color: appcolor().mainColor,
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   TextButton(
                     onPressed: () {
-                      Get.to(categories_view());
+                      Get.to(const categories_view());
                     },
-                    child: Text('See All'),
+                    child: const Text('See All'),
                   ),
                 ],
               ).paddingSymmetric(horizontal: 20),
@@ -353,12 +357,12 @@ class _home_view_1State extends State<home_view_1> {
                       color: appcolor().mainColor,
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   TextButton(
                     onPressed: () {
                       Get.to(Ui_23());
                     },
-                    child: Text('See All'),
+                    child: const Text('See All'),
                   ),
                 ],
               ).paddingSymmetric(horizontal: 20),
@@ -378,12 +382,12 @@ class _home_view_1State extends State<home_view_1> {
                       color: appcolor().mainColor,
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   TextButton(
                     onPressed: () {
                       Get.to(SeeAllErands());
                     },
-                    child: Text('See All'),
+                    child: const Text('See All'),
                   ),
                 ],
               ).paddingSymmetric(horizontal: 20),
@@ -406,9 +410,16 @@ Widget Categories_List_Widget() {
       future: api().GetData('categories'),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text('Server Error');
+          // return a container with text "data not found"
+          return Container(
+            height: Get.height * 0.17,
+            color: Colors.white,
+            child: const Center(
+              child: Text('Categories not found'),
+            ),
+          );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         } else if (snapshot.hasData) {
@@ -429,14 +440,14 @@ Widget Categories_List_Widget() {
                       ));
                     },
                     child: Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
                       width: Get.width * 0.2,
                       color: Colors.white,
                       child: Column(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(5),
+                            padding: const EdgeInsets.all(5),
                             color: appcolor().lightgreyColor,
                             child: data['icon_url'] != ''
                                 ? SvgPicture.network(data['icon_url'],
@@ -454,7 +465,7 @@ Widget Categories_List_Widget() {
                           ),
                           Text(
                             data['name'].toString(),
-                            style: TextStyle(fontSize: 13),
+                            style: const TextStyle(fontSize: 13),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -466,8 +477,12 @@ Widget Categories_List_Widget() {
             ),
           );
         } else {
-          return Center(
-            child: CircularProgressIndicator(),
+          return Container(
+            height: Get.height * 0.17,
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
         return CircularProgressIndicator();
@@ -479,13 +494,17 @@ Widget Featured_Businesses_List() {
       future: api().bussiness('shops', 1),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(
-            child: Text('Data not found'),
+          return Container(
+            height: Get.height * 0.17,
+            color: Colors.white,
+            child: const Center(
+              child: Text('Featured Businesses not found'),
+            ),
           );
         } else if (snapshot.hasData) {
           return Container(
-            padding: EdgeInsets.symmetric(horizontal: 14),
-            height: Get.height * 0.365,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            height: Get.height * 0.23,
             color: Colors.white,
             child: ListView.builder(
               primary: false,
@@ -499,7 +518,8 @@ Widget Featured_Businesses_List() {
                     Get.to(errandia_business_view(index: index));
                   },
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     width: Get.width * 0.4,
                     color: Colors.white,
                     child: Column(
@@ -546,10 +566,10 @@ Widget Featured_Businesses_List() {
                         ),
                         Row(
                           children: [
-                            Icon(Icons.location_on),
+                            const Icon(Icons.location_on),
                             Text(
                               data['street'],
-                              style: TextStyle(fontSize: 12),
+                              style: const TextStyle(fontSize: 12),
                             )
                           ],
                         ),
@@ -561,8 +581,12 @@ Widget Featured_Businesses_List() {
             ),
           );
         } else {
-          return Center(
-            child: CircularProgressIndicator(),
+          return Container(
+            height: Get.height * 0.17,
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
       });
@@ -573,12 +597,24 @@ Widget Recently_posted_items_Widget() {
       future: api().getProduct('products', 1),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(
-            child: Text('No data found'),
+          return Container(
+            height: Get.height * 0.17,
+            color: Colors.white,
+            child: const Center(
+              child: Text('Recently Posted Errands not found'),
+            ),
+          );
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container(
+            height: Get.height * 0.17,
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         } else if (snapshot.hasData) {
           return Container(
-            padding: EdgeInsets.symmetric(horizontal: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
             height: Get.height * 0.45,
             color: Colors.white,
             child: ListView.builder(
@@ -588,7 +624,9 @@ Widget Recently_posted_items_Widget() {
               itemCount: 5,
               itemBuilder: (context, index) {
                 var data = snapshot.data[index];
-                print("data: $data");
+                if (kDebugMode) {
+                  print("data: $data");
+                }
 
                 return InkWell(
                   onTap: () {
@@ -605,7 +643,7 @@ Widget Recently_posted_items_Widget() {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
+                          SizedBox(
                             height: Get.height * 0.09,
                             child: Row(
                               children: [
@@ -628,7 +666,7 @@ Widget Recently_posted_items_Widget() {
                                   children: [
                                     Text(
                                       data['shop']['name'].toString(),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -719,8 +757,12 @@ Widget Recently_posted_items_Widget() {
             ),
           );
         } else {
-          return Center(
-            child: CircularProgressIndicator(),
+          return Container(
+            height: Get.height * 0.17,
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
       });

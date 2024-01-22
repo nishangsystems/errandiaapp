@@ -93,7 +93,7 @@ class api {
     var token = prefs.getString('token');
 
     final response =
-        await http.get(Uri.parse('${apiDomain().domain}categories'),
+        await http.get(Uri.parse('${apiDomain().domain}/categories'),
             headers: ({
               'Content-Type': 'application/json; charset=UTF-8',
               'Accept': 'application/json',
@@ -101,7 +101,9 @@ class api {
             }));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       return data['data'];
     }
   }
@@ -112,7 +114,7 @@ class api {
     if (value == 1) {
       token = prefs.getString('token');
     }
-    final response = await http.get(Uri.parse('${apiDomain().domain}$url'),
+    final response = await http.get(Uri.parse('${apiDomain().domain}/$url'),
         headers: ({
           'Content-Type': 'application/json; charset=UTF-8',
           'Accept': 'application/json',
@@ -134,7 +136,7 @@ class api {
     if (value == 1) {
       token = prefs.getString('token');
     }
-    final response = await http.get(Uri.parse('${apiDomain().domain}$url'),
+    final response = await http.get(Uri.parse('${apiDomain().domain}/$url'),
         headers: ({
           'Content-Type': 'application/json; charset=UTF-8',
           'Accept': 'application/json',
@@ -156,7 +158,7 @@ class api {
     if (value == 1) {
       token = prefs.getString('token');
     }
-    final response = await http.get(Uri.parse('${apiDomain().domain}$url'),
+    final response = await http.get(Uri.parse('${apiDomain().domain}/$url'),
         headers: ({
           'Content-Type': 'application/json; charset=UTF-8',
           'Accept': 'application/json',
@@ -177,7 +179,7 @@ class api {
     }
     print(data);
 
-    final response = await http.post(Uri.parse('${apiDomain().domain}$url'),
+    final response = await http.post(Uri.parse('${apiDomain().domain}/$url'),
         body: jsonEncode(data),
         headers: ({
           'Content-Type': 'application/json; charset=UTF-8',
