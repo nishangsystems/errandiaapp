@@ -298,6 +298,7 @@ import 'package:errandia/app/modules/auth/Register/service_Provider/view/Registe
 import 'package:errandia/app/modules/auth/Sign%20in/view/forget_password.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
 import 'package:errandia/auth_services/firebase_auth_services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -327,7 +328,7 @@ class _PhoneState extends State<Phone> {
         SizedBox(
           height: Get.height * 0.05,
         ),
-        Text(
+        const Text(
           'Phone Number',
           style: TextStyle(
             fontSize: 16,
@@ -341,7 +342,7 @@ class _PhoneState extends State<Phone> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: Color(0xffe0e6ec),
+              color: const Color(0xffe0e6ec),
             ),
             color: Colors.white,
           ),
@@ -353,14 +354,17 @@ class _PhoneState extends State<Phone> {
                   width: Get.width * 0.86,
                   child: IntlPhoneField(
                     controller: widget.mobileno,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         contentPadding: EdgeInsets.only(top: 22),
                         border: InputBorder.none),
                     initialCountryCode: 'CM',
                     validator: (value) {
                       if (value == null) {
-                        print(value);
+                        if (kDebugMode) {
+                          print(value);
+                        }
                       }
+                      return null;
                     },
                     onChanged: (phone) {
                       setState(() {
@@ -373,16 +377,16 @@ class _PhoneState extends State<Phone> {
               ),
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     vertical: 1,
                   ),
                   child: TextFormField(
                     controller: widget.mobileno,
                     // keyboardType: TextInputType.phone,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                     ),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
                       counter: Offstage(),
                     ),
@@ -420,20 +424,20 @@ class _PhoneState extends State<Phone> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Color(0xffe0e6ec),
+                color: const Color(0xffe0e6ec),
               ),
-              color: Color(0xff113d6b),
+              color: const Color(0xff113d6b),
             ),
             child: Center(
               child: isLoading == false
-                  ? Text(
+                  ? const Text(
                       'CONTINUE',
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: Colors.white),
                     )
-                  : Center(
+                  : const Center(
                       child: CircularProgressIndicator(
                         color: Colors.white,
                       ),
@@ -444,7 +448,6 @@ class _PhoneState extends State<Phone> {
         SizedBox(
           height: Get.height * 0.05,
         ),
-
         SizedBox(
           height: Get.height * 0.05,
         ),
@@ -452,9 +455,9 @@ class _PhoneState extends State<Phone> {
           alignment: Alignment.center,
           child: RichText(
             text: TextSpan(
-                style: TextStyle(color: Color(0xff8ba0b7), fontSize: 17),
+                style: const TextStyle(color: Color(0xff8ba0b7), fontSize: 17),
                 children: [
-                  TextSpan(text: 'Don\'t have an Errandia Account? '),
+                  const TextSpan(text: 'Don\'t have an Errandia Account? '),
                   TextSpan(
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
@@ -462,7 +465,7 @@ class _PhoneState extends State<Phone> {
                         Get.off(register_serviceprovider_view());
                       },
                     text: 'Register',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Color(0xff3c7fc6),
                     ),
@@ -498,7 +501,7 @@ class _EmailState extends State<Email> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Email',
             style: TextStyle(
               fontSize: 16,
@@ -509,24 +512,22 @@ class _EmailState extends State<Email> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Color(0xffe0e6ec),
+                color: const Color(0xffe0e6ec),
               ),
               color: Colors.white,
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                child: TextFormField(
-                  obscureText: false,
-                  controller: email,
-                  keyboardType: TextInputType.emailAddress,
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    // hintText: 'Enter Passwor'
-                  ),
+              child: TextFormField(
+                obscureText: false,
+                controller: email,
+                keyboardType: TextInputType.emailAddress,
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  // hintText: 'Enter Passwor'
                 ),
               ),
             ),
@@ -536,7 +537,7 @@ class _EmailState extends State<Email> {
             height: Get.height * 0.003,
           ),
 
-          Text(
+          const Text(
             'Password',
             style: TextStyle(
               fontSize: 16,
@@ -553,24 +554,22 @@ class _EmailState extends State<Email> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Color(0xffe0e6ec),
+                color: const Color(0xffe0e6ec),
               ),
               color: Colors.white,
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                child: TextFormField(
-                  obscureText: true,
-                  controller: password,
-                  keyboardType: TextInputType.emailAddress,
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    //  hintText: 'Enter Password'
-                  ),
+              child: TextFormField(
+                obscureText: true,
+                controller: password,
+                keyboardType: TextInputType.emailAddress,
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  //  hintText: 'Enter Password'
                 ),
               ),
             ),
@@ -578,30 +577,33 @@ class _EmailState extends State<Email> {
           Center(
               child: TextButton(
                   onPressed: () {
-                    Get.to(ForgetPassword());
+                    Get.to(const ForgetPassword());
                   },
-                  child: Text(
+                  child: const Text(
                     "Forgot your password ?",
                     style: TextStyle(color: Colors.blue),
                   ))),
           InkWell(
-            onTap: () {
-              var Email = email.text.trim();
-              var Password = password.text.trim();
-              if (Email == '' && Password == '') {
-                alertBoxdialogBox(context, 'Alert', 'Please Enter Fill Field');
+            onTap: () async {
+              var email_ = email.text.trim();
+              var password_ = password.text.trim();
+              if (email_ == '' && password_ == '') {
+                alertDialogBox(context, 'Alert', 'Please fill out all fields');
               } else {
-                var value = {"email": Email, "password": Password};
+                var value = {"email": email_, "password": password_};
                 Home_view home = Home_view();
-                api().registration('email/login', value, context, home, '');
+                // api().registration('email/login', value, context, home, '');
                 setState(() {
                   isLoading = true;
                 });
-                Future.delayed(Duration(seconds: 2), () {
+
+                try {
+                  await api().login(value, context, home, '');
+                } finally {
                   setState(() {
                     isLoading = false;
                   });
-                });
+                }
                 //  Get.to(Home_view());
               }
             },
@@ -610,20 +612,20 @@ class _EmailState extends State<Email> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: Color(0xffe0e6ec),
+                  color: const Color(0xffe0e6ec),
                 ),
-                color: Color(0xff113d6b),
+                color: const Color(0xff113d6b),
               ),
               child: Center(
                 child: isLoading == false
-                    ? Text(
+                    ? const Text(
                         'CONTINUE',
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: Colors.white),
                       )
-                    : Center(
+                    : const Center(
                         child: CircularProgressIndicator(
                           color: Colors.white,
                         ),
@@ -842,32 +844,36 @@ class _signin_viewState extends State<signin_view>
                                     keyboardType: TextInputType.phone,
                                     decoration: const InputDecoration(
                                       prefixText: "+237 ",
-                                      hintText: "Enter you phone number",
+                                      hintText: "Enter your phone number",
                                       border: InputBorder.none,
                                     ),
                                     validator: (value) {
-                                      if (value!.length != 9)
+                                      if (value!.length != 9) {
                                         return "Invalid phone number";
+                                      }
                                       return null;
                                     },
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              height: 20,
-                            ),
+                            // const SizedBox(
+                            //   height: 20,
+                            // ),
                             SizedBox(
                               height: 50,
                               width: double.infinity,
                               child: ElevatedButton(
                                 onPressed: () {
+                                  if (kDebugMode) {
+                                    print("continue click: $_formKey");
+                                  }
                                   if (_formKey.currentState!.validate()) {
                                     AuthService.sentOtp(
                                         phone: _phoneContoller.text,
                                         errorStep: () =>
                                             ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
+                                                .showSnackBar(const SnackBar(
                                               content: Text(
                                                 "Error in sending OTP",
                                                 style: TextStyle(
@@ -879,7 +885,7 @@ class _signin_viewState extends State<signin_view>
                                           showDialog(
                                               context: context,
                                               builder: (context) => AlertDialog(
-                                                    title: Text(
+                                                    title: const Text(
                                                         "OTP Verification"),
                                                     content: Column(
                                                       mainAxisSize:
@@ -888,9 +894,9 @@ class _signin_viewState extends State<signin_view>
                                                           CrossAxisAlignment
                                                               .start,
                                                       children: [
-                                                        Text(
+                                                        const Text(
                                                             "Enter 6 digit OTP"),
-                                                        SizedBox(
+                                                        const SizedBox(
                                                           height: 12,
                                                         ),
                                                         Form(
@@ -911,8 +917,9 @@ class _signin_viewState extends State<signin_view>
                                                             validator: (value) {
                                                               if (value!
                                                                       .length !=
-                                                                  6)
+                                                                  6) {
                                                                 return "Invalid OTP";
+                                                              }
                                                               return null;
                                                             },
                                                           ),
@@ -949,7 +956,7 @@ class _signin_viewState extends State<signin_view>
                                                                     content:
                                                                         Text(
                                                                       value,
-                                                                      style: TextStyle(
+                                                                      style: const TextStyle(
                                                                           color:
                                                                               Colors.white),
                                                                     ),
@@ -961,16 +968,16 @@ class _signin_viewState extends State<signin_view>
                                                               });
                                                             }
                                                           },
-                                                          child: Text("Submit"))
+                                                          child: const Text("Submit"))
                                                     ],
                                                   ));
                                         });
                                   }
                                 },
-                                child: Text("Continue"),
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xff113d6b),
+                                    backgroundColor: const Color(0xff113d6b),
                                     foregroundColor: Colors.white),
+                                child: const Text("Continue"),
                               ),
                             )
                           ],
@@ -983,10 +990,10 @@ class _signin_viewState extends State<signin_view>
                         alignment: Alignment.center,
                         child: RichText(
                           text: TextSpan(
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Color(0xff8ba0b7), fontSize: 17),
                               children: [
-                                TextSpan(
+                                const TextSpan(
                                     text: 'Don\'t have an Errandia Account? '),
                                 TextSpan(
                                   recognizer: TapGestureRecognizer()
@@ -995,7 +1002,7 @@ class _signin_viewState extends State<signin_view>
                                       Get.off(register_serviceprovider_view());
                                     },
                                   text: 'Register',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xff3c7fc6),
                                   ),

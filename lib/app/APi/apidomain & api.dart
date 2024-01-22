@@ -54,7 +54,7 @@ class api {
   Future login( Object value, context, navigator, navigator1) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
-        Uri.parse('${apiDomain().domain}/auth/login'),
+        Uri.parse('${apiDomain().domain}/auth/login_with_email'),
         body: jsonEncode(value),
         headers: ({'Content-Type': 'application/json; charset=UTF-8'}));
     if (kDebugMode) {

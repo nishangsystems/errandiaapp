@@ -17,6 +17,7 @@ import 'package:errandia/app/modules/products/view/manage_products_view.dart';
 import 'package:errandia/app/modules/services/view/manage_service_view.dart';
 import 'package:errandia/app/modules/setting/view/setting_view.dart';
 import 'package:errandia/app/modules/subscribers/view/subscriber_view.dart';
+import 'package:errandia/auth_services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
@@ -38,6 +39,7 @@ class customendDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Drawer(
       shadowColor: Colors.grey,
       child: Container(
@@ -187,11 +189,7 @@ class customendDrawer extends StatelessWidget {
                     text: 'Logout',
                     imagePath: 'assets/images/sidebar_icon/icon-logout.png',
                     callback: () async {
-                      SharedPreferences preferences =
-                          await SharedPreferences.getInstance();
-                      await preferences.remove('token');
-                      Get.back();
-                      Get.to(home_view_1());
+                     await AuthService.logout();
                     },
                   )
                 : drawerItemWidget(
