@@ -361,7 +361,7 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                                   }
                                 },
                                 onChanged: (phone) {
-                                  print(phone);
+                                  print("phone: $phone");
                                 },
                               ),
                             ),
@@ -544,7 +544,7 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                                             obscureText: _obscured1,
                                             keyboardType:
                                                 TextInputType.visiblePassword,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 18,
                                             ),
                                             decoration: InputDecoration(
@@ -614,7 +614,7 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
       
                     InkWell(
       
-                      onTap: () {
+                      onTap: () async {
                         var Name = name.text.trim().toString();
                         var Phone = phoneNo.text.trim().toString();
                         var Email = email.text.trim().toString();
@@ -622,9 +622,10 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                         var cPassword = cpassword.text.trim().toString();
       
                         if(name=='' && email == ''&& Phone == '' && password == '' && cpassword == ''){
-                          alertBoxdialogBox(context, 'Alert', 'Please Fill Fields');
+                          alertDialogBox(context, 'Alert', 'Please Fill Fields');
                         }else if(Password != cPassword){
-                          alertBoxdialogBox(
+                          print("password and repeat password is not same");
+                          alertDialogBox(
                             context, 'Alert', 'Password and Repeat password is not same');
                         }
                         // }else if(isSelected == false){
@@ -633,20 +634,30 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                           var value = {
                             "name":Name,
                             "email":Email,
+                            // "country": phone.,
                             "phone":Phone,
-                            "password":cPassword
+                            "password":Password,
+                            "confirm_password": cPassword,
                           };
+                          print("value: $value");
                           registration_successful_view home =registration_successful_view ();
                           registration_failed_view failed= registration_failed_view();
-                          api().registration('register', value, context,home,failed);
                           setState(() {
                             isLoading =true;
                           });
-                          Future.delayed(Duration(seconds: 3),(){
-                            setState(() {
-                              isLoading = false;
-                            });
-                          });
+                          // api().registration('register', value, context,home,failed);
+                         try {
+                           await api().registration("/auth/register", value, context, home, failed);
+                         } finally {
+                           setState(() {
+                             isLoading = false;
+                           });
+                         }
+                          // Future.delayed(const Duration(seconds: 3),(){
+                          //   setState(() {
+                          //     isLoading = false;
+                          //   });
+                          // });
                         }
                       // Get.to(Home_view());
                       },

@@ -191,7 +191,7 @@ class customendDrawer extends StatelessWidget {
                           await SharedPreferences.getInstance();
                       await preferences.remove('token');
                       Get.back();
-                      Get.to(Home_view());
+                      Get.to(home_view_1());
                     },
                   )
                 : drawerItemWidget(

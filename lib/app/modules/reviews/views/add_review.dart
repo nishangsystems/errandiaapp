@@ -409,7 +409,7 @@ class _add_review_viewState extends State<add_review_view> {
                       isLoading = true;
                     });
                   }else{
-                    alertBoxdialogBox(context, 'Alert', 'Please Enter fill fields ');
+                    alertDialogBox(context, 'Alert', 'Please Enter fill fields ');
                   }
                 },
                 color: appcolor().mainColor,

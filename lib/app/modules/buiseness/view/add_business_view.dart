@@ -167,7 +167,7 @@ class _add_business_viewState extends State<add_business_view> {
                 var bussinessInfo = add_controller.Business_information_controller.text.toString();
 
                 if(name =='' || descripton ==''|| country == null){
-                  alertBoxdialogBox(context, "Alert", 'Please Enter Fields');
+                  alertDialogBox(context, "Alert", 'Please Enter Fields');
                 }else{
                   setState(() {
                     isLoading = true;
