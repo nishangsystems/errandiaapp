@@ -283,22 +283,20 @@ class _home_view_1State extends State<home_view_1> {
                     color: appcolor().mainColor,
                   ),
                   Expanded(
-                    child: Container(
-                      child: Text(
-                        homeController.loggedIn.value
-                            ? 'Update Business Location'.tr
-                            : 'Update Location'.tr,
-                        style: TextStyle(
-                            color: appcolor().mainColor, fontSize: 12),
-                      ),
+                    child: Text(
+                      homeController.loggedIn.value
+                          ? 'Update Business Location'.tr
+                          : 'Update Location'.tr,
+                      style: TextStyle(
+                          color: appcolor().mainColor, fontSize: 12),
                     ),
                   ),
                   TextButton(
                     onPressed: () async {
                       var status = await Permission.location.status;
                       if (status.isGranted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Camera access Permantly denied')));
+                        ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(const SnackBar(
+                            content: Text('Camera access permanently denied')));
                       } else {
                         locationPermission();
                       }
@@ -419,8 +417,12 @@ Widget Categories_List_Widget() {
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return Container(
+            height: Get.height * 0.17,
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         } else if (snapshot.hasData) {
           return SafeArea(
