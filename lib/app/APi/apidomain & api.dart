@@ -51,7 +51,7 @@ class api {
   }
 
   // login with email
-  Future login( Object value, context, navigator, navigator1) async {
+  Future login(Object value, context, navigator, navigator1) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
         Uri.parse('${apiDomain().domain}/auth/login_with_email'),
@@ -196,32 +196,43 @@ class api {
   // login with phone
   Future loginWithPhone(Object value, context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final response = await http.post(
-        Uri.parse('${apiDomain().domain}/auth/login_with_phone'),
-        body: jsonEncode(value),
-        headers: ({'Content-Type': 'application/json; charset=UTF-8'}));
-    if (kDebugMode) {
-      print("login response: ${response.body}");
-    }
-    if (response.statusCode == 400) {
+    try {
+      final response = await http.post(
+          Uri.parse('${apiDomain().domain}/auth/login_with_phone'),
+          body: jsonEncode(value),
+          headers: ({'Content-Type': 'application/json; charset=UTF-8'}));
       if (kDebugMode) {
-        print("status code: ${response.statusCode}");
+        print("login response: ${response.body}");
       }
-      var da = jsonDecode(response.body);
-      await alertDialogBox(context, 'Alert', '${da['message']}');
-    }
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      var data_ = data['data'];
-      if (kDebugMode) {
-        print("data uuid: ${data_['uuid']}");
-      }
-      prefs.setString('uuid', data_['uuid']);
+      if (response.statusCode == 400) {
+        if (kDebugMode) {
+          print("status code: ${response.statusCode}");
+        }
+        var da = jsonDecode(response.body);
+        print("data error: $da");
+        await alertDialogBox(context, 'Alert', '${da['message']}');
 
-      return data;
-    } else {
-      var da = jsonDecode(response.body);
+        return response;
+      }
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        var data_ = data['data'];
+        if (kDebugMode) {
+          print("data uuid: ${data_['uuid']}");
+        }
+        prefs.setString('uuid', data_['uuid']);
+
+        return response;
+      } else {
+        var da = jsonDecode(response.body);
         await alertDialogBox(context, 'Alert', '${da['data']['message']}');
+
+        return da;
+      }
+    } catch (e) {
+      print("Error in loginWithPhone: $e");
+      await alertDialogBox(context, 'Error', 'An unexpected error occurred.');
+      return null;
     }
   }
 
@@ -257,5 +268,4 @@ class api {
       await alertDialogBox(context, 'Alert', '${da['data']['message']}');
     }
   }
-
 }

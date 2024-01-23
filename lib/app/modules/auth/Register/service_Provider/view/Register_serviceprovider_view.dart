@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
@@ -21,31 +21,34 @@ import '../../registration_failed_view.dart';
 import '../../registration_successful_view.dart';
 
 class register_serviceprovider_view extends StatefulWidget {
-    register_serviceprovider_view({super.key});
+  register_serviceprovider_view({super.key});
 
   @override
-  State<register_serviceprovider_view> createState() => _register_serviceprovider_viewState();
+  State<register_serviceprovider_view> createState() =>
+      _register_serviceprovider_viewState();
 }
 
-class _register_serviceprovider_viewState extends State<register_serviceprovider_view> {
-    TextEditingController name = TextEditingController();
-    TextEditingController phoneNo = TextEditingController();
+class _register_serviceprovider_viewState
+    extends State<register_serviceprovider_view> {
+  TextEditingController name = TextEditingController();
+  TextEditingController phoneNo = TextEditingController();
 
-    TextEditingController email = TextEditingController();
+  TextEditingController email = TextEditingController();
 
-    TextEditingController password = TextEditingController();
+  TextEditingController password = TextEditingController();
 
-    TextEditingController cpassword = TextEditingController();
+  TextEditingController cPassword_ = TextEditingController();
 
-    bool isSelected = false;
-    bool isLoading = false;
-     void _showTermsAndConditionsDialog(BuildContext context) {
+  bool isSelected = false;
+  bool isLoading = false;
+
+  void _showTermsAndConditionsDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Terms and Conditions'),
-          content: SingleChildScrollView(
+          title: const Text('Terms and Conditions'),
+          content: const SingleChildScrollView(
             child: Column(
               children: [
                 Text(
@@ -57,7 +60,7 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                 Text(
                   '3. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
                 ),
-                 Text(
+                Text(
                   '4. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
                 ),
                 Text(
@@ -80,7 +83,7 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                   //termsAccepted = true; // Set termsAccepted to true on Accept
+                  //termsAccepted = true; // Set termsAccepted to true on Accept
                 });
                 Navigator.of(context).pop(); // Close the dialog
               },
@@ -94,33 +97,36 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
 
   imagePickercontroller image_pick_controller =
       Get.put(imagePickercontroller());
-        final textFieldFocusNode = FocusNode();
-          final textFieldFocusNode1 = FocusNode();
+  final textFieldFocusNode = FocusNode();
+  final textFieldFocusNode1 = FocusNode();
   bool _obscured = true;
 
   void _toggleObscured() {
     setState(() {
       _obscured = !_obscured;
-      if (textFieldFocusNode.hasPrimaryFocus) return; // If focus is on text field, dont unfocus
-      textFieldFocusNode.canRequestFocus = false;     // Prevents focus if tap on eye
+      if (textFieldFocusNode.hasPrimaryFocus)
+        return; // If focus is on text field, dont unfocus
+      textFieldFocusNode.canRequestFocus =
+          false; // Prevents focus if tap on eye
     });
   }
-    bool _obscured1 = true;
+
+  bool _obscured1 = true;
 
   void _toggleObscured1() {
     setState(() {
       _obscured1 = !_obscured1;
-      if (textFieldFocusNode1.hasPrimaryFocus) return; // If focus is on text field, dont unfocus
-      textFieldFocusNode1.canRequestFocus = false;     // Prevents focus if tap on eye
+      if (textFieldFocusNode1.hasPrimaryFocus)
+        return; // If focus is on text field, dont unfocus
+      textFieldFocusNode1.canRequestFocus =
+          false; // Prevents focus if tap on eye
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-    
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         centerTitle: true,
@@ -128,12 +134,12 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
           image: const AssetImage('assets/images/icon-errandia-logo-about.png'),
           width: Get.width * 0.3,
         ),
-       // elevation: 0.8,
+        // elevation: 0.8,
         leading: IconButton(
           onPressed: () {
             Get.back();
           },
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios,
             color: Color(0xff113d6b),
           ),
@@ -145,42 +151,38 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
         ),
         child: ListView(
           children: [
-           Divider(
-            color: Colors.grey.shade300,
-           ),
-            
-           
-            Container(
-              child: Column(
-                children: [
-                  Text(
-                    'Register your\n Errandia Account',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff113d6b),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  // Text(
-                  //   'ACCOUNT',
-                  //   style: TextStyle(
-                  //     fontSize: 26,
-                  //     fontWeight: FontWeight.w700,
-                  //     color: Color(0xff113d6b),
-                  //   ),
-                  // ),
-                ],
-              ),
+            Divider(
+              color: Colors.grey.shade300,
             ),
-      
+
+            const Column(
+              children: [
+                Text(
+                  'Register your\n Errandia Account',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff113d6b),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                // Text(
+                //   'ACCOUNT',
+                //   style: TextStyle(
+                //     fontSize: 26,
+                //     fontWeight: FontWeight.w700,
+                //     color: Color(0xff113d6b),
+                //   ),
+                // ),
+              ],
+            ),
+
             //
-      
+
             SizedBox(
               height: Get.height * 0.01,
             ),
-      
-          
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Container(
@@ -188,16 +190,13 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // buiseness name
-                  
-      
-                  
+
                     // text form field
-                  
-      
+
                     // SizedBox(
                     //   height: Get.height * 0.02,
                     // ),
-      
+
                     // profile photo
                     // Text(
                     //   'Profile Picture*',
@@ -273,21 +272,21 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                     //     ],
                     //   ),
                     // ),
-      
+
                     SizedBox(
                       height: Get.height * 0.01,
                     ),
-                    Text(
+                    const Text(
                       'Name',
                       style: TextStyle(
                         fontSize: 16,
                       ),
                     ),
-      
+
                     SizedBox(
                       height: Get.height * 0.001,
                     ),
-      
+
                     // text form field
                     Container(
                       height: Get.height * 0.07,
@@ -300,43 +299,41 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Container(
-                          child: TextFormField(
-                            controller: name,
-                            keyboardType: TextInputType.emailAddress,
-                            style: TextStyle(
-                              fontSize: 18,
-                            ),
-                            decoration:
-                                InputDecoration(border: InputBorder.none),
+                        child: TextFormField(
+                          controller: name,
+                          keyboardType: TextInputType.emailAddress,
+                          style: const TextStyle(
+                            fontSize: 18,
                           ),
+                          decoration:
+                              const InputDecoration(border: InputBorder.none),
                         ),
                       ),
                     ),
-      
-              SizedBox(
+
+                    SizedBox(
                       height: Get.height * 0.02,
                     ),
-      
+
                     // buiseness phone number
-                    Text(
+                    const Text(
                       'Phone',
                       style: TextStyle(
                         fontSize: 16,
                       ),
                     ),
-      
+
                     SizedBox(
                       height: Get.height * 0.001,
                     ),
-      
+
                     // phone number text field
                     Container(
                       height: Get.height * 0.09,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: Color(0xffe0e6ec),
+                          color: const Color(0xffe0e6ec),
                         ),
                         color: Colors.white,
                       ),
@@ -345,19 +342,16 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: SizedBox(
-      
-                              width: Get.width* 0.86,
+                              width: Get.width * 0.86,
                               child: IntlPhoneField(
                                 controller: phoneNo,
-                                decoration: InputDecoration(contentPadding: EdgeInsets.only(top: 22),
-                                  border:InputBorder.none
-                                ),
-      
+                                decoration: const InputDecoration(
+                                    contentPadding: EdgeInsets.only(top: 22),
+                                    border: InputBorder.none),
                                 initialCountryCode: 'CM',
-                                validator: (value){
-                                  if(value == null){
+                                validator: (value) {
+                                  if (value == null) {
                                     print(value);
-      
                                   }
                                 },
                                 onChanged: (phone) {
@@ -366,48 +360,46 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                               ),
                             ),
                           ),
-      
+
                           Expanded(
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 vertical: 1,
                               ),
                               child: TextFormField(
-                               
                                 keyboardType: TextInputType.phone,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 18,
                                 ),
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   border: InputBorder.none,
-                                 
                                 ),
                               ),
                             ),
                           ),
-      
+
                           // by registering
                         ],
                       ),
                     ),
-      
+
                     SizedBox(
                       height: Get.height * 0.02,
                     ),
-      
+
                     // buiseness email
-      
-                    Text(
+
+                    const Text(
                       'Email',
                       style: TextStyle(
                         fontSize: 16,
                       ),
                     ),
-      
+
                     SizedBox(
                       height: Get.height * 0.001,
                     ),
-      
+
                     // text form field
                     Container(
                       height: Get.height * 0.07,
@@ -420,43 +412,38 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Container(
-                          child: TextFormField(
-                            controller: email,
-                            keyboardType: TextInputType.emailAddress,
-                            style: TextStyle(
-                              fontSize: 18,
-                            ),
-                            decoration:
-                                InputDecoration(border: InputBorder.none),
+                        child: TextFormField(
+                          controller: email,
+                          keyboardType: TextInputType.emailAddress,
+                          style: const TextStyle(
+                            fontSize: 18,
                           ),
+                          decoration:
+                              const InputDecoration(border: InputBorder.none),
                         ),
                       ),
                     ),
-      
+
                     SizedBox(
                       height: Get.height * 0.01,
                     ),
-      
+
                     //pass+ retype password
-                    Container(
+                    SizedBox(
                       height: Get.height * 0.11,
                       child: Column(
                         children: [
-                          Row(
+                          const Row(
                             children: [
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(right: 4),
-                                  child: Container(
-                                    child: Text(
-                                      'Password*',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
+                                  padding: EdgeInsets.only(right: 4),
+                                  child: Text(
+                                    'Password*',
+                                    style: TextStyle(fontSize: 16),
                                   ),
                                 ),
                               ),
-                          
                             ],
                           ),
                           SizedBox(
@@ -468,108 +455,105 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: Color(0xffe0e6ec),
+                                  color: const Color(0xffe0e6ec),
                                 ),
                                 color: Colors.white,
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 child: TextFormField(
                                   controller: password,
                                   obscureText: _obscured,
-                                  keyboardType:
-                                      TextInputType.visiblePassword,
-                                  style: TextStyle(
+                                  keyboardType: TextInputType.visiblePassword,
+                                  style: const TextStyle(
                                     fontSize: 18,
                                   ),
                                   decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      suffixIcon:  Padding(
-                                        padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                                        child: GestureDetector(
-                                          onTap: _toggleObscured,
-                                          child: Icon(
-                                            _obscured
-                                                ? Icons.visibility_rounded
-                                                : Icons.visibility_off_rounded,
-                                            size: 24,
-                                          ),
+                                    border: InputBorder.none,
+                                    suffixIcon: Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                      child: GestureDetector(
+                                        onTap: _toggleObscured,
+                                        child: Icon(
+                                          _obscured
+                                              ? Icons.visibility_rounded
+                                              : Icons.visibility_off_rounded,
+                                          size: 24,
                                         ),
                                       ),
                                     ),
-                                      
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                                
+
                           // retype pass form field
-                                
-                        
                         ],
                       ),
                     ),
-      
+
                     SizedBox(
                       height: Get.height * 0.01,
                     ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 4),
-                              child: Container(
-                                child: Text(
-                                  'Repeat Password*',
-                                  style: TextStyle(fontSize: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4),
+                          child: Text(
+                            'Repeat Password*',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color(0xffe0e6ec),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: TextFormField(
+                                controller: cPassword_,
+                                obscureText: _obscured1,
+                                keyboardType: TextInputType.visiblePassword,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                ),
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  suffixIcon: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                    child: GestureDetector(
+                                      onTap: _toggleObscured1,
+                                      child: Icon(
+                                        _obscured1
+                                            ? Icons.visibility_rounded
+                                            : Icons.visibility_off_rounded,
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 4),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: Color(0xffe0e6ec),
-                                          ),
-                                          color: Colors.white,
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: TextFormField(
-                                            controller: cpassword,
-                                            obscureText: _obscured1,
-                                            keyboardType:
-                                                TextInputType.visiblePassword,
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                            ),
-                                            decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                           suffixIcon:  Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-          child: GestureDetector(
-            onTap: _toggleObscured1,
-            child: Icon(
-              _obscured1
-                  ? Icons.visibility_rounded
-                  : Icons.visibility_off_rounded,
-              size: 24,
-            ),
-          ),
-        ), 
-                                                ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                          ],
+                          ),
                         ),
+                      ],
+                    ),
                     // by registering you agree
-                    SizedBox(height: 20,),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -583,101 +567,126 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                         //     });
                         //   },
                         // ),
-                        Text("By registering, you agree to the Errandia's ",style: TextStyle(fontSize: 12),),
+                        const Text(
+                          "By registering, you agree to the Errandia's ",
+                          style: TextStyle(fontSize: 12),
+                        ),
                         InkWell(
-                          onTap: (){
-                             _showTermsAndConditionsDialog(context);
-                          },
-                          child: Text("User's ",textAlign: TextAlign.center,style: TextStyle(color: Colors.blue),))
-                        
+                            onTap: () {
+                              _showTermsAndConditionsDialog(context);
+                            },
+                            child: const Text(
+                              "User's ",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.blue),
+                            ))
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                              InkWell(
-                          onTap: (){
-                             _showTermsAndConditionsDialog(context);
-                          },
-                          child: Text("Agreement ",textAlign: TextAlign.center,style: TextStyle(color: Colors.blue),)),
-                         Text("and "),
-                         Text("Privacy Policy",style: TextStyle(color: Colors.blue),),
-
+                        InkWell(
+                            onTap: () {
+                              _showTermsAndConditionsDialog(context);
+                            },
+                            child: const Text(
+                              "Agreement ",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.blue),
+                            )),
+                        const Text("and "),
+                        const Text(
+                          "Privacy Policy",
+                          style: TextStyle(color: Colors.blue),
+                        ),
                       ],
                     ),
-      
+
                     SizedBox(
                       height: Get.height * 0.04,
                     ),
-      
+
                     //button container
-      
+
                     InkWell(
-      
                       onTap: () async {
                         var Name = name.text.trim().toString();
                         var Phone = phoneNo.text.trim().toString();
                         var Email = email.text.trim().toString();
                         var Password = password.text.trim().toString();
-                        var cPassword = cpassword.text.trim().toString();
-      
-                        if(name=='' && email == ''&& Phone == '' && password == '' && cpassword == ''){
-                          alertDialogBox(context, 'Alert', 'Please Fill Fields');
-                        }else if(Password != cPassword){
-                          print("password and repeat password is not same");
+                        var cPassword = cPassword_.text.trim().toString();
+
+                        if (name == '' &&
+                            email == '' &&
+                            Phone == '' &&
+                            password == '' &&
+                            cPassword_ == '') {
                           alertDialogBox(
-                            context, 'Alert', 'Password and Repeat password is not same');
+                              context, 'Alert', 'Please Fill Fields');
+                        } else if (Password != cPassword) {
+                          print("password and repeat password is not same");
+                          alertDialogBox(context, 'Alert',
+                              'Password and Repeat password is not same');
                         }
                         // }else if(isSelected == false){
                         //   alertBoxdialogBox(context, 'Alert', 'Please agree Terms and Conditon');
-                        else{
+                        else {
                           var value = {
-                            "name":Name,
-                            "email":Email,
+                            "name": Name,
+                            "email": Email,
                             // "country": phone.,
-                            "phone":Phone,
-                            "password":Password,
+                            "phone": Phone,
+                            "password": Password,
                             "confirm_password": cPassword,
                           };
                           print("value: $value");
-                          registration_successful_view home =registration_successful_view ();
-                          registration_failed_view failed= registration_failed_view();
+                          registration_successful_view home =
+                              registration_successful_view();
+                          registration_failed_view failed =
+                              registration_failed_view();
                           setState(() {
-                            isLoading =true;
+                            isLoading = true;
                           });
                           // api().registration('register', value, context,home,failed);
-                         try {
-                           await api().registration("/auth/register", value, context, home, failed);
-                         } finally {
-                           setState(() {
-                             isLoading = false;
-                           });
-                         }
+                          try {
+                            await api().registration(
+                                "/auth/register", value, context, home, failed);
+                          } finally {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
                           // Future.delayed(const Duration(seconds: 3),(){
                           //   setState(() {
                           //     isLoading = false;
                           //   });
                           // });
                         }
-                      // Get.to(Home_view());
+                        // Get.to(Home_view());
                       },
                       child: Container(
                         height: Get.height * 0.09,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: Color(0xffe0e6ec),
+                            color: const Color(0xffe0e6ec),
                           ),
-                          color: Color(0xff113d6b),
+                          color: const Color(0xff113d6b),
                         ),
                         child: Center(
-                          child:isLoading == false? Text(
-                            'CONTINUE',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white),
-                          ):Center(child: CircularProgressIndicator(color: Colors.white,),),
+                          child: isLoading == false
+                              ? const Text(
+                                  'CONTINUE',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white),
+                                )
+                              : const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -713,7 +722,7 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
                     ]),
               ),
             ),
-      
+
             SizedBox(
               height: Get.height * 0.04,
             ),
@@ -722,5 +731,4 @@ class _register_serviceprovider_viewState extends State<register_serviceprovider
       ),
     );
   }
-
 }

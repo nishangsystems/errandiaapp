@@ -1,21 +1,37 @@
 import 'package:errandia/app/modules/auth/Register/registration_successful_view.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/view/home_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../APi/apidomain & api.dart';
 import '../../Register/register_ui.dart';
 
 class signin_otp_verification_screen extends StatelessWidget {
-  signin_otp_verification_screen({super.key});
+  final Map<String, dynamic> otpData;
+
+  signin_otp_verification_screen({super.key, required this.otpData});
 
   RxInt x = 0.obs;
 
+  TextEditingController? otpController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+    String otpText = "";
+
+    print("otp data: $otpData");
+    final String phoneNumber =
+        otpData['uuid'] != null ? "+237 ${otpData['phone']}" : '';
+    final String email = otpData['email'].toString();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -79,9 +95,9 @@ class signin_otp_verification_screen extends StatelessWidget {
                           color: Color(0xff8ba0b7),
                         ),
                       ),
-                      const Text(
-                        'on +237 678 245 693',
-                        style: TextStyle(
+                      Text(
+                        'on ${phoneNumber.isNotEmpty ? phoneNumber : email}',
+                        style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
                           color: Color(0xff8ba0b7),
@@ -139,13 +155,14 @@ class signin_otp_verification_screen extends StatelessWidget {
                             shape: PinCodeFieldShape.box,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          // controller: otpcontroller,
+                          controller: otpController,
                           keyboardType: TextInputType.number,
                           autoFocus: true,
                           appContext: context,
                           length: 4,
                           onChanged: (value) {
                             x.value = value.length;
+                            otpText = value;
                             debugPrint(value);
                           }),
                     ),
@@ -159,7 +176,16 @@ class signin_otp_verification_screen extends StatelessWidget {
                               TextStyle(color: Color(0xff8ba0b7), fontSize: 15),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            var value = {
+                              "phone": otpData['phone']?.toString(),
+                            };
+                            await api()
+                                .loginWithPhone(
+                                value,
+                                context ??
+                                    scaffoldKey.currentContext!);
+                          },
                           child: const Text(
                             'Request Again',
                             style: TextStyle(
@@ -176,8 +202,21 @@ class signin_otp_verification_screen extends StatelessWidget {
                     //button container
 
                     InkWell(
-                      onTap: () {
-                        Get.to(registration_successful_view());
+                      onTap: () async {
+                        if (kDebugMode) {
+                          print("otp code: ${otpController?.text}");
+                        }
+                        var value = {
+                          "code": otpController?.text,
+                          "uuid": otpData['uuid']?.toString(),
+                        };
+
+                        // Home_view home = Home_view();
+
+                        await api().validatePhoneOtp(
+                            value,
+                            context,
+                            registration_successful_view());
                       },
                       child: Container(
                         height: Get.height * 0.09,

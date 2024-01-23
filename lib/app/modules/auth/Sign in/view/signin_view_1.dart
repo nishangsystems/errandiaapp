@@ -291,17 +291,21 @@
 //   }
 // }
 
+import 'dart:convert';
+
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/modules/auth/Register/register_ui.dart';
 import 'package:errandia/app/modules/auth/Register/service_Provider/view/Register_serviceprovider_view.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/forget_password.dart';
+import 'package:errandia/app/modules/auth/Sign%20in/view/signin_otp_verification_screen.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
 import 'package:errandia/auth_services/firebase_auth_services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -361,9 +365,7 @@ class _PhoneState extends State<Phone> {
                         border: InputBorder.none),
                     initialCountryCode: 'CM',
                     validator: (value) {
-                      if (value == null) {
-                        print(value);
-                      }
+                      if (value == null) {}
                       return null;
                     },
                     onChanged: (phone) {
@@ -731,7 +733,7 @@ class _signin_viewState extends State<signin_view_1>
   late AnimationController _controller;
 
   final TextEditingController _phoneContoller = TextEditingController();
-  TextEditingController _otpContoller = TextEditingController();
+  final TextEditingController _otpContoller = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController phone = TextEditingController();
@@ -740,6 +742,7 @@ class _signin_viewState extends State<signin_view_1>
   final _formKey1 = GlobalKey<FormState>();
   bool isSelected = true;
   bool isSelected2 = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -756,6 +759,7 @@ class _signin_viewState extends State<signin_view_1>
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+    // bool isLoading = false;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -899,115 +903,80 @@ class _signin_viewState extends State<signin_view_1>
                               height: 50,
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () async {
+                                onPressed: isLoading ? null : () async {
                                   if (_formKey.currentState!.validate()) {
                                     var value = {"phone": _phoneContoller.text};
                                     SharedPreferences prefs =
                                         await SharedPreferences.getInstance();
 
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+
+                                    print("value: $value");
+                                    var response_ = null;
+
                                     await api()
-                                        .loginWithPhone(value, scaffoldKey.currentContext)
+                                        .loginWithPhone(
+                                            value,
+                                            context ??
+                                                scaffoldKey.currentContext!)
                                         .then((response) => {
-                                              if (response['data']['uuid'] !=
-                                                      null ||
-                                                  response['data']['uuid'] !=
-                                                      "")
+                                              if (response != null)
                                                 {
-                                                  print(
-                                                      "showing popup: $response"),
-                                                  showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) =>
-                                                              AlertDialog(
-                                                                title: const Text(
-                                                                    "OTP Verification"),
-                                                                content: Column(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    const Text(
-                                                                        "Enter 4 digit code"),
-                                                                    const SizedBox(
-                                                                      height:
-                                                                          12,
-                                                                    ),
-                                                                    Form(
-                                                                      key:
-                                                                          _formKey1,
-                                                                      child:
-                                                                          TextFormField(
-                                                                        maxLength:
-                                                                            4,
-                                                                        keyboardType:
-                                                                            TextInputType.number,
-                                                                        controller:
-                                                                            _otpContoller,
-                                                                        decoration: InputDecoration(
-                                                                            labelText:
-                                                                                "Enter you phone number",
-                                                                            border:
-                                                                                OutlineInputBorder(borderRadius: BorderRadius.circular(32))),
-                                                                        validator:
-                                                                            (value) {
-                                                                          if (value!.length !=
-                                                                              4) {
-                                                                            return "Invalid OTP";
-                                                                          }
-                                                                          return null;
-                                                                        },
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                actions: [
-                                                                  TextButton(
-                                                                      onPressed:
-                                                                          () async {
-                                                                        if (_formKey1
-                                                                            .currentState!
-                                                                            .validate()) {
-                                                                          var value =
-                                                                              {
-                                                                            "code":
-                                                                                _otpContoller.text,
-                                                                            "uuid":
-                                                                                prefs.getString("uuid"),
-                                                                          };
+                                                  // var uuid = response['data']['uuid'],
+                                                  print("response: ${response.body}"),
+                                                  if (response.statusCode == 200)
+                                                    {
 
-                                                                          Home_view
-                                                                              home =
-                                                                              Home_view();
-
-                                                                          await api().validatePhoneOtp(
-                                                                              value,
-                                                                              context,
-                                                                              home);
-                                                                        }
-                                                                      },
-                                                                      child: const Text(
-                                                                          "Submit"))
-                                                                ],
-                                                              ))
+                                                      response_ = jsonDecode(response.body),
+                                                      print(
+                                                          "showing popup: ${response_['data']}"),
+                                                      setState(() {
+                                                        isLoading = false;
+                                                      }),
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  signin_otp_verification_screen(
+                                                                      otpData: {
+                                                                        "uuid": response_['data']
+                                                                            [
+                                                                            'uuid'],
+                                                                        "phone":
+                                                                            _phoneContoller.text,
+                                                                        // "email": response['data']['email'],
+                                                                      })))
+                                                    }
+                                                  else
+                                                    {
+                                                      print(
+                                                          "issue login: ${response.body}"),
+                                                      setState(() {
+                                                        isLoading = false;
+                                                      }),
+                                                      ScaffoldMessenger.of(
+                                                              scaffoldKey
+                                                                  .currentContext!)
+                                                          .showSnackBar(
+                                                              const SnackBar(
+                                                        content: Text(
+                                                          "Error in sending OTP",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                      ))
+                                                    }
                                                 }
                                               else
                                                 {
-                                                  ScaffoldMessenger.of(
-                                                          scaffoldKey
-                                                              .currentContext!)
-                                                      .showSnackBar(
-                                                          const SnackBar(
-                                                    content: Text(
-                                                      "Error in sending OTP",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                    backgroundColor: Colors.red,
-                                                  ))
+                                                  setState(() {
+                                                    isLoading = false;
+                                                  }),
                                                 }
                                             });
                                   }
@@ -1015,7 +984,19 @@ class _signin_viewState extends State<signin_view_1>
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xff113d6b),
                                     foregroundColor: Colors.white),
-                                child: const Text("Continue"),
+                                child: isLoading == false
+                                    ? const Text(
+                                        'Continue',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white),
+                                      )
+                                    : const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
+                                      ),
                               ),
                             )
                           ],
