@@ -15,17 +15,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../APi/apidomain & api.dart';
 import '../../Register/register_ui.dart';
 
-class signin_otp_verification_screen extends StatelessWidget {
+class signin_otp_verification_screen extends StatefulWidget {
   final Map<String, dynamic> otpData;
 
   signin_otp_verification_screen({super.key, required this.otpData});
 
-  RxInt x = 0.obs;
+  @override
+  _signin_otp_verification_screenState createState() =>
+      _signin_otp_verification_screenState();
+}
 
+class _signin_otp_verification_screenState
+    extends State<signin_otp_verification_screen> {
+  RxInt x = 0.obs;
   TextEditingController? otpController = TextEditingController();
 
   // load shared preferences
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  bool isLoading = false;
 
   // get uuid from shared preferences
   Future<String?> getUuid() async {
@@ -39,14 +46,12 @@ class signin_otp_verification_screen extends StatelessWidget {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     String otpText = "";
 
-    print("otp data: $otpData");
+    print("otp data: ${widget.otpData}");
 
     final String identifier =
-        getUuid().toString() != "" ? otpData['identifier'] : '';
+        getUuid().toString() != "" ? widget.otpData['identifier'] : '';
     final String phoneNumber = isNumeric(identifier) ? "+237 $identifier" : "";
     final String email = !isNumeric(identifier) ? identifier : "";
-
-    bool isLoading = false;
 
     // final String email = otpData['identifier'].toString();
 
@@ -196,7 +201,7 @@ class signin_otp_verification_screen extends StatelessWidget {
                         TextButton(
                           onPressed: () async {
                             var value = {
-                              "identifier": otpData['identifier']?.toString(),
+                              "identifier": widget.otpData['identifier']?.toString(),
                             };
                             signin_otp_verification_screen verifyCodeView =
                                 signin_otp_verification_screen(
@@ -249,16 +254,26 @@ class signin_otp_verification_screen extends StatelessWidget {
                                   }
 
                                   // Home_view home = Home_view();
-                                  isLoading = true;
+                                  setState(() {
+                                    isLoading = true;
+                                  });
                                   await Future.delayed(
-                                      const Duration(seconds: 100));
+                                      const Duration(seconds: 3));
+
                                   try {
+                                    print("isLoading: $isLoading");
                                     await api().validatePhoneOtp(
                                         value,
                                         context ?? scaffoldKey.currentContext!,
-                                        registration_successful_view());
+                                        registration_successful_view(
+                                            userAction: const {
+                                              "name": "login",
+                                            }
+                                        ));
                                   } finally {
-                                    isLoading = false;
+                                    setState(() {
+                                      isLoading = false;
+                                    });
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
@@ -266,19 +281,18 @@ class signin_otp_verification_screen extends StatelessWidget {
                               foregroundColor: Colors.white),
                           child: isLoading == false
                               ? const Text(
-                            'CONTINUE',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white),
-                          )
+                                  'CONTINUE',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white),
+                                )
                               : const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          ),
-                        )
-                    ),
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        )),
                   ],
                 ),
               ),
@@ -300,7 +314,10 @@ class signin_otp_verification_screen extends StatelessWidget {
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               debugPrint('Register View');
-                              Get.offAll(register_serviceprovider_view());
+                              Get.offAll(registration_successful_view(
+                                  userAction: const {
+                                    "name": "login",
+                                  }));
                             },
                           text: 'Register',
                           style: const TextStyle(

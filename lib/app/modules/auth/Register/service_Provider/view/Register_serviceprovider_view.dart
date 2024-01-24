@@ -154,6 +154,9 @@ class _register_serviceprovider_viewState
             Divider(
               color: Colors.grey.shade300,
             ),
+            SizedBox(
+              height: Get.height * 0.03,
+            ),
 
             const Column(
               children: [
@@ -166,14 +169,6 @@ class _register_serviceprovider_viewState
                   ),
                   textAlign: TextAlign.center,
                 ),
-                // Text(
-                //   'ACCOUNT',
-                //   style: TextStyle(
-                //     fontSize: 26,
-                //     fontWeight: FontWeight.w700,
-                //     color: Color(0xff113d6b),
-                //   ),
-                // ),
               ],
             ),
 
@@ -189,89 +184,6 @@ class _register_serviceprovider_viewState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // buiseness name
-
-                    // text form field
-
-                    // SizedBox(
-                    //   height: Get.height * 0.02,
-                    // ),
-
-                    // profile photo
-                    // Text(
-                    //   'Profile Picture*',
-                    //   style: TextStyle(
-                    //     fontSize: 16,
-                    //   ),
-                    // ),
-                    //
-                    // SizedBox(
-                    //   height: Get.height * 0.001,
-                    // ),
-                    //
-                    // // text form field
-                    // Container(
-                    //   height: Get.height * 0.09,
-                    //   child: Row(
-                    //     children: [
-                    //       Obx(
-                    //         () => Container(
-                    //           width: Get.width * 0.2,
-                    //           child: Card(
-                    //             child: image_pick_controller
-                    //                     .image_path.isEmpty
-                    //                 ? Image(
-                    //                     image: AssetImage(
-                    //                       'assets/images/person_avatar.png',
-                    //                     ),
-                    //                   )
-                    //                 : Image(
-                    //                     image: FileImage(
-                    //                       File(
-                    //                         image_pick_controller.image_path
-                    //                             .toString(),
-                    //                       ),
-                    //                     ),
-                    //                     fit: BoxFit.fill,
-                    //                   ),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //       InkWell(
-                    //         onTap: () {
-                    //           // here image picker will be implemented
-                    //
-                    //           image_pick_controller.getImagefromgallery();
-                    //         },
-                    //         child: Card(
-                    //           color: Color(0xffe0f6fe),
-                    //           child: Container(
-                    //             margin: EdgeInsets.symmetric(horizontal: 20),
-                    //             height: Get.height,
-                    //             width: Get.width * 0.3,
-                    //             child: Row(
-                    //               mainAxisAlignment: MainAxisAlignment.start,
-                    //               children: [
-                    //                 Icon(
-                    //                   Icons.upload,
-                    //                   size: 30,
-                    //                   color: Color(0xff113d6b),
-                    //                 ),
-                    //                 Text(
-                    //                   'UPLOAD',
-                    //                   style: TextStyle(
-                    //                       fontSize: 18,
-                    //                       color: Color(0xff113d6b),
-                    //                       fontWeight: FontWeight.bold),
-                    //                 ),
-                    //               ],
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
 
                     SizedBox(
                       height: Get.height * 0.01,
@@ -293,7 +205,7 @@ class _register_serviceprovider_viewState
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: Color(0xffe0e6ec),
+                          color: const Color(0xffe0e6ec),
                         ),
                         color: Colors.white,
                       ),
@@ -353,6 +265,7 @@ class _register_serviceprovider_viewState
                                   if (value == null) {
                                     print(value);
                                   }
+                                  return null;
                                 },
                                 onChanged: (phone) {
                                   print("phone: $phone");
@@ -406,7 +319,7 @@ class _register_serviceprovider_viewState
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: Color(0xffe0e6ec),
+                          color: const Color(0xffe0e6ec),
                         ),
                         color: Colors.white,
                       ),
@@ -424,132 +337,6 @@ class _register_serviceprovider_viewState
                       ),
                     ),
 
-                    SizedBox(
-                      height: Get.height * 0.01,
-                    ),
-
-                    //pass+ retype password
-                    SizedBox(
-                      height: Get.height * 0.11,
-                      child: Column(
-                        children: [
-                          const Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(right: 4),
-                                  child: Text(
-                                    'Password*',
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: Get.height * 0.001,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 4),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: const Color(0xffe0e6ec),
-                                ),
-                                color: Colors.white,
-                              ),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                child: TextFormField(
-                                  controller: password,
-                                  obscureText: _obscured,
-                                  keyboardType: TextInputType.visiblePassword,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                  ),
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    suffixIcon: Padding(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                                      child: GestureDetector(
-                                        onTap: _toggleObscured,
-                                        child: Icon(
-                                          _obscured
-                                              ? Icons.visibility_rounded
-                                              : Icons.visibility_off_rounded,
-                                          size: 24,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          // retype pass form field
-                        ],
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: Get.height * 0.01,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(left: 4),
-                          child: Text(
-                            'Repeat Password*',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: const Color(0xffe0e6ec),
-                              ),
-                              color: Colors.white,
-                            ),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: TextFormField(
-                                controller: cPassword_,
-                                obscureText: _obscured1,
-                                keyboardType: TextInputType.visiblePassword,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                ),
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  suffixIcon: Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                                    child: GestureDetector(
-                                      onTap: _toggleObscured1,
-                                      child: Icon(
-                                        _obscured1
-                                            ? Icons.visibility_rounded
-                                            : Icons.visibility_off_rounded,
-                                        size: 24,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                     // by registering you agree
                     const SizedBox(
                       height: 20,
@@ -613,20 +400,12 @@ class _register_serviceprovider_viewState
                         var Name = name.text.trim().toString();
                         var Phone = phoneNo.text.trim().toString();
                         var Email = email.text.trim().toString();
-                        var Password = password.text.trim().toString();
-                        var cPassword = cPassword_.text.trim().toString();
 
                         if (name == '' &&
                             email == '' &&
-                            Phone == '' &&
-                            password == '' &&
-                            cPassword_ == '') {
+                            Phone == '') {
                           alertDialogBox(
                               context, 'Alert', 'Please Fill Fields');
-                        } else if (Password != cPassword) {
-                          print("password and repeat password is not same");
-                          alertDialogBox(context, 'Alert',
-                              'Password and Repeat password is not same');
                         }
                         // }else if(isSelected == false){
                         //   alertBoxdialogBox(context, 'Alert', 'Please agree Terms and Conditon');
@@ -636,12 +415,12 @@ class _register_serviceprovider_viewState
                             "email": Email,
                             // "country": phone.,
                             "phone": Phone,
-                            "password": Password,
-                            "confirm_password": cPassword,
                           };
                           print("value: $value");
                           registration_successful_view home =
-                              registration_successful_view();
+                              registration_successful_view(userAction: const {
+                            "name": "register",
+                              });
                           registration_failed_view failed =
                               registration_failed_view();
                           setState(() {
@@ -649,8 +428,7 @@ class _register_serviceprovider_viewState
                           });
                           // api().registration('register', value, context,home,failed);
                           try {
-                            await api().registration(
-                                "/auth/register", value, context, home, failed);
+                            await api().registration(value, context, home, failed);
                           } finally {
                             setState(() {
                               isLoading = false;

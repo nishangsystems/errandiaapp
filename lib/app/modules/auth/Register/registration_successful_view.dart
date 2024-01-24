@@ -1,4 +1,6 @@
 import 'package:errandia/app/modules/auth/Register/registration_failed_view.dart';
+import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
+import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view_1.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +10,12 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../home/view/home_view.dart';
 
 class registration_successful_view extends StatelessWidget {
-  registration_successful_view({super.key});
+  final Map<String, dynamic> userAction;
+  registration_successful_view({super.key, required this.userAction});
   RxInt x = 0.obs;
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -22,7 +26,7 @@ class registration_successful_view extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios,
             color: Color(0xff113d6b),
           ),
@@ -49,7 +53,7 @@ class registration_successful_view extends StatelessWidget {
                             ),
                         child: Center(
                           child: Image(
-                            image: AssetImage('assets/images/success_image.png'),
+                            image: const AssetImage('assets/images/success_image.png'),
                             fit: BoxFit.cover,
                             height: Get.height*0.5,
                           ),
@@ -60,10 +64,10 @@ class registration_successful_view extends StatelessWidget {
                         height: Get.height * 0.02,
                       ),
                       Container(
-                        margin:EdgeInsets.symmetric(horizontal: 25),
+                        margin:const EdgeInsets.symmetric(horizontal: 25),
                         child: Column(
                           children: [
-                            Text(
+                           const Text(
                               'Registration Successful',
                               style: TextStyle(
                                 fontSize: 22,
@@ -77,23 +81,21 @@ class registration_successful_view extends StatelessWidget {
                             ),
 
                             //
-                            Container(
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'Lorem Ipsum is simply dummy text the printing and typesetting industry',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xff8ba0b7),
-                                    ),
-                                    textAlign: TextAlign.center,
+                            Column(
+                              children: [
+                                const Text(
+                                  'Lorem Ipsum is simply dummy text the printing and typesetting industry',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xff8ba0b7),
                                   ),
-                                 
-                                  SizedBox(height: Get.height*0.02,)
-                                  
-                                ],
-                              ),
+                                  textAlign: TextAlign.center,
+                                ),
+
+                                SizedBox(height: Get.height*0.02,)
+
+                              ],
                             ),
                           ],
                         ),
@@ -106,7 +108,11 @@ class registration_successful_view extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  Get.to(Home_view());
+                  if (userAction['name'] == 'register') {
+                    Get.to(const signin_view());
+                  } else {
+                    Get.to(() => Home_view());
+                  }
                   //registration_failed_view(
                 },
                 child: Container(
@@ -114,11 +120,11 @@ class registration_successful_view extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: Color(0xffe0e6ec),
+                      color: const Color(0xffe0e6ec),
                     ),
-                    color: Color(0xff113d6b),
+                    color: const Color(0xff113d6b),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'CONTINUE',
                       style: TextStyle(

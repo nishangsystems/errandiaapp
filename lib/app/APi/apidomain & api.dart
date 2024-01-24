@@ -12,8 +12,7 @@ class apiDomain {
 }
 
 class api {
-  Future registration(
-      String Url, Object value, context, navigator, navigator1) async {
+  Future registration(Object value, context, navigator, navigator1) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
         Uri.parse('${apiDomain().domain}/auth/signup'),
@@ -31,11 +30,11 @@ class api {
     }
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      var data_ = data['data'];
-      if (kDebugMode) {
-        print("data token: ${data_['token']}");
-      }
-      prefs.setString('token', data_['token']);
+      // var data_ = data['data'];
+      // if (kDebugMode) {
+      //   print("data token: ${data_['token']}");
+      // }
+      // prefs.setString('token', data_['token']);
 
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => navigator));

@@ -327,7 +327,7 @@ class _EmailState extends State<Email> {
                     "password":Password
                   };
                   Home_view home = Home_view();
-                  api().registration('email/login', value, context, home,'');
+                  api().registration( value, context, home,'');
                   setState(() {
                     isLoading =true;
                   });

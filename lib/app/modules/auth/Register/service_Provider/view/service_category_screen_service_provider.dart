@@ -82,7 +82,9 @@ class service_category_service_provider extends StatelessWidget {
                       ),
                       color: appcolor().greyColor,
                       ontap: () {
-                        Get.to(registration_successful_view());
+                        Get.to(registration_successful_view(userAction: const {
+                          "name": 'Registration Successful',
+                        },));
                       },
                       textcolor: appcolor().mediumGreyColor,
                     ),

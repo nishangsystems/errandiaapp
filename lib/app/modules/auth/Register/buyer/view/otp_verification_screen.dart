@@ -166,7 +166,9 @@ class register_otp_verification_screen extends StatelessWidget {
                       
                       InkWell(
                         onTap: () {
-                          Get.to(registration_successful_view());
+                          Get.to(registration_successful_view(
+                            userAction: const {'name': 'register'},
+                          ));
                         },
                         child: Container(
                           height: Get.height * 0.09,

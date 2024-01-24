@@ -782,7 +782,7 @@ class _signin_viewState extends State<signin_view>
                           ),
                           child: Padding(
                             padding: const EdgeInsets.only(
-                                left: 15, right: 15, top: 40),
+                                left: 15, right: 15, top: 10),
                             child: TextFormField(
                               style: const TextStyle(
                                 fontSize: 18,
@@ -831,7 +831,7 @@ class _signin_viewState extends State<signin_view>
                                   }
                                 }
                                 // You can add additional validation logic here
-                                return "";
+                                return null;
                               },
                             ),
                           ),
@@ -844,13 +844,12 @@ class _signin_viewState extends State<signin_view>
                         height: 50,
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: isLoading
-                              ? null
-                              : () async {
+                          onPressed: isLoading ? null : () async {
                             if (_formKey.currentState!.validate()) {
-                              var value = {"phone": _phoneContoller.text};
-                              SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
+                              var value = {"identifier": _emailPhoneController.text};
+                              signin_otp_verification_screen verifyCodeView = signin_otp_verification_screen(
+                                otpData: value,
+                              );
 
                               setState(() {
                                 isLoading = true;
@@ -859,73 +858,14 @@ class _signin_viewState extends State<signin_view>
                               if (kDebugMode) {
                                 print("value: $value");
                               }
-                              var response_ = null;
 
-                              await api()
-                                  .loginWithPhone(
-                                  value,
-                                  context ??
-                                      scaffoldKey.currentContext!)
-                                  .then((response) => {
-                                if (response != null)
-                                  {
-                                    // var uuid = response['data']['uuid'],
-                                    print(
-                                        "response: ${response.body}"),
-                                    if (response.statusCode ==
-                                        200)
-                                      {
-                                        response_ = jsonDecode(
-                                            response.body),
-                                        print(
-                                            "showing popup: ${response_['data']}"),
-                                        setState(() {
-                                          isLoading = false;
-                                        }),
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    signin_otp_verification_screen(
-                                                        otpData: {
-                                                          "uuid": response_['data']
-                                                          [
-                                                          'uuid'],
-                                                          "phone":
-                                                          _phoneContoller.text,
-                                                          // "email": response['data']['email'],
-                                                        })))
-                                      }
-                                    else
-                                      {
-                                        print(
-                                            "issue login: ${response.body}"),
-                                        setState(() {
-                                          isLoading = false;
-                                        }),
-                                        ScaffoldMessenger.of(
-                                            scaffoldKey
-                                                .currentContext!)
-                                            .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                "Error in sending OTP",
-                                                style: TextStyle(
-                                                    color:
-                                                    Colors.white),
-                                              ),
-                                              backgroundColor:
-                                              Colors.red,
-                                            ))
-                                      }
-                                  }
-                                else
-                                  {
-                                    setState(() {
-                                      isLoading = false;
-                                    }),
-                                  }
-                              });
+                              try {
+                                await api().login(value, context ?? scaffoldKey.currentContext!, verifyCodeView, "");
+                              } finally {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }
                             }
                           },
                           style: ElevatedButton.styleFrom(
