@@ -116,6 +116,7 @@ class signin_otp_verification_screen extends StatelessWidget {
                             ),
                             TextSpan(
                               text: 'Try another phone',
+
                               style: TextStyle(
                                 color: Color(0xff113d6b),
                               ),

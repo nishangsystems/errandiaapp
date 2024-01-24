@@ -291,17 +291,21 @@
 //   }
 // }
 
+import 'dart:convert';
+
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/modules/auth/Register/register_ui.dart';
 import 'package:errandia/app/modules/auth/Register/service_Provider/view/Register_serviceprovider_view.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/forget_password.dart';
+import 'package:errandia/app/modules/auth/Sign%20in/view/signin_otp_verification_screen.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
 import 'package:errandia/auth_services/firebase_auth_services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/helpers.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -682,11 +686,14 @@ class _signin_viewState extends State<signin_view>
   TextEditingController password = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController phone = TextEditingController();
+  final TextEditingController _emailPhoneController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
   final _formKey1 = GlobalKey<FormState>();
   bool isSelected = true;
   bool isSelected2 = false;
+  bool isLoading = false;
+  bool isPhone = false;
 
   @override
   void initState() {
@@ -755,270 +762,222 @@ class _signin_viewState extends State<signin_view>
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10)),
-                width: Get.width * 0.9,
-                height: 50,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          isSelected2 = false;
-                          isSelected = true;
-                        });
-                      },
-                      child: Container(
-                        width: 150,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: isSelected
-                                ? Colors.blue.shade100
-                                : Colors.white),
-                        child: Center(child: Text("Phone")),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          isSelected = false;
-                          isSelected2 = true;
-                        });
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 150,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: isSelected2
-                                ? Colors.blue.shade100
-                                : Colors.white),
-                        child: Center(child: Text("Email")),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // child: Column(
-                //   children: [
-                //     Text(
-                //       'Log into your Errandia account',
-                //       style: TextStyle(
-                //         fontSize: 17,
-                //         fontWeight: FontWeight.w500,
-                //         color: Color(0xff8ba0b7),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-              ),
-            ),
-            isSelected
-                ? Column(
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Form(
-                              key: _formKey,
-                              child: Container(
-                                height: Get.height * 0.09,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Color(0xffe0e6ec),
-                                  ),
-                                  color: Colors.white,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10, right: 10, top: 10),
-                                  child: TextFormField(
-                                    controller: _phoneContoller,
-                                    maxLength: 9,
-                                    keyboardType: TextInputType.phone,
-                                    decoration: const InputDecoration(
-                                      prefixText: "+237 ",
-                                      hintText: "Enter your phone number",
-                                      border: InputBorder.none,
-                                    ),
-                                    validator: (value) {
-                                      if (value!.length != 9) {
-                                        return "Invalid phone number";
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
+                      Form(
+                        key: _formKey,
+                        child: Container(
+                          height: Get.height * 0.09,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xffe0e6ec),
+                            ),
+                            color: Colors.white,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 15, right: 15, top: 40),
+                            child: TextFormField(
+                              style: const TextStyle(
+                                fontSize: 18,
                               ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            SizedBox(
-                              height: 50,
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    var value = {"phone": _phoneContoller.text};
-                                    SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
+                              controller: _emailPhoneController,
+                              keyboardType: isPhone
+                                  ? TextInputType.phone
+                                  : TextInputType.emailAddress,
+                              maxLength: isPhone ? 9 : 100,
+                              onChanged: (value) {
+                                if (kDebugMode) {
+                                  print("value: $value");
+                                }
+                                if (isNumeric(value)) {
+                                  setState(() {
+                                    isPhone = true;
+                                  });
+                                } else if (value.contains('@') ||
+                                    value.isEmpty) {
+                                  setState(() {
+                                    isPhone = false;
+                                  });
+                                }
+                              },
+                              decoration: InputDecoration(
+                                hintText: "Phone number or email",
+                                border: InputBorder.none,
+                                prefixText: isPhone ? "+237 " : "",
+                                errorBorder: InputBorder.none,
+                                focusedErrorBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                alignLabelWithHint: true,
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your phone number or email';
+                                }
 
-                                    await api()
-                                        .loginWithPhone(value, scaffoldKey.currentContext)
-                                        .then((response) => {
-                                      if (response['data']['uuid'] !=
-                                          null ||
-                                          response['data']['uuid'] !=
-                                              "")
-                                        {
-                                          print(
-                                              "showing popup: $response"),
-                                          showDialog(
-                                              context: context,
-                                              builder:
-                                                  (context) =>
-                                                  AlertDialog(
-                                                    title: const Text(
-                                                        "OTP Verification"),
-                                                    content: Column(
-                                                      mainAxisSize:
-                                                      MainAxisSize
-                                                          .min,
-                                                      crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
-                                                      children: [
-                                                        const Text(
-                                                            "Enter 4 digit code"),
-                                                        const SizedBox(
-                                                          height:
-                                                          12,
-                                                        ),
-                                                        Form(
-                                                          key:
-                                                          _formKey1,
-                                                          child:
-                                                          TextFormField(
-                                                            maxLength:
-                                                            4,
-                                                            keyboardType:
-                                                            TextInputType.number,
-                                                            controller:
-                                                            _otpContoller,
-                                                            decoration: InputDecoration(
-                                                                labelText:
-                                                                "Enter you phone number",
-                                                                border:
-                                                                OutlineInputBorder(borderRadius: BorderRadius.circular(32))),
-                                                            validator:
-                                                                (value) {
-                                                              if (value!.length !=
-                                                                  4) {
-                                                                return "Invalid OTP";
-                                                              }
-                                                              return null;
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    actions: [
-                                                      TextButton(
-                                                          onPressed:
-                                                              () async {
-                                                            if (_formKey1
-                                                                .currentState!
-                                                                .validate()) {
-                                                              var value =
-                                                              {
-                                                                "code":
-                                                                _otpContoller.text,
-                                                                "uuid":
-                                                                prefs.getString("uuid"),
-                                                              };
-
-                                                              Home_view
-                                                              home =
-                                                              Home_view();
-
-                                                              await api().validatePhoneOtp(
-                                                                  value,
-                                                                  context,
-                                                                  home);
-                                                            }
-                                                          },
-                                                          child: const Text(
-                                                              "Submit"))
-                                                    ],
-                                                  ))
-                                        }
-                                      else
-                                        {
-                                          ScaffoldMessenger.of(
-                                              scaffoldKey
-                                                  .currentContext!)
-                                              .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  "Error in sending OTP",
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                                backgroundColor: Colors.red,
-                                              ))
-                                        }
-                                    });
+                                if (isPhone) {
+                                  if (value.length != 9) {
+                                    return 'Please enter a valid phone number';
                                   }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xff113d6b),
-                                    foregroundColor: Colors.white),
-                                child: const Text("Continue"),
-                              ),
-                            )
-                          ],
+                                } else {
+                                  if (!value.contains('@')) {
+                                    return 'Please enter a valid email';
+                                  }
+                                }
+                                // You can add additional validation logic here
+                                return "";
+                              },
+                            ),
+                          ),
                         ),
                       ),
-                      SizedBox(
-                        height: Get.height * 0.02,
+                      const SizedBox(
+                        height: 20,
                       ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: RichText(
-                          text: TextSpan(
-                              style: const TextStyle(
-                                  color: Color(0xff8ba0b7), fontSize: 17),
-                              children: [
-                                const TextSpan(
-                                    text: 'Don\'t have an Errandia Account? '),
-                                TextSpan(
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      debugPrint('Register View');
-                                      Get.off(register_serviceprovider_view());
-                                    },
-                                  text: 'Register',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xff3c7fc6),
-                                  ),
-                                )
-                              ]),
+                      SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: isLoading
+                              ? null
+                              : () async {
+                            if (_formKey.currentState!.validate()) {
+                              var value = {"phone": _phoneContoller.text};
+                              SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+
+                              setState(() {
+                                isLoading = true;
+                              });
+
+                              if (kDebugMode) {
+                                print("value: $value");
+                              }
+                              var response_ = null;
+
+                              await api()
+                                  .loginWithPhone(
+                                  value,
+                                  context ??
+                                      scaffoldKey.currentContext!)
+                                  .then((response) => {
+                                if (response != null)
+                                  {
+                                    // var uuid = response['data']['uuid'],
+                                    print(
+                                        "response: ${response.body}"),
+                                    if (response.statusCode ==
+                                        200)
+                                      {
+                                        response_ = jsonDecode(
+                                            response.body),
+                                        print(
+                                            "showing popup: ${response_['data']}"),
+                                        setState(() {
+                                          isLoading = false;
+                                        }),
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    signin_otp_verification_screen(
+                                                        otpData: {
+                                                          "uuid": response_['data']
+                                                          [
+                                                          'uuid'],
+                                                          "phone":
+                                                          _phoneContoller.text,
+                                                          // "email": response['data']['email'],
+                                                        })))
+                                      }
+                                    else
+                                      {
+                                        print(
+                                            "issue login: ${response.body}"),
+                                        setState(() {
+                                          isLoading = false;
+                                        }),
+                                        ScaffoldMessenger.of(
+                                            scaffoldKey
+                                                .currentContext!)
+                                            .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                "Error in sending OTP",
+                                                style: TextStyle(
+                                                    color:
+                                                    Colors.white),
+                                              ),
+                                              backgroundColor:
+                                              Colors.red,
+                                            ))
+                                      }
+                                  }
+                                else
+                                  {
+                                    setState(() {
+                                      isLoading = false;
+                                    }),
+                                  }
+                              });
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xff113d6b),
+                              foregroundColor: Colors.white),
+                          child: isLoading == false
+                              ? const Text(
+                            'Continue',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
+                          )
+                              : const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       )
                     ],
-                  )
-                : Email()
+                  ),
+                ),
+                SizedBox(
+                  height: Get.height * 0.03,
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: RichText(
+                    text: TextSpan(
+                        style: const TextStyle(
+                            color: Color(0xff8ba0b7), fontSize: 17),
+                        children: [
+                          const TextSpan(
+                              text: 'Don\'t have an Errandia Account? '),
+                          TextSpan(
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                debugPrint('Register View');
+                                Get.off(register_serviceprovider_view());
+                              },
+                            text: 'Register',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff3c7fc6),
+                            ),
+                          )
+                        ]),
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),
