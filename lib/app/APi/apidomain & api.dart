@@ -54,7 +54,7 @@ class api {
   Future login(Object value, context, navigator, navigator1) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
-        Uri.parse('${apiDomain().domain}/auth/login_with_email'),
+        Uri.parse('${apiDomain().domain}/auth/login'),
         body: jsonEncode(value),
         headers: ({'Content-Type': 'application/json; charset=UTF-8'}));
     if (kDebugMode) {
@@ -71,9 +71,9 @@ class api {
       final data = jsonDecode(response.body);
       var data_ = data['data'];
       if (kDebugMode) {
-        print("data token: ${data_['token']}");
+        print("data uuid: ${data_['uuid']}");
       }
-      prefs.setString('token', data_['token']);
+      prefs.setString('uuid', data_['uuid']);
 
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => navigator));
@@ -240,7 +240,7 @@ class api {
   Future validatePhoneOtp(Object value, context, navigator) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
-        Uri.parse('${apiDomain().domain}/auth/validate_login_otp_code'),
+        Uri.parse('${apiDomain().domain}/auth/validate_otp_code'),
         body: jsonEncode(value),
         headers: ({'Content-Type': 'application/json; charset=UTF-8'}));
     if (kDebugMode) {

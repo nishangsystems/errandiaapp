@@ -1,4 +1,5 @@
 import 'package:errandia/app/modules/auth/Register/registration_successful_view.dart';
+import 'package:errandia/app/modules/auth/Register/service_Provider/view/Register_serviceprovider_view.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/helpers.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,15 +24,31 @@ class signin_otp_verification_screen extends StatelessWidget {
 
   TextEditingController? otpController = TextEditingController();
 
+  // load shared preferences
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  // get uuid from shared preferences
+  Future<String?> getUuid() async {
+    final SharedPreferences prefs = await _prefs;
+    final String? uuid = prefs.getString('uuid');
+    return uuid;
+  }
+
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     String otpText = "";
 
     print("otp data: $otpData");
-    final String phoneNumber =
-        otpData['uuid'] != null ? "+237 ${otpData['phone']}" : '';
-    final String email = otpData['email'].toString();
+
+    final String identifier =
+        getUuid().toString() != "" ? otpData['identifier'] : '';
+    final String phoneNumber = isNumeric(identifier) ? "+237 $identifier" : "";
+    final String email = !isNumeric(identifier) ? identifier : "";
+
+    bool isLoading = false;
+
+    // final String email = otpData['identifier'].toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -116,7 +134,6 @@ class signin_otp_verification_screen extends StatelessWidget {
                             ),
                             TextSpan(
                               text: 'Try another phone',
-
                               style: TextStyle(
                                 color: Color(0xff113d6b),
                               ),
@@ -179,13 +196,24 @@ class signin_otp_verification_screen extends StatelessWidget {
                         TextButton(
                           onPressed: () async {
                             var value = {
-                              "phone": otpData['phone']?.toString(),
+                              "identifier": otpData['identifier']?.toString(),
                             };
-                            await api()
-                                .loginWithPhone(
-                                value,
-                                context ??
-                                    scaffoldKey.currentContext!);
+                            signin_otp_verification_screen verifyCodeView =
+                                signin_otp_verification_screen(
+                              otpData: value,
+                            );
+
+                            isLoading = true;
+
+                            try {
+                              await api().login(
+                                  value,
+                                  context ?? scaffoldKey.currentContext!,
+                                  verifyCodeView,
+                                  "");
+                            } finally {
+                              isLoading = false;
+                            }
                           },
                           child: const Text(
                             'Request Again',
@@ -201,50 +229,62 @@ class signin_otp_verification_screen extends StatelessWidget {
                     ),
 
                     //button container
+                    SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: isLoading
+                              ? null
+                              : () async {
+                                  if (kDebugMode) {
+                                    print("otp code: ${otpController?.text}");
+                                  }
+                                  var value = {
+                                    "code": otpController?.text,
+                                    "uuid": await getUuid(),
+                                  };
 
-                    InkWell(
-                      onTap: () async {
-                        if (kDebugMode) {
-                          print("otp code: ${otpController?.text}");
-                        }
-                        var value = {
-                          "code": otpController?.text,
-                          "uuid": otpData['uuid']?.toString(),
-                        };
+                                  if (kDebugMode) {
+                                    print("value: $value");
+                                  }
 
-                        // Home_view home = Home_view();
-
-                        await api().validatePhoneOtp(
-                            value,
-                            context,
-                            registration_successful_view());
-                      },
-                      child: Container(
-                        height: Get.height * 0.09,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: const Color(0xffe0e6ec),
-                          ),
-                          color: const Color(0xff113d6b),
-                        ),
-                        child: const Center(
-                          child: Text(
+                                  // Home_view home = Home_view();
+                                  isLoading = true;
+                                  await Future.delayed(
+                                      const Duration(seconds: 100));
+                                  try {
+                                    await api().validatePhoneOtp(
+                                        value,
+                                        context ?? scaffoldKey.currentContext!,
+                                        registration_successful_view());
+                                  } finally {
+                                    isLoading = false;
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xff113d6b),
+                              foregroundColor: Colors.white),
+                          child: isLoading == false
+                              ? const Text(
                             'CONTINUE',
                             style: TextStyle(
                                 fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: Colors.white),
+                          )
+                              : const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                      ),
+                        )
                     ),
                   ],
                 ),
               ),
 
               SizedBox(
-                height: Get.height * 0.08,
+                height: Get.height * 0.03,
               ),
 
               Align(
@@ -260,7 +300,7 @@ class signin_otp_verification_screen extends StatelessWidget {
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               debugPrint('Register View');
-                              Get.offAll(const Register_Ui());
+                              Get.offAll(register_serviceprovider_view());
                             },
                           text: 'Register',
                           style: const TextStyle(
