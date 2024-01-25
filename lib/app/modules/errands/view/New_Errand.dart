@@ -7,7 +7,7 @@ import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
 import '../../../../modal/Region.dart';
 import '../../../../modal/Street.dart';
 import '../../../../modal/Town.dart';
@@ -23,7 +23,6 @@ new_errandia_controller product_controller = Get.put(new_errandia_controller());
 imagePickercontroller imageController = Get.put(imagePickercontroller());
 
 class New_Errand extends StatefulWidget {
-
   New_Errand({super.key});
 
   @override
@@ -31,26 +30,23 @@ class New_Errand extends StatefulWidget {
 }
 
 class _New_ErrandState extends State<New_Errand> {
-  var value = null;
+  var value;
   var regionCode;
   var town;
   var streetvalue;
-
-
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     street();
-
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: ()async{
-        Get.offAll(errand_view());
+      onWillPop: () async {
+        Get.offAll(() => errand_view());
         return true;
       },
       child: Scaffold(
@@ -59,10 +55,13 @@ class _New_ErrandState extends State<New_Errand> {
           elevation: 0,
           backgroundColor: Colors.white,
           titleSpacing: 8,
-          title: Text('New Errand'.tr, style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xff113d6b),
-          ),),
+          title: Text(
+            'New Errand'.tr,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xff113d6b),
+            ),
+          ),
           titleTextStyle: TextStyle(
               fontWeight: FontWeight.bold,
               color: appcolor().mediumGreyColor,
@@ -71,10 +70,11 @@ class _New_ErrandState extends State<New_Errand> {
           leading: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () {
-              Get.offAll(errand_view());
+              Navigator.pop(context);
+
             },
-            icon: Icon(Icons.arrow_back_ios),
-            color: Color(0xff113d6b),
+            icon: const Icon(Icons.arrow_back_ios),
+            color: const Color(0xff113d6b),
           ),
           // actions: [
           //   TextButton(
@@ -89,13 +89,13 @@ class _New_ErrandState extends State<New_Errand> {
           child: Wrap(
             children: [
               Container(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 15,
                   vertical: 15,
                 ),
                 child: Text(
-                  '1- Enter Search Detils'.tr,
-                  style: TextStyle(
+                  '1- Enter Search Details'.tr,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
@@ -110,12 +110,13 @@ class _New_ErrandState extends State<New_Errand> {
 
               // company name
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                 child: TextFormField(
                   keyboardType: TextInputType.name,
                   textCapitalization: TextCapitalization.sentences,
                   controller: product_controller.title,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(
                       FontAwesomeIcons.buildingUser,
@@ -138,19 +139,24 @@ class _New_ErrandState extends State<New_Errand> {
                 height: 1,
                 indent: 0,
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: Text('e.g laptop,charger',style: TextStyle(fontSize: 10),),
+              const Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Text(
+                  'e.g laptop,charger',
+                  style: TextStyle(fontSize: 10),
+                ),
               ),
-              SizedBox(height: 20,),
+              const SizedBox(
+                height: 20,
+              ),
               Container(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 15,
                   vertical: 15,
                 ),
                 child: Text(
                   'Specify Search Location'.tr,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
@@ -165,17 +171,17 @@ class _New_ErrandState extends State<New_Errand> {
 
               // service categories
               ListTile(
-                leading: Icon(
+                leading: const Icon(
                   FontAwesomeIcons.locationCrosshairs,
                 ),
-                trailing:   Icon(
+                trailing: const Icon(
                   Icons.arrow_forward_ios_outlined,
                 ),
                 title: Padding(
-                  padding: const EdgeInsets.only(right: 10,bottom: 10),
+                  padding: const EdgeInsets.only(right: 10, bottom: 10),
                   child: DropdownButtonFormField(
                     iconSize: 0.0,
-                    decoration: InputDecoration.collapsed(
+                    decoration: const InputDecoration.collapsed(
                       hintText: 'Region',
                     ),
                     value: value,
@@ -184,7 +190,13 @@ class _New_ErrandState extends State<New_Errand> {
                         regionCode = value as int;
                       });
                     },
-                    items:Regions.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 11),),value: e.id,)).toList(),
+                    items: Regions.Items.map((e) => DropdownMenuItem(
+                          value: e.id,
+                          child: Text(
+                            e.name.toString(),
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        )).toList(),
                   ),
                 ),
               ),
@@ -197,17 +209,16 @@ class _New_ErrandState extends State<New_Errand> {
 
               //  price
               ListTile(
-                leading:  Icon(FontAwesomeIcons.locationArrow),
-                trailing:   Icon(
+                leading: const Icon(FontAwesomeIcons.locationArrow),
+                trailing: const Icon(
                   Icons.arrow_forward_ios_outlined,
                 ),
                 title: Padding(
-                  padding: const EdgeInsets.only(right: 10,bottom: 10),
+                  padding: const EdgeInsets.only(right: 10, bottom: 10),
                   child: DropdownButtonFormField(
                     iconSize: 0.0,
-                    decoration: InputDecoration.collapsed(
+                    decoration: const InputDecoration.collapsed(
                       hintText: 'Town',
-
                     ),
                     value: value,
                     onChanged: (value) {
@@ -215,7 +226,13 @@ class _New_ErrandState extends State<New_Errand> {
                         town = value as int;
                       });
                     },
-                    items:Towns.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 11),),value: e.id,)).toList(),
+                    items: Towns.Items.map((e) => DropdownMenuItem(
+                          value: e.id,
+                          child: Text(
+                            e.name.toString(),
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        )).toList(),
                   ),
                 ),
               ),
@@ -226,17 +243,17 @@ class _New_ErrandState extends State<New_Errand> {
                 indent: 0,
               ),
               ListTile(
-                leading: Icon(
+                leading: const Icon(
                   FontAwesomeIcons.locationCrosshairs,
                 ),
-                trailing:   Icon(
+                trailing: const Icon(
                   Icons.arrow_forward_ios_outlined,
                 ),
                 title: Padding(
-                  padding: const EdgeInsets.only(right: 10,bottom: 10),
+                  padding: const EdgeInsets.only(right: 10, bottom: 10),
                   child: DropdownButtonFormField(
                     iconSize: 0.0,
-                    decoration: InputDecoration.collapsed(
+                    decoration: const InputDecoration.collapsed(
                       hintText: 'Street',
                     ),
                     value: value,
@@ -245,7 +262,13 @@ class _New_ErrandState extends State<New_Errand> {
                         streetvalue = value as int;
                       });
                     },
-                    items:Street.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 11),),value: e.id,)).toList(),
+                    items: Street.Items.map((e) => DropdownMenuItem(
+                          value: e.id,
+                          child: Text(
+                            e.name.toString(),
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        )).toList(),
                   ),
                 ),
               ),
@@ -259,14 +282,14 @@ class _New_ErrandState extends State<New_Errand> {
               //  info
               Container(
                 height: Get.height * 0.2,
-                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                 child: TextFormField(
                   keyboardType: TextInputType.name,
                   textCapitalization: TextCapitalization.sentences,
                   controller: product_controller.description,
                   minLines: 1,
                   maxLines: 4,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(
                       color: Colors.black,
@@ -289,25 +312,35 @@ class _New_ErrandState extends State<New_Errand> {
                 height: 1,
                 indent: 0,
               ),
-             SizedBox(height: 30,),
+              const SizedBox(
+                height: 30,
+              ),
               InkWell(
                 onTap: () {
-                  if(product_controller.title.text != '' && product_controller.description.text != '' ){
-                    Get.to(nd_screen(title: product_controller.title.text.toString(),description: product_controller.description.text.toString(),region: regionCode,street: street,town: town,));
-                  }else{
+                  if (product_controller.title.text != '' &&
+                      product_controller.description.text != '') {
+                    Get.to(nd_screen(
+                      title: product_controller.title.text.toString(),
+                      description:
+                          product_controller.description.text.toString(),
+                      region: regionCode,
+                      street: street,
+                      town: town,
+                    ));
+                  } else {
                     alertDialogBox(context, 'Alert', 'Please Fill Fields');
                   }
                   product_controller.title.clear();
                   product_controller.description.clear();
                 },
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
+                  padding:
+                      const EdgeInsets.only(left: 20, right: 20, bottom: 20),
                   child: Container(
                     height: Get.height * 0.09,
                     width: Get.width * 0.9,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-
                       color: Color(0xffe0e6ec),
                     ),
                     child: Center(
@@ -881,6 +914,3 @@ class _New_ErrandState extends State<New_Errand> {
     );
   }
 }
-
-
-

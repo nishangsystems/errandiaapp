@@ -47,7 +47,7 @@ class _splash_screenState extends State<splash_screen> {
 
     Timer(const Duration(seconds: 2,), () async {
      if (hasVisited) {
-       Get.offAll(Home_view());
+       Get.offAll(() => Home_view());
         // if (isLoggedIn != null && isLoggedIn.isNotEmpty) {
         //   Get.offAll(Home_view());
         // } else {

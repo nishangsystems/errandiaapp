@@ -758,7 +758,7 @@ for (int i =0; i < imageController.imageList.length; i++) {
   try {
     var response = await request.send();
     if (response.statusCode == 200) {
-        Get.offAll(errand_view());
+      Get.offAll(() => errand_view());
       setState(() {
         isLoading = false;
         imageController.imageList.clear();

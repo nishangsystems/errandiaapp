@@ -55,7 +55,7 @@ class manage_business_view extends StatelessWidget {
             // size: 30,
           ),
           onPressed: () {
-            Get.offAll(Home_view());
+            Get.offAll(() => Home_view());
           },
         ),
         automaticallyImplyLeading: false,

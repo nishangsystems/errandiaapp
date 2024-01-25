@@ -314,7 +314,7 @@ class _signin_otp_verification_screenState
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               debugPrint('Register View');
-                              Get.offAll(registration_successful_view(
+                              Get.offAll(() => registration_successful_view(
                                   userAction: const {
                                     "name": "login",
                                   }));

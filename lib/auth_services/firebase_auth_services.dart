@@ -69,7 +69,7 @@ class AuthService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
     Get.back();
-    Get.offAll(Home_view());
+    Get.offAll(() => Home_view());
   }
 
   // check whether the user is logged in or not

@@ -467,7 +467,7 @@ class register_vendor_view extends StatelessWidget {
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               debugPrint('sign in');
-                              Get.offAll(signin_view());
+                              Get.offAll(() => signin_view());
                             },
                           text: 'Sign In',
                           style: TextStyle(

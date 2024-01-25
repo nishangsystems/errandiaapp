@@ -106,7 +106,7 @@ class registration_failed_view extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  Get.offAll(Home_view());
+                  Get.offAll(() => Home_view());
                 },
                 child: Container(
                   height: Get.height * 0.09,

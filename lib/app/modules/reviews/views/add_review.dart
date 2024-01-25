@@ -454,7 +454,7 @@ class _add_review_viewState extends State<add_review_view> {
     try {
       var response = await request.send();
       if (response.statusCode == 200) {
-        Get.offAll(errand_view());
+        Get.offAll(() => errand_view());
         setState(() {
           isLoading = false;
           imageController.imageList.clear();

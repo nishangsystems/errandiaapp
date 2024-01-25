@@ -31,7 +31,7 @@ AppBar appbar() {
       children: [
         InkWell(
           onTap: () {
-            Get.offAll(Home_view());
+            Get.offAll(() => Home_view());
           },
           child: Image(
             image: AssetImage('assets/images/icon-errandia-logo-about.png'),

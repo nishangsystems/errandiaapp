@@ -489,7 +489,7 @@ class _register_serviceprovider_viewState
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             debugPrint('sign in');
-                            Get.offAll(signin_view());
+                            Get.offAll(() => signin_view());
                           },
                         text: 'Sign In',
                         style: TextStyle(

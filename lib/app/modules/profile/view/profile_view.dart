@@ -16,8 +16,7 @@ class Profile_view extends StatefulWidget {
   State<Profile_view> createState() => _Profile_viewState();
 }
 
-class _Profile_viewState extends State<Profile_view>
-    with TickerProviderStateMixin {
+class _Profile_viewState extends State<Profile_view> with TickerProviderStateMixin {
   late final TabController tabController =
       TabController(length: 3, vsync: this);
 
@@ -38,22 +37,6 @@ class _Profile_viewState extends State<Profile_view>
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Column(
-              //   crossAxisAlignment: CrossAxisAlignment.start,
-              //   children: [
-              //     // Pencil icon at the top-right corner
-              //     Align(
-              //       alignment: Alignment.topRight,
-              //       child: IconButton(
-              //         icon: Icon(Icons.edit), // Change this to your pencil icon
-              //         onPressed: () {
-              //           // Handle pencil icon tap
-              //         },
-              //       ),
-              //     ),
-              //   ],
-              // ),
-
               // profile picture container
               Stack(
                 children: [
@@ -79,7 +62,6 @@ class _Profile_viewState extends State<Profile_view>
                       ),
                     ),
                   ),
-
                   Align(
                     alignment: AlignmentDirectional.topEnd,
                     child: SizedBox(

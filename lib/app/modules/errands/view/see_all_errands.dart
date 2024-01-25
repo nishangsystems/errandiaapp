@@ -24,17 +24,17 @@ class _SeeAllErandsState extends State<SeeAllErands> {
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(onPressed:() {
+          Navigator.pop(context);
 
         }, icon:Icon(Icons.navigate_before,size:30,color: appcolor().mediumGreyColor,)),
-        title:Text("RECENT ERANDS", style: TextStyle(
+        title:Text("RECENT ERRANDS", style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 18,
           color: appcolor().mainColor,
         ),) ,
         actions: [
           IconButton(onPressed:() {
-            Navigator.pop(context);
-          }, icon:Icon(Icons.notifications,size: 30,),color: appcolor().mediumGreyColor,)
+          }, icon:const Icon(Icons.notifications,size: 30,),color: appcolor().mediumGreyColor,)
         ],
       ),
       body: 
@@ -42,7 +42,7 @@ class _SeeAllErandsState extends State<SeeAllErands> {
         future: api().getProduct('products', 1),
         builder: (context, snapshot){
           if(snapshot.hasError){
-            return Center(child: Text('No Data Found'),);
+            return const Center(child: Text('No Data Found'),);
           }else if(snapshot.hasData){
             return  ListView.builder(
               primary: false,

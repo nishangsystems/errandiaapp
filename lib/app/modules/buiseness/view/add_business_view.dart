@@ -114,7 +114,7 @@ class _add_business_viewState extends State<add_business_view> {
         setState(() {
           isLoading = false;
         });
-        Get.offAll(manage_business_view());
+        Get.offAll(() => manage_business_view());
         add_controller.company_name_controller.clear();
         add_controller.Business_information_controller.clear();
         add_controller.website_address_controller.clear();

@@ -38,7 +38,7 @@ class edit_profile_view extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {},
-            child: Text(
+            child: const Text(
               'UPDATE',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
             ),

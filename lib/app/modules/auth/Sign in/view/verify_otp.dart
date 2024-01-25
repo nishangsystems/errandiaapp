@@ -182,7 +182,7 @@ class _OTPFieldsState extends State<OTPFields> {
             PhoneAuthCredential crediental = await PhoneAuthProvider.credential(verificationId: widget.value, smsCode: pinMatch);
            FirebaseAuth.instance.signInWithCredential(crediental).then((value) {
              print(value);
-             Get.offAll(Home_view());
+             Get.offAll(() => Home_view());
            });
 
             }catch(e){

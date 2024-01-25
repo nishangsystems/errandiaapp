@@ -111,7 +111,7 @@ class _add_product_viewState extends State<add_product_view> {
         setState(() {
           isLoading = false;
         });
-        Get.offAll(manage_business_view());
+        Get.offAll(() => manage_business_view());
 
         // imageController.image_path.clear();
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('success')));

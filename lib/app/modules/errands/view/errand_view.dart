@@ -65,7 +65,7 @@ class errand_view extends StatelessWidget {
             // SizedBox(height: 20,),
             InkWell(
               onTap: () {
-                Get.offAll(New_Errand());
+                Get.to(() => New_Errand());
               },
               child: Container(
                 width: Get.width * 0.44,
@@ -566,7 +566,7 @@ Widget PostedErrands(BuildContext ctx) {
                                               'errand/delete', 1, value);
                                           Future.delayed(Duration(seconds: 2),
                                               () {
-                                            Get.offAll(errand_view());
+                                                Get.offAll(() => errand_view());
                                           });
                                         },
                                       ),
