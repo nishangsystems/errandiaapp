@@ -2,12 +2,12 @@ import 'package:errandia/app/modules/buiseness/controller/business_controller.da
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
+import 'package:errandia/app/modules/profile/view/edit_profile_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-
-// profile_controller profilecontroller= Get.put(profile_controller());
 
 class Profile_view extends StatefulWidget {
   const Profile_view({super.key});
@@ -38,21 +38,80 @@ class _Profile_viewState extends State<Profile_view>
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Column(
+              //   crossAxisAlignment: CrossAxisAlignment.start,
+              //   children: [
+              //     // Pencil icon at the top-right corner
+              //     Align(
+              //       alignment: Alignment.topRight,
+              //       child: IconButton(
+              //         icon: Icon(Icons.edit), // Change this to your pencil icon
+              //         onPressed: () {
+              //           // Handle pencil icon tap
+              //         },
+              //       ),
+              //     ),
+              //   ],
+              // ),
+
               // profile picture container
-              Container(
-                // child: Image(image: AssetImage(''),),
-                height: Get.height * 0.12,
-                width: Get.width * 0.27,
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Image(
-                  image: AssetImage(
-                    'assets/images/profile_image.png',
+              Stack(
+                children: [
+                  Align(
+                    alignment: AlignmentDirectional.center,
+                    child: Container(
+                      height: Get.height * 0.13,
+                      width: Get.width * 0.27,
+                      // color: Colors.redAccent,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Column(
+                        children: [
+                          Image(
+                            image: AssetImage(
+                              'assets/images/profile_image.png', // TODO: replace with default image
+                            ),
+                            fit: BoxFit.fill,
+                          )
+                        ],
+                      ),
+                    ),
                   ),
-                  fit: BoxFit.fill,
-                ),
+
+                  Align(
+                    alignment: AlignmentDirectional.topEnd,
+                    child: SizedBox(
+                      width: Get.width * 0.3,
+                      height: Get.height * 0.13,
+                      // color: Colors.redAccent,
+
+                    ),
+                  ),
+                  Positioned(
+                    top: -8.0,
+                    right: 12.0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                        onTap: () {
+                          if (kDebugMode) {
+                            print("edit profile");
+                          }
+                          Get.to(() => edit_profile_view());
+                        },
+                        customBorder: const CircleBorder(),
+                        splashColor: Colors.red,
+                        child: const Icon(
+                          Icons.edit,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
               // profile name container
@@ -71,15 +130,13 @@ class _Profile_viewState extends State<Profile_view>
               ),
 
               // profile location
-              Container(
-                child: const Text(
-                  'Buea, South West Region, Cameroon',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
+              // const Text(
+              //   'Buea, South West Region, Cameroon',
+              //   style: TextStyle(
+              //     color: Colors.white,
+              //     fontSize: 13,
+              //   ),
+              // ),
               // details container
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -122,8 +179,7 @@ class _Profile_viewState extends State<Profile_view>
 
               //
             ],
-          ).
-          paddingSymmetric(vertical: 15),
+          ).paddingSymmetric(vertical: 15),
         ),
 
         // tab bar
@@ -144,7 +200,7 @@ class _Profile_viewState extends State<Profile_view>
                   // isScrollable: true,
                   dividerColor: appcolor().mediumGreyColor,
                   unselectedLabelColor: appcolor().mediumGreyColor,
-                  unselectedLabelStyle: TextStyle(
+                  unselectedLabelStyle: const TextStyle(
                     fontWeight: FontWeight.normal,
                     fontSize: 15,
                   ),
@@ -160,9 +216,9 @@ class _Profile_viewState extends State<Profile_view>
                   tabs: const [
                     Tab(
                       text: "Products",
-                        // tabController.index == 0
-                        //     ? "Products ($prod_list_size)"
-                        //     : "Product
+                      // tabController.index == 0
+                      //     ? "Products ($prod_list_size)"
+                      //     : "Product
                     ),
                     Tab(
                       text: "Services",
@@ -203,7 +259,7 @@ class _Profile_viewState extends State<Profile_view>
                           ),
                           TextButton(
                             onPressed: () {},
-                            child: Text(
+                            child: const Text(
                               'Add Services',
                               style: TextStyle(
                                 fontSize: 16,
@@ -214,7 +270,7 @@ class _Profile_viewState extends State<Profile_view>
                           )
                         ],
                       ),
-                profile_controller().Buiseness_list.length > 0
+                profile_controller().Buiseness_list.isNotEmpty
                     ? Buiseness_item_list()
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -228,7 +284,7 @@ class _Profile_viewState extends State<Profile_view>
                           ),
                           TextButton(
                             onPressed: () {},
-                            child: Text(
+                            child: const Text(
                               'Add Business',
                               style: TextStyle(
                                 fontSize: 16,
@@ -280,7 +336,7 @@ Widget details_container_item_widget(
 Widget product_item_list() {
   return GridView.builder(
     itemCount: profile_controller().product_list.length,
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2,
       crossAxisSpacing: 10,
       childAspectRatio: 1 / 1.5,
@@ -294,7 +350,7 @@ Widget product_item_list() {
 Widget Service_item_list() {
   return GridView.builder(
     itemCount: profile_controller().service_list.length,
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2,
       crossAxisSpacing: 10,
       childAspectRatio: 1 / 1.5,
@@ -308,7 +364,7 @@ Widget Service_item_list() {
 Widget Buiseness_item_list() {
   return GridView.builder(
       itemCount: profile_controller().Buiseness_list.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 5,
         childAspectRatio: 1 / 1.8,
@@ -321,8 +377,8 @@ Widget Buiseness_item_list() {
 
 Widget noProductsFound() {
   return Container(
-    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-    margin: EdgeInsets.only(top: 10),
+    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+    margin: const EdgeInsets.only(top: 10),
     decoration: BoxDecoration(
       color: Colors.grey[200],
       borderRadius: BorderRadius.circular(10),
@@ -381,8 +437,8 @@ Widget accountSuspended() {
   return Container(
     // height: Get.height,
 
-    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-    margin: EdgeInsets.only(
+    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+    margin: const EdgeInsets.only(
       top: 10,
     ),
     decoration: BoxDecoration(
@@ -392,9 +448,9 @@ Widget accountSuspended() {
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
+        SizedBox(
           height: Get.height * 0.07,
-          child: Image(
+          child: const Image(
             image: AssetImage(
               'assets/images/account_suspended.png',
             ),
@@ -408,18 +464,16 @@ Widget accountSuspended() {
               fontWeight: FontWeight.bold,
               fontSize: 18),
         ),
-        Container(
-          child: Text(
-            'Sorry your account has been . While your account is suspended, You cannot add products, services, businesses nor carryout transactions on Errand.',
-            textAlign: TextAlign.center,
-          ),
+        const Text(
+          'Sorry your account has been . While your account is suspended, You cannot add products, services, businesses nor carryout transactions on Errand.',
+          textAlign: TextAlign.center,
         ),
         SizedBox(
           height: Get.height * 0.02,
         ),
         RichText(
           text: TextSpan(
-            style: TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16),
             children: [
               TextSpan(
                 recognizer: TapGestureRecognizer()..onTap = () {},
