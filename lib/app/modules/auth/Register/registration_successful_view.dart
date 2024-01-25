@@ -67,8 +67,16 @@ class registration_successful_view extends StatelessWidget {
                         margin:const EdgeInsets.symmetric(horizontal: 25),
                         child: Column(
                           children: [
+                            userAction['name'] == 'register' ?
                            const Text(
                               'Registration Successful',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xff113d6b),
+                              ),
+                            ): const Text(
+                              'Login Successful',
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
