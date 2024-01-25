@@ -42,169 +42,166 @@ class customendDrawer extends StatelessWidget {
 
     return Drawer(
       shadowColor: Colors.grey,
-      child: Container(
-        // padding: padding,
-        child: ListView(
-          children: [
-            SizedBox(
-              height: Get.height * 0.02,
-            ),
-            Container(
-              padding: padding + EdgeInsets.symmetric(horizontal: 8),
-              // height: Get.height * 0.2,
-              child: Text(
-                'Explore Errandia',
-                style: TextStyle(
-                  color: appcolor().mainColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+      child: ListView(
+        children: [
+          SizedBox(
+            height: Get.height * 0.02,
+          ),
+          Container(
+            padding: padding + const EdgeInsets.symmetric(horizontal: 8),
+            // height: Get.height * 0.2,
+            child: Text(
+              'Explore Errandia',
+              style: TextStyle(
+                color: appcolor().mainColor,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(
-              height: Get.height * 0.01,
-            ),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Create Business',
-                    imagePath: 'assets/images/sidebar_icon/create_shop.png',
-                    callback: () {
-                      Get.to(add_business_view());
-                    },
-                  )
-                : drawerItemWidget(
-                    text: 'Businesses',
-                    imagePath: 'assets/images/sidebar_icon/create_shop.png',
-                    callback: () {
-                      Get.to(Businesses_View());
-                    },
-                  )),
-            Obx(() => !homeController.loggedIn.value
-                ? drawerItemWidget(
-              text: 'Search',
-              imagePath: 'assets/images/sidebar_icon/create_shop.png',
-              callback: () {
-                Get.to(() => const run_an_errand_1());
-              },
-            )
-                : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'My Dashboard',
-                    imagePath: 'assets/images/sidebar_icon/dashboard.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(const dashboard_view());
-                    },
-                  )
-                : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? Divider(
-                    color: appcolor().mediumGreyColor,
-                  )
-                : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? Container()
-                : drawerItemWidget(
-                    text: 'Categories',
-                    imagePath:
-                        'assets/images/sidebar_icon/icon-profile-errands.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(const categories_view());
-                    },
-                  )),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-              text: 'Manage Businesses',
-              imagePath: 'assets/images/sidebar_icon/icon-company.png',
-              callback: () {
-                Get.back();
-                Get.to(() => manage_business_view(), popGesture: true);
-              },
-            )
-                : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Errands',
-                    imagePath:
-                        'assets/images/sidebar_icon/icon-profile-errands.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(errand_view());
-                    },
-                  ): Container()),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Following',
-                    imagePath:
-                        'assets/images/sidebar_icon/icon-profile-following.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(following_view());
-                    },
-                  )
-                : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Reviews',
-                    imagePath:
-                        'assets/images/sidebar_icon/icon-profile-reviews.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(() => manage_review_view());
-                    })
-                : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Billing History',
-                    imagePath:
-                        'assets/images/sidebar_icon/icon-billing-history.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(() => billing_history_view());
-                    },
-                  )
-                : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? SizedBox(
-                    height: 5,
-                  )
-                : Container()),
-            Divider(),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Settings',
-                    imagePath: 'assets/images/sidebar_icon/icon-settings.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(setting_view());
-                    },
-                  )
-                : Container()),
-            Obx(() =>
-                homeController.loggedIn.value ? const Divider() : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Logout',
-                    imagePath: 'assets/images/sidebar_icon/icon-logout.png',
-                    callback: () async {
-                     await AuthService.logout();
-                    },
-                  )
-                : drawerItemWidget(
-                    text: 'Register/Login',
-                    imagePath: 'assets/images/sidebar_icon/icon-logout.png',
-                    callback: () {
-                      // Get.back();
-                      Get.to(() => const signin_view());
-                    },
-                  )),
-            SizedBox(
-              height: 60,
-            ),
-          ],
-        ),
+          ),
+          SizedBox(
+            height: Get.height * 0.01,
+          ),
+          Obx(() => homeController.loggedIn.value
+              ? drawerItemWidget(
+                  text: 'Create Business',
+                  imagePath: 'assets/images/sidebar_icon/create_shop.png',
+                  callback: () {
+                    Get.to(add_business_view());
+                  },
+                )
+              : drawerItemWidget(
+                  text: 'Businesses',
+                  imagePath: 'assets/images/sidebar_icon/create_shop.png',
+                  callback: () {
+                    Get.to(Businesses_View());
+                  },
+                )),
+          Obx(() => !homeController.loggedIn.value
+              ? drawerItemWidget(
+            text: 'Search',
+            imagePath: 'assets/images/sidebar_icon/create_shop.png',
+            callback: () {
+              Get.to(() => const run_an_errand_1());
+            },
+          )
+              : Container()),
+          Obx(() => homeController.loggedIn.value
+              ? drawerItemWidget(
+                  text: 'My Dashboard',
+                  imagePath: 'assets/images/sidebar_icon/dashboard.png',
+                  callback: () {
+                    Get.back();
+                    Get.to(const dashboard_view());
+                  },
+                )
+              : Container()),
+          Obx(() => homeController.loggedIn.value
+              ? Divider(
+                  color: appcolor().mediumGreyColor,
+                )
+              : Container()),
+          Obx(() => homeController.loggedIn.value
+              ? Container()
+              : drawerItemWidget(
+                  text: 'Categories',
+                  imagePath:
+                      'assets/images/sidebar_icon/icon-profile-errands.png',
+                  callback: () {
+                    Get.back();
+                    Get.to(const categories_view());
+                  },
+                )),
+          Obx(() => homeController.loggedIn.value
+              ? drawerItemWidget(
+            text: 'Manage Businesses',
+            imagePath: 'assets/images/sidebar_icon/icon-company.png',
+            callback: () {
+              Get.back();
+              Get.to(() => manage_business_view(), popGesture: true);
+            },
+          )
+              : Container()),
+          Obx(() => homeController.loggedIn.value
+              ? drawerItemWidget(
+                  text: 'Errands',
+                  imagePath:
+                      'assets/images/sidebar_icon/icon-profile-errands.png',
+                  callback: () {
+                    Get.back();
+                    Get.to(errand_view());
+                  },
+                ): Container()),
+          Obx(() => homeController.loggedIn.value
+              ? drawerItemWidget(
+                  text: 'Following',
+                  imagePath:
+                      'assets/images/sidebar_icon/icon-profile-following.png',
+                  callback: () {
+                    Get.back();
+                    Get.to(const following_view());
+                  },
+                )
+              : Container()),
+          Obx(() => homeController.loggedIn.value
+              ? drawerItemWidget(
+                  text: 'Reviews',
+                  imagePath:
+                      'assets/images/sidebar_icon/icon-profile-reviews.png',
+                  callback: () {
+                    Get.back();
+                    Get.to(() => manage_review_view());
+                  })
+              : Container()),
+          Obx(() => homeController.loggedIn.value
+              ? drawerItemWidget(
+                  text: 'Billing History',
+                  imagePath:
+                      'assets/images/sidebar_icon/icon-billing-history.png',
+                  callback: () {
+                    Get.back();
+                    Get.to(() => billing_history_view());
+                  },
+                )
+              : Container()),
+          Obx(() => homeController.loggedIn.value
+              ? const SizedBox(
+                  height: 5,
+                )
+              : Container()),
+          const Divider(),
+          Obx(() => homeController.loggedIn.value
+              ? drawerItemWidget(
+                  text: 'Settings',
+                  imagePath: 'assets/images/sidebar_icon/icon-settings.png',
+                  callback: () {
+                    Get.back();
+                    Get.to(setting_view());
+                  },
+                )
+              : Container()),
+          Obx(() =>
+              homeController.loggedIn.value ? const Divider() : Container()),
+          Obx(() => homeController.loggedIn.value
+              ? drawerItemWidget(
+                  text: 'Logout',
+                  imagePath: 'assets/images/sidebar_icon/icon-logout.png',
+                  callback: () async {
+                   await AuthService.logout();
+                  },
+                )
+              : drawerItemWidget(
+                  text: 'Register/Login',
+                  imagePath: 'assets/images/sidebar_icon/icon-logout.png',
+                  callback: () {
+                    // Get.back();
+                    Get.to(() => const signin_view());
+                  },
+                )),
+          SizedBox(
+            height: 60,
+          ),
+        ],
       ),
     );
   }

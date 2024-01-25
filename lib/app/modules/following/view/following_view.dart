@@ -25,17 +25,17 @@ class _following_viewState extends State<following_view> {
         backgroundColor: Colors.white,
         elevation: 2,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios,
             // size: 30,
           ),
           onPressed: () {
-            Get.back();
+            Navigator.pop(context);
           },
         ),
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Manage Following',
           style: TextStyle(
             color: Colors.black,
@@ -51,7 +51,7 @@ class _following_viewState extends State<following_view> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+            margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
             child: Text(
               'Manage businesses you follow',
               style: TextStyle(
@@ -60,17 +60,15 @@ class _following_viewState extends State<following_view> {
             ),
           ),
           blockButton(
-            title: Container(
-              child: TextFormField(
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                    suffixIcon: Icon(
-                      Icons.search,
-                    ),
-                    hintText: 'Search Business'),
-              ),
+            title: TextFormField(
+              decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                  suffixIcon: Icon(
+                    Icons.search,
+                  ),
+                  hintText: 'Search Business'),
             ),
             ontap: () {},
             color: Colors.white,
@@ -80,7 +78,7 @@ class _following_viewState extends State<following_view> {
           ),
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 8,
               ),
               itemCount: controller.following_list.length,
@@ -106,11 +104,11 @@ class _following_viewState extends State<following_view> {
                   } else {}
                 },
                 child: Container(
-                  margin: EdgeInsets.symmetric(
+                  margin: const EdgeInsets.symmetric(
                     horizontal: 5,
                     vertical: 5,
                   ),
-                  padding: EdgeInsets.all(
+                  padding: const EdgeInsets.all(
                     10,
                   ),
                   decoration: BoxDecoration(
@@ -123,7 +121,7 @@ class _following_viewState extends State<following_view> {
                   ),
                   child: Center(
                     child: Container(
-                      padding: EdgeInsets.all(
+                      padding: const EdgeInsets.all(
                         0,
                       ),
                       decoration: BoxDecoration(

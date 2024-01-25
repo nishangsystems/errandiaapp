@@ -30,17 +30,17 @@ class _sms_plan_viewState extends State<sms_plan_view> {
         backgroundColor: Colors.white,
         elevation: 2,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios,
             // size: 30,
           ),
           onPressed: () {
-            Get.back();
+            Navigator.pop(context);
           },
         ),
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Manage SMS Plan',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
         ),

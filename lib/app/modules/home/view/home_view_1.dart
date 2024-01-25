@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:errandia/app/modules/buiseness/view/businesses_view.dart';
+import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:flutter/foundation.dart';
@@ -358,7 +360,7 @@ class _home_view_1State extends State<home_view_1> {
                   const Spacer(),
                   TextButton(
                     onPressed: () {
-                      Get.to(Ui_23());
+                      Get.to(BusinessesViewWithBar());
                     },
                     child: const Text('See All'),
                   ),
@@ -709,7 +711,7 @@ Widget Recently_posted_items_Widget() {
                             height: Get.height * 0.009,
                           ),
                           Container(
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                               horizontal: 10,
                             ),
                             child: Column(

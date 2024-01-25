@@ -26,17 +26,17 @@ class _subscriber_viewState extends State<subscriber_view> {
               backgroundColor: Colors.white,
               elevation: 2,
               leading: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.arrow_back_ios,
                   // size: 30,
                 ),
                 onPressed: () {
-                  Get.back();
+                  Navigator.pop(context);
                 },
               ),
               automaticallyImplyLeading: false,
               centerTitle: true,
-              title: Text(
+              title: const Text(
                 'Manage Subscribers',
                 style: TextStyle(
                   color: Colors.black,
@@ -50,7 +50,7 @@ class _subscriber_viewState extends State<subscriber_view> {
               actions: [
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(FontAwesomeIcons.arrowDownWideShort),
+                  icon: const Icon(FontAwesomeIcons.arrowDownWideShort),
                 ),
               ],
             )
@@ -58,7 +58,7 @@ class _subscriber_viewState extends State<subscriber_view> {
               backgroundColor: Colors.white,
               elevation: 2,
               leading: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   FontAwesomeIcons.xmark,
                   // size: 30,
                 ),
@@ -70,7 +70,7 @@ class _subscriber_viewState extends State<subscriber_view> {
               automaticallyImplyLeading: false,
               title: Text(
                 controller.selectedCounter.value.toString(),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 25,
                   fontWeight: FontWeight.normal,

@@ -28,7 +28,7 @@ class manage_review_view extends StatelessWidget {
             // size: 30,
           ),
           onPressed: () {
-            Get.back();
+            Navigator.pop(context);
           },
         ),
         automaticallyImplyLeading: false,

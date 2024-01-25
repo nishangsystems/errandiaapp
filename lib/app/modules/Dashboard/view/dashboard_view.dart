@@ -50,7 +50,7 @@ class dashboard_view extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.only(left: 8, bottom: 5, top: 7),
+              padding: const EdgeInsets.only(left: 8, bottom: 5, top: 7),
               child: Text(
                 'My Dashboard',
                 style: TextStyle(
@@ -59,10 +59,10 @@ class dashboard_view extends StatelessWidget {
                     fontWeight: FontWeight.w600),
               ),
             ),
-            Container(
+            SizedBox(
               height: Get.height * 0.58,
               child: GridView.count(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 1,
                 mainAxisSpacing: 5,
                 childAspectRatio: 1 / 1.3,
@@ -128,17 +128,17 @@ class dashboard_view extends StatelessWidget {
                     title: 'Following',
                     belowtext: '0 Following',
                     callback: () {
-                      Get.to(following_view());
+                      Get.to(const following_view());
                     },
                   ),
                 ],
               ),
             ),
-            Divider(),
-            Container(
+            const Divider(),
+            SizedBox(
               height: Get.height * 0.2,
               child: GridView.count(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 1,
                 childAspectRatio: 1 / 1.3,
                 crossAxisCount: 3,
@@ -157,11 +157,11 @@ class dashboard_view extends StatelessWidget {
                 ],
               ),
             ),
-            Divider(),
-            Container(
+            const Divider(),
+            SizedBox(
               height: Get.height * 0.2,
               child: GridView.count(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 1,
                 childAspectRatio: 1 / 1.3,
                 crossAxisCount: 3,

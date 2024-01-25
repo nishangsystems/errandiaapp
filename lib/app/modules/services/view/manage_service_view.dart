@@ -31,9 +31,9 @@ class manage_service_view extends StatelessWidget {
           onTap: () {
             Get.to(add_service_view());
           },
-          child: new Container(
+          child: Container(
             width: Get.width * 0.47,
-            padding: EdgeInsets.all(15),
+            padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
               color: appcolor().skyblueColor,
               borderRadius: BorderRadius.circular(8),
@@ -45,7 +45,7 @@ class manage_service_view extends StatelessWidget {
                   color: appcolor().mainColor,
                   size: 28,
                 ),
-                Spacer(),
+                const Spacer(),
                 Text(
                   'Add Product',
                   style: TextStyle(
@@ -64,7 +64,7 @@ class manage_service_view extends StatelessWidget {
               children: [
                 blockButton(
                   title: TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 10,
@@ -98,7 +98,7 @@ class manage_service_view extends StatelessWidget {
                 // ).paddingOnly(bottom: 20,),
 
                 blockButton(
-                  title: Text(
+                  title: const Text(
                     'Search',
                     style: TextStyle(
                       color: Colors.white,
@@ -116,17 +116,17 @@ class manage_service_view extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 2,
           leading: IconButton(
-            icon: Icon(
+            icon: const  Icon(
               Icons.arrow_back_ios,
               // size: 30,
             ),
             onPressed: () {
-              Get.back();
+              Navigator.pop(context);
             },
           ),
           automaticallyImplyLeading: false,
           centerTitle: true,
-          title: Text(
+          title: const Text(
             'Manage Services',
             style:
                 TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
@@ -156,7 +156,7 @@ class manage_service_view extends StatelessWidget {
                     dividerColor: appcolor().bluetextcolor,
                     isScrollable: true,
                     unselectedLabelColor: appcolor().mediumGreyColor,
-                    unselectedLabelStyle: TextStyle(
+                    unselectedLabelStyle: const TextStyle(
                       fontWeight: FontWeight.normal,
                       fontSize: 16,
                     ),

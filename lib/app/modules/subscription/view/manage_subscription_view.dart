@@ -15,17 +15,17 @@ class subscription_view extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 2,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios,
             // size: 30,
           ),
           onPressed: () {
-            Get.back();
+            Navigator.pop(context);
           },
         ),
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Manage Subscription',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
         ),
@@ -36,7 +36,7 @@ class subscription_view extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.settings,
             ),
           ),
@@ -46,15 +46,15 @@ class subscription_view extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
               itemCount: controller.list.length,
               itemBuilder: (context, index) {
                 return Container(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 5,
                     vertical: 5,
                   ),
-                  margin: EdgeInsets.all(5),
+                  margin: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(
@@ -74,14 +74,14 @@ class subscription_view extends StatelessWidget {
                         ),
                         // height: 60,
                         padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                         child: Icon(
                           Icons.file_copy,
                           color: appcolor().greenColor,
                           size: 30,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       Column(
@@ -94,7 +94,7 @@ class subscription_view extends StatelessWidget {
                                 fontSize: 17,
                               ),
                               children: [
-                                TextSpan(text: 'Subscription '),
+                                const TextSpan(text: 'Subscription '),
                                 TextSpan(
                                   text: controller.list[index].title.toString(),
                                   style: TextStyle(
@@ -113,7 +113,7 @@ class subscription_view extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 5,
                           ),
                           Row(
@@ -132,7 +132,7 @@ class subscription_view extends StatelessWidget {
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 15,
                               ),
                               Container(
@@ -140,7 +140,7 @@ class subscription_view extends StatelessWidget {
                                   color: appcolor().greyColor,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                   horizontal: 10,
                                   vertical: 3,
                                 ),
@@ -152,16 +152,16 @@ class subscription_view extends StatelessWidget {
                                             8,
                                           ),
                                           color: appcolor().mediumGreyColor),
-                                      padding: EdgeInsets.all(
+                                      padding: const EdgeInsets.all(
                                         5,
                                       ),
-                                      child: Icon(
+                                      child: const Icon(
                                         FontAwesomeIcons.earth,
                                         color: Colors.white,
                                         size: 15,
                                       ),
                                     ),
-                                    Text(
+                                    const Text(
                                       '  Cameroon',
                                       style: TextStyle(
                                         fontSize: 10,
@@ -175,12 +175,12 @@ class subscription_view extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Spacer(),
+                      const Spacer(),
                       IconButton(
                         onPressed: () {
                           Get.bottomSheet(customBottomSheet());
                         },
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.more_vert,
                         ),
                       ),
@@ -198,7 +198,7 @@ class subscription_view extends StatelessWidget {
 
 Widget customBottomSheet() {
   return Container(
-    padding: EdgeInsets.symmetric(
+    padding: const EdgeInsets.symmetric(
       horizontal: 15,
     ),
     color: Colors.white,
@@ -206,7 +206,7 @@ Widget customBottomSheet() {
       crossAxisAlignment: WrapCrossAlignment.center,
       alignment: WrapAlignment.center,
       children: [
-        Icon(
+        const Icon(
           Icons.horizontal_rule_outlined,
           size: 30,
         ),

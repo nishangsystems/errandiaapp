@@ -1,6 +1,7 @@
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/business_item.dart';
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
+import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,13 +9,15 @@ import 'package:get/get.dart';
 
 import '../../global/constants/color.dart';
 
-class Businesses_View extends StatelessWidget {
-  Businesses_View({super.key});
-  business_controller busi_controller = Get.put(business_controller());
+class BusinessesViewWithBar extends StatelessWidget {
+  BusinessesViewWithBar({super.key});
+  final business_controller busi_controller = Get.put(business_controller());
+
   @override
   Widget build(BuildContext context) {
     home_controller().atbusiness.value = true;
     return Scaffold(
+      appBar: appbar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -62,13 +65,13 @@ class Businesses_View extends StatelessWidget {
             ),
           ),
 
-          //business
+          //busieness
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               children: [
                 Text(
-                  'Business ',
+                  'Bussiness ',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
