@@ -412,7 +412,7 @@ class errandia_business_view extends StatelessWidget {
                 ),
                 color: Colors.white,
               ),
-              padding: EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
+              padding: const EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
               child: InkWell(
                 onTap: () {},
                 child: Row(
@@ -427,7 +427,7 @@ class errandia_business_view extends StatelessWidget {
                       style:
                           TextStyle(color: appcolor().blueColor, fontSize: 16),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Icon(
                       Icons.arrow_forward_ios_outlined,
                       color: appcolor().bluetextcolor,

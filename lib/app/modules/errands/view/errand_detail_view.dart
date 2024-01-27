@@ -65,7 +65,7 @@ class errand_detail_view extends StatelessWidget {
                 ),
                 Container(
                   child: Text(
-                    '${data['title']}',
+                    '${data['name']}',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -216,9 +216,7 @@ class errand_detail_view extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          data['user'] != null
-                              ? data['user']['name']
-                              : data['name'],
+                          data['shop']['name'].toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
