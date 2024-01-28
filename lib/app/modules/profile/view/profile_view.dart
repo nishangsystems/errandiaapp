@@ -6,6 +6,7 @@ import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/profile/view/edit_profile_view.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
+import 'package:errandia/app/modules/services/view/service_details_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -352,7 +353,16 @@ Widget Service_item_list() {
       childAspectRatio: 1 / 1.5,
     ),
     itemBuilder: (context, index) {
-      return profile_controller().service_list[index];
+      final item = profile_controller().service_list[index];
+      return GestureDetector(
+        onTap: () {
+          if (kDebugMode) {
+            print("service item: ${item.name}");
+          }
+          Get.to(() => ServiceDetailsView(service: item));
+        },
+        child: profile_controller().service_list[index],
+      );
     },
   );
 }
