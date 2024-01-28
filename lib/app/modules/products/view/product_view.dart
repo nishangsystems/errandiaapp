@@ -135,7 +135,7 @@ class _Product_viewState extends State<Product_view>
           },
         ),
         title: Text(
-          "${widget.name}",
+          "${widget.item.name}",
           style: TextStyle(
             color: appcolor().mainColor,
           ),
@@ -143,7 +143,7 @@ class _Product_viewState extends State<Product_view>
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.messenger_sharp,
               size: 30,
             ),
@@ -153,7 +153,7 @@ class _Product_viewState extends State<Product_view>
             onPressed: () {
               Share.share('text', subject: 'hello share');
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.share,
               size: 30,
             ),

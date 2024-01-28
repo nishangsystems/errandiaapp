@@ -389,7 +389,7 @@ Widget allProducts(BuildContext ctx) {
               children: List.generate(ui_23_item_list.length, (index) {
                 return InkWell(
                   onTap: () {
-                    Get.to(Product_view(
+                    Get.to(() => Product_view(
                       item: Recently_item_List[0],
                     ));
                   },
