@@ -72,7 +72,7 @@ class _add_review_viewState extends State<add_review_view> {
                         width: Get.width * 0.2,
                         child: Image(
                           image: NetworkImage(
-                            '${widget.review['featured_image']}',
+                            '${widget.review['featured_image'] ?? widget.review.featured_image}',
                           ),
                           fit: BoxFit.fill,
                         )),
@@ -82,7 +82,7 @@ class _add_review_viewState extends State<add_review_view> {
                       children: [
                         Text(
                           '${widget.review['name']}',
-                          style: TextStyle(
+                          style: const TextStyle(
                               // color: appcolor().mediumGreyColor,
                               fontSize: 16,
                               fontWeight: FontWeight.bold),
@@ -92,14 +92,14 @@ class _add_review_viewState extends State<add_review_view> {
                         ),
                         Row(
                           children: [
-                            Container(
+                            SizedBox(
                               width: Get.width * 0.1,
-                              child: Image(
+                              child: const Image(
                                   image: AssetImage(
                                       'assets/images/ui_23_item.png')),
                             ),
                             Text(
-                              ' ${widget.review['shop']['address']} \n ${widget.review['shop']['street']}',
+                              ' ${widget.review['address'] ?? widget.review.address} \n ${widget.review['street'] ?? 'Some street'}',
                               style: TextStyle(
                                 color: appcolor().mediumGreyColor,
                                 fontSize: 12,
@@ -129,7 +129,7 @@ class _add_review_viewState extends State<add_review_view> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text(
+                    const Text(
                       'Rating',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -141,14 +141,14 @@ class _add_review_viewState extends State<add_review_view> {
                       unratedColor: appcolor().greyColor,
                       itemSize: 40,
                       itemBuilder: (context, index) {
-                        return Icon(
+                        return const Icon(
                           Icons.star,
                           color: Colors.amber,
                           size: 10,
                         );
                       },
-                      onRatingUpdate: (rating_value) {
-                        rating = rating_value;
+                      onRatingUpdate: (ratingValue) {
+                        rating = ratingValue;
                       },
                     ),
                   ],
@@ -164,22 +164,22 @@ class _add_review_viewState extends State<add_review_view> {
                 () => imageController.image_path.isEmpty
                     ? Container(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                            const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                         child: Column(
                           children: [
                             Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   FontAwesomeIcons.solidImage,
                                 ),
                                 SizedBox(
                                   width: Get.width * 0.03,
                                 ),
-                                Text(
+                                const Text(
                                   'Add Image',
                                   style: TextStyle(fontSize: 16),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 IconButton(
                                   onPressed: () {},
                                   icon: Icon(
@@ -194,72 +194,71 @@ class _add_review_viewState extends State<add_review_view> {
                       )
                     : Container(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                            const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                         height: 300,
                         child: ListView(
-                          children: [],
+                          children: const [],
                         ),
                       ),
               ),
 
               Obx(
-                () => Container(
+                () => SizedBox(
                   height: imageController.imageList.isEmpty ? null : null,
                   child: imageController.imageList.isEmpty
                       ? InkWell(
                           onTap: () {
                             imageController.getmultipleImage();
                           },
-                          child: Container(
-                              child: Column(
+                          child: Column(
                             children: [
-                              Container(
-                                color: appcolor().greyColor,
-                                height: Get.height * 0.22,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    // SizedBox(height: Get.height*0.05,),
-                                    Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            FontAwesomeIcons.images,
-                                            size: 60,
-                                            color: appcolor().mediumGreyColor,
-                                          ),
-                                          Text(
-                                            '     Browse Images',
-                                            style: TextStyle(
-                                              color: appcolor().bluetextcolor,
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    // SizedBox(
-                                    //   height: Get.height * 0.05,
-                                    // ),
-                                    Text(
-                                      'Other variations of the main product image',
-                                      style: TextStyle(
-                                        fontSize: 10,
+                          Container(
+                            color: appcolor().greyColor,
+                            height: Get.height * 0.22,
+                            child: Column(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceEvenly,
+                              children: [
+                                // SizedBox(height: Get.height*0.05,),
+                                Center(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        FontAwesomeIcons.images,
+                                        size: 60,
                                         color: appcolor().mediumGreyColor,
-                                        fontWeight: FontWeight.w500,
                                       ),
-                                    ),
-                                  ],
+                                      Text(
+                                        '     Browse Images',
+                                        style: TextStyle(
+                                          color: appcolor().bluetextcolor,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
+                                // SizedBox(
+                                //   height: Get.height * 0.05,
+                                // ),
+                                Text(
+                                  'Other variations of the main product image',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: appcolor().mediumGreyColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                             ],
-                          )),
+                          ),
                         )
                       : Container(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 10),
                           height: Get.height * 0.24,
                           child: Center(
@@ -286,49 +285,47 @@ class _add_review_viewState extends State<add_review_view> {
                                         fit: BoxFit.fill,
                                       ),
                                     ),
-                                    Container(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              imageController.edit(index);
-                                            },
-                                            child: Container(
-                                              height: 35,
-                                              width: Get.width * 0.20,
-                                              color: Colors.lightGreen,
-                                              child: Center(
-                                                child: Text(
-                                                  'Edit',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            imageController.edit(index);
+                                          },
+                                          child: Container(
+                                            height: 35,
+                                            width: Get.width * 0.20,
+                                            color: Colors.lightGreen,
+                                            child: const Center(
+                                              child: Text(
+                                                'Edit',
+                                                style: TextStyle(
+                                                  color: Colors.white,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          InkWell(
-                                            onTap: () {
-                                              imageController.removeat(index);
-                                            },
-                                            child: Container(
-                                              height: 35,
-                                              width: Get.width * 0.2,
-                                              color: appcolor().greyColor,
-                                              child: Center(
-                                                child: Text(
-                                                  'Remove',
-                                                  style: TextStyle(),
-                                                ),
+                                        ),
+                                        InkWell(
+                                          onTap: () {
+                                            imageController.removeat(index);
+                                          },
+                                          child: Container(
+                                            height: 35,
+                                            width: Get.width * 0.2,
+                                            color: appcolor().greyColor,
+                                            child: const Center(
+                                              child: Text(
+                                                'Remove',
+                                                style: TextStyle(),
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     )
                                   ],
                                 ).paddingSymmetric(horizontal: 5);
@@ -347,7 +344,7 @@ class _add_review_viewState extends State<add_review_view> {
                             imageController.getmultipleImage();
                           },
                           child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 15),
+                            margin: const EdgeInsets.symmetric(horizontal: 15),
                             decoration: BoxDecoration(
                               color: appcolor().skyblueColor,
                               borderRadius: BorderRadius.circular(
@@ -355,7 +352,7 @@ class _add_review_viewState extends State<add_review_view> {
                               ),
                             ),
                             height: Get.height * 0.08,
-                            child: Row(
+                            child: const Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -374,12 +371,12 @@ class _add_review_viewState extends State<add_review_view> {
 
               // add more images
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                 color: Colors.white,
                 height: Get.height * 0.25,
                 child: TextFormField(
                   controller: reviewText,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(
                       Icons.message_outlined,
@@ -391,17 +388,17 @@ class _add_review_viewState extends State<add_review_view> {
                   ),
                 ),
               ),
-              Divider(),
+              const Divider(),
               SizedBox(
                 height: Get.height * 0.02,
               ),
               blockButton(
-                title:isLoading == false? Text(
+                title:isLoading == false? const Text(
                   'Submit Review',
                   style: TextStyle(color: Colors.white),
-                ):Center(child: CircularProgressIndicator(color: Colors.blue,),),
+                ):const Center(child: CircularProgressIndicator(color: Colors.blue,),),
                 ontap: () {
-                  var RatingText=reviewText.text.toString();
+                  var RatingText = reviewText.text.toString();
                   var productid = widget.review['id'].toString();
                   if(RatingText != ''){
                     PanDocumentInfoupload(RatingText,productid);

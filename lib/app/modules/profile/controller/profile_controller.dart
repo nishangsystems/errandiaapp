@@ -36,7 +36,7 @@ class profile_controller extends GetxController {
   List<errandia_widget> service_list = [
     errandia_widget(
       cost: 'XAF 5000',
-      imagePath: 'assets/images/boy1.png',
+      imagePath: 'assets/images/service-image.png',
       name: 'Low Cut',
       location: 'Molyko, Buea',
     ),

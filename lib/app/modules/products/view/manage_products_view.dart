@@ -384,7 +384,7 @@ Widget allProducts(BuildContext ctx) {
                       10,
                     ),
                   ),
-                  margin: EdgeInsets.symmetric(
+                  margin: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 10,
                   ),
@@ -392,7 +392,7 @@ Widget allProducts(BuildContext ctx) {
                     children: [
                       // image container
                       Container(
-                        margin: EdgeInsets.only(
+                        margin: const EdgeInsets.only(
                           right: 10,
                         ),
                         decoration: BoxDecoration(
@@ -402,13 +402,13 @@ Widget allProducts(BuildContext ctx) {
                         ),
                         width: Get.width * 0.16,
                         height: Get.height * 0.06,
-                        child: Image.network('${data['featured_image'].toString()}')
+                        child: Image.network(data['featured_image'].toString())
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${data['name'].length >=15?'${data['name'] + '..'}'.substring(0,15):data['name'].toString()}',
+                            data['name'].length >=15?'${data['name'] + '..'}'.substring(0,15):data['name'].toString(),
                             style: TextStyle(
                               color: appcolor().mainColor,
                               fontWeight: FontWeight.w500,
