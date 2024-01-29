@@ -31,7 +31,18 @@ class Review_view extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              Get.to(add_review_view());
+              var item = {
+                'name': "Rolls Royce",
+                'price': "20000",
+                'image': "https://picsum.photos/250?image=9",
+                'location': 'location',
+                'address': 'Molyko, Buea',
+                'featured_image': 'https://picsum.photos/250?image=9'
+              };
+              print("item: $item");
+              Get.to(add_review_view(
+                review: item,
+              ));
             },
             child: Text(
               'Add Reviews',
