@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
@@ -341,7 +344,7 @@ class errandia_business_view extends StatelessWidget {
                             8,
                           ),
                         ),
-                        padding: EdgeInsets.only(
+                        padding: const EdgeInsets.only(
                           left: 5,
                         ),
                         child: Icon(
@@ -414,7 +417,14 @@ class errandia_business_view extends StatelessWidget {
               ),
               padding: const EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  var data = controller.businessList[index].toJson();
+                  print("bz data: ${data}");
+
+                  Get.to(() =>  VisitShop(
+                    businessData: data
+                  ));
+                },
                 child: Row(
                   children: [
                     Icon(

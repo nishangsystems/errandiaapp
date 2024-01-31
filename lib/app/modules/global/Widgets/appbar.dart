@@ -101,3 +101,32 @@ AppBar appbar() {
     // ],
   );
 }
+
+AppBar titledAppBar(String title, List<Widget>? actions) {
+  return AppBar(
+    backgroundColor: Colors.white,
+    // automaticallyImplyLeading: false,
+    elevation: 1,
+    title: Text(title,
+      style: TextStyle(
+        color: appcolor().mediumGreyColor,
+        fontSize: 20,
+      ),
+    ),
+    leading: IconButton(
+      onPressed: () {
+        Get.back();
+      },
+      icon: Icon(
+        Icons.arrow_back_ios,
+        color: appcolor().mediumGreyColor,
+      ),
+    ),
+    iconTheme: IconThemeData(
+      color: appcolor().mediumGreyColor,
+      size: 30,
+    ),
+    actions: actions,
+  );
+}
+
