@@ -476,8 +476,17 @@ class _Product_viewState extends State<Product_view>
 
             InkWell(
               onTap: () {
+                var item_ = {
+                  'name': item.name,
+                  'price': item.price,
+                  'image': item.imagePath,
+                  'location': 'location',
+                  'address': 'Molyko, Buea',
+                  'featured_image': 'https://picsum.photos/250?image=9'
+                };
+                print("item: $item");
                 Get.to(add_review_view(
-                  review: item,
+                  review: item_,
                 ));
               },
               child: Container(
