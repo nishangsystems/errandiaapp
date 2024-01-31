@@ -4,6 +4,8 @@ import 'package:errandia/app/modules/buiseness/controller/business_controller.da
 import 'package:errandia/app/modules/buiseness/featured_buiseness/view/featured_list_item.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:errandia/app/modules/errands/view/search_errand_prod.dart';
+import 'package:errandia/app/modules/errands/view/see_all_erands.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/view/manage_products_view.dart';
@@ -66,18 +68,18 @@ class _VisitShopState extends State<VisitShop> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                height: 300,
-                width: Get.width * 1,
+                height: Get.height * 0.3,
+                width: Get.width,
                 color: Colors.red,
                 child: Image.asset(
                   widget.businessData['imagepath'],
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                 ),
               ),
 
               Column(
                 children: [
-                  product_review_widget(),
+                  product_review_widget(widget.businessData),
                   SizedBox(
                     height: Get.height * 0.02,
                   ),
@@ -204,7 +206,7 @@ class _VisitShopState extends State<VisitShop> {
                     const Spacer(),
                     TextButton(
                       onPressed: () {
-                        Get.to(() => manage_product_view());
+                        Get.to(() => search_errand_prod());
                       },
                       child: const Text('See All'),
                     ),
@@ -283,7 +285,7 @@ class _VisitShopState extends State<VisitShop> {
                     const Spacer(),
                     TextButton(
                       onPressed: () {
-                        // Get.to(BusinessesViewWithBar());
+                        Get.to(() => SeeAllErands());
                       },
                       child: const Text('See All'),
                     ),
@@ -300,17 +302,17 @@ class _VisitShopState extends State<VisitShop> {
   }
 }
 
-Widget product_review_widget() {
+Widget product_review_widget(Map<String, dynamic> data) {
   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    const Text(
-      'Rubiliams hair salon',
-      style: TextStyle(
+     Text(
+      data['name'].toString(),
+      style: const TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
     ),
-    const Text(
-      'Akwa Douala, Littoral, Cameroon',
+    Text(
+      data['location'].toString(),
       style: TextStyle(fontSize: 15, color: Colors.black),
     ),
     const SizedBox(
