@@ -8,6 +8,7 @@ import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
+import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -629,17 +630,19 @@ class errandia_business_view extends StatelessWidget {
                 ),
                 color: Colors.white,
               ),
-              padding: EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
+              padding: const EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     'Supplier Review',
                     style: TextStyle(fontSize: 15),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   TextButton(
-                    onPressed: () {},
-                    child: Text(
+                    onPressed: () {
+                      Get.to(() => Review_view());
+                    },
+                    child: const Text(
                       'See All',
                     ),
                   ),
