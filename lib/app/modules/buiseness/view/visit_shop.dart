@@ -260,7 +260,7 @@ class _VisitShopState extends State<VisitShop> {
                     const Spacer(),
                     TextButton(
                       onPressed: () {
-                        Get.to(BusinessesViewWithBar());
+                        Get.to(() => BusinessesViewWithBar());
                       },
                       child: const Text('See All'),
                     ),
