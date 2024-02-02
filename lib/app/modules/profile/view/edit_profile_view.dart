@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
@@ -132,7 +133,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                               color: Colors.grey,
                               image: userData['profile'] != null ? DecorationImage(
                                 image: NetworkImage(
-                                  userData['profile'] ?? "",
+                                  userData['profile'] ?? "http://placehold.it/200x200",
                                 ),
                                 fit: BoxFit.fill,
                               ) : const DecorationImage(
@@ -276,9 +277,22 @@ class edit_profile_viewState extends State<edit_profile_view> {
                                     print(
                                         "fullName: ${fullNameController.text}");
                                   },
-                                  child: const Icon(
-                                    Icons.save_sharp,
-                                    color: Color(0xff113d6b),
+                                  child: IconButton(
+                                    onPressed: () {
+                                      if (kDebugMode) {
+                                        print("edit full name ${fullNameController.text}");
+                                        var value = {
+                                          "field_name": "name",
+                                          "field_value": fullNameController.text
+                                        };
+
+                                        api().updateProfile(value, context, navigator);
+                                      }
+                                    },
+                                    icon: const Icon(
+                                      Icons.save_sharp,
+                                      color: Color(0xff113d6b),
+                                    ),
                                   ),
                                 )
                               : const Icon(
@@ -392,9 +406,22 @@ class edit_profile_viewState extends State<edit_profile_view> {
                       // });
                       print("whatsapp: ${whatsappController.text}");
                     },
-                    child: const Icon(
-                      Icons.save_sharp,
-                      color: Color(0xff113d6b),
+                    child: IconButton(
+                      onPressed: () {
+                        if (kDebugMode) {
+                          print("edit whatsapp ${whatsappController.text}");
+                          var value = {
+                            "field_name": "whatsapp_number",
+                            "field_value": whatsappController.text
+                          };
+
+                          api().updateProfile(value, context, navigator);
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.save_sharp,
+                        color: Color(0xff113d6b),
+                      ),
                     ),
                   )
                       : const Icon(
