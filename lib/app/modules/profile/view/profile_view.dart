@@ -1,11 +1,15 @@
 import 'dart:convert';
 
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/profile/view/edit_profile_view.dart';
 import 'package:errandia/utils/helper.dart';
+import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
+import 'package:errandia/app/modules/services/view/service_details_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +56,7 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
         : "";
 
     if (kDebugMode) {
-      print("user: ${userData}");
+      print("user: ${userData.toString}");
     }
 
     return Scaffold(
@@ -83,7 +87,7 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                         borderRadius: BorderRadius.circular(8.0),
                         child:
                           userData['profile'] == null ? Image.network(
-                            userData['profile'],
+                            userData['profile'] ?? "",
                             height: Get.height * 0.13,
                             width: Get.width * 0.27,
                             fit: BoxFit.cover,
@@ -96,8 +100,7 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                                 fontWeight: FontWeight.bold,
                               ),
                             )
-                          )
-
+                          ),
                       ),
                     ),
                   ),
@@ -363,8 +366,19 @@ Widget product_item_list() {
       crossAxisSpacing: 10,
       childAspectRatio: 1 / 1.5,
     ),
+
     itemBuilder: (context, index) {
-      return profile_controller().product_list[index];
+      final item = Recently_item_List[index];
+
+      return GestureDetector(
+        onTap: () {
+          if (kDebugMode) {
+            print("product item clicked: ${item.name}");
+          }
+          Get.to(() => Product_view(item: item));
+        },
+        child: profile_controller().product_list[index],
+      );
     },
   );
 }
@@ -378,7 +392,16 @@ Widget Service_item_list() {
       childAspectRatio: 1 / 1.5,
     ),
     itemBuilder: (context, index) {
-      return profile_controller().service_list[index];
+      final item = profile_controller().service_list[index];
+      return GestureDetector(
+        onTap: () {
+          if (kDebugMode) {
+            print("service item: ${item.name}");
+          }
+          Get.to(() => ServiceDetailsView(service: item));
+        },
+        child: profile_controller().service_list[index],
+      );
     },
   );
 }

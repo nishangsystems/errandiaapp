@@ -1,245 +1,200 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:errandia/app/modules/categories/CategoryData.dart';
+import 'package:errandia/app/modules/errands/view/Product/serivces.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
+import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/view/products_send_enquiry.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
 import 'package:errandia/app/modules/reviews/views/add_review.dart';
 import 'package:errandia/app/modules/reviews/views/review_view.dart';
-import 'package:errandia/common/random_ui/ui_23.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:share/share.dart';
-import '../../errands/view/Product/serivces.dart';
-import '../../global/constants/color.dart';
 
-class Product_view extends StatefulWidget {
-  final item;
-  final name;
+class ServiceDetailsView extends StatefulWidget {
+  final service;
 
-  Product_view({super.key, required this.item, this.name});
+  const ServiceDetailsView({super.key, required this.service});
 
   @override
-  State<Product_view> createState() => _Product_viewState(item);
+  State<ServiceDetailsView> createState() => _ServiceDetailsViewState();
 }
 
-class _Product_viewState extends State<Product_view>
+class _ServiceDetailsViewState extends State<ServiceDetailsView>
     with TickerProviderStateMixin {
   late final TabController tabController =
-      TabController(length: 2, vsync: this);
-  final item;
-
-  _Product_viewState(this.item);
+  TabController(length: 2, vsync: this);
+  // final service;
+  // _ServiceDetailsViewState(this.service);
 
   @override
   Widget build(BuildContext context) {
-    //  print(widget.item.product_name);
-    print("product item: ${widget.item.id}");
+    if (kDebugMode) {
+      print("service: ${widget.service.name}");
+    }
     return Scaffold(
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: SizedBox(
-          height: 52,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              InkWell(
-                onTap: () {
-                  Get.to(const Product_serivices());
-                },
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    FaIcon(FontAwesomeIcons.store),
-                    Text(
-                      'Store',
-                      style: TextStyle(color: Colors.black, fontSize: 10),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              SizedBox(
-                width: Get.width * 0.4,
-                height: 50,
-                child: blockButton(
-                  title: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          FontAwesomeIcons.whatsapp,
-                          color: Colors.white,
-                        ),
-                        Text(
-                          '  Chat on Whatsapp',
-                          style: TextStyle(color: Colors.white, fontSize: 9),
-                        ),
-                      ],
-                    ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: SizedBox(
+            height: 52,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                InkWell(
+                  onTap: () {
+                    Get.to(const Product_serivices());
+                  },
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      FaIcon(FontAwesomeIcons.store),
+                      Text(
+                        'Store',
+                        style: TextStyle(color: Colors.black, fontSize: 10),
+                      ),
+                    ],
                   ),
-                  ontap: () async {},
-                  color: appcolor().mainColor,
                 ),
-              ),
-              SizedBox(
-                width: Get.width * 0.4,
-                height: 50,
-                child: blockButton(
-                  title: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.call,
-                          color: appcolor().mainColor,
-                        ),
-                        Text(
-                          // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
-                          'Call 673580194',
-                          style: TextStyle(
-                            fontSize: 9,
+                const SizedBox(
+                  width: 10,
+                ),
+                SizedBox(
+                  width: Get.width * 0.4,
+                  height: 50,
+                  child: blockButton(
+                    title: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.whatsapp,
+                            color: Colors.white,
+                          ),
+                          Text(
+                            '  Chat on Whatsapp',
+                            style: TextStyle(color: Colors.white, fontSize: 9),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ontap: () async {},
+                    color: appcolor().mainColor,
+                  ),
+                ),
+                SizedBox(
+                  width: Get.width * 0.4,
+                  height: 50,
+                  child: blockButton(
+                    title: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.call,
                             color: appcolor().mainColor,
                           ),
-                        ),
-                      ],
+                          Text(
+                            // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
+                            'Call 673580194',
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: appcolor().mainColor,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    ontap: () {},
+                    color: appcolor().skyblueColor,
                   ),
-                  ontap: () {},
-                  color: appcolor().skyblueColor,
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      backgroundColor: const Color.fromARGB(255, 244, 244, 244),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: appcolor().mediumGreyColor,
-          ),
-          onPressed: () {
-            Get.back();
-          },
-        ),
-        title: Text(
-          "${widget.item.name}",
-          style: TextStyle(
-            color: appcolor().mainColor,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.messenger_sharp,
-              size: 30,
+              ],
             ),
-            color: appcolor().mediumGreyColor,
           ),
-          IconButton(
+        ),
+        backgroundColor: const Color.fromARGB(255, 244, 244, 244),
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: appcolor().mediumGreyColor,
+            ),
             onPressed: () {
-              Share.share('text', subject: 'hello share');
+              Get.back();
             },
-            icon: const Icon(
-              Icons.share,
-              size: 30,
-            ),
-            color: appcolor().mediumGreyColor,
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
+          title: Text(
+            "${widget.service.name}",
+            style: TextStyle(
+              color: appcolor().mainColor,
+            ),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.messenger_sharp,
+                size: 30,
+              ),
+              color: appcolor().mediumGreyColor,
+            ),
+            IconButton(
+              onPressed: () {
+                Share.share('text', subject: 'hello share');
+              },
+              icon: const Icon(
+                Icons.share,
+                size: 30,
+              ),
+              color: appcolor().mediumGreyColor,
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+            child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // service image
+            Container(
+              height: 300,
+              width: Get.width * 1,
+              color: Colors.red,
+              child: Image.asset(
+                widget.service.imagePath,
+                fit: BoxFit.cover,
+              ),
+            ),
+
             Column(
               children: [
-                image_select_widget(
-                    // widget.item['images']
-                  widget.item.imagePath
-                ),
-                product_review_widget(widget.item),
-                // SizedBox(
-                //   height: Get.height * 0.03,
-                // ),
-                // chat on whatsapp button
-                // blockButton(
-                //   title: Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       Icon(
-                //         FontAwesomeIcons.whatsapp,
-                //         color: Colors.white,
-                //       ),
-                //       Text(
-                //         '  Chat on Whatsapp',
-                //         style: TextStyle(
-                //           color: Colors.white,
-                //         ),
-                //       )
-                //     ],
-                //   ),
-                //   ontap: () {},
-                //   color: appcolor().mainColor,
-                // ),
+                product_review_widget(widget.service),
 
-                // call button
                 SizedBox(
                   height: Get.height * 0.02,
                 ),
-                // blockButton(
-                //   title: Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       Icon(
-                //         FontAwesomeIcons.phone,
-                //         color: appcolor().mainColor,
-                //         size: 18,
-                //       ),
-                //       Text(
-                //         '  Call 673580194',
-                //         style: TextStyle(
-                //             color: appcolor().mainColor, fontSize: 16),
-                //       )
-                //     ],
-                //   ),
-                //   ontap: () {},
-                //   color: appcolor().skyblueColor,
-                // ),
               ],
-            ).paddingOnly(
-              left: 15,
-              right: 15,
-              top: 20,
-            ),
+            ).paddingOnly(top: 20, left: 15, right: 15),
 
-            // tab bar view
             SizedBox(
               height: Get.height * 0.01,
             ),
-            // Divider(
-            //   color: appcolor().mediumGreyColor,
-            // ),
+
             Container(
               decoration: BoxDecoration(
                   border: Border.symmetric(
                       horizontal: BorderSide(
-                color: appcolor().greyColor,
-              ))),
+                        color: appcolor().greyColor,
+                      ))),
               child: Column(
                 children: [
                   Container(
@@ -249,7 +204,7 @@ class _Product_viewState extends State<Product_view>
                       // isScrollable: true,
                       dividerColor: appcolor().mediumGreyColor,
                       unselectedLabelColor: appcolor().mediumGreyColor,
-                      unselectedLabelStyle: TextStyle(
+                      unselectedLabelStyle: const TextStyle(
                         fontWeight: FontWeight.normal,
                         fontSize: 15,
                       ),
@@ -262,7 +217,7 @@ class _Product_viewState extends State<Product_view>
                       ),
                       controller: tabController,
                       labelColor: appcolor().darkBlueColor,
-                      tabs: [
+                      tabs: const [
                         Tab(
                           text: "Description",
                         ),
@@ -303,9 +258,11 @@ class _Product_viewState extends State<Product_view>
                 ],
               ),
             ),
+
             SizedBox(
               height: Get.height * 0.015,
             ),
+
             Container(
               height: Get.height * 0.08,
               decoration: BoxDecoration(
@@ -316,7 +273,7 @@ class _Product_viewState extends State<Product_view>
                 ),
                 color: Colors.white,
               ),
-              padding: EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
+              padding: const EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
               child: InkWell(
                 onTap: () {
                   Get.to(product_send_enquiry());
@@ -328,10 +285,10 @@ class _Product_viewState extends State<Product_view>
                       color: appcolor().blueColor,
                     ),
                     Text(
-                      '   Send Enquiry',
+                      'Send Enquiry',
                       style: TextStyle(color: appcolor().blueColor),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Icon(
                       Icons.arrow_forward_ios_outlined,
                       color: appcolor().mainColor,
@@ -344,6 +301,7 @@ class _Product_viewState extends State<Product_view>
             SizedBox(
               height: Get.height * 0.015,
             ),
+
             // suplier review
             Container(
               height: Get.height * 0.08,
@@ -355,19 +313,19 @@ class _Product_viewState extends State<Product_view>
                 ),
                 color: Colors.white,
               ),
-              padding: EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
+              padding: const EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     'Supplier Review',
                     style: TextStyle(fontSize: 15),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   TextButton(
                     onPressed: () {
                       Get.to(Review_view());
                     },
-                    child: Text(
+                    child: const Text(
                       'See All',
                     ),
                   ),
@@ -386,63 +344,61 @@ class _Product_viewState extends State<Product_view>
                 ),
                 color: Colors.white,
               ),
-              padding: EdgeInsets.only(left: 20, right: 15, top: 15, bottom: 5),
+              padding: const EdgeInsets.only(left: 20, right: 15, top: 15, bottom: 5),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(right: 8),
-                              height: Get.height * 0.05,
-                              width: Get.width * 0.1,
-                              color: Colors.white,
-                              // child: Image.asset(widget.item['featured_image']),
-                              child: Image.asset(
-                                widget.item.imagePath,
+                      Row(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            height: Get.height * 0.05,
+                            width: Get.width * 0.1,
+                            color: Colors.white,
+                            // child: Image.asset(widget.item['featured_image']),
+                            child: Image.asset(
+                              widget.service.imagePath,
+                            ),
+                          ),
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Name of supplier',
                               ),
-                            ),
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Name of supplier',
-                                ),
-                                Text('location'),
-                              ],
-                            ),
-                            // Spacer(),
-                            SizedBox(
-                              width: Get.width * 0.13,
-                            ),
-                            RatingBar.builder(
-                              itemCount: 5,
-                              direction: Axis.horizontal,
-                              initialRating: 1,
-                              itemSize: 22,
-                              maxRating: 5,
-                              allowHalfRating: true,
-                              glow: true,
-                              itemBuilder: (context, _) {
-                                return Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                );
-                              },
-                              onRatingUpdate: (value) {
-                                debugPrint(value.toString());
-                              },
-                            ),
-                          ],
-                        ),
+                              Text('location'),
+                            ],
+                          ),
+                          // Spacer(),
+                          SizedBox(
+                            width: Get.width * 0.13,
+                          ),
+                          RatingBar.builder(
+                            itemCount: 5,
+                            direction: Axis.horizontal,
+                            initialRating: 1,
+                            itemSize: 22,
+                            maxRating: 5,
+                            allowHalfRating: true,
+                            glow: true,
+                            itemBuilder: (context, _) {
+                              return const Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                              );
+                            },
+                            onRatingUpdate: (value) {
+                              debugPrint(value.toString());
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  Container(
+                  SizedBox(
                     height: Get.height * 0.15,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
@@ -450,7 +406,7 @@ class _Product_viewState extends State<Product_view>
                       itemBuilder: (context, index) {
                         return Container(
                           margin:
-                              EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                          const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                           height: Get.height * 0.2,
                           color: Colors.white,
                           width: Get.width * 0.2,
@@ -463,8 +419,8 @@ class _Product_viewState extends State<Product_view>
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(bottom: 10),
-                    child: Text(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: const Text(
                       'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.',
                     ),
                   ),
@@ -472,33 +428,30 @@ class _Product_viewState extends State<Product_view>
               ),
             ),
 
-            // add your Reviews
-
             InkWell(
               onTap: () {
-                var item_ = {
-                  'name': item.name,
-                  'price': item.price,
-                  'image': item.imagePath,
-                  'location': 'location',
-                  'address': 'Molyko, Buea',
-                  'featured_image': 'https://picsum.photos/250?image=9'
+                var item = {
+                  'name': widget.service.name,
+                  'imagePath': widget.service.imagePath,
+                  'cost': widget.service.cost,
+                  'location': widget.service.location,
+                  'featured_image': "https://picsum.photos/250?image=9",
+                  'address': 'Akwa, Douala',
                 };
-                print("item: $item");
-                Get.to(add_review_view(
-                  review: item_,
+                Get.to(() => add_review_view(
+                  review: item,
                 ));
               },
               child: Container(
                 margin:
-                    EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
+                const EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
                 height: Get.height * 0.05,
                 width: Get.width * 0.4,
                 decoration: BoxDecoration(
                     color: appcolor().mainColor,
                     borderRadius: BorderRadius.circular(5)),
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: Center(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: const Center(
                   child: Text(
                     'Add Your Review',
                     style: TextStyle(
@@ -510,7 +463,7 @@ class _Product_viewState extends State<Product_view>
               ),
             ),
 
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 20, right: 15, top: 0, bottom: 10),
               child: Text(
                 'More products from this supplier',
@@ -519,20 +472,21 @@ class _Product_viewState extends State<Product_view>
                 ),
               ),
             ),
-            Container(
+
+            SizedBox(
               height: Get.height * 0.32,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: ui_23_item_list.length,
                 itemBuilder: (context, index) {
                   return Container(
-                      margin: EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                      margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                       // height: Get.height * 0.15,
                       color: Colors.white,
                       width: Get.width * 0.38,
                       child: Column(
                         children: [
-                          Container(
+                          SizedBox(
                             height: Get.height * 0.15,
                             child: Image.asset(
                                 ui_23_item_list[index].imagePath.toString()),
@@ -571,9 +525,9 @@ class _Product_viewState extends State<Product_view>
               ),
             ),
 
-            Padding(
+            const Padding(
               padding:
-                  EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
+              EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
               child: Text(
                 'Services Offered by this Supplier',
                 style: TextStyle(
@@ -581,20 +535,21 @@ class _Product_viewState extends State<Product_view>
                 ),
               ),
             ),
-            Container(
+
+            SizedBox(
               height: Get.height * 0.32,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: Recently_item_List.length,
                 itemBuilder: (context, index) {
                   return Container(
-                      margin: EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                      margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                       // height: Get.height * 0.15,
                       color: Colors.white,
                       width: Get.width * 0.38,
                       child: Column(
                         children: [
-                          Container(
+                          SizedBox(
                             height: Get.height * 0.15,
                             child: Image.asset(
                                 Recently_item_List[index].imagePath.toString()),
@@ -636,114 +591,57 @@ class _Product_viewState extends State<Product_view>
             SizedBox(
               height: Get.height * 0.1,
             )
+
           ],
-        ),
-      ),
-    );
+        )));
   }
 }
 
-Widget image_select_widget(final item) {
-  return Container(
-    child: Column(
+Widget product_review_widget(item) {
+  return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    Text(
+      '${item.name}',
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    Text(
+      '${item.cost}',
+      style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          color: appcolor().darkBlueColor),
+    ),
+    Row(
       children: [
-        Container(
-          height: Get.height * 0.4,
-          color: Colors.white,
-          //  child: Image.asset(item.imagePath.toString()),
-          child: CarouselSlider.builder(
-            options: CarouselOptions(
-              enableInfiniteScroll: true,
-              aspectRatio: 2.0,
-              viewportFraction: 1.0,
-              scrollDirection: Axis.horizontal,
-              // aspectRatio: 2,
-            ),
-            itemCount: item.length,
-            itemBuilder: (context, index, realIndex) {
-              // var image = item[index];
-              // return Image.network(
-              //   image['url'].toString(),
-              //   fit: BoxFit.cover,
-              // );
-              print("image path: ${item}");
-              return Image.asset(
-                item.toString(),
-                fit: BoxFit.cover,
-              );
-            },
-          ),
+        RatingBar.builder(
+          itemCount: 5,
+          direction: Axis.horizontal,
+          initialRating: 3,
+          itemSize: 22,
+          maxRating: 5,
+          allowHalfRating: true,
+          glow: true,
+          itemBuilder: (context, _) {
+            return const Icon(
+              Icons.star,
+              color: Colors.amber,
+            );
+          },
+          onRatingUpdate: (value) {
+            debugPrint(value.toString());
+          },
         ),
-        Container(
-          height: Get.height * 0.15,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: item.length,
-            itemBuilder: (context, index) {
-              var image = item[index];
-              return Container(
-                margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                height: Get.height * 0.2,
-                color: Colors.white,
-                width: Get.width * 0.2,
-                // child: Center(child: Image.network(image['url'].toString())),
-                child: Center(child: Image.network(image.toString())),
-              );
-            },
-          ),
+        SizedBox(
+          width: Get.width * 0.01,
+        ),
+        Text(
+          // '${item['reviews']} Supplier Reviews',
+          '10 Reviews',
+          style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
         ),
       ],
     ),
-  );
-}
-
-Widget product_review_widget(item) {
-  return Container(
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        '${item.name}',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      Text(
-        'XAF ${item.price}',
-        style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: appcolor().mediumGreyColor),
-      ),
-      Row(
-        children: [
-          RatingBar.builder(
-            itemCount: 5,
-            direction: Axis.horizontal,
-            initialRating: 1,
-            itemSize: 22,
-            maxRating: 5,
-            allowHalfRating: true,
-            glow: true,
-            itemBuilder: (context, _) {
-              return Icon(
-                Icons.star,
-                color: Colors.amber,
-              );
-            },
-            onRatingUpdate: (value) {
-              debugPrint(value.toString());
-            },
-          ),
-          SizedBox(
-            width: Get.width * 0.01,
-          ),
-          Text(
-            // '${item['reviews']} Supplier Reviews',
-            '{} Supplier Reviews',
-            style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
-          ),
-        ],
-      ),
-    ]),
-  );
+  ]);
 }

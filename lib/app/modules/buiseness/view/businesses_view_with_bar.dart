@@ -283,7 +283,7 @@ class BusinessesViewWithBar extends StatelessWidget {
           Expanded(
             child: GridView.builder(
               itemCount: business_controller().businessList.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 1 / 1.7,
                 crossAxisSpacing: 6,

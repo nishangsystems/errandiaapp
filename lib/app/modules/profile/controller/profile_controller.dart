@@ -5,6 +5,19 @@ import 'package:get/get.dart';
 class profile_controller extends GetxController {
 
   RxInt tabControllerindex= 0.obs;
+  RxBool isFullNameValid = false.obs;
+  RxBool isEmailValid = false.obs;
+  RxBool isPhoneValid = false.obs;
+  RxBool isWhatsappValid = false.obs;
+
+  bool isEmail(String em) {
+
+    String p = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+
+    RegExp regExp = RegExp(p);
+
+    return regExp.hasMatch(em);
+  }
 
   List<errandia_widget> product_list = [
     errandia_widget(
@@ -36,7 +49,7 @@ class profile_controller extends GetxController {
   List<errandia_widget> service_list = [
     errandia_widget(
       cost: 'XAF 5000',
-      imagePath: 'assets/images/boy1.png',
+      imagePath: 'assets/images/service-image.png',
       name: 'Low Cut',
       location: 'Molyko, Buea',
     ),
