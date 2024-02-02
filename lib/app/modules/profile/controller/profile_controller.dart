@@ -44,6 +44,18 @@ class profile_controller extends GetxController {
       name: 'hello',
       location: 'Akwa, Douala',
     ),
+    errandia_widget(
+      cost: 'XAF 1000',
+      imagePath: 'assets/images/ui_23_item.png',
+      name: 'wax',
+      location: 'Akwa, Douala',
+    ),
+    errandia_widget(
+      cost: 'XAF 1000',
+      imagePath: 'assets/images/er2.png',
+      name: 'hello',
+      location: 'Akwa, Douala',
+    ),
 
   ];
   List<errandia_widget> service_list = [
