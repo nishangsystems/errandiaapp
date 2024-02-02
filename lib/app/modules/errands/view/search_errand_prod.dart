@@ -1,6 +1,15 @@
+import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/buiseness/featured_buiseness/view/featured_list_item.dart';
+import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
+import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
+import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/products/controller/manage_products_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
+import 'package:errandia/app/modules/services/view/service_details_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -24,33 +33,6 @@ class search_errand_prod extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // floatingActionButton: InkWell(
-        //   onTap: () {
-        //     Get.to(add_product_view());
-        //   },
-        //   child: new Container(
-        //     width: Get.width * 0.47,
-        //     padding: EdgeInsets.all(15),
-        //     decoration: BoxDecoration(
-        //       color: appcolor().skyblueColor,
-        //       borderRadius: BorderRadius.circular(8),
-        //     ),
-        //     child: Row(
-        //       children: [
-        //         Icon(
-        //           Icons.add,
-        //           color: appcolor().mainColor,
-        //           size: 28,
-        //         ),
-        //         Spacer(),
-        //         Text(
-        //           'Add Product',
-        //           style: TextStyle(fontSize: 16, color: appcolor().mainColor),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
         endDrawer: Drawer(
           width: Get.width * 0.7,
           child: SafeArea(
@@ -58,7 +40,7 @@ class search_errand_prod extends StatelessWidget {
               children: [
                 blockButton(
                   title: TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 10,
@@ -72,25 +54,6 @@ class search_errand_prod extends StatelessWidget {
                 ).paddingOnly(
                   bottom: 20,
                 ),
-                // Container(
-                //   decoration: BoxDecoration(
-                //     border: Border.all(
-                //       color: appcolor().mediumGreyColor,
-                //     ),
-                //     borderRadius: BorderRadius.circular(10),
-                //   ),
-                //   child: TextFormField(
-                //     decoration: InputDecoration(
-                //       border: InputBorder.none,
-                //       contentPadding: EdgeInsets.symmetric(
-                //         horizontal: 10,
-                //         vertical: 5,
-                //       ),
-                //       hintText: 'Search Product',
-                //     ),
-                //   ),
-                // ).paddingOnly(bottom: 20,),
-
                 blockButton(
                   title: Text(
                     'Search',
@@ -169,7 +132,7 @@ class search_errand_prod extends StatelessWidget {
                       ),
                       SizedBox(
                         width: Get.width * 0.26,
-                        child: const Text('Product'),
+                        child: const Text('Products'),
                       ),
                       const Text('Services'),
                       const Text('Business'),
@@ -177,22 +140,22 @@ class search_errand_prod extends StatelessWidget {
                   ),
                 ),
                 // a text saying Errandia Suggest the following businesses that might have your product
-                Container(
-                  margin: EdgeInsets.only(
-                    top: Get.height * 0.01,
-                    left: Get.width * 0.03,
-                  ),
-                  child: Expanded(
-                    child: Text(
-                      'Errandia Suggest the following businesses that might have your product',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: appcolor().mediumGreyColor,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ),
+                // Container(
+                //   margin: EdgeInsets.only(
+                //     top: Get.height * 0.01,
+                //     left: Get.width * 0.03,
+                //   ),
+                //   child: Expanded(
+                //     child: Text(
+                //       'Errandia Suggest the following businesses that might have your product',
+                //       textAlign: TextAlign.center,
+                //       style: TextStyle(
+                //         color: appcolor().mediumGreyColor,
+                //         fontSize: 12,
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 Expanded(
                   child: TabBarView(
                       controller: pcontroller.tabController,
@@ -211,249 +174,702 @@ class search_errand_prod extends StatelessWidget {
 }
 
 Widget allProducts(BuildContext ctx) {
-  return Column(
-    children: [
-      filter_sort_container(
-        () {
-          Get.to(filter_product_view());
-        },
-        () {
-          Get.bottomSheet(
-            Container(
-              color: const Color.fromRGBO(255, 255, 255, 1),
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.start,
-                children: [
-                  Text(
-                    'Sort List',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                      color: appcolor().mainColor,
+  return SingleChildScrollView(
+    child: Column(
+      children: [
+        filter_sort_container(
+          () {
+            Get.to(filter_product_view());
+          },
+          () {
+            Get.bottomSheet(
+              Container(
+                color: const Color.fromRGBO(255, 255, 255, 1),
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  children: [
+                    Text(
+                      'Sort List',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        color: appcolor().mainColor,
+                      ),
                     ),
-                  ),
-                  // z-a
-                  Row(
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(fontSize: 16),
-                          children: [
-                            TextSpan(
-                              text: 'Product Name : ',
-                              style: TextStyle(
-                                color: appcolor().mainColor,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'Desc Z-A',
-                              style: TextStyle(
-                                color: appcolor().mediumGreyColor,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Spacer(),
-                      Obx(
-                        () => Radio(
-                          value: 'sort descending',
-                          groupValue: manageProductController
-                              .allProducts_sort_group_value.value,
-                          onChanged: (val) {
-                            manageProductController.allProducts_sort_group_value
-                                .value = val.toString();
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-
-                  // a-z
-                  Row(
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(fontSize: 16),
-                          children: [
-                            TextSpan(
-                              text: 'Product Name : ',
-                              style: TextStyle(
-                                color: appcolor().mainColor,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'Asc A-Z',
-                              style: TextStyle(
-                                color: appcolor().mediumGreyColor,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Spacer(),
-                      Obx(() => Radio(
-                            value: 'sort ascending',
-                            groupValue: manageProductController
-                                .allProducts_sort_group_value.value,
-                            onChanged: (val) {
-                              manageProductController
-                                  .allProducts_sort_group_value
-                                  .value = val.toString();
-                            },
-                          ))
-                    ],
-                  ),
-
-                  // distance nearest to me
-                  Row(
-                    children: [
-                      RichText(
+                    // z-a
+                    Row(
+                      children: [
+                        RichText(
                           text: TextSpan(
-                              style: TextStyle(fontSize: 16),
-                              children: [
-                            TextSpan(
-                              text: 'Date',
-                              style: TextStyle(
-                                color: appcolor().mainColor,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'Last Modified',
-                            ),
-                          ])),
-                      Spacer(),
-                      Obx(() => Radio(
-                            value: 'Date Last modified ',
-                            groupValue: manageProductController
-                                .allProducts_sort_group_value.value,
-                            onChanged: (val) {
-                              manageProductController
-                                  .allProducts_sort_group_value
-                                  .value = val.toString();
-                            },
-                          ))
-                    ],
-                  ),
-
-                  //recentaly added
-                  Row(
-                    children: [
-                      Text(
-                        'Price',
-                        style: TextStyle(
-                            color: appcolor().mainColor, fontSize: 16),
-                      ),
-                      Icon(
-                        Icons.arrow_upward,
-                        size: 25,
-                        color: appcolor().mediumGreyColor,
-                      ),
-                      Spacer(),
-                      Obx(
-                        () => Radio(
-                          value: 'Price',
-                          groupValue: manageProductController
-                              .allProducts_sort_group_value.value,
-                          onChanged: (val) {
-                            manageProductController.allProducts_sort_group_value
-                                .value = val.toString();
-                            print(val.toString());
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                ],
-              ).paddingSymmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-            ),
-          );
-        },
-        () {
-          Scaffold.of(ctx).openEndDrawer();
-        },
-      ),
-      SizedBox(
-        height: Get.height * 0.01,
-      ),
-      Expanded(
-        child: Container(
-            margin: const EdgeInsets.all(10),
-            color: const Color.fromARGB(255, 255, 255, 255),
-            child: GridView.count(
-              childAspectRatio: (1 / 1.4),
-              crossAxisCount: 2,
-              children: List.generate(ui_23_item_list.length, (index) {
-                return InkWell(
-                  onTap: () {
-                    Get.to(() => Product_view(
-                      item: Recently_item_List[0],
-                    ));
-                  },
-                  child: Card(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 6),
-                      height: Get.height * 0.8,
-                      // color: Colors.blue,
-                      width: Get.width * 0.4,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Center(
-                            child: Image(
-                              image: AssetImage(
-                                ui_23_item_list[index].imagePath,
-                              ),
-                              height: Get.height * 0.12,
-                            ),
-                          ),
-                          SizedBox(
-                            height: Get.height * 0.01,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            style: TextStyle(fontSize: 16),
                             children: [
-                              Icon(
-                                Icons.location_on,
-                                color: appcolor().mediumGreyColor,
-                              ),
-                              Text(
-                                ui_23_item_list[index].location.toString(),
+                              TextSpan(
+                                text: 'Product Name : ',
                                 style: TextStyle(
-                                    color: appcolor().mediumGreyColor,
-                                    fontSize: 12),
+                                  color: appcolor().mainColor,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Desc Z-A',
+                                style: TextStyle(
+                                  color: appcolor().mediumGreyColor,
+                                ),
                               )
                             ],
                           ),
-                          Text(
-                            ui_23_item_list[index].item_desc,
-                            style: TextStyle(
-                                fontSize: 12, color: appcolor().mainColor),
-                            textAlign: TextAlign.center,
+                        ),
+                        Spacer(),
+                        Obx(
+                          () => Radio(
+                            value: 'sort descending',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController.allProducts_sort_group_value
+                                  .value = val.toString();
+                            },
                           ),
-                          Text(
-                            ui_23_item_list[index].itemname,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
+                        )
+                      ],
+                    ),
+
+                    // a-z
+                    Row(
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            style: TextStyle(fontSize: 16),
+                            children: [
+                              TextSpan(
+                                text: 'Product Name : ',
+                                style: TextStyle(
+                                  color: appcolor().mainColor,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Asc A-Z',
+                                style: TextStyle(
+                                  color: appcolor().mediumGreyColor,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Spacer(),
+                        Obx(() => Radio(
+                              value: 'sort ascending',
+                              groupValue: manageProductController
+                                  .allProducts_sort_group_value.value,
+                              onChanged: (val) {
+                                manageProductController
+                                    .allProducts_sort_group_value
+                                    .value = val.toString();
+                              },
+                            ))
+                      ],
+                    ),
+
+                    // distance nearest to me
+                    Row(
+                      children: [
+                        RichText(
+                            text: TextSpan(
+                                style: TextStyle(fontSize: 16),
+                                children: [
+                              TextSpan(
+                                text: 'Date',
+                                style: TextStyle(
+                                  color: appcolor().mainColor,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Last Modified',
+                              ),
+                            ])),
+                        Spacer(),
+                        Obx(() => Radio(
+                              value: 'Date Last modified ',
+                              groupValue: manageProductController
+                                  .allProducts_sort_group_value.value,
+                              onChanged: (val) {
+                                manageProductController
+                                    .allProducts_sort_group_value
+                                    .value = val.toString();
+                              },
+                            ))
+                      ],
+                    ),
+
+                    //recentaly added
+                    Row(
+                      children: [
+                        Text(
+                          'Price',
+                          style: TextStyle(
+                              color: appcolor().mainColor, fontSize: 16),
+                        ),
+                        Icon(
+                          Icons.arrow_upward,
+                          size: 25,
+                          color: appcolor().mediumGreyColor,
+                        ),
+                        Spacer(),
+                        Obx(
+                          () => Radio(
+                            value: 'Price',
+                            groupValue: manageProductController
+                                .allProducts_sort_group_value.value,
+                            onChanged: (val) {
+                              manageProductController.allProducts_sort_group_value
+                                  .value = val.toString();
+                              print(val.toString());
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ).paddingSymmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+              ),
+            );
+          },
+          () {
+            Scaffold.of(ctx).openEndDrawer();
+          },
+        ),
+        SizedBox(
+          height: Get.height * 0.01,
+        ),
+        Container(
+          child: Row(
+            children: [
+              Text(
+                '6 Suggested Products',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                  color: appcolor().mainColor,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {
+                  // screen for the list of all products
+                  // Get.to(() => SeeAllErands());
+                },
+                child: const Text('See All'),
+              ),
+            ],
+          ).paddingSymmetric(horizontal: 20),
+        ),
+
+        Container(
+          margin: const EdgeInsets.all(10),
+          height: Get.height * 0.45,
+          child: ListView.builder(
+              itemCount: ui_23_item_list.length - 3,
+              primary: false,
+              shrinkWrap: false,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () {
+                    Get.to(() => Product_view(
+                          item: Recently_item_List[0],
+                        ));
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    child: Column(
+                      children: [
+                        Card(
+                          shadowColor: Colors.transparent,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                            height: Get.height * 0.37,
+                            // color: Colors.blue,
+                            width: Get.width * 0.4,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Center(
+                                  child: Image(
+                                    image: AssetImage(
+                                      ui_23_item_list[index].imagePath,
+                                    ),
+                                    height: Get.height * 0.12,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.01,
+                                ),
+
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      color: appcolor().mediumGreyColor,
+                                    ),
+                                    Text(
+                                      ui_23_item_list[index]
+                                          .location
+                                          .toString(),
+                                      style: TextStyle(
+                                          color: appcolor().mediumGreyColor,
+                                          fontSize: 12),
+                                    )
+                                  ],
+                                ),
+
+                                Text(
+                                  ui_23_item_list[index].item_desc,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: appcolor().mainColor),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  ui_23_item_list[index].itemname,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: appcolor().mainColor,
+                                      fontSize: 16),
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.01,
+                                ),
+                                // contact shop button
+                                SizedBox(
+                                  width: Get.width * 0.4,
+                                  // height: 50,
+                                  child: blockButton(
+                                    title: const Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.call,
+                                            color: Colors.white,
+                                            size: 15,
+                                          ),
+                                          SizedBox(
+                                            width: 7,
+                                          ),
+                                          Text(
+                                            // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
+                                            'Contact Shop',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    ontap: () {},
+                                    color: appcolor().mainColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        //  business name and icon
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              business_controller()
+                                  .businessList[index]
+                                  .imagepath,
+                              height: 10,
+                            ),
+                            const SizedBox(
+                              width: 7,
+                            ),
+                            Text(
+                              business_controller().businessList[index].name,
+                              style: TextStyle(
+                                fontSize: 12,
                                 color: appcolor().mainColor,
-                                fontSize: 16),
-                          )
-                        ],
-                      ),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 );
               }),
-            )),
-      ),
-    ],
-  ).paddingOnly(
-    left: 10,
-    right: 10,
-    top: 10,
+        ),
+
+        Container(
+          child: Row(
+            children: [
+              Text(
+                '5 Suggested Services',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                  color: appcolor().mainColor,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {
+                  // screen for the list of all services
+                  // Get.to(() => SeeAllErands());
+                },
+                child: const Text('See All'),
+              ),
+            ],
+          ).paddingSymmetric(horizontal: 20),
+        ),
+
+        Container(
+          margin: const EdgeInsets.all(10),
+          height: Get.height * 0.45,
+          child: ListView.builder(
+              itemCount: profile_controller().service_list.length,
+              primary: false,
+              shrinkWrap: false,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                final item = profile_controller().service_list[index];
+
+                return InkWell(
+                  onTap: () {
+                    if (kDebugMode) {
+                      print("service item: ${item.name}");
+                    }
+                    Get.to(() => ServiceDetailsView(service: item));
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    child: Column(
+                      children: [
+                        Card(
+                          shadowColor: Colors.transparent,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                            height: Get.height * 0.37,
+                            // color: Colors.blue,
+                            width: Get.width * 0.4,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Center(
+                                  child: Image(
+                                    image: AssetImage(
+                                      profile_controller()
+                                          .service_list[index]
+                                          .imagePath
+                                          .toString(),
+                                    ),
+                                    height: Get.height * 0.12,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.01,
+                                ),
+
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      color: appcolor().mediumGreyColor,
+                                    ),
+                                    Text(
+                                      ui_23_item_list[index]
+                                          .location
+                                          .toString(),
+                                      style: TextStyle(
+                                          color: appcolor().mediumGreyColor,
+                                          fontSize: 12),
+                                    )
+                                  ],
+                                ),
+
+                                Text(
+                                  ui_23_item_list[index].item_desc,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: appcolor().mainColor),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  ui_23_item_list[index].itemname,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: appcolor().mainColor,
+                                      fontSize: 16),
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.01,
+                                ),
+                                // contact shop button
+                                SizedBox(
+                                  width: Get.width * 0.4,
+                                  // height: 50,
+                                  child: blockButton(
+                                    title: const Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.call,
+                                            color: Colors.white,
+                                            size: 15,
+                                          ),
+                                          SizedBox(
+                                            width: 7,
+                                          ),
+                                          Text(
+                                            // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
+                                            'Contact Shop',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    ontap: () {},
+                                    color: appcolor().mainColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        //  business name and icon
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              business_controller()
+                                  .businessList[index]
+                                  .imagepath,
+                              height: 10,
+                            ),
+                            const SizedBox(
+                              width: 7,
+                            ),
+                            Text(
+                              business_controller().businessList[index].name,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: appcolor().mainColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+        ),
+
+        Container(
+          child: Row(
+            children: [
+              Text(
+                '4 Suggested Businesses',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                  color: appcolor().mainColor,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {
+                  Get.to(() => BusinessesViewWithBar());
+                },
+                child: const Text('See All'),
+              ),
+            ],
+          ).paddingSymmetric(horizontal: 20),
+        ),
+
+        FutureBuilder(
+            future: api().bussiness('shops', 1),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Container(
+                  height: Get.height * 0.17,
+                  color: Colors.white,
+                  child: const Center(
+                    child: Text('Featured Businesses not found'),
+                  ),
+                );
+              } else if (snapshot.hasData) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  height: Get.height * 0.4,
+                  child: ListView.builder(
+                    primary: false,
+                    shrinkWrap: false,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 4,
+                    itemBuilder: (context, index) {
+                      // var data = snapshot.data[index];
+                      var data = business_controller().businessList[index];
+                      return InkWell(
+                        onTap: () {
+                          Get.to(errandia_business_view(index: index));
+                        },
+                        child: Card(
+                          shadowColor: Colors.transparent,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                            width: Get.width * 0.4,
+                            height: Get.height * 0.43,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(
+                                    // child: Image(
+                                    //   image: NetworkImage(
+                                    //     data['image'] != ''
+                                    //         ? data['image'].toString()
+                                    //         : Featured_Businesses_Item_List[index]
+                                    //         .imagePath
+                                    //         .toString(),
+                                    //   ),
+                                    //   fit: BoxFit.cover,
+                                    // ),
+                                    child: Image(
+                                      image: AssetImage(
+                                        data.imagepath,
+                                      ),
+                                      fit: BoxFit.fill,
+                                      height: Get.height * 0.15,
+                                    )
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.009,
+                                ),
+                                Text(
+                                  Featured_Businesses_Item_List[index]
+                                      .servicetype
+                                      .toString(),
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      // fontWeight: FontWeight.bold,
+                                      color: appcolor().mediumGreyColor),
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.001,
+                                ),
+                                Text(
+                                  data.name.toString(),
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: appcolor().mainColor),
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.001,
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.location_on, color: Colors.blueGrey
+                                      ,),
+                                    Text(
+                                      data.location,
+                                      style: const TextStyle(fontSize: 12, color: Colors.blueGrey),
+                                    )
+                                  ],
+                                ),
+
+                                SizedBox(
+                                  height: Get.height * 0.02,
+                                ),
+
+                                // contact shop button
+                                SizedBox(
+                                  width: Get.width * 0.4,
+                                  // height: 50,
+                                  child: blockButton(
+                                    title: const Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.call,
+                                            color: Colors.white,
+                                            size: 15,
+                                          ),
+                                          SizedBox(
+                                            width: 7,
+                                          ),
+                                          Text(
+                                            // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
+                                            'Contact Shop',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    ontap: () {},
+                                    color: appcolor().mainColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              } else {
+                return Container(
+                  height: Get.height * 0.17,
+                  color: Colors.white,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+            }),
+
+        SizedBox(
+  height: Get.height * 0.02,
+        ),
+      ],
+    ).paddingOnly(
+      left: 2,
+      right: 2,
+      top: 10,
+    ),
   );
 }
 

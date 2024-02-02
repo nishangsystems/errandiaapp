@@ -19,6 +19,17 @@ class business_item extends StatelessWidget {
   String type_of_business;
   String name;
   String location;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'imagepath': imagepath,
+      'location': location,
+      'name': name,
+      'type_of_business': type_of_business,
+      'BusinessBranch_location': BusinessBranch_location,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -31,6 +42,7 @@ class business_item extends StatelessWidget {
               Container(
                 color: appcolor().lightgreyColor,
                 child: Image(
+                  height: Get.height * 0.15,
                   image: AssetImage(
                     Featured_Businesses_Item_List[0].imagePath,
                   ),

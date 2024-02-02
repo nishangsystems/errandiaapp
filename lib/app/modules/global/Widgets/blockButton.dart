@@ -20,7 +20,7 @@ class blockButton extends StatelessWidget {
     return InkWell(
       onTap: ontap,
       child: Container(
-        height: Get.height * 0.08,
+        height: Get.height * 0.07,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
