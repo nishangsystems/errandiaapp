@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
@@ -25,33 +26,44 @@ class edit_profile_viewState extends State<edit_profile_view> {
   profile_controller profileController = Get.put(profile_controller());
 
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController fullNameController = TextEditingController();
+  TextEditingController fullNameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController whatsappController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
+  late Map<String, dynamic> userData = {};
+
   SharedPreferences? prefs;
 
   // get user from shared preferences
   Future<void> getUser() async {
-    prefs = await SharedPreferences.getInstance();
-    print("email: ${prefs!.getString('email')}");
-    // setState(() {
-    //   emailController.text = prefs!.getString('email')!;
-    //   firstNameController.text = prefs!.getString('firstName')!;
-    //   lastNameController.text = prefs!.getString('lastName')!;
-    //   phoneController.text = prefs!.getString('phone')!;
-    //   whatsappController.text = prefs!.getString('whatsapp')!;
-    // });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userDataString = prefs.getString('user');
+    if (userDataString != null) {
+      print("user data: $userDataString");
+      setState(() {
+        userData = jsonDecode(userDataString);
+      });
+      fullNameController.text = userData['name'];
+      emailController.text = userData['email'];
+      phoneController.text = userData['phone'];
+      whatsappController.text = userData['whatsapp'];
+    }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    getUser();
+    if (kDebugMode) {
+      print("user: ${userData.toString}");
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -118,7 +130,12 @@ class edit_profile_viewState extends State<edit_profile_view> {
                                 Radius.circular(25),
                               ),
                               color: Colors.grey,
-                              image: const DecorationImage(
+                              image: userData['profile'] != null ? DecorationImage(
+                                image: NetworkImage(
+                                  userData['profile'] ?? "",
+                                ),
+                                fit: BoxFit.fill,
+                              ) : const DecorationImage(
                                 image: AssetImage(
                                   'assets/images/profilePlaceholder.png',
                                 ),
@@ -236,6 +253,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
               child: TextFormField(
+                controller: fullNameController,
                   decoration: InputDecoration(
                       border: InputBorder.none,
                       prefixIcon: const Icon(
@@ -295,6 +313,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
               child: TextFormField(
                 enabled: false,
                 keyboardType: TextInputType.emailAddress,
+                controller: emailController,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
@@ -350,6 +369,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                 maxLength: 9,
                 maxLines: 1,
                 keyboardType: TextInputType.phone,
+                controller: whatsappController,
                 decoration: InputDecoration(
                   counter: const Offstage(),
                   border: InputBorder.none,
@@ -412,6 +432,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                 keyboardType: TextInputType.phone,
                 maxLength: 9,
                 maxLines: 1,
+                controller: phoneController,
                 decoration: const InputDecoration(
                   counter: Offstage(),
                   border: InputBorder.none,
