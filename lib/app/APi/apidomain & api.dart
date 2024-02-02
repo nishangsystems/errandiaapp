@@ -256,9 +256,12 @@ class api {
       final data = jsonDecode(response.body);
       var data_ = data['data'];
       if (kDebugMode) {
-        print("data: $data_");
+        print("data: ${data_}");
       }
+      var user = data_['user'];
+      print("user: $user");
       prefs.setString('token', data_['token']);
+      prefs.setString("user", jsonEncode(user));
 
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => navigator));

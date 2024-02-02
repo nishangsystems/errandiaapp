@@ -1,13 +1,18 @@
+import 'dart:convert';
+
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/profile/view/edit_profile_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile_view extends StatefulWidget {
   const Profile_view({super.key});
@@ -19,12 +24,36 @@ class Profile_view extends StatefulWidget {
 class _Profile_viewState extends State<Profile_view> with TickerProviderStateMixin {
   late final TabController tabController =
       TabController(length: 3, vsync: this);
+  late Map<String, dynamic> userData = {};
+  late SharedPreferences prefs;
+
+  // get user from sharedprefs
+  Future<void> getUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userDataString = prefs.getString('user');
+    if (userDataString != null) {
+      print("user data: $userDataString");
+      setState(() {
+        userData = jsonDecode(userDataString);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
 
   @override
   Widget build(BuildContext context) {
     String prod_list_size = profile_controller().product_list.isNotEmpty
         ? profile_controller().product_list.length.toString()
         : "";
+
+    if (kDebugMode) {
+      print("user: ${userData}");
+    }
 
     return Scaffold(
         body: Column(
@@ -47,18 +76,28 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                       width: Get.width * 0.27,
                       // color: Colors.redAccent,
                       decoration: BoxDecoration(
-                        color: Colors.red,
+                        color: Colors.blueGrey[100],
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Column(
-                        children: [
-                          Image(
-                            image: AssetImage(
-                              'assets/images/profile_image.png', // TODO: replace with default image
-                            ),
-                            fit: BoxFit.fill,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child:
+                          userData['profile'] == null ? Image.network(
+                            userData['profile'],
+                            height: Get.height * 0.13,
+                            width: Get.width * 0.27,
+                            fit: BoxFit.cover,
+                          ) : Center(
+                            child: Text(
+                              getFirstLetter(userData['name']),
+                              style: const TextStyle(
+                                color: Color(0xffff0000),
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
                           )
-                        ],
+
                       ),
                     ),
                   ),
@@ -101,12 +140,13 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                 margin: const EdgeInsets.only(
                   top: 10,
                 ),
-                child: const Text(
-                  'Profile Name',
-                  style: TextStyle(
+                child:  Text(
+                    userData['name'] != null ? capitalizeAll(userData['name']) : "",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
+
                   ),
                 ),
               ),
