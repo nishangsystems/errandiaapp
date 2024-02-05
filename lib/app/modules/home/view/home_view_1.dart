@@ -318,30 +318,30 @@ class _home_view_1State extends State<home_view_1> {
 
             // categories widget
 
-            Container(
-              color: Colors.white,
-              child: Row(
-                children: [
-                  Text(
-                    'Categories',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                      color: appcolor().mainColor,
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      Get.to(const categories_view());
-                    },
-                    child: const Text('See All'),
-                  ),
-                ],
-              ).paddingSymmetric(horizontal: 20),
-            ),
-
-            Categories_List_Widget(),
+            // Container(
+            //   color: Colors.white,
+            //   child: Row(
+            //     children: [
+            //       Text(
+            //         'Categories',
+            //         style: TextStyle(
+            //           fontWeight: FontWeight.w700,
+            //           fontSize: 18,
+            //           color: appcolor().mainColor,
+            //         ),
+            //       ),
+            //       const Spacer(),
+            //       TextButton(
+            //         onPressed: () {
+            //           Get.to(const categories_view());
+            //         },
+            //         child: const Text('See All'),
+            //       ),
+            //     ],
+            //   ).paddingSymmetric(horizontal: 20),
+            // ),
+            //
+            // Categories_List_Widget(),
 
             // Featured Businesses
 
@@ -508,7 +508,7 @@ Widget Featured_Businesses_List() {
         } else if (snapshot.hasData) {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 14),
-            height: Get.height * 0.23,
+            height: Get.height * 0.33,
             color: Colors.white,
             child: ListView.builder(
               primary: false,
@@ -519,7 +519,7 @@ Widget Featured_Businesses_List() {
                 var data = snapshot.data[index];
                 return InkWell(
                   onTap: () {
-                    Get.to(errandia_business_view(index: index));
+                    Get.to(() => errandia_business_view(index: index));
                   },
                   child: Container(
                     margin:
@@ -529,20 +529,21 @@ Widget Featured_Businesses_List() {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        SizedBox(
+                          height: Get.height * 0.005,
+                        ),
                         Container(
-                          height: Get.height * 0.09,
+                          height: Get.height * 0.15,
+                          width: Get.width ,
                           color: appcolor().lightgreyColor,
                           child: Image(
-                            image: NetworkImage(
-                              data['image'] != ''
-                                  ? data['image'].toString()
-                                  : Featured_Businesses_Item_List[index]
-                                      .imagePath
-                                      .toString(),
-                            ),
-                            fit: BoxFit.cover,
+                            image: AssetImage(Featured_Businesses_Item_List[index]
+                                .imagePath),
+                            fit: BoxFit.fill,
+                            height: Get.height * 0.15,
+                            // width: Get.width * 0.3,
                           ),
-                        ),
+                        ).paddingOnly(left: 10, right: 10, top: 10, bottom: 5),
                         SizedBox(
                           height: Get.height * 0.009,
                         ),
@@ -562,7 +563,7 @@ Widget Featured_Businesses_List() {
                           data['name'].toString(),
                           style: TextStyle(
                               fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: appcolor().mainColor),
                         ),
                         SizedBox(
@@ -570,7 +571,11 @@ Widget Featured_Businesses_List() {
                         ),
                         Row(
                           children: [
-                            const Icon(Icons.location_on),
+                             Icon(
+                              Icons.location_on,
+                            color: appcolor().mediumGreyColor,
+                            size: 15,
+                            ),
                             Text(
                               data['street'],
                               style: const TextStyle(fontSize: 12),
