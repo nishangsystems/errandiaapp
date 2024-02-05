@@ -738,7 +738,7 @@ Widget Recently_posted_items_Widget() {
                                   data['name'].toString(),
                                   style: TextStyle(
                                       fontSize: 15,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       color: appcolor().mainColor),
                                 ),
                                 SizedBox(
@@ -746,7 +746,10 @@ Widget Recently_posted_items_Widget() {
                                 ),
                                 Row(
                                   children: [
-                                    Icon(Icons.location_on),
+                                    Icon(Icons.location_on,
+                                      color: appcolor().mediumGreyColor,
+                                      size: 15,
+                                    ),
                                     Text(
                                       data['shop']['street'].toString(),
                                       style: TextStyle(
