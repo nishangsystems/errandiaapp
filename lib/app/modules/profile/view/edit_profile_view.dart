@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/bottomsheet_item.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:flutter/foundation.dart';
@@ -25,33 +28,45 @@ class edit_profile_viewState extends State<edit_profile_view> {
   profile_controller profileController = Get.put(profile_controller());
 
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController fullNameController = TextEditingController();
+  TextEditingController fullNameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController whatsappController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
+  late Map<String, dynamic> userData = {};
+
+  bool isLoading = false;
+
   SharedPreferences? prefs;
 
   // get user from shared preferences
   Future<void> getUser() async {
-    prefs = await SharedPreferences.getInstance();
-    print("email: ${prefs!.getString('email')}");
-    // setState(() {
-    //   emailController.text = prefs!.getString('email')!;
-    //   firstNameController.text = prefs!.getString('firstName')!;
-    //   lastNameController.text = prefs!.getString('lastName')!;
-    //   phoneController.text = prefs!.getString('phone')!;
-    //   whatsappController.text = prefs!.getString('whatsapp')!;
-    // });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userDataString = prefs.getString('user');
+    if (userDataString != null) {
+      print("user data: $userDataString");
+      setState(() {
+        userData = jsonDecode(userDataString);
+      });
+      fullNameController.text = userData['name'];
+      emailController.text = userData['email'];
+      phoneController.text = userData['phone'];
+      whatsappController.text = userData['whatsapp_number'];
+    }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    getUser();
+    if (kDebugMode) {
+      print("user: ${userData.toString}");
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -83,377 +98,479 @@ class edit_profile_viewState extends State<edit_profile_view> {
           // ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // image container
-            Container(
-              height: Get.height * 0.26,
-              width: Get.width,
-              decoration: BoxDecoration(
-                color: appcolor().mainColor,
-              ),
-              margin: const EdgeInsets.only(bottom: 15),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Obx(
-                    () => imageController.image_path.value == ""
-                        ? Container(
-                            height: Get.height * 0.15,
-                            width: Get.width * 0.30,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 0.00,
-                              ),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 15,
-                                  offset: Offset(10, 15),
-                                ),
-                              ],
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(25),
-                              ),
-                              color: Colors.grey,
-                              image: const DecorationImage(
-                                image: AssetImage(
-                                  'assets/images/profilePlaceholder.png',
-                                ),
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          )
-                        : Container(
-                            height: Get.height * 0.23,
-                            width: Get.width,
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              image: DecorationImage(
-                                image: FileImage(
-                                  File(
-                                    imageController.image_path.value,
-                                  ),
-                                ),
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
-                  ),
-                  Positioned(
-                      bottom: 30,
-                      right: Get.width * 0.33,
-                      child: Container(
-                        height: 30,
-                        width: 30,
+      body: Stack(children: [
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              // image container
+              Container(
+                height: Get.height * 0.26,
+                width: Get.width,
+                decoration: BoxDecoration(
+                  color: appcolor().mainColor,
+                ),
+                margin: const EdgeInsets.only(bottom: 15),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Obx(() => imageController.image_path.value == ""
+                          ? Container(
+                        height: Get.height * 0.15,
+                        width: Get.width * 0.30,
                         decoration: BoxDecoration(
-                          color: appcolor().darkBlueColor,
-                          borderRadius: BorderRadius.circular(50),
                           border: Border.all(
                             color: Colors.white,
-                            width: 0.2,
+                            width: 0.00,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 15,
+                              offset: Offset(10, 15),
+                            ),
+                          ],
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(25),
+                          ),
+                          color: Colors.grey,
+                          image: userData['photo'] != null
+                              ? DecorationImage(
+                            image: NetworkImage(
+                              userData['profile'] ??
+                                  "http://placehold.it/200x200",
+                            ),
+                            fit: BoxFit.fill,
+                          )
+                              : const DecorationImage(
+                            image: AssetImage(
+                              'assets/images/profilePlaceholder.png',
+                            ),
+                            fit: BoxFit.fill,
                           ),
                         ),
-                        child: InkWell(
-                          onTap: () {
-                            Get.bottomSheet(
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                color: Colors.white,
-                                child: Wrap(
-                                  children: [
-                                    const Center(
-                                      child: Icon(
-                                        Icons.horizontal_rule,
-                                        size: 25,
-                                      ),
-                                    ),
-                                    bottomSheetWidgetitem(
-                                      title: 'Edit Image',
-                                      imagepath:
-                                          'assets/images/sidebar_icon/icon-edit.png',
-                                      callback: () {
-                                        Get.back();
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return customDialogBox();
-                                          },
-                                        );
-                                      },
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        Get.back();
-                                        imageController.reset();
-                                      },
-                                      child: const Row(
-                                        children: [
-                                          SizedBox(
-                                            height: 24,
-                                            child: Icon(
-                                              Icons.image,
-                                              size: 30,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 18,
-                                          ),
-                                          Text(
-                                            'Remove Photo',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ],
-                                      ).paddingSymmetric(vertical: 15),
-                                    ),
-                                  ],
-                                ),
+                      )
+                          : Container(
+                      height: Get.height * 0.15,
+                      width: Get.width * 0.30,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 0.00,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 15,
+                              offset: Offset(10, 15),
+                            ),
+                          ],
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(25),
+                          ),
+                          color: Colors.grey,
+                          image: DecorationImage(
+                            image: FileImage(
+                              File(
+                                imageController.image_path.value,
                               ),
-                            );
-                          },
-                          child: Icon(
-                            Icons.camera_alt_sharp,
-                            color: appcolor().iconcolor,
-                            size: 20,
+                            ),
+                            fit: BoxFit.fill,
                           ),
                         ),
-                      )),
-                ],
+                      ),
+                    ),
+                    Positioned(
+                        bottom: 30,
+                        right: Get.width * 0.33,
+                        child: Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                            color: appcolor().darkBlueColor,
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 0.2,
+                            ),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              Get.bottomSheet(
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  color: Colors.white,
+                                  child: Wrap(
+                                    children: [
+                                      const Center(
+                                        child: Icon(
+                                          Icons.horizontal_rule,
+                                          size: 25,
+                                        ),
+                                      ),
+                                      bottomSheetWidgetitem(
+                                        title: 'Edit Image',
+                                        imagepath:
+                                        'assets/images/sidebar_icon/icon-edit.png',
+                                        callback: () {
+                                          Get.back();
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return customDialogBox();
+                                            },
+                                          );
+                                        },
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          Get.back();
+                                          imageController.reset();
+                                        },
+                                        child: const Row(
+                                          children: [
+                                            SizedBox(
+                                              height: 24,
+                                              child: Icon(
+                                                Icons.image,
+                                                size: 30,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 18,
+                                            ),
+                                            Text(
+                                              'Remove Photo',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ],
+                                        ).paddingSymmetric(vertical: 15),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Icon(
+                              Icons.camera_alt_sharp,
+                              color: appcolor().iconcolor,
+                              size: 20,
+                            ),
+                          ),
+                        )),
+                  ],
+                ),
               ),
-            ),
-            // Divider(
-            //   color: appcolor().greyColor,
-            //   thickness: 1,
-            //   height: 1,
-            //   indent: 0,
-            // ),
-            // first name
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-              child: TextFormField(
-                  decoration: InputDecoration(
+
+              // full name
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+                child: TextFormField(
+                    controller: fullNameController,
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: const Icon(
+                          FontAwesomeIcons.user,
+                          color: Colors.black,
+                        ),
+                        hintStyle: const TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Full Name ',
+                        suffixIcon:
+                        Obx(() => profileController.isFullNameValid.value
+                            ? InkWell(
+                          onTap: () {},
+                          child: IconButton(
+                            onPressed: () {
+                              if (kDebugMode) {
+                                print(
+                                    "edit full name ${fullNameController.text}");
+                                var value = {
+                                  "field_name": "name",
+                                  "field_value":
+                                  fullNameController.text
+                                };
+
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                print("loading: $isLoading");
+
+                                api()
+                                    .updateProfile(
+                                    value, context, navigator)
+                                    .then((data) {
+                                  print(
+                                      "response: ${data['message']}");
+
+                                  PopupBox popupBox = PopupBox(
+                                    title: 'Success',
+                                    description: '${data['message']}',
+                                    type: PopupType.success,
+                                  );
+
+                                  // 3 seconds delay
+                                  Future.delayed(const Duration(seconds: 3),
+                                          () {
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                      });
+
+                                  popupBox.showPopup(context);
+                                });
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.save_sharp,
+                              color: Color(0xff113d6b),
+                            ),
+                          ),
+                        )
+                            : const Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ))),
+                    onChanged: (value) {
+                      if (kDebugMode) {
+                        print(
+                            "field length: ${fullNameController.text.length}");
+                      }
+                      if (value.length >= 3) {
+                        fullNameController.text = value;
+                        setState(() {
+                          profileController.isFullNameValid.value = true;
+                        });
+                      } else {
+                        setState(() {
+                          profileController.isFullNameValid.value = false;
+                        });
+                      }
+                    }),
+              ),
+              Divider(
+                color: appcolor().greyColor,
+                thickness: 1,
+                height: 1,
+                indent: 0,
+              ),
+              // email
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                child: TextFormField(
+                    enabled: false,
+                    keyboardType: TextInputType.emailAddress,
+                    controller: emailController,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: Icon(
+                        Icons.email,
+                        color: Colors.grey,
+                      ),
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
+                      ),
+                      hintText: 'Email',
+                      suffixIcon: Icon(
+                        Icons.lock,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      if (kDebugMode) {
+                        print("field length: ${emailController.text.length}");
+                      }
+                      if (profileController.isEmail(value)) {
+                        emailController.text = value;
+                        setState(() {
+                          profileController.isEmailValid.value = true;
+                        });
+                      } else {
+                        setState(() {
+                          profileController.isEmailValid.value = false;
+                        });
+                      }
+                    }),
+              ),
+              Divider(
+                color: appcolor().greyColor,
+                thickness: 1,
+                height: 1,
+                indent: 0,
+              ),
+              // const SizedBox(
+              //   height: 20,
+              // ),
+              // Divider(
+              //   color: appcolor().greyColor,
+              //   thickness: 1,
+              //   height: 1,
+              //   indent: 0,
+              // ),
+
+              // whatsapp number
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                child: TextFormField(
+                    maxLength: 9,
+                    maxLines: 1,
+                    keyboardType: TextInputType.phone,
+                    controller: whatsappController,
+                    decoration: InputDecoration(
+                      counter: const Offstage(),
                       border: InputBorder.none,
                       prefixIcon: const Icon(
-                        FontAwesomeIcons.user,
+                        FontAwesomeIcons.whatsapp,
                         color: Colors.black,
                       ),
                       hintStyle: const TextStyle(
                         color: Colors.black,
                       ),
-                      hintText: 'Full Name ',
+                      hintText: 'WhatsApp Number *',
                       suffixIcon:
-                          Obx(() => profileController.isFullNameValid.value
-                              ? InkWell(
-                                  onTap: () {
-                                    // firstNameController.clear();
-                                    // setState(() {
-                                    //   profileController.isFirstNameValid.value =
-                                    //       false;
-                                    // });
-                                    print(
-                                        "fullName: ${fullNameController.text}");
-                                  },
-                                  child: const Icon(
-                                    Icons.save_sharp,
-                                    color: Color(0xff113d6b),
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.edit,
-                                  color: Colors.black,
-                                ))),
-                  onChanged: (value) {
-                    if (kDebugMode) {
-                      print("field length: ${fullNameController.text.length}");
-                    }
-                    if (value.length >= 3) {
-                      fullNameController.text = value;
-                      setState(() {
-                        profileController.isFullNameValid.value = true;
-                      });
-                    } else {
-                      setState(() {
-                        profileController.isFullNameValid.value = false;
-                      });
-                    }
-                  }),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-            // email
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: TextFormField(
-                enabled: false,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    Icons.email,
-                    color: Colors.grey,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                  hintText: 'Email',
-                  suffixIcon: Icon(
-                    Icons.lock,
-                    color: Colors.grey,
-                  ),
-                ),
-                  onChanged: (value) {
-                    if (kDebugMode) {
-                      print("field length: ${emailController.text.length}");
-                    }
-                    if (profileController.isEmail(value)) {
-                      emailController.text = value;
-                      setState(() {
-                        profileController.isEmailValid.value = true;
-                      });
-                    } else {
-                      setState(() {
-                        profileController.isEmailValid.value = false;
-                      });
-                    }
-                  }
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-            // const SizedBox(
-            //   height: 20,
-            // ),
-            // Divider(
-            //   color: appcolor().greyColor,
-            //   thickness: 1,
-            //   height: 1,
-            //   indent: 0,
-            // ),
+                      Obx(() => profileController.isWhatsappValid.value
+                          ? InkWell(
+                        onTap: () {},
+                        child: IconButton(
+                          onPressed: () {
+                            if (kDebugMode) {
+                              print(
+                                  "edit whatsapp ${whatsappController.text}");
+                              var value = {
+                                "field_name": "whatsapp_number",
+                                "field_value": whatsappController.text
+                              };
 
-            // whatsapp number
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: TextFormField(
-                maxLength: 9,
-                maxLines: 1,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  counter: const Offstage(),
-                  border: InputBorder.none,
-                  prefixIcon: const Icon(
-                    FontAwesomeIcons.whatsapp,
-                    color: Colors.black,
-                  ),
-                  hintStyle: const TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'WhatsApp Number *',
-                  suffixIcon:
-                  Obx(() => profileController.isWhatsappValid.value
-                      ? InkWell(
-                    onTap: () {
-                      // firstNameController.clear();
-                      // setState(() {
-                      //   profileController.isFirstNameValid.value =
-                      //       false;
-                      // });
-                      print("whatsapp: ${whatsappController.text}");
-                    },
-                    child: const Icon(
-                      Icons.save_sharp,
-                      color: Color(0xff113d6b),
+                              setState(() {
+                                isLoading = true;
+                              });
+
+                              api()
+                                  .updateProfile(
+                                  value, context, navigator)
+                                  .then((data) {
+                                print(
+                                    "response: ${data['message']}");
+
+                                PopupBox popupBox = PopupBox(
+                                  title: 'Success',
+                                  description: '${data['message']}',
+                                  type: PopupType.success,
+                                );
+
+                                // 3 seconds delay
+                                Future.delayed(const Duration(seconds: 3),
+                                        () {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    });
+
+                                popupBox.showPopup(context);
+                              });
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.save_sharp,
+                            color: Color(0xff113d6b),
+                          ),
+                        ),
+                      )
+                          : const Icon(
+                        Icons.edit,
+                        color: Colors.black,
+                      )),
                     ),
-                  )
-                      : const Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  )),
-                ),
-                  onChanged: (value) {
-                    if (kDebugMode) {
-                      print("field length: ${whatsappController.text.length}");
-                    }
-                    if (value.length == 9) {
-                      whatsappController.text = value;
-                      setState(() {
-                        profileController.isWhatsappValid.value = true;
-                      });
-                    } else {
-                      setState(() {
-                        profileController.isWhatsappValid.value = false;
-                      });
-                    }
-                  }
+                    onChanged: (value) {
+                      if (kDebugMode) {
+                        print(
+                            "field length: ${whatsappController.text.length}");
+                      }
+                      if (value.length == 9) {
+                        whatsappController.text = value;
+                        setState(() {
+                          profileController.isWhatsappValid.value = true;
+                        });
+                      } else {
+                        setState(() {
+                          profileController.isWhatsappValid.value = false;
+                        });
+                      }
+                    }),
               ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: TextFormField(
-                enabled: false,
-                keyboardType: TextInputType.phone,
-                maxLength: 9,
-                maxLines: 1,
-                decoration: const InputDecoration(
-                  counter: Offstage(),
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    Icons.call,
-                    color: Colors.grey,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                  hintText: '6xx xxx xxx',
-                  suffixIcon: Icon(
-                    Icons.lock,
-                    color: Colors.grey,
-                  ),
-                ),
-                  onChanged: (value) {
-                    if (kDebugMode) {
-                      print("field length: ${phoneController.text.length}");
-                    }
-                    if (value.length == 9) {
-                      whatsappController.text = value;
-                      setState(() {
-                        profileController.isPhoneValid.value = true;
-                      });
-                    } else {
-                      setState(() {
-                        profileController.isPhoneValid.value = false;
-                      });
-                    }
-                  }
+              Divider(
+                color: appcolor().greyColor,
+                thickness: 1,
+                height: 1,
+                indent: 0,
               ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-          ],
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                child: TextFormField(
+                    enabled: false,
+                    keyboardType: TextInputType.phone,
+                    maxLength: 9,
+                    maxLines: 1,
+                    controller: phoneController,
+                    decoration: const InputDecoration(
+                      counter: Offstage(),
+                      border: InputBorder.none,
+                      prefixIcon: Icon(
+                        Icons.call,
+                        color: Colors.grey,
+                      ),
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
+                      ),
+                      hintText: '6xx xxx xxx',
+                      suffixIcon: Icon(
+                        Icons.lock,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      if (kDebugMode) {
+                        print("field length: ${phoneController.text.length}");
+                      }
+                      if (value.length == 9) {
+                        whatsappController.text = value;
+                        setState(() {
+                          profileController.isPhoneValid.value = true;
+                        });
+                      } else {
+                        setState(() {
+                          profileController.isPhoneValid.value = false;
+                        });
+                      }
+                    }),
+              ),
+              Divider(
+                color: appcolor().greyColor,
+                thickness: 1,
+                height: 1,
+                indent: 0,
+              ),
+            ],
+          ),
         ),
-      ),
+        if (isLoading)
+          const Opacity(
+            opacity: 0.4,
+            child: ModalBarrier(dismissible: false, color: Colors.black),
+          ),
+        if (isLoading)
+           Center(
+            child: CircularProgressIndicator(
+              color: appcolor().mainColor,
+            ),
+          ),
+      ]),
     );
   }
 
@@ -502,9 +619,23 @@ class edit_profile_viewState extends State<edit_profile_view> {
                       ),
                     ],
                   ),
-                  ontap: () {
+                  ontap: () async {
                     Get.back();
-                    imageController.getImagefromgallery();
+                    File? file = await imageController.getImageFromGallery();
+                    if (file != null) {
+                      print("Selected image path: ${file.path}");
+
+                      // var value = {
+                      //   "image": file
+                      // };
+
+                      api().uploadProfileImage(file, context).then((response) {
+                        print("Upload response: $response");
+                        // Handle the response as needed
+                      });
+                    } else {
+                      print("No image selected.");
+                    }
                   },
                   color: appcolor().greyColor,
                 ),
@@ -528,9 +659,10 @@ class edit_profile_viewState extends State<edit_profile_view> {
                       ),
                     ],
                   ),
-                  ontap: () {
+                  ontap: () async {
                     Get.back();
-                    imageController.getimagefromCamera();
+                    var path = await imageController.getimagefromCamera();
+                    print("photo path: ${path}");
                   },
                   color: const Color(0xfffafafa),
                 ),

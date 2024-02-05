@@ -265,14 +265,16 @@ class ui_23_items {
   String item_desc = "";
 
   String itemname = "";
+  String itemPrice = "";
 
   ui_23_items(int Id, String ImagePath, String Item_desc, String Itemname,
-      String Location) {
+      String Location, String ItemPrice) {
     id = Id;
     imagePath = ImagePath;
     item_desc = Item_desc;
     itemname = Itemname;
     location = Location;
+    itemPrice = ItemPrice;
   }
 }
 
@@ -281,70 +283,80 @@ List<ui_23_items> ui_23_item_list = [
     0,
     "assets/images/ui_23_item.png",
     "Slick Gorilla Clay Pomade 70 gm",
-    "XAF 10,000",
+    "Clay Pomade 70 gm",
     "Molyko, Buea",
+    "XAF 10,000"
   ),
   ui_23_items(
     0,
     "assets/images/ui_23_item.png",
     "Beauty & Hairs",
-    "XAF 10,000",
+    "Beauty Product For the Hair",
     "Molyko, Buea",
+    "XAF 8,000"
   ),
   ui_23_items(
     0,
     "assets/images/ui_23_item.png",
     "Beauty & Hairs",
-    "XAF 10,000",
+    "Hair Product cream",
     "Molyko, Buea",
+    "XAF 10,000"
   ),
   ui_23_items(
     0,
     "assets/images/ui_23_item.png",
     "Beauty & Hairs",
-    "XAF 10,000",
+    "Hair Product cream",
     "Molyko, Buea",
+    "XAF 5,000"
   ),
   ui_23_items(
     0,
     "assets/images/ui_23_item.png",
     "Beauty & Hairs",
-    "XAF 10,000",
+    "Beauty Product For the Hair",
     "Molyko, Buea",
+    "XAF 10,000"
   ),
   ui_23_items(
     0,
     "assets/images/ui_23_item.png",
     "Beauty & Hairs",
-    "XAF 10,000",
+    "Beauty Product For the Hair",
     "Molyko, Buea",
+    "XAF 9,000"
   ),
   ui_23_items(
     0,
     "assets/images/ui_23_item.png",
     "Beauty & Hairs",
-    "XAF 10,000",
+    "Beauty Product For the Hair",
     "Molyko, Buea",
+    "XAF 10,000"
   ),
   ui_23_items(
     0,
     "assets/images/ui_23_item.png",
     "Beauty & Hairs",
-    "XAF 10,000",
+    "Hair Product cream",
     "Molyko, Buea",
+    "XAF 10,000"
   ),
   ui_23_items(
     0,
     "assets/images/ui_23_item.png",
     "Beauty & Hairs",
-    "XAF 10,000",
+    "Beauty Product For the Hair",
     "Molyko, Buea",
+    "XAF 10,000"
   ),
   ui_23_items(
     0,
     "assets/images/ui_23_item.png",
     "Beauty & Hairs",
-    "XAF 10,000",
+    "Beauty Product For the Hair",
     "Molyko, Buea",
+    "XAF 10,000"
   ),
 ];

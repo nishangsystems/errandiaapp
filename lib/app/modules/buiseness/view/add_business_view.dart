@@ -403,7 +403,7 @@ class _add_business_viewState extends State<add_business_view> {
                                             ontap: () {
                                               Get.back();
                                               imageController
-                                                  .getImagefromgallery();
+                                                  .getImageFromGallery();
                                             },
                                             color: appcolor().greyColor,
                                           ),
@@ -513,7 +513,7 @@ class _add_business_viewState extends State<add_business_view> {
                                     children: [
                                       InkWell(
                                         onTap: () {
-                                          imageController.getImagefromgallery();
+                                          imageController.getImageFromGallery();
                                         },
                                         child: Container(
                                           height: 35,

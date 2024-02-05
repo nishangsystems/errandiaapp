@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,23 +7,29 @@ import 'package:image_picker/image_picker.dart';
 class imagePickercontroller extends GetxController {
   RxList<XFile> imageList = <XFile>[].obs;
   RxString image_path = ''.obs;
-  Future getImagefromgallery() async {
+  Future getImageFromGallery() async {
     final ImagePicker _picker = ImagePicker();
     final image = await _picker.pickImage(
       source: ImageSource.gallery,
     );
     if (image != null) {
-      image_path.value = image!.path.toString();
+      final File imageFile = File(image.path);
+      image_path.value = image.path;
+      print("imagePath: $image_path");
+
+      return imageFile;
       //imageList.add(image);
     }
+    return null;
   }
 
-  Future<void> getimagefromCamera() async {
+  Future getimagefromCamera() async {
     final ImagePicker _picker = ImagePicker();
     final image = await _picker.pickImage(source: ImageSource.camera);
 
     if (image != null) {
       image_path.value = image.path.toString();
+      return image_path.value;
      // imageList.add(image);
     }
   }

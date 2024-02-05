@@ -69,7 +69,8 @@ dependencies:
   path: any
   flutter_image_compress: ^2.1.0
   path_provider: any
-
+  awesome_dialog: ^3.2.0
+  http_parser: any
 
 dev_dependencies:
   flutter_test:
