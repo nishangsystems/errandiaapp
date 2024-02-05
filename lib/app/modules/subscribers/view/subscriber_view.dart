@@ -83,13 +83,13 @@ class _subscriber_viewState extends State<subscriber_view> {
               actions: [
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(FontAwesomeIcons.square),
+                  icon: const Icon(FontAwesomeIcons.square),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                 ),
-                TextButton(onPressed: () {}, child: Text('Bulk SMS')),
+                TextButton(onPressed: () {}, child: const Text('Bulk SMS')),
               ],
             ),
       body: Column(
@@ -98,17 +98,15 @@ class _subscriber_viewState extends State<subscriber_view> {
             height: 20,
           ),
           blockButton(
-            title: Container(
-              child: TextFormField(
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                    suffixIcon: Icon(
-                      Icons.search,
-                    ),
-                    hintText: 'Search Subscribers'),
-              ),
+            title: TextFormField(
+              decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                  suffixIcon: Icon(
+                    Icons.search,
+                  ),
+                  hintText: 'Search Subscribers'),
             ),
             ontap: () {},
             color: Colors.white,
@@ -118,7 +116,7 @@ class _subscriber_viewState extends State<subscriber_view> {
           ),
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 8,
               ),
               itemCount: controller.subscriber_list.length,
@@ -145,11 +143,11 @@ class _subscriber_viewState extends State<subscriber_view> {
                 },
                 child: Container(
                   height: Get.height * 0.12,
-                  margin: EdgeInsets.symmetric(
+                  margin: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 5,
                   ),
-                  padding: EdgeInsets.all(
+                  padding: const EdgeInsets.all(
                     10,
                   ),
                   decoration: BoxDecoration(
@@ -173,16 +171,14 @@ class _subscriber_viewState extends State<subscriber_view> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           controller.subscriber_list[index].isSelected == true
-                              ? Container(
-                                  child: Icon(
-                                    Icons.check_box,
-                                    color: appcolor().bluetextcolor,
-                                  ),
-                                )
+                              ? Icon(
+                                Icons.check_box,
+                                color: appcolor().bluetextcolor,
+                              )
                               : Container(),
                         ],
                       ),
@@ -199,7 +195,7 @@ class _subscriber_viewState extends State<subscriber_view> {
                           ),
                           RichText(
                             text: TextSpan(
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 13,
                               ),
                               children: [
@@ -213,7 +209,7 @@ class _subscriber_viewState extends State<subscriber_view> {
                                   text: controller
                                       .subscriber_list[index].subscribedDate
                                       .toString(),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.black,
                                   ),
                                 ),
@@ -221,7 +217,7 @@ class _subscriber_viewState extends State<subscriber_view> {
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 10,
                               vertical: 5,
                             ),
@@ -232,9 +228,7 @@ class _subscriber_viewState extends State<subscriber_view> {
                               ),
                             ),
                             child: Text(
-                              controller.subscriber_list[index].msgCounter
-                                      .toString() +
-                                  ' messages',
+                              '${controller.subscriber_list[index].msgCounter} messages',
                               style: TextStyle(
                                   color: appcolor().bluetextcolor,
                                   fontSize: 13),
@@ -244,7 +238,7 @@ class _subscriber_viewState extends State<subscriber_view> {
                       ).paddingOnly(
                         left: 10,
                       ),
-                      Spacer(),
+                      const Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -323,9 +317,9 @@ class _subscriber_viewState extends State<subscriber_view> {
 
 Widget remove_subscriber_widget(RxList<subscriber_model> list, int index) {
   return AlertDialog(
-    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-    insetPadding: EdgeInsets.symmetric(horizontal: 15),
-    content: Container(
+    contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+    insetPadding: const EdgeInsets.symmetric(horizontal: 15),
+    content: SizedBox(
       height: Get.height * 0.52,
       width: Get.width,
       child: Column(
@@ -339,8 +333,8 @@ Widget remove_subscriber_widget(RxList<subscriber_model> list, int index) {
                 fontWeight: FontWeight.w700),
           ),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 15),
-            padding: EdgeInsets.symmetric(
+            margin: const EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 15,
             ),
@@ -352,13 +346,13 @@ Widget remove_subscriber_widget(RxList<subscriber_model> list, int index) {
             ),
             child: Row(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 25,
                   backgroundImage: AssetImage(
                     'assets/images/person_avatar.png',
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 Text(
@@ -372,7 +366,7 @@ Widget remove_subscriber_widget(RxList<subscriber_model> list, int index) {
               ],
             ),
           ),
-          Spacer(),
+          const Spacer(),
           blockButton(
             title: Text(
               'Yes , Remove Subscriber',
@@ -384,19 +378,19 @@ Widget remove_subscriber_widget(RxList<subscriber_model> list, int index) {
             ontap: () {
               Get.back();
 
-              Get.showSnackbar(customsnackbar(
+              Get.showSnackbar(customSnackBar(
                  Row(
         children: [
-          Text(
+          const Text(
             'Subscriber Removed',
             style: TextStyle(
               color: Colors.white,
             ),
           ),
-          Spacer(),
+          const Spacer(),
           TextButton(
             onPressed: () {},
-            child: Text(
+            child: const Text(
               'UNDO',
             ),
           ),
@@ -407,7 +401,7 @@ Widget remove_subscriber_widget(RxList<subscriber_model> list, int index) {
             color: Colors.white,
             bordercolor: appcolor().mainColor,
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           blockButton(

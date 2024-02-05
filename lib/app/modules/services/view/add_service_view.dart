@@ -256,7 +256,7 @@ class add_service_view extends StatelessWidget {
                                             ontap: () {
                                               Get.back();
                                               imageController
-                                                  .getImagefromgallery();
+                                                  .getImageFromGallery();
                                             },
                                             color: appcolor().greyColor,
                                           ),
@@ -366,7 +366,7 @@ class add_service_view extends StatelessWidget {
                                     children: [
                                       InkWell(
                                         onTap: () {
-                                          imageController.getImagefromgallery();
+                                          imageController.getImageFromGallery();
                                         },
                                         child: Container(
                                           height: 35,

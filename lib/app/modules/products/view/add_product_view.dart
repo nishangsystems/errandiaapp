@@ -439,7 +439,7 @@ class _add_product_viewState extends State<add_product_view> {
                                               ],
                                             ),
                                             ontap: () {
-                                              imageController.getImagefromgallery();
+                                              imageController.getImageFromGallery();
                                               Get.back();
                                             },
                                             color: appcolor().greyColor,
@@ -549,7 +549,7 @@ class _add_product_viewState extends State<add_product_view> {
                                     children: [
                                       InkWell(
                                         onTap: () {
-                                          imageController.getImagefromgallery();
+                                          imageController.getImageFromGallery();
                                         },
                                         child: Container(
                                           height: 35,

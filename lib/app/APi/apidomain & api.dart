@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/Widgets/snackBar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http_parser/http_parser.dart';
 
 class apiDomain {
   final domain = 'https://errandia.com/api';
@@ -183,7 +185,7 @@ class api {
     print(response.statusCode);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      customsnackbar(Text('${data['data']['message']}'));
+      customSnackBar(Text('${data['data']['message']}'));
     }
   }
 
@@ -254,12 +256,67 @@ class api {
       var user = data_['user'];
       print("user: $user");
       prefs.setString("user", jsonEncode(user));
-      customsnackbar(Text('${data_['message']}'));
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => navigator));
-    } else {
+      // customSnackBar(Text('${data['message']}'));
+
+      return data;
+
+      } else {
       var da = jsonDecode(response.body);
       await alertDialogBox(context, 'Alert', '${da['data']['message']}');
+    }
+  }
+
+  // user profile image upload
+  Future uploadProfileImage(image, context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('${apiDomain().domain}/user/image_upload'),
+    );
+
+    // Add image file to the request
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'image',
+        image.path
+      ),
+    );
+
+    // Add headers
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    });
+
+    // Send request
+    var response = await request.send();
+
+    // Read response
+    var responseBody = await response.stream.bytesToString();
+    var responseData = jsonDecode(responseBody);
+
+    if (kDebugMode) {
+      print("upload profile image response: ${responseBody}");
+    }
+    if (response.statusCode == 400) {
+      if (kDebugMode) {
+        print("status code: ${response.statusCode}");
+      }
+      var da = jsonDecode(responseData);
+      await alertDialogBox(context, 'Alert', '${da['message']}');
+    }
+    if (response.statusCode == 200) {
+      var data_ = responseData['data'];
+      var userProfileImg = data_['image_path'];
+      prefs.setString("userProfileImg", jsonEncode(userProfileImg));
+      return data_;
+    } else {
+      var errorMessage = responseData['message'] ?? 'Unknown error';
+      await alertDialogBox(context, 'Alert', errorMessage);
+      return null;
     }
   }
 }

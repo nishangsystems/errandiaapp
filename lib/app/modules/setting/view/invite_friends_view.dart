@@ -792,7 +792,7 @@ class _sms_plan_viewState extends State<sms_plan_view> {
                                         ),
                                         text: 'Remaining SMS : ',
                                         children: [
-                                          TextSpan(
+                                          const TextSpan(
                                             text: '30',
                                             style: TextStyle(
                                               color: Colors.black,
@@ -807,7 +807,7 @@ class _sms_plan_viewState extends State<sms_plan_view> {
                                       onTap: () {
                                         Get.back();
                                         Get.showSnackbar(
-                                          customsnackbar(
+                                          customSnackBar(
                                             Row(
                                               children: [
                                                 Icon(
