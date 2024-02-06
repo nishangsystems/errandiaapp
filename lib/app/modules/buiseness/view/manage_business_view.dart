@@ -11,6 +11,8 @@ import '../../global/Widgets/customDrawer.dart';
 import '../../global/constants/color.dart';
 import '../../home/view/home_view.dart';
 
+enum BusinessAction { suspend, reinstate, delete }
+
 class manage_business_view extends StatelessWidget {
   manage_business_view({super.key});
   manage_business_tabController mController =
@@ -216,6 +218,24 @@ Widget allBusiness() {
                               },
                             ),
                             bottomSheetWidgetitem(
+                              title: 'Add New Product',
+                              imagepath:
+                              'assets/images/sidebar_icon/add_products.png',
+                              callback: () async {
+                                print('add new product');
+                                Get.back();
+                              },
+                            ),
+                            bottomSheetWidgetitem(
+                              title: 'Add New Service',
+                              imagepath:
+                              'assets/images/sidebar_icon/services.png',
+                              callback: () async {
+                                print('add new service');
+                                Get.back();
+                              },
+                            ),
+                            bottomSheetWidgetitem(
                               title: 'Suspend Business',
                               imagepath:
                               'assets/images/sidebar_icon/icon-suspend.png',
@@ -224,133 +244,7 @@ Widget allBusiness() {
                                 showDialog(
                                   context: context,
                                   builder: (context) {
-                                    return AlertDialog(
-                                      insetPadding: EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                      ),
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 20,
-                                      ),
-                                      scrollable: true,
-                                      content: Container(
-                                        // height: Get.height * 0.7,
-                                        width: Get.width,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Suspend Business',
-                                              style: TextStyle(
-                                                color: appcolor().mainColor,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.symmetric(
-                                                vertical: 15,
-                                              ),
-                                              child: Text(
-                                                'Are you sure you want to suspend this Business ?',
-                                                textAlign: TextAlign.start,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: Get.height * 0.02,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  margin: EdgeInsets.only(
-                                                    right: 10,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                    BorderRadius.circular(
-                                                      8,
-                                                    ),
-                                                  ),
-                                                  width: Get.width * 0.16,
-                                                  height: Get.height * 0.06,
-                                                  child: Image(
-                                                    image: AssetImage(
-                                                      'assets/images/barber_logo.png',
-                                                    ),
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment
-                                                      .start,
-                                                  children: [
-                                                    Text(
-                                                      'Rubiliams Hair Clinic',
-                                                      style: TextStyle(
-                                                        color: appcolor()
-                                                            .mainColor,
-                                                        fontWeight:
-                                                        FontWeight.w500,
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'Molyko, Buea',
-                                                      style: TextStyle(
-                                                        color: appcolor()
-                                                            .mediumGreyColor,
-                                                        fontSize: 13,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: Get.height * 0.12,
-                                            ),
-                                            Column(
-                                              children: [
-                                                blockButton(
-                                                  title: Text(
-                                                    'Suspend Business',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  ontap: () {
-                                                    Get.back();
-                                                  },
-                                                  color: Color.fromARGB(
-                                                      255, 225, 146, 20),
-                                                ),
-                                                SizedBox(
-                                                  height: Get.height * 0.015,
-                                                ),
-                                                blockButton(
-                                                  title: Text(
-                                                    'Cancel',
-                                                    style: TextStyle(
-                                                        color: appcolor()
-                                                            .mediumGreyColor),
-                                                  ),
-                                                  ontap: () {
-                                                    Get.back();
-                                                  },
-                                                  color: Color(0xfffafafa),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ).paddingSymmetric(
-                                          horizontal: 10,
-                                          vertical: 10,
-                                        ),
-                                      ),
-                                    );
+                                    return businessDialog(BusinessAction.suspend);
                                   },
                                 );
                               },
@@ -366,6 +260,13 @@ Widget allBusiness() {
                               imagepath:
                               'assets/images/sidebar_icon/icon-trash.png',
                               callback: () {
+                                Get.back();
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return businessDialog(BusinessAction.delete);
+                                  },
+                                );
                               //   var value = {
                               //     "errand_id": data['id']
                               //   };
@@ -409,11 +310,175 @@ Widget allBusiness() {
         },
       );
     }else{
-      return Center(child: CircularProgressIndicator(),);
+      return const Center(child: CircularProgressIndicator(),);
     }
   },
   );
 
+}
+
+String getActionText(BusinessAction action) {
+  switch (action) {
+    case BusinessAction.suspend:
+      return 'Suspend Business';
+    case BusinessAction.reinstate:
+      return 'Reinstate Business';
+    case BusinessAction.delete:
+      return 'Delete Business';
+  }
+}
+
+String getActionPrompt(BusinessAction action) {
+  switch (action) {
+    case BusinessAction.suspend:
+      return 'Are you sure you want to suspend this Business ?';
+    case BusinessAction.reinstate:
+      return 'Are you sure you want to Reinstate this Business ?';
+    case BusinessAction.delete:
+      return 'Are you sure you want to Delete this Business ?';
+  }
+}
+
+// get action button color
+Color getActionButtonColor(BusinessAction action) {
+  switch (action) {
+    case BusinessAction.suspend:
+      return const Color.fromARGB(
+          255, 225, 146, 20);
+    case BusinessAction.reinstate:
+      return appcolor().mainColor;
+    case BusinessAction.delete:
+      return appcolor().redColor;
+  }
+}
+
+Widget businessDialog(BusinessAction action) {
+  return AlertDialog(
+    insetPadding: const EdgeInsets.symmetric(
+      horizontal: 10,
+    ),
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: 8,
+      vertical: 20,
+    ),
+    scrollable: true,
+    content: SizedBox(
+      // height: Get.height * 0.7,
+      width: Get.width,
+      child: Column(
+        mainAxisAlignment:
+        MainAxisAlignment.center,
+        crossAxisAlignment:
+        CrossAxisAlignment.start,
+        children: [
+          Text(
+            getActionText(action),
+            style: TextStyle(
+              color: appcolor().mainColor,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(
+              vertical: 15,
+            ),
+            child: Text(
+              getActionPrompt(action),
+              textAlign: TextAlign.start,
+            ),
+          ),
+          SizedBox(
+            height: Get.height * 0.02,
+          ),
+          Row(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(
+                  right: 10,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius:
+                  BorderRadius.circular(
+                    8,
+                  ),
+                ),
+                width: Get.width * 0.16,
+                height: Get.height * 0.06,
+                child: const Image(
+                  image: AssetImage(
+                    'assets/images/barber_logo.png',
+                  ),
+                  fit: BoxFit.fill,
+                ),
+              ),
+              Column(
+                crossAxisAlignment:
+                CrossAxisAlignment
+                    .start,
+                children: [
+                  Text(
+                    'Rubiliams Hair Clinic',
+                    style: TextStyle(
+                      color: appcolor()
+                          .mainColor,
+                      fontWeight:
+                      FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    'Molyko, Buea',
+                    style: TextStyle(
+                      color: appcolor()
+                          .mediumGreyColor,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(
+            height: Get.height * 0.12,
+          ),
+          Column(
+            children: [
+              blockButton(
+                title: Text(
+                 getActionText(action),
+                  style: const TextStyle(
+                      color: Colors.white),
+                ),
+                ontap: () {
+                  Get.back();
+                },
+                color: getActionButtonColor(action),
+              ),
+              SizedBox(
+                height: Get.height * 0.015,
+              ),
+              blockButton(
+                title: Text(
+                  'Cancel',
+                  style: TextStyle(
+                      color: appcolor()
+                          .mediumGreyColor),
+                ),
+                ontap: () {
+                  Get.back();
+                },
+                color: const Color(0xfffafafa),
+              ),
+            ],
+          )
+        ],
+      ).paddingSymmetric(
+        horizontal: 10,
+        vertical: 10,
+      ),
+    ),
+  );
 }
 
 Widget Published() {
