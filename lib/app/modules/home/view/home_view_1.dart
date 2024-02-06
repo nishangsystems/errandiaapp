@@ -385,7 +385,7 @@ class _home_view_1State extends State<home_view_1> {
                   const Spacer(),
                   TextButton(
                     onPressed: () {
-                      Get.to(() => SeeAllErands());
+                      Get.to(() => SeeAllErrands());
                     },
                     child: const Text('See All'),
                   ),

@@ -10,14 +10,14 @@ import 'package:get/get_core/src/get_main.dart';
 
 import '../../../APi/apidomain & api.dart';
 
-class SeeAllErands extends StatefulWidget {
-  SeeAllErands({super.key});
+class SeeAllErrands extends StatefulWidget {
+  const SeeAllErrands({super.key});
 
   @override
-  State<SeeAllErands> createState() => _SeeAllErandsState();
+  State<SeeAllErrands> createState() => _SeeAllErrandsState();
 }
 
-class _SeeAllErandsState extends State<SeeAllErands> {
+class _SeeAllErrandsState extends State<SeeAllErrands> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -98,9 +98,9 @@ class _SeeAllErandsState extends State<SeeAllErands> {
                                         children: [
                                           CircleAvatar(
                                             radius: 25,
-                                            backgroundImage: NetworkImage(
-                                              data['shop']['image'].toString(),
-                                            ),
+                                            // backgroundImage: NetworkImage(
+                                            //   data['shop']['image'].toString(),
+                                            // ),
                                             child: data['shop']['image'] == ""
                                                 ? const Icon(Icons.person)
                                                 : null,
@@ -115,16 +115,16 @@ class _SeeAllErandsState extends State<SeeAllErands> {
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                data['name'].toString(),
+                                                Recently_item_List[index].name.toString(),
                                                 style: const TextStyle(
                                                     fontSize: 13,
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
-                                              // Text(
-                                              //   Recently_item_List[index].date.toString(),
-                                              //   style: TextStyle(fontSize: 12),
-                                              // ),
+                                              Text(
+                                                Recently_item_List[index].date.toString(),
+                                                style: const TextStyle(fontSize: 12),
+                                              ),
                                             ],
                                           ),
                                         ],
@@ -141,8 +141,9 @@ class _SeeAllErandsState extends State<SeeAllErands> {
                                     color: Colors.white,
                                     child: Center(
                                       child: Image(
-                                        image: NetworkImage(
-                                            data['featured_image'].toString()),
+                                        image: AssetImage(
+                                          Recently_item_List[index].imagePath,
+                                        ),
                                         height: Get.height * 0.22,
                                       ),
                                     ),
@@ -173,7 +174,7 @@ class _SeeAllErandsState extends State<SeeAllErands> {
                                         //   height: Get.height * 0.001,
                                         // ),
                                         Text(
-                                          data['shop']['name'].toString(),
+                                          Recently_item_List[index].belowText.toString(),
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
@@ -184,9 +185,10 @@ class _SeeAllErandsState extends State<SeeAllErands> {
                                         ),
                                         Row(
                                           children: [
-                                            const Icon(Icons.location_on),
+                                             Icon(Icons.location_on,
+                                                color: appcolor().mediumGreyColor, size: 15),
                                             const SizedBox(
-                                              width: 20,
+                                              width: 4,
                                             ),
                                             Text(
                                               data['shop']['street'].toString(),
