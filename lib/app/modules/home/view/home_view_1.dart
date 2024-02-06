@@ -641,7 +641,7 @@ Widget Recently_posted_items_Widget() {
                   onTap: () {
                     // Get.to(Product_view(item: data,name: data['name'].toString(),));
                     // Get.back();
-                    Get.to(errand_detail_view(
+                    Get.to(() => errand_detail_view(
                       data: data,
                     ));
                   },
@@ -674,15 +674,15 @@ Widget Recently_posted_items_Widget() {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      data['shop']['name'].toString(),
+                                      Recently_item_List[index].name.toString(),
                                       style: const TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    // Text(
-                                    //   Recently_item_List[index].date.toString(),
-                                    //   style: TextStyle(fontSize: 12),
-                                    // ),
+                                    Text(
+                                      Recently_item_List[index].date.toString(),
+                                      style: TextStyle(fontSize: 12),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -693,18 +693,12 @@ Widget Recently_posted_items_Widget() {
                           ),
                           Container(
                             height: Get.height * 0.2,
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 0),
                             color: appcolor().lightgreyColor,
                             child: Center(
                               child: Image(
-                                image: NetworkImage(
-                                  data['featured_image'] != ''
-                                      ? data['featured_image'].toString()
-                                      : Featured_Businesses_Item_List[index]
-                                          .imagePath
-                                          .toString(),
-                                ),
+                                image: AssetImage(Recently_item_List[index].imagePath.toString()),
                                 height: Get.height * 0.15,
                               ),
                             ),
@@ -735,7 +729,7 @@ Widget Recently_posted_items_Widget() {
                                 //   height: Get.height * 0.001,
                                 // ),
                                 Text(
-                                  data['name'].toString(),
+                                  data['name'].toString() != "null" ? data['name'].toString() : 'errand name',
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
@@ -753,6 +747,7 @@ Widget Recently_posted_items_Widget() {
                                     Text(
                                       data['shop']['street'].toString(),
                                       style: TextStyle(
+                                          fontSize: 12,
                                           color: appcolor().mainColor),
                                     )
                                   ],
