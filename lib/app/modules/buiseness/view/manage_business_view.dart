@@ -160,9 +160,9 @@ Widget allBusiness() {
                   ),
                   width: Get.width * 0.16,
                   height: Get.height * 0.06,
-                  child: Image(
-                    image: NetworkImage(
-                      '${data['image']}',
+                  child: const Image(
+                    image: AssetImage(
+                      'assets/images/barber_logo.png',
                     ),
                     fit: BoxFit.fill,
                   ),

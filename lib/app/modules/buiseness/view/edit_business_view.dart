@@ -212,7 +212,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
               },
               child: isLoading == false
                   ? const Text(
-                'Publish',
+                'UPDATE',
                 style:
                 TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               )
@@ -309,35 +309,33 @@ class EditBusinessViewState extends State<EditBusinessView> {
                     var data = subCetegoryData.Items[index];
                     return Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        child: Wrap(
-                          direction: Axis.vertical,
-                          spacing: 20.0, // gap between adjacent chips
-                          runSpacing: 4.0, // gap between lines
-                          children: <Widget>[
-                            InputChip(
-                              label: Text('${data.name}'),
-                              selectedColor: Colors.green,
-                              selected:
-                              selectedFilters.contains(data.name),
-                              onSelected: (value) {
-                                setState(() {
-                                  if (value) {
-                                    selectedFilters
-                                        .add(data.name.toString());
-                                    selectedFilters_.add(
-                                        int.parse(data.id.toString()));
-                                  } else if (!value) {
-                                    selectedFilters
-                                        .remove(data.name.toString());
-                                    selectedFilters_.remove(
-                                        int.parse(data.id.toString()));
-                                  }
-                                });
-                              },
-                            ),
-                          ],
-                        ),
+                      child: Wrap(
+                        direction: Axis.vertical,
+                        spacing: 20.0, // gap between adjacent chips
+                        runSpacing: 4.0, // gap between lines
+                        children: <Widget>[
+                          InputChip(
+                            label: Text('${data.name}'),
+                            selectedColor: Colors.green,
+                            selected:
+                            selectedFilters.contains(data.name),
+                            onSelected: (value) {
+                              setState(() {
+                                if (value) {
+                                  selectedFilters
+                                      .add(data.name.toString());
+                                  selectedFilters_.add(
+                                      int.parse(data.id.toString()));
+                                } else if (!value) {
+                                  selectedFilters
+                                      .remove(data.name.toString());
+                                  selectedFilters_.remove(
+                                      int.parse(data.id.toString()));
+                                }
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     );
                   }),

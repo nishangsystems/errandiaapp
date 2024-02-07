@@ -531,15 +531,13 @@ Widget recently_posted_errands() {
                           ),
                           Container(
                             height: Get.height * 0.2,
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 0),
                             color: appcolor().lightgreyColor,
                             child: Center(
                               child: Image(
-                                image: NetworkImage(
-                                  data['featured_image'] != ''
-                                      ? data['featured_image'].toString()
-                                      : Featured_Businesses_Item_List[index]
+                                image: AssetImage(
+                                  Featured_Businesses_Item_List[index]
                                       .imagePath
                                       .toString(),
                                 ),

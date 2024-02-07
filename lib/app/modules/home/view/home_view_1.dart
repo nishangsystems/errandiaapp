@@ -458,8 +458,9 @@ Widget Categories_List_Widget() {
                                     // colorFilter: ColorFilter.mode( BlendMode.srcIn),
                                     semanticsLabel: 'A red up arrow')
                                 : Image(
-                                    image: const NetworkImage(
-                                        "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"),
+                                    image: const AssetImage(
+                                      'assets/images/errandia_logo.png',
+                                    ),
                                     height: Get.height * 0.05,
                                     width: Get.width * 0.1,
                                   ),
