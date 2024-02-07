@@ -31,11 +31,11 @@ class add_product_view extends StatefulWidget {
 
 class _add_product_viewState extends State<add_product_view> {
   List<String> selectedFilters = [];
-  List<int> selectedFilterss = [];
+  List<int> selectedFilters_ = [];
   bool isLoading = false;
 
 
-  Future<void> PanDocumentInfoupload(context,String name, shopid, unitPrice,productDescription,tags,) async {
+  Future<void> PanDocumentInfoupload(context,String name, shopId, unitPrice,productDescription,tags,) async {
     // var file;
     // // Create a MultipartRequest
     // final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -82,8 +82,8 @@ class _add_product_viewState extends State<add_product_view> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       var token = prefs.getString('token');
 
-      for(int i = 1; i < selectedFilterss.length; i++){
-        file = file +","+ selectedFilterss[i].toString();
+      for(int i = 1; i < selectedFilters_.length; i++){
+        file = "$file,${selectedFilters_[i]}";
       }
       // print(file);
       var uri = Uri.parse('${apiDomain().domain}products?name=$name&shop_id=25&description=Luxery car &unit_price=50&service=false&categories=1,3,4,8&image_count=1'); // Replace with your server's endpoint
@@ -114,7 +114,7 @@ class _add_product_viewState extends State<add_product_view> {
         Get.offAll(() => manage_business_view());
 
         // imageController.image_path.clear();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('success')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('success')));
 
       }else {
         // alertBoxdialogBox(context, 'Alert', 'P')
@@ -144,7 +144,7 @@ class _add_product_viewState extends State<add_product_view> {
           onPressed: () {
             Get.back();
           },
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
           color: appcolor().greyColor,
         ),
         actions: [
@@ -161,7 +161,7 @@ class _add_product_viewState extends State<add_product_view> {
                   PanDocumentInfoupload(context, namesed, shopid, unitPrice, productDescription, tags);
                 }
               },
-              child: Text(
+              child: const Text(
                 'Publish',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ))
@@ -171,12 +171,12 @@ class _add_product_viewState extends State<add_product_view> {
         child: Wrap(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 15,
                 vertical: 15,
               ),
-              child: Text(
-                'New Product Detail'.tr,
+              child: const Text(
+                'New Product Detail',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -192,10 +192,10 @@ class _add_product_viewState extends State<add_product_view> {
 
             // company name
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
               child: TextFormField(
                 controller: product_controller.product_name_controller,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
                     FontAwesomeIcons.buildingUser,
@@ -219,10 +219,10 @@ class _add_product_viewState extends State<add_product_view> {
               indent: 0,
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
               child: TextFormField(
                 controller: product_controller.shop_Id_controller,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
                     FontAwesomeIcons.shop,
@@ -247,11 +247,11 @@ class _add_product_viewState extends State<add_product_view> {
             ),
             // Business categories
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
               child: TextFormField(
                 readOnly: true,
                 controller: product_controller.category_controller,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
                     color: Colors.black,
@@ -292,10 +292,10 @@ class _add_product_viewState extends State<add_product_view> {
                                 setState(() {
                                   if (value) {
                                     selectedFilters.add(data.name.toString());
-                                    selectedFilterss.add(int.parse(data.id.toString()));
+                                    selectedFilters_.add(int.parse(data.id.toString()));
                                   } else if(!value){
                                     selectedFilters.remove(data.name.toString());
-                                    selectedFilterss.remove(int.parse(data.id.toString()));
+                                    selectedFilters_.remove(int.parse(data.id.toString()));
                                   }
                                 });
                               },
@@ -318,10 +318,10 @@ class _add_product_viewState extends State<add_product_view> {
 
             // Business categories
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
               child: TextFormField(
                 controller: product_controller.unit_price_controller,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
                     color: Colors.black,
@@ -354,7 +354,7 @@ class _add_product_viewState extends State<add_product_view> {
                 controller: product_controller.product_desc_controller,
                 minLines: 1,
                 maxLines: 4,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
                     color: Colors.black,
@@ -391,15 +391,15 @@ class _add_product_viewState extends State<add_product_view> {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                insetPadding: EdgeInsets.symmetric(
+                                insetPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 20,
                                 ),
                                 scrollable: true,
-                                content: Container(
+                                content: SizedBox(
                                   // height: Get.height * 0.7,
                                   width: Get.width,
                                   child: Column(
@@ -484,9 +484,9 @@ class _add_product_viewState extends State<add_product_view> {
                           );
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 15, vertical: 20),
-                          child: Row(
+                          child: const Row(
                             children: [
                               Icon(Icons.image),
                               Text('  Cover Image *'),
@@ -498,14 +498,14 @@ class _add_product_viewState extends State<add_product_view> {
                           ),
                         ),
                       )
-                    : Container(
+                    : SizedBox(
                         height: Get.height * 0.15,
                         child: Column(
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.image),
-                                Text(
+                                const Icon(Icons.image),
+                                const Text(
                                   '  Company Logo *',
                                   style: TextStyle(
                                     fontSize: 16,
@@ -555,7 +555,7 @@ class _add_product_viewState extends State<add_product_view> {
                                           height: 35,
                                           width: 60,
                                           color: Colors.lightGreen,
-                                          child: Center(
+                                          child: const Center(
                                             child: Text(
                                               'Edit',
                                               style: TextStyle(
@@ -573,7 +573,7 @@ class _add_product_viewState extends State<add_product_view> {
                                           height: 35,
                                           width: 60,
                                           color: appcolor().greyColor,
-                                          child: Center(
+                                          child: const Center(
                                             child: Text(
                                               'Remove',
                                               style: TextStyle(),
@@ -599,8 +599,8 @@ class _add_product_viewState extends State<add_product_view> {
               indent: 0,
             ),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-              child: Row(
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+              child: const Row(
                 children: [
                   Icon(
                     Icons.image,
@@ -615,7 +615,7 @@ class _add_product_viewState extends State<add_product_view> {
             ),
 
             Obx(
-              () => Container(
+              () => SizedBox(
                 height: imageController.imageList.isEmpty ? null : null,
                 child: imageController.imageList.isEmpty
                     ? InkWell(
@@ -624,15 +624,15 @@ class _add_product_viewState extends State<add_product_view> {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                insetPadding: EdgeInsets.symmetric(
+                                insetPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 20,
                                 ),
                                 scrollable: true,
-                                content: Container(
+                                content: SizedBox(
                                   // height: Get.height * 0.7,
                                   width: Get.width,
                                   child: Column(
@@ -808,7 +808,7 @@ class _add_product_viewState extends State<add_product_view> {
                                             height: 35,
                                             width: Get.width * 0.20,
                                             color: Colors.lightGreen,
-                                            child: Center(
+                                            child: const Center(
                                               child: Text(
                                                 'Edit',
                                                 style: TextStyle(
@@ -826,7 +826,7 @@ class _add_product_viewState extends State<add_product_view> {
                                             height: 35,
                                             width: Get.width * 0.2,
                                             color: appcolor().greyColor,
-                                            child: Center(
+                                            child: const Center(
                                               child: Text(
                                                 'Remove',
                                                 style: TextStyle(),
@@ -854,13 +854,13 @@ class _add_product_viewState extends State<add_product_view> {
                         imageController.getmultipleImage();
                       },
                       child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 15),
+                        margin:const  EdgeInsets.symmetric(horizontal: 15),
                         decoration: BoxDecoration(
                           color: appcolor().skyblueColor,
                           borderRadius: BorderRadius.circular(10,),
                         ),
                         height: Get.height*0.08,
-                          child: Row(
+                          child: const Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -885,10 +885,10 @@ class _add_product_viewState extends State<add_product_view> {
 
             // product tags
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
               child: TextFormField(
                 controller: product_controller.product_tags_controller,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
                     FontAwesomeIcons.tags,

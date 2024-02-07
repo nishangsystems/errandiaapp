@@ -74,7 +74,7 @@ class dashboard_view extends StatelessWidget {
                     belowtext: '0 Businesses',
                     callback: () {
                       // Get.offAll(Home_view());
-                      Get.to(manage_business_view());
+                      Get.to(() => manage_business_view());
                     },
                   ),
                   dashboard_widget(
@@ -84,7 +84,7 @@ class dashboard_view extends StatelessWidget {
                     belowtext: '0 Products',
                     callback: () {
                       // Get.back();
-                      Get.to(manage_product_view());
+                      Get.to(() => manage_product_view());
                     },
                   ),
                   dashboard_widget(
@@ -93,7 +93,7 @@ class dashboard_view extends StatelessWidget {
                     belowtext: '0 Services',
                     callback: () {
                       // Get.back();
-                      Get.to(manage_service_view());
+                      Get.to(() => manage_service_view());
                     },
                   ),
                   dashboard_widget(
@@ -102,7 +102,7 @@ class dashboard_view extends StatelessWidget {
                     title: 'Errands',
                     belowtext: '0 Errands',
                     callback: () {
-                      Get.to(errand_view());
+                      Get.to(() => errand_view());
                     },
                   ),
                   dashboard_widget(
@@ -119,7 +119,7 @@ class dashboard_view extends StatelessWidget {
                     title: 'Subscribers',
                     belowtext: '0 Subscribers',
                     callback: () {
-                      Get.to(subscriber_view());
+                      Get.to(() => subscriber_view());
                     },
                   ),
                   dashboard_widget(
@@ -128,7 +128,7 @@ class dashboard_view extends StatelessWidget {
                     title: 'Following',
                     belowtext: '0 Following',
                     callback: () {
-                      Get.to(const following_view());
+                      Get.to(() => const following_view());
                     },
                   ),
                 ],
