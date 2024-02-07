@@ -1,6 +1,7 @@
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
+import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
 import 'package:errandia/app/modules/home/view/home_view_1.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -201,7 +202,7 @@ Widget allBusiness() {
                         child: Wrap(
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            Center(
+                            const Center(
                               child: Icon(
                                 Icons.horizontal_rule,
                                 size: 25,
@@ -215,6 +216,7 @@ Widget allBusiness() {
                               callback: () async {
                                 print('tapped');
                                 Get.back();
+                                Get.to(() => EditBusinessView(data: data,));
                               },
                             ),
                             bottomSheetWidgetitem(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
@@ -23,14 +24,15 @@ business_controller controller = Get.put(business_controller());
 add_business_controller add_controller = Get.put(add_business_controller());
 imagePickercontroller imageController = Get.put(imagePickercontroller());
 
-class add_business_view extends StatefulWidget {
-  add_business_view({super.key});
+class EditBusinessView extends StatefulWidget {
+  final Map<String, dynamic> data;
+  const EditBusinessView({super.key, required this.data});
 
   @override
-  State<add_business_view> createState() => _add_business_viewState();
+  State<EditBusinessView> createState() => EditBusinessViewState();
 }
 
-class _add_business_viewState extends State<add_business_view> {
+class EditBusinessViewState extends State<EditBusinessView> {
   var country;
   var value = null;
   var regionCode;
@@ -141,14 +143,30 @@ class _add_business_viewState extends State<add_business_view> {
     }
   }
 
+  void initState() {
+    super.initState();
+    add_controller.company_name_controller.text = widget.data['name'] ?? '';
+    add_controller.Business_information_controller.text =
+        widget.data['description'] ?? '';
+    add_controller.website_address_controller.text = widget.data['website'] ?? '';
+    add_controller.address_controller.text = widget.data['address'] ?? '';
+    add_controller.facebook_controller.text = widget.data['facebook'] ?? '';
+    add_controller.instagram_controller.text = widget.data['instagram'] ?? '';
+    add_controller.twitter_controller.text = widget.data['twitter'] ?? '';
+    add_controller.Business_category_controller.text =
+        widget.data['categories'] ?? '';
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    print("Edit Data: ${widget.data}");
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         titleSpacing: 8,
-        title: Text('Add Business'),
+        title: Text(capitalizeAll(widget.data['name'])),
         titleTextStyle: TextStyle(
             fontWeight: FontWeight.bold,
             color: appcolor().mediumGreyColor,
@@ -159,24 +177,24 @@ class _add_business_viewState extends State<add_business_view> {
           onPressed: () {
             Get.back();
           },
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
           color: appcolor().greyColor,
         ),
         actions: [
           TextButton(
               onPressed: () {
                 var name =
-                    add_controller.company_name_controller.text.toString();
+                add_controller.company_name_controller.text.toString();
                 var description = add_controller
                     .Business_information_controller.text
                     .toString();
                 var websiteAddress =
-                    add_controller.website_address_controller.text.toString();
+                add_controller.website_address_controller.text.toString();
                 var address = add_controller.address_controller.text.toString();
                 var facebook =
-                    add_controller.facebook_controller.text.toString();
+                add_controller.facebook_controller.text.toString();
                 var instagram =
-                    add_controller.instagram_controller.text.toString();
+                add_controller.instagram_controller.text.toString();
                 var twitter = add_controller.twitter_controller.text.toString();
                 var businessInfo = add_controller
                     .Business_information_controller.text
@@ -194,16 +212,16 @@ class _add_business_viewState extends State<add_business_view> {
               },
               child: isLoading == false
                   ? const Text(
-                      'Publish',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    )
+                'Publish',
+                style:
+                TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              )
                   : const SizedBox(
-                      height: 10,
-                      width: 10,
-                      child: CircularProgressIndicator(
-                        color: Colors.blue,
-                      )))
+                  height: 10,
+                  width: 10,
+                  child: CircularProgressIndicator(
+                    color: Colors.blue,
+                  )))
         ],
       ),
       body: SingleChildScrollView(
@@ -283,47 +301,47 @@ class _add_business_viewState extends State<add_business_view> {
             ),
             subCetegoryData.Items.isNotEmpty
                 ? SizedBox(
-                    height: 70,
-                    child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: subCetegoryData.Items.length,
-                        itemBuilder: (context, index) {
-                          var data = subCetegoryData.Items[index];
-                          return Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Container(
-                              child: Wrap(
-                                direction: Axis.vertical,
-                                spacing: 20.0, // gap between adjacent chips
-                                runSpacing: 4.0, // gap between lines
-                                children: <Widget>[
-                                  InputChip(
-                                    label: Text('${data.name}'),
-                                    selectedColor: Colors.green,
-                                    selected:
-                                        selectedFilters.contains(data.name),
-                                    onSelected: (value) {
-                                      setState(() {
-                                        if (value) {
-                                          selectedFilters
-                                              .add(data.name.toString());
-                                          selectedFilters_.add(
-                                              int.parse(data.id.toString()));
-                                        } else if (!value) {
-                                          selectedFilters
-                                              .remove(data.name.toString());
-                                          selectedFilters_.remove(
-                                              int.parse(data.id.toString()));
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
+              height: 70,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: subCetegoryData.Items.length,
+                  itemBuilder: (context, index) {
+                    var data = subCetegoryData.Items[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Container(
+                        child: Wrap(
+                          direction: Axis.vertical,
+                          spacing: 20.0, // gap between adjacent chips
+                          runSpacing: 4.0, // gap between lines
+                          children: <Widget>[
+                            InputChip(
+                              label: Text('${data.name}'),
+                              selectedColor: Colors.green,
+                              selected:
+                              selectedFilters.contains(data.name),
+                              onSelected: (value) {
+                                setState(() {
+                                  if (value) {
+                                    selectedFilters
+                                        .add(data.name.toString());
+                                    selectedFilters_.add(
+                                        int.parse(data.id.toString()));
+                                  } else if (!value) {
+                                    selectedFilters
+                                        .remove(data.name.toString());
+                                    selectedFilters_.remove(
+                                        int.parse(data.id.toString()));
+                                  }
+                                });
+                              },
                             ),
-                          );
-                        }),
-                  )
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+            )
                 : const Center(child: CircularProgressIndicator()),
             Divider(
               color: appcolor().greyColor,
@@ -366,217 +384,217 @@ class _add_business_viewState extends State<add_business_view> {
 
             // upload company logo
             Obx(
-              () => SizedBox(
+                  () => SizedBox(
                 height: imageController.image_path.isEmpty
                     ? null
                     : Get.height * 0.28,
                 child: imageController.image_path.isEmpty
                     ? InkWell(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                insetPadding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          insetPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 20,
+                          ),
+                          scrollable: true,
+                          content: SizedBox(
+                            // height: Get.height * 0.7,
+                            width: Get.width,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Upload Company Logo',
+                                  style: TextStyle(
+                                    color: appcolor().mainColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 20,
+                                SizedBox(
+                                  height: Get.height * 0.05,
                                 ),
-                                scrollable: true,
-                                content: SizedBox(
-                                  // height: Get.height * 0.7,
-                                  width: Get.width,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Upload Company Logo',
-                                        style: TextStyle(
-                                          color: appcolor().mainColor,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: Get.height * 0.05,
-                                      ),
-                                      Column(
+                                Column(
+                                  children: [
+                                    blockButton(
+                                      title: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
                                         children: [
-                                          blockButton(
-                                            title: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FontAwesomeIcons.image,
-                                                  color: appcolor().mainColor,
-                                                  size: 22,
-                                                ),
-                                                Text(
-                                                  '  Image Gallery',
-                                                  style: TextStyle(
-                                                      color:
-                                                          appcolor().mainColor),
-                                                ),
-                                              ],
-                                            ),
-                                            ontap: () {
-                                              Get.back();
-                                              imageController
-                                                  .getImageFromGallery();
-                                            },
-                                            color: appcolor().greyColor,
+                                          Icon(
+                                            FontAwesomeIcons.image,
+                                            color: appcolor().mainColor,
+                                            size: 22,
                                           ),
-                                          SizedBox(
-                                            height: Get.height * 0.015,
-                                          ),
-                                          blockButton(
-                                            title: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FontAwesomeIcons.camera,
-                                                  color: appcolor().mainColor,
-                                                  size: 22,
-                                                ),
-                                                Text(
-                                                  '  Take Photo',
-                                                  style: TextStyle(
-                                                    color: appcolor().mainColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            ontap: () {
-                                              Get.back();
-                                              imageController
-                                                  .getimagefromCamera();
-                                            },
-                                            color: Color(0xfffafafa),
+                                          Text(
+                                            '  Image Gallery',
+                                            style: TextStyle(
+                                                color:
+                                                appcolor().mainColor),
                                           ),
                                         ],
-                                      )
-                                    ],
-                                  ).paddingSymmetric(
-                                    horizontal: 10,
-                                    vertical: 10,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 20),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.image),
-                              Text('  Upload Company Logo *'),
-                              Spacer(),
-                              Icon(
-                                Icons.edit,
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                    : SizedBox(
-                        height: Get.height * 0.15,
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.image),
-                                const Text(
-                                  '  Company Logo *',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const Spacer(),
-                                InkWell(
-                                  onTap: () {},
-                                  child: const Icon(
-                                    Icons.edit,
-                                  ),
+                                      ),
+                                      ontap: () {
+                                        Get.back();
+                                        imageController
+                                            .getImageFromGallery();
+                                      },
+                                      color: appcolor().greyColor,
+                                    ),
+                                    SizedBox(
+                                      height: Get.height * 0.015,
+                                    ),
+                                    blockButton(
+                                      title: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            FontAwesomeIcons.camera,
+                                            color: appcolor().mainColor,
+                                            size: 22,
+                                          ),
+                                          Text(
+                                            '  Take Photo',
+                                            style: TextStyle(
+                                              color: appcolor().mainColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      ontap: () {
+                                        Get.back();
+                                        imageController
+                                            .getimagefromCamera();
+                                      },
+                                      color: Color(0xfffafafa),
+                                    ),
+                                  ],
                                 )
                               ],
                             ).paddingSymmetric(
-                              vertical: 15,
-                              horizontal: 15,
+                              horizontal: 10,
+                              vertical: 10,
                             ),
-                            Divider(
-                              color: appcolor().greyColor,
-                              thickness: 1,
-                              height: 1,
-                              indent: 0,
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 20),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.image),
+                        Text('  Upload Company Logo *'),
+                        Spacer(),
+                        Icon(
+                          Icons.edit,
+                        )
+                      ],
+                    ),
+                  ),
+                )
+                    : SizedBox(
+                  height: Get.height * 0.15,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.image),
+                          const Text(
+                            '  Company Logo *',
+                            style: TextStyle(
+                              fontSize: 16,
                             ),
-                            Stack(
+                          ),
+                          const Spacer(),
+                          InkWell(
+                            onTap: () {},
+                            child: const Icon(
+                              Icons.edit,
+                            ),
+                          )
+                        ],
+                      ).paddingSymmetric(
+                        vertical: 15,
+                        horizontal: 15,
+                      ),
+                      Divider(
+                        color: appcolor().greyColor,
+                        thickness: 1,
+                        height: 1,
+                        indent: 0,
+                      ),
+                      Stack(
+                        children: [
+                          Image(
+                            image: FileImage(
+                              File(
+                                imageController.image_path.toString(),
+                              ),
+                            ),
+                            height: Get.height * 0.19,
+                            width: double.infinity,
+                            fit: BoxFit.fill,
+                          ).paddingSymmetric(horizontal: 20),
+                          SizedBox(
+                            height: Get.height * 0.19,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Image(
-                                  image: FileImage(
-                                    File(
-                                      imageController.image_path.toString(),
+                                InkWell(
+                                  onTap: () {
+                                    imageController.getImageFromGallery();
+                                  },
+                                  child: Container(
+                                    height: 35,
+                                    width: 60,
+                                    color: Colors.lightGreen,
+                                    child: const Center(
+                                      child: Text(
+                                        'Edit',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  height: Get.height * 0.19,
-                                  width: double.infinity,
-                                  fit: BoxFit.fill,
-                                ).paddingSymmetric(horizontal: 20),
-                                SizedBox(
-                                  height: Get.height * 0.19,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          imageController.getImageFromGallery();
-                                        },
-                                        child: Container(
-                                          height: 35,
-                                          width: 60,
-                                          color: Colors.lightGreen,
-                                          child: const Center(
-                                            child: Text(
-                                              'Edit',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    imageController.reset();
+                                  },
+                                  child: Container(
+                                    height: 35,
+                                    width: 60,
+                                    color: appcolor().greyColor,
+                                    child: const Center(
+                                      child: Text(
+                                        'Remove',
+                                        style: TextStyle(),
                                       ),
-                                      InkWell(
-                                        onTap: () {
-                                          imageController.reset();
-                                        },
-                                        child: Container(
-                                          height: 35,
-                                          width: 60,
-                                          color: appcolor().greyColor,
-                                          child: const Center(
-                                            child: Text(
-                                              'Remove',
-                                              style: TextStyle(),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                )
+                                ),
                               ],
                             ),
-                          ],
-                        ),
+                          )
+                        ],
                       ),
+                    ],
+                  ),
+                ),
               ),
             ),
 
@@ -626,7 +644,7 @@ class _add_business_viewState extends State<add_business_view> {
                   ),
                   Spacer(),
                   Obx(
-                    () => SizedBox(
+                        () => SizedBox(
                       width: Get.width * 0.2,
                       child: FittedBox(
                         fit: BoxFit.fill,
@@ -694,12 +712,12 @@ class _add_business_viewState extends State<add_business_view> {
                     });
                   },
                   items: Regions.Items.map((e) => DropdownMenuItem(
-                        child: Text(
-                          e.name.toString(),
-                          style: TextStyle(fontSize: 11),
-                        ),
-                        value: e.id,
-                      )).toList(),
+                    child: Text(
+                      e.name.toString(),
+                      style: TextStyle(fontSize: 11),
+                    ),
+                    value: e.id,
+                  )).toList(),
                 ),
               ),
             ),
@@ -730,12 +748,12 @@ class _add_business_viewState extends State<add_business_view> {
                     });
                   },
                   items: Towns.Items.map((e) => DropdownMenuItem(
-                        child: Text(
-                          e.name.toString(),
-                          style: TextStyle(fontSize: 11),
-                        ),
-                        value: e.id,
-                      )).toList(),
+                    child: Text(
+                      e.name.toString(),
+                      style: TextStyle(fontSize: 11),
+                    ),
+                    value: e.id,
+                  )).toList(),
                 ),
               ),
             ),
@@ -755,7 +773,7 @@ class _add_business_viewState extends State<add_business_view> {
                 child: DropdownButtonFormField(
                   iconSize: 0.0,
                   decoration:
-                      const InputDecoration.collapsed(hintText: 'Street'),
+                  const InputDecoration.collapsed(hintText: 'Street'),
                   value: value,
                   onChanged: (value) {
                     setState(() {
@@ -763,12 +781,12 @@ class _add_business_viewState extends State<add_business_view> {
                     });
                   },
                   items: Street.Items.map((e) => DropdownMenuItem(
-                        child: Text(
-                          e.name.toString(),
-                          style: TextStyle(fontSize: 11),
-                        ),
-                        value: e.id,
-                      )).toList(),
+                    child: Text(
+                      e.name.toString(),
+                      style: TextStyle(fontSize: 11),
+                    ),
+                    value: e.id,
+                  )).toList(),
                 ),
               ),
             ),
@@ -1068,7 +1086,7 @@ class _add_business_viewState extends State<add_business_view> {
             Text(add_controller.managerList[index]),
             const Spacer(),
             Obx(
-              () => Radio(
+                  () => Radio(
                 value: add_controller.managerList[index].toString(),
                 groupValue: add_controller.group_value.value,
                 onChanged: (val) {
@@ -1372,8 +1390,8 @@ class _add_business_viewState extends State<add_business_view> {
               ontap: () {
                 Get.back();
                 String fullName = add_controller
-                        .add_manager_first_name_controller.text
-                        .toString() +
+                    .add_manager_first_name_controller.text
+                    .toString() +
                     add_controller.add_manager_last_name_controller.text
                         .toString();
                 add_controller.add_Manager(fullName);
