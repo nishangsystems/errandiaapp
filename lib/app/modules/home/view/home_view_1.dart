@@ -48,7 +48,7 @@ class _home_view_1State extends State<home_view_1> {
   Country() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}countries'),
+        Uri.parse('${apiDomain().domain}/countries'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -67,7 +67,7 @@ class _home_view_1State extends State<home_view_1> {
   CountryData() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}categories'),
+        Uri.parse('${apiDomain().domain}/categories'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -86,7 +86,7 @@ class _home_view_1State extends State<home_view_1> {
   RegionData() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}regions'),
+        Uri.parse('${apiDomain().domain}/regions'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -105,7 +105,7 @@ class _home_view_1State extends State<home_view_1> {
 
   TownData() async {
     try {
-      final response = await http.get(Uri.parse('${apiDomain().domain}towns'));
+      final response = await http.get(Uri.parse('${apiDomain().domain}/towns'));
       if (response.statusCode == 200) {
         final catalogJson = response.body;
         final decodedData = jsonDecode(catalogJson);
@@ -124,7 +124,7 @@ class _home_view_1State extends State<home_view_1> {
   street() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}streets'),
+        Uri.parse('${apiDomain().domain}/streets'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -144,7 +144,7 @@ class _home_view_1State extends State<home_view_1> {
   subCategoryData() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}streets'),
+        Uri.parse('${apiDomain().domain}/streets'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -507,6 +507,9 @@ Widget Featured_Businesses_List() {
             ),
           );
         } else if (snapshot.hasData) {
+          if (kDebugMode) {
+            print("featured data: ${snapshot.data}");
+          }
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 14),
             height: Get.height * 0.33,
@@ -518,6 +521,7 @@ Widget Featured_Businesses_List() {
               itemCount: 4,
               itemBuilder: (context, index) {
                 var data = snapshot.data[index];
+                print("sub data: ${data['street']}");
                 return InkWell(
                   onTap: () {
                     Get.to(() => errandia_business_view(index: index));
@@ -556,7 +560,7 @@ Widget Featured_Businesses_List() {
                               fontSize: 12,
                               // fontWeight: FontWeight.bold,
                               color: appcolor().mediumGreyColor),
-                        ),
+                        ).paddingOnly(left: 3),
                         SizedBox(
                           height: Get.height * 0.001,
                         ),
@@ -566,23 +570,26 @@ Widget Featured_Businesses_List() {
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: appcolor().mainColor),
-                        ),
+                        ).paddingOnly(left: 3),
                         SizedBox(
                           height: Get.height * 0.001,
                         ),
-                        Row(
+                        data['street'] != '' ? Row(
                           children: [
                              Icon(
                               Icons.location_on,
                             color: appcolor().mediumGreyColor,
                             size: 15,
                             ),
+                            const SizedBox(
+                              width: 1,
+                            ),
                             Text(
                               data['street'],
                               style: const TextStyle(fontSize: 12),
                             )
                           ],
-                        ),
+                        ) : Container(),
                       ],
                     ),
                   ),
@@ -623,6 +630,9 @@ Widget Recently_posted_items_Widget() {
             ),
           );
         } else if (snapshot.hasData) {
+          if (kDebugMode) {
+            print("recent errands data: ${snapshot.data}");
+          }
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 14),
             height: Get.height * 0.45,
@@ -634,9 +644,6 @@ Widget Recently_posted_items_Widget() {
               itemCount: 5,
               itemBuilder: (context, index) {
                 var data = snapshot.data[index];
-                if (kDebugMode) {
-                  print("data: $data");
-                }
 
                 return InkWell(
                   onTap: () {

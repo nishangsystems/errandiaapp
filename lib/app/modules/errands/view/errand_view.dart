@@ -102,7 +102,7 @@ class errand_view extends StatelessWidget {
               children: [
                 blockButton(
                   title: TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 10,
@@ -953,12 +953,12 @@ Widget RecievedErrands(BuildContext ctx) {
                                 icondata: Icons.email,
                                 callback: () {},
                               ),
-                              managebottomSheetWidgetitem(
-                                title: 'Delete Errand Permanently',
-                                icondata: Icons.delete,
-                                callback: () {},
-                                color: Colors.red,
-                              ),
+                              // managebottomSheetWidgetitem(
+                              //   title: 'Delete Errand Permanently',
+                              //   icondata: Icons.delete,
+                              //   callback: () {},
+                              //   color: Colors.red,
+                              // ),
                             ],
                           ),
                         ),
@@ -1334,10 +1334,10 @@ Widget Trashed(BuildContext ctx) {
                               ),
 
                               managebottomSheetWidgetitem(
-                                title: 'Delete Permanently',
-                                icondata: Icons.delete,
+                                title: 'Restore Errand',
+                                icondata: Icons.restore_from_trash,
                                 callback: () {},
-                                color: Colors.red,
+                                color: appcolor().mainColor,
                               ),
                             ],
                           ),

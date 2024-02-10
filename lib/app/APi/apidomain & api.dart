@@ -140,8 +140,8 @@ class api {
         }));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      // print('sdaf$data');
-      return data['data']['shops'];
+      print('shops response: $data');
+      return data['data']['items'];
     }
   }
 
