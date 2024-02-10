@@ -29,15 +29,14 @@ class errandia_business_view extends StatelessWidget {
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         titleSpacing: 0,
-        leading: Container(
-            child: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
+        leading: IconButton(
+          icon: const Icon(
+        Icons.arrow_back_ios,
           ),
           onPressed: () {
-            Get.back();
+        Get.back();
           },
-        )),
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -87,9 +86,9 @@ class errandia_business_view extends StatelessWidget {
             children: [
               InkWell(
                 onTap: (){
-                  Get.to(Product_serivices());
+                  Get.to(() => const Product_serivices());
                 },
-                child: Column(
+                child: const Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     FaIcon(FontAwesomeIcons.store),
@@ -103,13 +102,13 @@ class errandia_business_view extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 10,),
+              const SizedBox(width: 10,),
               SizedBox(
                 width: Get.width * 0.4,
                 height: 50,
                 child: blockButton(
-                  title: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  title: const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -485,138 +484,77 @@ class errandia_business_view extends StatelessWidget {
                   thickness: 1.5,
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                  padding: const EdgeInsets.symmetric(vertical: 5),
                   height: 280,
-                  child: ListView(
-                    physics: NeverScrollableScrollPhysics(),
-                    children: [
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                              ),
-                              child: Image(
-                                image: AssetImage(
-                                  controller.businessList[index].imagepath,
-                                ),
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  controller.businessList[index].name,
-                                ),
-                                Text(
-                                  controller.businessList[index]
-                                      .BusinessBranch_location![0]
-                                      .toString(),
-                                ),
-                              ],
-                            ).paddingOnly(left: 10),
-                            Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                color: appcolor().bluetextcolor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ).paddingOnly(bottom: 10, top: 5),
-                      Divider(),
+                  child: ListView.builder(
+                    itemCount: controller.businessList[index]
+                        .BusinessBranch_location!.length,
+                    // physics: const NeverScrollableScrollPhysics(),
 
-                      //
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                              ),
-                              child: Image(
-                                image: AssetImage(
-                                  controller.businessList[index].imagepath,
-                                ),
-                              ),
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          Get.to(() => VisitShop(businessData: controller.businessList[index].toJson()));
+                        },
+                        child: Container(
+ padding: const EdgeInsets.symmetric( horizontal: 10),
+                          margin: const EdgeInsets.only(bottom: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: appcolor().greyColor,
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  controller.businessList[index].name,
-                                ),
-                                Text(
-                                  controller.businessList[index]
-                                      .BusinessBranch_location![0]
-                                      .toString(),
-                                ),
-                              ],
-                            ).paddingOnly(left: 10),
-                            Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                color: appcolor().bluetextcolor,
-                              ),
-                            ),
-                          ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(),
+                                    ),
+                                    child: Image(
+                                      image: AssetImage(
+                                        controller.businessList[index].imagepath,
+                                      ),
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        controller.businessList[index].name,
+                                      ),
+                                      Text(
+                                        controller.businessList[index]
+                                            .BusinessBranch_location![0]
+                                            .toString(),
+                                      ),
+                                    ],
+                                  ).paddingOnly(left: 10),
+                                  Spacer(),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      Icons.arrow_forward_ios_outlined,
+                                      color: appcolor().bluetextcolor,
+                                    ),
+                                  ),
+                                ],
+                              ).paddingOnly(bottom: 10, top: 5),
+                            ],
+                          ),
                         ),
-                      ).paddingOnly(bottom: 10, top: 5),
-                      Divider(),
-
-                      //
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                              ),
-                              child: Image(
-                                image: AssetImage(
-                                  controller.businessList[index].imagepath,
-                                ),
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  controller.businessList[index].name,
-                                ),
-                                Text(
-                                  controller.businessList[index]
-                                      .BusinessBranch_location![0]
-                                      .toString(),
-                                ),
-                              ],
-                            ).paddingOnly(left: 10),
-                            Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                color: appcolor().bluetextcolor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ).paddingOnly(bottom: 10, top: 5),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],
             ).paddingSymmetric(
               horizontal: 15,
-              vertical: 5,
+              vertical: 3,
             ),
 
             //supplier review
