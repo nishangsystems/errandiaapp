@@ -71,4 +71,13 @@ class errandia_widget extends StatelessWidget {
           ),
         ));
   }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['imagePath'] = this.imagePath;
+    data['location'] = this.location;
+    data['cost'] = this.cost;
+    return data;
+  }
 }
