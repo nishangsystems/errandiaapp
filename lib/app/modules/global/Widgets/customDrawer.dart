@@ -67,14 +67,14 @@ class customendDrawer extends StatelessWidget {
                   text: 'Create Business',
                   imagePath: 'assets/images/sidebar_icon/create_shop.png',
                   callback: () {
-                    Get.to(add_business_view());
+                    Get.to(() => add_business_view());
                   },
                 )
               : drawerItemWidget(
                   text: 'Businesses',
                   imagePath: 'assets/images/sidebar_icon/create_shop.png',
                   callback: () {
-                    Get.to(Businesses_View());
+                    Get.to(() => Businesses_View());
                   },
                 )),
           Obx(() => !homeController.loggedIn.value
@@ -92,7 +92,7 @@ class customendDrawer extends StatelessWidget {
                   imagePath: 'assets/images/sidebar_icon/dashboard.png',
                   callback: () {
                     Get.back();
-                    Get.to(const dashboard_view());
+                    Get.to(() => const dashboard_view());
                   },
                 )
               : Container()),
@@ -109,7 +109,7 @@ class customendDrawer extends StatelessWidget {
                       'assets/images/sidebar_icon/icon-profile-errands.png',
                   callback: () {
                     Get.back();
-                    Get.to(const categories_view());
+                    Get.to(() => const categories_view());
                   },
                 )),
           Obx(() => homeController.loggedIn.value
@@ -129,7 +129,7 @@ class customendDrawer extends StatelessWidget {
                       'assets/images/sidebar_icon/icon-profile-errands.png',
                   callback: () {
                     Get.back();
-                    Get.to(errand_view());
+                    Get.to(() => errand_view());
                   },
                 ): Container()),
           Obx(() => homeController.loggedIn.value
@@ -139,7 +139,7 @@ class customendDrawer extends StatelessWidget {
                       'assets/images/sidebar_icon/icon-profile-following.png',
                   callback: () {
                     Get.back();
-                    Get.to(const following_view());
+                    Get.to(() => const following_view());
                   },
                 )
               : Container()),
@@ -155,12 +155,12 @@ class customendDrawer extends StatelessWidget {
               : Container()),
           Obx(() => homeController.loggedIn.value
               ? drawerItemWidget(
-                  text: 'Billing History',
+                  text: 'Subscriptions',
                   imagePath:
-                      'assets/images/sidebar_icon/icon-billing-history.png',
+                      'assets/images/sidebar_icon/icon-profile-subscribers.png',
                   callback: () {
                     Get.back();
-                    Get.to(() => billing_history_view());
+                    Get.to(() => subscriber_view());
                   },
                 )
               : Container()),
@@ -176,7 +176,7 @@ class customendDrawer extends StatelessWidget {
                   imagePath: 'assets/images/sidebar_icon/icon-settings.png',
                   callback: () {
                     Get.back();
-                    Get.to(setting_view());
+                    Get.to(() => setting_view());
                   },
                 )
               : Container()),
@@ -198,7 +198,7 @@ class customendDrawer extends StatelessWidget {
                     Get.to(() => const signin_view());
                   },
                 )),
-          SizedBox(
+          const SizedBox(
             height: 60,
           ),
         ],
