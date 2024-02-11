@@ -60,7 +60,7 @@ class dashboard_view extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: Get.height * 0.58,
+              height: Get.height * 0.40,
               child: GridView.count(
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 1,
@@ -122,15 +122,15 @@ class dashboard_view extends StatelessWidget {
                       Get.to(() => subscriber_view());
                     },
                   ),
-                  dashboard_widget(
-                    Imagepath:
-                        'assets/images/sidebar_icon/icon-profile-following.png',
-                    title: 'Following',
-                    belowtext: '0 Following',
-                    callback: () {
-                      Get.to(() => const following_view());
-                    },
-                  ),
+                  // dashboard_widget(
+                  //   Imagepath:
+                  //       'assets/images/sidebar_icon/icon-profile-following.png',
+                  //   title: 'Following',
+                  //   belowtext: '0 Following',
+                  //   callback: () {
+                  //     Get.to(() => const following_view());
+                  //   },
+                  // ),
                 ],
               ),
             ),
