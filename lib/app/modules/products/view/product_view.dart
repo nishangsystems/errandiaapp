@@ -1,4 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/products/view/products_send_enquiry.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
@@ -48,7 +50,7 @@ class _Product_viewState extends State<Product_view>
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(const Product_serivices());
+                  Get.to(() => errandia_business_view(index: 3));
                 },
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -249,7 +251,7 @@ class _Product_viewState extends State<Product_view>
                       // isScrollable: true,
                       dividerColor: appcolor().mediumGreyColor,
                       unselectedLabelColor: appcolor().mediumGreyColor,
-                      unselectedLabelStyle: TextStyle(
+                      unselectedLabelStyle: const TextStyle(
                         fontWeight: FontWeight.normal,
                         fontSize: 15,
                       ),
@@ -262,7 +264,7 @@ class _Product_viewState extends State<Product_view>
                       ),
                       controller: tabController,
                       labelColor: appcolor().darkBlueColor,
-                      tabs: [
+                      tabs: const [
                         Tab(
                           text: "Description",
                         ),
@@ -491,14 +493,14 @@ class _Product_viewState extends State<Product_view>
               },
               child: Container(
                 margin:
-                    EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
+                    const EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
                 height: Get.height * 0.05,
                 width: Get.width * 0.4,
                 decoration: BoxDecoration(
                     color: appcolor().mainColor,
                     borderRadius: BorderRadius.circular(5)),
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: Center(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: const Center(
                   child: Text(
                     'Add Your Review',
                     style: TextStyle(
@@ -510,7 +512,7 @@ class _Product_viewState extends State<Product_view>
               ),
             ),
 
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 20, right: 15, top: 0, bottom: 10),
               child: Text(
                 'More products from this supplier',
@@ -519,30 +521,36 @@ class _Product_viewState extends State<Product_view>
                 ),
               ),
             ),
-            Container(
-              height: Get.height * 0.32,
+            SizedBox(
+              height: Get.height * 0.36,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: ui_23_item_list.length,
                 itemBuilder: (context, index) {
                   return Container(
-                      margin: EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                      margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                       // height: Get.height * 0.15,
                       color: Colors.white,
                       width: Get.width * 0.38,
                       child: Column(
                         children: [
-                          Container(
+                          SizedBox(
+                            height: Get.height * 0.02,
+                          ),
+                          SizedBox(
                             height: Get.height * 0.15,
                             child: Image.asset(
                                 ui_23_item_list[index].imagePath.toString()),
                           ),
+                          SizedBox(
+                            height: Get.height * 0.01,
+                          ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.location_on,
                                 color: appcolor().mediumGreyColor,
+                                size: 13,
                               ),
                               Text(
                                 ui_23_item_list[index].location.toString(),
@@ -551,27 +559,31 @@ class _Product_viewState extends State<Product_view>
                                     fontSize: 12),
                               )
                             ],
-                          ),
+                          ).paddingOnly(left: 10, right: 10),
+
                           Text(
                             ui_23_item_list[index].item_desc,
                             style: TextStyle(
-                                fontSize: 12, color: appcolor().mainColor),
-                            textAlign: TextAlign.center,
-                          ),
+                                fontSize: 12,
+                                color: appcolor().mainColor),
+                          ).paddingOnly(left: 12, right: 12),
+
                           Text(
                             ui_23_item_list[index].itemname,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: appcolor().mainColor,
-                                fontSize: 16),
-                          )
+                                fontSize: 14),
+                          ).paddingOnly(left: 10, right: 10),
                         ],
                       ));
                 },
               ),
             ),
 
-            Padding(
+            const Padding(
               padding:
                   EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
               child: Text(
@@ -581,30 +593,36 @@ class _Product_viewState extends State<Product_view>
                 ),
               ),
             ),
-            Container(
-              height: Get.height * 0.32,
+            SizedBox(
+              height: Get.height * 0.35,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: Recently_item_List.length,
                 itemBuilder: (context, index) {
                   return Container(
-                      margin: EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                      margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                       // height: Get.height * 0.15,
                       color: Colors.white,
                       width: Get.width * 0.38,
                       child: Column(
                         children: [
-                          Container(
+                          SizedBox(
+                            height: Get.height * 0.02,
+                          ),
+                          SizedBox(
                             height: Get.height * 0.15,
                             child: Image.asset(
                                 Recently_item_List[index].imagePath.toString()),
                           ),
+                          SizedBox(
+                            height: Get.height * 0.01,
+                          ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.location_on,
                                 color: appcolor().mediumGreyColor,
+                                size: 13,
                               ),
                               Text(
                                 ui_23_item_list[index].location.toString(),
@@ -613,20 +631,22 @@ class _Product_viewState extends State<Product_view>
                                     fontSize: 12),
                               )
                             ],
-                          ),
+                          ).paddingOnly(left: 10, right: 10),
                           Text(
                             ui_23_item_list[index].item_desc,
                             style: TextStyle(
                                 fontSize: 12, color: appcolor().mainColor),
                             textAlign: TextAlign.center,
-                          ),
+                          ).paddingOnly(left: 12, right: 12),
                           Text(
                             ui_23_item_list[index].itemname,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: appcolor().mainColor,
-                                fontSize: 16),
-                          )
+                                fontSize: 14),
+                          ).paddingOnly(left: 10, right: 10),
                         ],
                       ));
                 },

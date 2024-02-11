@@ -84,27 +84,8 @@ class errandia_business_view extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              InkWell(
-                onTap: (){
-                  Get.to(() => const Product_serivices());
-                },
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    FaIcon(FontAwesomeIcons.store),
-                    Text(
-                      'Store',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 10
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10,),
               SizedBox(
-                width: Get.width * 0.4,
+                width: Get.width * 0.45,
                 height: 50,
                 child: blockButton(
                   title: const Padding(
@@ -134,7 +115,7 @@ class errandia_business_view extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: Get.width * 0.4,
+                width: Get.width * 0.45,
                 height: 50,
                 child: blockButton(
                   title: Padding(
