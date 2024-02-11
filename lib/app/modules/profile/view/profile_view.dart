@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
@@ -416,7 +417,16 @@ Widget Buiseness_item_list() {
       ),
       itemBuilder: (context, index) {
         // return Text(index.toString());
-        return business_controller().businessList[index];
+        final businessData = business_controller().businessList[index];
+        return GestureDetector(
+          onTap: () {
+            if (kDebugMode) {
+              print("business item clicked: ${businessData.name}");
+            }
+            Get.to(() => VisitShop(businessData: businessData.toJson()));
+          },
+          child: business_controller().businessList[index],
+        );
       });
 }
 
