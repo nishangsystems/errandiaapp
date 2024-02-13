@@ -496,7 +496,7 @@ Widget Categories_List_Widget() {
 
 Widget Featured_Businesses_List() {
   return FutureBuilder(
-      future: api().bussiness('shops', 1),
+      future: api().business('shops', 1),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Container(

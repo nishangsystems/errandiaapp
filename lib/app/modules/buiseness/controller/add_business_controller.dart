@@ -16,7 +16,7 @@ class add_business_controller extends GetxController{
   TextEditingController twitter_controller= TextEditingController();
   TextEditingController add_manager_first_name_controller= TextEditingController();
   TextEditingController add_manager_last_name_controller= TextEditingController();
-  
+  TextEditingController phone_controller= TextEditingController();
   
   RxList<String> managerList=[
     'Abhishek',

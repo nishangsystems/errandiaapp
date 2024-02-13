@@ -89,12 +89,12 @@ class api {
     var token = prefs.getString('token');
 
     final response =
-        await http.get(Uri.parse('${apiDomain().domain}/categories'),
-            headers: ({
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token'
-            }));
+    await http.get(Uri.parse('${apiDomain().domain}/categories'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (kDebugMode) {
@@ -123,10 +123,8 @@ class api {
     }
   }
 
-  Future bussiness(
-    String url,
-    int value,
-  ) async {
+  Future business(String url,
+      int value,) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token;
     if (value == 1) {
@@ -145,10 +143,8 @@ class api {
     }
   }
 
-  Future getProduct(
-    String url,
-    int value,
-  ) async {
+  Future getProduct(String url,
+      int value,) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token;
     if (value == 1) {
@@ -259,8 +255,7 @@ class api {
       // customSnackBar(Text('${data['message']}'));
 
       return data;
-
-      } else {
+    } else {
       var da = jsonDecode(response.body);
       await alertDialogBox(context, 'Alert', '${da['data']['message']}');
     }
@@ -279,8 +274,8 @@ class api {
     // Add image file to the request
     request.files.add(
       await http.MultipartFile.fromPath(
-        'image',
-        image.path
+          'image',
+          image.path
       ),
     );
 
@@ -299,7 +294,7 @@ class api {
     var responseData = jsonDecode(responseBody);
 
     if (kDebugMode) {
-      print("upload profile image response: ${responseBody}");
+      print("upload profile image response: $responseBody");
     }
     if (response.statusCode == 400) {
       if (kDebugMode) {
@@ -319,4 +314,5 @@ class api {
       return null;
     }
   }
+
 }

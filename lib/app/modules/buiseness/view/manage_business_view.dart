@@ -131,7 +131,7 @@ class manage_business_view extends StatelessWidget {
 
 Widget allBusiness() {
  return FutureBuilder(
-    future: api().bussiness('shops', 1),
+    future: api().business('shops', 1),
       builder: (context, snapshot){
     if(snapshot.hasError){
       return Center(child: CircularProgressIndicator(),);

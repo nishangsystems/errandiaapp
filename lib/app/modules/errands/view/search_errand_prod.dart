@@ -771,7 +771,7 @@ Widget allProducts(BuildContext ctx) {
           ).paddingSymmetric(horizontal: 20),
         ),
         FutureBuilder(
-            future: api().bussiness('shops', 1),
+            future: api().business('shops', 1),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Container(
@@ -1299,7 +1299,7 @@ Widget Trashed(BuildContext ctx) {
           ),
         ),
         FutureBuilder(
-          future: api().bussiness('shops', 1),
+          future: api().business('shops', 1),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Container(

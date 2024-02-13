@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:errandia/app/APi/business.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
@@ -19,10 +21,6 @@ import '../../global/Widgets/blockButton.dart';
 import '../controller/add_business_controller.dart';
 import 'manage_business_view.dart';
 
-business_controller controller = Get.put(business_controller());
-add_business_controller add_controller = Get.put(add_business_controller());
-imagePickercontroller imageController = Get.put(imagePickercontroller());
-
 class add_business_view extends StatefulWidget {
   add_business_view({super.key});
 
@@ -31,6 +29,12 @@ class add_business_view extends StatefulWidget {
 }
 
 class _add_business_viewState extends State<add_business_view> {
+  final business_controller controller = Get.put(business_controller());
+  final add_business_controller add_controller =
+      Get.put(add_business_controller());
+  final imagePickercontroller imageController =
+      Get.put(imagePickercontroller());
+
   var country;
   var value = null;
   var regionCode;
@@ -39,107 +43,7 @@ class _add_business_viewState extends State<add_business_view> {
   List<int> selectedFilters_ = [];
   var town;
 
-  Future<void> PanDocumentInfoupload(String title, description, websiteAddress,
-      address, facebook, instagram, twitter, businessInfo) async {
-    // var file;
-    // // Create a MultipartRequest
-    // final SharedPreferences prefs = await SharedPreferences.getInstance();
-    // var token = prefs.getString('token');
-    // var uri = Uri.parse('${apiDomain().domain}errands?image_count=${imageController.imageList.length}');
-    // var request = http.MultipartRequest("POST", uri)
-    //   ..headers['Authorization'] = 'Bearer $token';
-    // for (int i =0; i < imageController.imageList.length; i++) {
-    //   for (var image in imageController.imageList) {
-    //     request.files.add(
-    //       await http.MultipartFile.fromPath(
-    //         'image_${i + 1}', // Field name for each image
-    //         image.path,
-    //       ),
-    //     );
-    //   }
-    // }
-    //
-    // request.fields['title'] =  '$title';
-    // request.fields['description'] =  '$description';
-    // request.fields['categories'] =  '$category';
-    // request.fields['street'] =  '$streetid';
-    // request.fields['town'] =  '$townid';
-    // request.fields['region'] =  '$regionid';
-    // // Send the request
-    // try {
-    //   var response = await request.send();
-    //   if (response.statusCode == 200) {
-    //     Get.offAll(errand_view());
-    //     setState(() {
-    //       isLoading = false;
-    //       imageController.imageList.clear();
-    //     });
-    //     // Handle the API response here
-    //   } else {
-    //     print('Failed to upload images. Status code: ${response.statusCode}');
-    //   }
-    // } catch (e) {
-    //   print('Error uploading images: $e');
-    // }
-    //
-    var file = selectedFilters_[0].toString();
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      var token = prefs.getString('token');
-
-      for (int i = 1; i < selectedFilters_.length; i++) {
-        file = "$file,${selectedFilters_[i]}";
-      }
-      if (kDebugMode) {
-        print(file);
-      }
-      var uri = Uri.parse(
-          '${apiDomain().domain}shops?name=$title}&description=$description &is_branch=${controller.headmainSwitch.value}&parent_slug&slogan=$businessInfo &street_id=${country}&phone&whatsapp=whatsapp&address=${address}&facebook=${facebook}&instagram=$instagram&website=$websiteAddress&email&categories=${file}'); // Replace with your server's endpoint
-
-      var request = http.MultipartRequest("POST", uri)
-        ..headers['Authorization'] = 'Bearer $token';
-      // Add images to the request
-
-      if (imageController.image_path.toString() != '') {
-        request.files.add(await http.MultipartFile.fromPath(
-            'image', imageController.image_path.toString()));
-      }
-      // request.fields['name'] =  '$title';
-      // request.fields['description'] =  '$description';
-      // request.fields['categories'] =  '$selectedFilters';
-      // request.fields['street_id'] =  '$country';
-      // request.fields['town'] =  '$townid';
-      // request.fields['region'] =  '$regionid';
-      // request.fields['address'] =  '$streetid';
-      // request.fields['facebook'] =  '$townid';
-      // request.fields['instagram'] =  '$regionid';
-      // request.fields['website'] =  '$twitter';
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        final res = await http.Response.fromStream(response);
-        var rest = jsonDecode(res.body);
-        setState(() {
-          isLoading = false;
-        });
-        Get.offAll(() => manage_business_view());
-        add_controller.company_name_controller.clear();
-        add_controller.Business_information_controller.clear();
-        add_controller.website_address_controller.clear();
-        add_controller.address_controller.clear();
-        add_controller.facebook_controller.clear();
-        add_controller.instagram_controller.clear();
-        add_controller.twitter_controller.clear();
-        // imageController.image_path.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${rest['data']['message']}')));
-      } else {
-        // alertBoxdialogBox(context, 'Alert', 'P')
-        print("Failed to upload images. Status code: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
+  void categoriesSelected() {}
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +52,7 @@ class _add_business_viewState extends State<add_business_view> {
         elevation: 0,
         backgroundColor: Colors.white,
         titleSpacing: 8,
-        title: Text('Add Business'),
+        title: const Text('Add Business'),
         titleTextStyle: TextStyle(
             fontWeight: FontWeight.bold,
             color: appcolor().mediumGreyColor,
@@ -159,8 +63,8 @@ class _add_business_viewState extends State<add_business_view> {
           onPressed: () {
             Get.back();
           },
-          icon: Icon(Icons.arrow_back_ios),
-          color: appcolor().greyColor,
+          icon: const Icon(Icons.arrow_back_ios),
+          color: appcolor().mediumGreyColor,
         ),
         actions: [
           TextButton(
@@ -181,15 +85,109 @@ class _add_business_viewState extends State<add_business_view> {
                 var businessInfo = add_controller
                     .Business_information_controller.text
                     .toString();
+                var phone = add_controller.phone_controller.text.toString();
+                var categories =
+                    add_controller.Business_category_controller.text.toString();
 
                 if (name == '' || description == '' || country == null) {
                   alertDialogBox(context, "Alert", 'Please Enter Fields');
                 } else {
+                  var file = selectedFilters_[0].toString();
+
+                  for (int i = 1; i < selectedFilters_.length; i++) {
+                    file = "$file,${selectedFilters_[i]}";
+                  }
+                  if (kDebugMode) {
+                    print("logo to upload: $file");
+                  }
+
                   setState(() {
                     isLoading = true;
                   });
-                  PanDocumentInfoupload(name, description, websiteAddress,
-                      address, facebook, instagram, twitter, businessInfo);
+
+                  var value = {
+                    "name": name,
+                    "description": description,
+                    "is_branch": controller.headmainSwitch.value,
+                    "slogan": businessInfo,
+                    "street_id": country,
+                    "phone": phone,
+                    "whatsapp": "whatsapp",
+                    // "image_path": imageController.image_path.toString(),
+                    "address": address,
+                    "facebook": facebook,
+                    "instagram": instagram,
+                    "twitter": twitter,
+                    "website": websiteAddress,
+                    "categories": categories
+                  };
+
+                  PopupBox popup;
+                  var response;
+
+                  // check if logo image is empty
+                  if (imageController.image_path.toString() == '') {
+                    BusinessAPI.createBusiness(value, context)
+                        .then((response_) => {
+                              response = jsonDecode(response_),
+                              print("added business: $response"),
+                              if (response['status'] == 'success')
+                                {
+                                  popup = PopupBox(
+                                    title: 'Success',
+                                    description: response['data']['message'],
+                                    type: PopupType.success,
+                                  )
+                                }
+                              else
+                                {
+                                  popup = PopupBox(
+                                    title: 'Error',
+                                    description: response['data']['data']
+                                        ['error'],
+                                    type: PopupType.error,
+                                  )
+                                },
+                              Future.delayed(const Duration(seconds: 3), () {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }),
+                              popup.showPopup(context),
+                            });
+                  } else {
+                    print(
+                        "image path: ${imageController.image_path.toString()}");
+                    BusinessAPI.createBusinessWithImageLogo(value, context,
+                            imageController.image_path.toString())
+                        .then((response_) => {
+                              response = jsonDecode(response_),
+                              print("added business: $response"),
+                              if (response['status'] == 'success')
+                                {
+                                  popup = PopupBox(
+                                    title: 'Success',
+                                    description: response['data']['message'],
+                                    type: PopupType.success,
+                                  )
+                                }
+                              else
+                                {
+                                  popup = PopupBox(
+                                    title: 'Error',
+                                    description: response['data']['data']
+                                        ['error'],
+                                    type: PopupType.error,
+                                  )
+                                },
+                              Future.delayed(const Duration(seconds: 3), () {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }),
+                              popup.showPopup(context),
+                            });
+                  }
                 }
               },
               child: isLoading == false
@@ -289,37 +287,35 @@ class _add_business_viewState extends State<add_business_view> {
                         itemCount: subCetegoryData.Items.length,
                         itemBuilder: (context, index) {
                           var data = subCetegoryData.Items[index];
+                          print("subCat data: $data");
                           return Padding(
                             padding: const EdgeInsets.all(5.0),
-                            child: Container(
-                              child: Wrap(
-                                direction: Axis.vertical,
-                                spacing: 20.0, // gap between adjacent chips
-                                runSpacing: 4.0, // gap between lines
-                                children: <Widget>[
-                                  InputChip(
-                                    label: Text('${data.name}'),
-                                    selectedColor: Colors.green,
-                                    selected:
-                                        selectedFilters.contains(data.name),
-                                    onSelected: (value) {
-                                      setState(() {
-                                        if (value) {
-                                          selectedFilters
-                                              .add(data.name.toString());
-                                          selectedFilters_.add(
-                                              int.parse(data.id.toString()));
-                                        } else if (!value) {
-                                          selectedFilters
-                                              .remove(data.name.toString());
-                                          selectedFilters_.remove(
-                                              int.parse(data.id.toString()));
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
+                            child: Wrap(
+                              direction: Axis.vertical,
+                              spacing: 20.0, // gap between adjacent chips
+                              runSpacing: 4.0, // gap between lines
+                              children: <Widget>[
+                                InputChip(
+                                  label: Text('${data.name}'),
+                                  selectedColor: Colors.green,
+                                  selected: selectedFilters.contains(data.name),
+                                  onSelected: (value) {
+                                    setState(() {
+                                      if (value) {
+                                        selectedFilters
+                                            .add(data.name.toString());
+                                        selectedFilters_
+                                            .add(int.parse(data.id.toString()));
+                                      } else if (!value) {
+                                        selectedFilters
+                                            .remove(data.name.toString());
+                                        selectedFilters_.remove(
+                                            int.parse(data.id.toString()));
+                                      }
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
                           );
                         }),
@@ -615,6 +611,38 @@ class _add_business_viewState extends State<add_business_view> {
               height: 1,
               indent: 0,
             ),
+            // phone number
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+              child: TextFormField(
+                controller: add_controller.phone_controller,
+                keyboardType: TextInputType.phone,
+                maxLength: 9,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  prefixIcon: Icon(
+                    Icons.phone,
+                    color: Colors.black,
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.black,
+                  ),
+                  hintText: 'Phone Number *',
+                  counterText: '',
+                  suffixIcon: Icon(
+                    color: Colors.black,
+                    Icons.edit,
+                  ),
+                ),
+              ),
+            ),
+            Divider(
+              color: appcolor().greyColor,
+              thickness: 1,
+              height: 1,
+              indent: 0,
+            ),
+
             // shop head
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
