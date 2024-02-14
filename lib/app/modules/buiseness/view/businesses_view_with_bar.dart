@@ -340,7 +340,7 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                               return InkWell(
                                 onTap: () {
                                   Get.to(() => errandia_business_view(
-                                    index: index,
+                                    businessData: business,
                                   ));
                                 },
                                 child: Container(

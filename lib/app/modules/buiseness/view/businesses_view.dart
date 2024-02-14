@@ -280,7 +280,7 @@ class Businesses_View extends StatelessWidget {
           Expanded(
             child: GridView.builder(
               itemCount: business_controller().businessList.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 1 / 1.7,
                 crossAxisSpacing: 6,
@@ -289,12 +289,12 @@ class Businesses_View extends StatelessWidget {
               itemBuilder: (context, index) {
                 return InkWell(
                   onTap: () {
-                    Get.to(errandia_business_view(
-                      index: index,
-                    ));
+                    // Get.to(errandia_business_view(
+                    //   businessData: ,
+                    // ));
                   },
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       // border: Border.all(color: appcolor().greyColor)
                     ),

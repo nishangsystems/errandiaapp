@@ -47,7 +47,9 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
               children: [
                 InkWell(
                   onTap: () {
-                    Get.to(() => errandia_business_view(index: 2));
+                    Get.to(() => errandia_business_view(
+                      businessData: widget.service,
+                    ));
                   },
                   child: const Column(
                     mainAxisAlignment: MainAxisAlignment.end,

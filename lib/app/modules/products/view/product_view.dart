@@ -50,7 +50,9 @@ class _Product_viewState extends State<Product_view>
             children: [
               InkWell(
                 onTap: () {
-                  Get.to(() => errandia_business_view(index: 3));
+                  Get.to(() => errandia_business_view(
+                    businessData: widget.item,
+                  ));
                 },
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.end,

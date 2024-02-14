@@ -526,7 +526,9 @@ Widget Featured_Businesses_List() {
                 print("sub data: ${data['street']}");
                 return InkWell(
                   onTap: () {
-                    Get.to(() => errandia_business_view(index: index));
+                    Get.to(() => errandia_business_view(
+                      businessData: data)
+                    );
                   },
                   child: Container(
                     margin:

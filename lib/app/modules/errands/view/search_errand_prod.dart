@@ -10,6 +10,7 @@ import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
 import 'package:errandia/app/modules/services/view/service_details_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -792,11 +793,11 @@ Widget allProducts(BuildContext ctx) {
                     scrollDirection: Axis.horizontal,
                     itemCount: 4,
                     itemBuilder: (context, index) {
-                      // var data = snapshot.data[index];
-                      var data = business_controller().businessList[index];
+                      var data = snapshot.data[index];
                       return InkWell(
                         onTap: () {
-                          Get.to(errandia_business_view(index: index));
+                          Get.to(errandia_business_view(
+                            businessData: data,));
                         },
                         child: Card(
                           shadowColor: Colors.transparent,
@@ -810,20 +811,9 @@ Widget allProducts(BuildContext ctx) {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Center(
-                                      // child: Image(
-                                      //   image: NetworkImage(
-                                      //     data['image'] != ''
-                                      //         ? data['image'].toString()
-                                      //         : Featured_Businesses_Item_List[index]
-                                      //         .imagePath
-                                      //         .toString(),
-                                      //   ),
-                                      //   fit: BoxFit.cover,
-                                      // ),
-                                      child: Image(
-                                    image: AssetImage(
-                                      data.imagepath,
-                                    ),
+                                      child: Image.network(
+                                    getImagePath(data.imagepath.toString()
+                                      ),
                                     fit: BoxFit.fill,
                                     height: Get.height * 0.15,
                                   )),
@@ -1318,12 +1308,13 @@ Widget Trashed(BuildContext ctx) {
                 physics: const NeverScrollableScrollPhysics(),
                 children:
                 List.generate(profile_controller().service_list.length, (index) {
-                  // var data = snapshot.data[index];
-                  var item = business_controller().businessList[index];
+                  var item = snapshot.data[index];
                   print("item: $item");
                   return InkWell(
                     onTap: () {
-                      Get.to(() => errandia_business_view(index: index));
+                      Get.to(() => errandia_business_view(
+                        businessData: item)
+                      );
                     },
                     child: Card(
                       shadowColor: Colors.transparent,
@@ -1339,10 +1330,8 @@ Widget Trashed(BuildContext ctx) {
                               height: Get.height * 0.02,
                             ),
                             Center(
-                              child: Image(
-                                image: AssetImage(
-                                  item.imagepath.toString(),
-                                ),
+                              child: Image.network(
+                                getImagePath(item.image.toString()),
                                 fit: BoxFit.fill,
                                 height: Get.height * 0.15,
                               ),
