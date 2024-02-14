@@ -128,7 +128,7 @@ class _VisitShopState extends State<VisitShop> {
                   // fb
                   InkWell(
                     onTap: () async {
-                      controller.mylaunchUrl('www.bmdu.net');
+                      controller.myLaunchUrl('www.bmdu.net');
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -149,7 +149,7 @@ class _VisitShopState extends State<VisitShop> {
                   // insta
                   InkWell(
                     onTap: () async {
-                      controller.mylaunchUrl('www.google.com');
+                      controller.myLaunchUrl('www.google.com');
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -170,7 +170,7 @@ class _VisitShopState extends State<VisitShop> {
                   // twitter
                   InkWell(
                     onTap: () async {
-                      controller.mylaunchUrl('www.instagram.com');
+                      controller.myLaunchUrl('www.instagram.com');
                     },
                     child: Container(
                       decoration: BoxDecoration(

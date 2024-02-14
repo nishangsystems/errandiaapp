@@ -11,6 +11,7 @@ import 'package:http_parser/http_parser.dart';
 
 class apiDomain {
   final domain = 'https://errandia.com/api';
+  final imageDomain = 'https://errandia.com';
 }
 
 class api {
@@ -120,26 +121,6 @@ class api {
       final data = jsonDecode(response.body);
       // print(data);
       return data['data'];
-    }
-  }
-
-  Future business(String url,
-      int value,) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token;
-    if (value == 1) {
-      token = prefs.getString('token');
-    }
-    final response = await http.get(Uri.parse('${apiDomain().domain}/$url'),
-        headers: ({
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token'
-        }));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print('shops response: $data');
-      return data['data']['items'];
     }
   }
 

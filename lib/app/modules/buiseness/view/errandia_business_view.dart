@@ -317,7 +317,7 @@ class errandia_business_view extends StatelessWidget {
                     // fb
                     InkWell(
                       onTap: ()async{
-                        controller.mylaunchUrl('www.bmdu.net');
+                        controller.myLaunchUrl('www.bmdu.net');
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -338,7 +338,7 @@ class errandia_business_view extends StatelessWidget {
                     // insta
                     InkWell(
                       onTap: () async {
-                        controller.mylaunchUrl('www.google.com');
+                        controller.myLaunchUrl('www.google.com');
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -359,7 +359,7 @@ class errandia_business_view extends StatelessWidget {
                     // twitter
                     InkWell(
                       onTap: ()async{
-                        controller.mylaunchUrl('www.instagram.com');
+                        controller.myLaunchUrl('www.instagram.com');
                       },
                       child: Container(
                         decoration: BoxDecoration(

@@ -103,4 +103,50 @@ class BusinessAPI {
       return jsonEncode({"status": "error", "data": responseData});
     }
   }
+
+  // get featured businesses
+  static Future businesses(int page) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.get(Uri.parse('${apiDomain().domain}/shops?page=$page'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print('shops response: $data');
+      }
+      return data['data']['items'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
+
+  // get business list
+  static Future businessList(int page) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.get(Uri.parse('${apiDomain().domain}/shops?page=$page'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print('shops list response: $data');
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
 }

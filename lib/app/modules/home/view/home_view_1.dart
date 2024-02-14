@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -192,6 +194,7 @@ class _home_view_1State extends State<home_view_1> {
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey =
         GlobalKey<ScaffoldState>(); // ADD THIS LINE
+    home_controller().atbusiness.value = false;
 
     Future<void> locationPermission() async {
       var status = await Permission.location.request();
@@ -207,7 +210,6 @@ class _home_view_1State extends State<home_view_1> {
       }
     }
 
-    home_controller().atbusiness.value = false;
     return Stack(
       children: [
         Image(
@@ -496,7 +498,7 @@ Widget Categories_List_Widget() {
 
 Widget Featured_Businesses_List() {
   return FutureBuilder(
-      future: api().business('shops', 1),
+      future: BusinessAPI.businesses(1),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Container(
@@ -542,8 +544,11 @@ Widget Featured_Businesses_List() {
                           width: Get.width ,
                           color: appcolor().lightgreyColor,
                           child: Image(
-                            image: AssetImage(Featured_Businesses_Item_List[index]
-                                .imagePath),
+                            image: NetworkImage(
+                              data['image'] != ''
+                                  ? getImagePath(data['image'].toString())
+                                  : 'https://errandia.com/assets/images/logo-default.png'
+                            ),
                             fit: BoxFit.fill,
                             height: Get.height * 0.15,
                             // width: Get.width * 0.3,
@@ -553,9 +558,7 @@ Widget Featured_Businesses_List() {
                           height: Get.height * 0.009,
                         ),
                         Text(
-                          Featured_Businesses_Item_List[index]
-                              .servicetype
-                              .toString(),
+                         data['category']['name'].toString(),
                           style: TextStyle(
                               fontSize: 12,
                               // fontWeight: FontWeight.bold,

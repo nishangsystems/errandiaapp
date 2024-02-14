@@ -1,4 +1,5 @@
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/featured_buiseness/view/featured_list_item.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
@@ -771,7 +772,7 @@ Widget allProducts(BuildContext ctx) {
           ).paddingSymmetric(horizontal: 20),
         ),
         FutureBuilder(
-            future: api().business('shops', 1),
+            future: BusinessAPI.businesses(1),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Container(
@@ -1299,7 +1300,7 @@ Widget Trashed(BuildContext ctx) {
           ),
         ),
         FutureBuilder(
-          future: api().business('shops', 1),
+          future: BusinessAPI.businesses(1),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Container(

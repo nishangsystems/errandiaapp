@@ -1,4 +1,5 @@
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
@@ -131,7 +132,7 @@ class manage_business_view extends StatelessWidget {
 
 Widget allBusiness() {
  return FutureBuilder(
-    future: api().business('shops', 1),
+    future: BusinessAPI.businesses(1),
       builder: (context, snapshot){
     if(snapshot.hasError){
       return Center(child: CircularProgressIndicator(),);
