@@ -184,7 +184,7 @@ class _home_view_1State extends State<home_view_1> {
     super.initState();
     CountryData();
     RegionData();
-    TownData();
+    // TownData();
     Country();
     street();
     subCategoryData();
@@ -579,7 +579,7 @@ Widget Featured_Businesses_List() {
                         SizedBox(
                           height: Get.height * 0.001,
                         ),
-                        data['street'] != '' ? Row(
+                        (data['street'] != '' && data['street'] != null) ? Row(
                           children: [
                              Icon(
                               Icons.location_on,
@@ -590,7 +590,7 @@ Widget Featured_Businesses_List() {
                               width: 1,
                             ),
                             Text(
-                              data['street'],
+                              data['street'].toString(),
                               style: const TextStyle(fontSize: 12),
                             )
                           ],

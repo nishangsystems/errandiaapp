@@ -45,7 +45,7 @@ class BusinessAPI {
 
   // create business with imageLogo upload
   static Future createBusinessWithImageLogo(
-      Map<String, dynamic> value, context, String imagePath) async {
+      Map<String, String> value, context, String imagePath) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
 
@@ -58,19 +58,7 @@ class BusinessAPI {
       'Authorization': 'Bearer $token',
     });
 
-    request.fields['name'] = value['name'];
-    request.fields['description'] = value['description'];
-    request.fields['is_branch'] = value['is_branch'].toString();
-    request.fields['slogan'] = value['slogan'];
-    request.fields['street_id'] = value['street_id'].toString();
-    request.fields['phone'] = value['phone'];
-    request.fields['whatsapp'] = value['whatsapp'];
-    request.fields['facebook'] = value['facebook'];
-    request.fields['instagram'] = value['instagram'];
-    request.fields['twitter'] = value['twitter'];
-    request.fields['address'] = value['address'];
-    request.fields['website'] = value['website'];
-    request.fields['categories'] = value['categories'];
+    request.fields.addAll(value);
 
     if (await File(imagePath).exists()) {
       request.files.add(await http.MultipartFile.fromPath('image', imagePath));

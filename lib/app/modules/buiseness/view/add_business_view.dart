@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
+import 'package:errandia/modal/category.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
@@ -42,8 +43,13 @@ class _add_business_viewState extends State<add_business_view> {
   List<String> selectedFilters = [];
   List<int> selectedFilters_ = [];
   var town;
+  var category;
 
-  void categoriesSelected() {}
+  @override
+  void initState() {
+    super.initState();
+    add_controller.loadCategories();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,13 +92,13 @@ class _add_business_viewState extends State<add_business_view> {
                     .Business_information_controller.text
                     .toString();
                 var phone = add_controller.phone_controller.text.toString();
-                var categories =
-                    add_controller.Business_category_controller.text.toString();
+                // var categories =
+                //     add_controller.Business_category_controller.text.toString();
 
-                if (name == '' || description == '' || country == null) {
+                if (name == '' || description == '') {
                   alertDialogBox(context, "Alert", 'Please Enter Fields');
                 } else {
-                  var file = selectedFilters_[0].toString();
+                  var file = "";
 
                   for (int i = 1; i < selectedFilters_.length; i++) {
                     file = "$file,${selectedFilters_[i]}";
@@ -108,18 +114,18 @@ class _add_business_viewState extends State<add_business_view> {
                   var value = {
                     "name": name,
                     "description": description,
-                    "is_branch": controller.headmainSwitch.value,
                     "slogan": businessInfo,
-                    "street_id": country,
                     "phone": phone,
                     "whatsapp": "whatsapp",
+                    "category_id": category.toString(),
                     // "image_path": imageController.image_path.toString(),
-                    "address": address,
+                    "street": address,
                     "facebook": facebook,
                     "instagram": instagram,
                     "twitter": twitter,
                     "website": websiteAddress,
-                    "categories": categories
+                    "region_id": regionCode.toString(),
+                    "town_id": town.toString(),
                   };
 
                   PopupBox popup;
@@ -256,71 +262,50 @@ class _add_business_viewState extends State<add_business_view> {
               indent: 0,
             ),
 
-            // Business categories
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-              child: TextFormField(
-                readOnly: true,
-                controller: add_controller.Business_category_controller,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    color: Colors.black,
-                    Icons.category,
-                  ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.only(left: 12, right: 0),
+                child: const Icon(
+                  Icons.category,
+                  color: Colors.black,
+                ),
+              ),
+              trailing: Container(
+                padding: const EdgeInsets.only(left: 0, right: 12),
+                child: const Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  color: Colors.black,
+                ),
+              ),
+              contentPadding: EdgeInsets.zero,
+              title: DropdownButtonFormField(
+                iconSize: 0.0,
+                isDense: true,
+                isExpanded: true,
+                padding: EdgeInsets.zero,
+                decoration: const InputDecoration.collapsed(
+                  hintText: 'Business Category *',
                   hintStyle: TextStyle(
                     color: Colors.black,
                   ),
-                  hintText: 'Business Categories *',
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
                 ),
+                value: value,
+                onChanged: (value) {
+                  setState(() {
+                    category = value as int;
+                  });
+                  print("category_id: $category");
+                },
+                items: categor.Items.map((e) => DropdownMenuItem(
+                      value: e.id,
+                      child: Text(
+                        e.name.toString(),
+                        style:
+                            const TextStyle(fontSize: 15, color: Colors.black),
+                      ),
+                    )).toList(),
               ),
             ),
-            subCetegoryData.Items.isNotEmpty
-                ? SizedBox(
-                    height: 70,
-                    child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: subCetegoryData.Items.length,
-                        itemBuilder: (context, index) {
-                          var data = subCetegoryData.Items[index];
-                          print("subCat data: $data");
-                          return Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Wrap(
-                              direction: Axis.vertical,
-                              spacing: 20.0, // gap between adjacent chips
-                              runSpacing: 4.0, // gap between lines
-                              children: <Widget>[
-                                InputChip(
-                                  label: Text('${data.name}'),
-                                  selectedColor: Colors.green,
-                                  selected: selectedFilters.contains(data.name),
-                                  onSelected: (value) {
-                                    setState(() {
-                                      if (value) {
-                                        selectedFilters
-                                            .add(data.name.toString());
-                                        selectedFilters_
-                                            .add(int.parse(data.id.toString()));
-                                      } else if (!value) {
-                                        selectedFilters
-                                            .remove(data.name.toString());
-                                        selectedFilters_.remove(
-                                            int.parse(data.id.toString()));
-                                      }
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                  )
-                : const Center(child: CircularProgressIndicator()),
             Divider(
               color: appcolor().greyColor,
               thickness: 1,
@@ -644,33 +629,33 @@ class _add_business_viewState extends State<add_business_view> {
             ),
 
             // shop head
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-              child: Row(
-                children: [
-                  const Text(
-                    'Shop Head/Main Office *',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  Spacer(),
-                  Obx(
-                    () => SizedBox(
-                      width: Get.width * 0.2,
-                      child: FittedBox(
-                        fit: BoxFit.fill,
-                        child: Switch(
-                          value: controller.headmainSwitch.value,
-                          onChanged: (val) {
-                            controller.headmainSwitch.value = val;
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Text('Active')
-                ],
-              ),
-            ),
+            // Container(
+            //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            //   child: Row(
+            //     children: [
+            //       const Text(
+            //         'Shop Head/Main Office *',
+            //         style: TextStyle(fontSize: 15),
+            //       ),
+            //       Spacer(),
+            //       Obx(
+            //         () => SizedBox(
+            //           width: Get.width * 0.2,
+            //           child: FittedBox(
+            //             fit: BoxFit.fill,
+            //             child: Switch(
+            //               value: controller.headmainSwitch.value,
+            //               onChanged: (val) {
+            //                 controller.headmainSwitch.value = val;
+            //               },
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       const Text('Active')
+            //     ],
+            //   ),
+            // ),
             Divider(
               color: appcolor().greyColor,
               thickness: 1,
@@ -699,36 +684,51 @@ class _add_business_viewState extends State<add_business_view> {
               indent: 0,
             ),
 
-            // country
+            // regions
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.only(left: 15, right: 0),
+                child: const Icon(
+                  FontAwesomeIcons.earthAmericas,
+                  color: Colors.black,
+                ),
+              ),
+              trailing: Container(
+                padding: const EdgeInsets.only(left: 0, right: 15),
+                child: const Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  color: Colors.black,
+                ),
+              ),
+              contentPadding: EdgeInsets.zero,
+              title: DropdownButtonFormField(
 
-            ListTile(
-              leading: const Icon(
-                FontAwesomeIcons.earthAmericas,
-              ),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
-              ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 10, bottom: 10),
-                child: DropdownButtonFormField(
-                  iconSize: 0.0,
-                  decoration: const InputDecoration.collapsed(
-                    hintText: 'Region',
+                iconSize: 0.0,
+                padding: EdgeInsets.zero,
+                isDense: true,
+                isExpanded: true,
+                decoration: const InputDecoration.collapsed(
+                  hintText: 'Region *',
+                  hintStyle: TextStyle(
+                    color: Colors.black,
                   ),
-                  value: value,
-                  onChanged: (value) {
-                    setState(() {
-                      regionCode = value as int;
-                    });
-                  },
-                  items: Regions.Items.map((e) => DropdownMenuItem(
-                        child: Text(
-                          e.name.toString(),
-                          style: TextStyle(fontSize: 11),
-                        ),
-                        value: e.id,
-                      )).toList(),
                 ),
+                value: value,
+                onChanged: (value) async {
+                  setState(() {
+                    regionCode = value as int;
+                  });
+                  print("regionCode: $regionCode");
+                   add_controller.loadTownsData(regionCode);
+                },
+                items: Regions.Items.map((e) => DropdownMenuItem(
+                      value: e.id,
+                      child: Text(
+                        e.name.toString(),
+                        style:
+                            const TextStyle(fontSize: 15, color: Colors.black),
+                      ),
+                    )).toList(),
               ),
             ),
             Divider(
@@ -738,33 +738,62 @@ class _add_business_viewState extends State<add_business_view> {
               indent: 0,
             ),
             ListTile(
-              leading: const Icon(
-                FontAwesomeIcons.locationCrosshairs,
+              leading: Container(
+                padding: const EdgeInsets.only(left: 15, right: 0),
+                child:  Icon(
+                  FontAwesomeIcons.city,
+                  color: regionCode == null
+                      ? Colors.grey
+                      : Colors.black
+                ),
               ),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
+              trailing: Container(
+                padding: const EdgeInsets.only(left: 0, right: 15),
+                child:  Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  color: regionCode == null
+                      ? Colors.grey
+                      : Colors.black
+                ),
               ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 10, bottom: 10),
-                child: DropdownButtonFormField(
-                  iconSize: 0.0,
-                  decoration: const InputDecoration.collapsed(
-                    hintText: 'Town',
-                  ),
-                  value: value,
-                  onChanged: (value) {
-                    setState(() {
-                      town = value as int;
-                    });
-                  },
-                  items: Towns.Items.map((e) => DropdownMenuItem(
+              contentPadding: EdgeInsets.zero,
+              title: Obx(
+                  () {
+                    if (add_controller.isTownsLoading.value) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    return DropdownButtonFormField(
+                      iconSize: 0.0,
+                      isDense: true,
+                      isExpanded: true,
+                      padding: EdgeInsets.zero,
+                      decoration:  InputDecoration.collapsed(
+                        hintText: 'Town *',
+                        hintStyle: TextStyle(
+                            color: regionCode == null
+                                ? Colors.grey
+                                : Colors.black
+                        ),
+                      ),
+                      value: value,
+                      onChanged: (value) {
+                        setState(() {
+                          town = value as int;
+                        });
+                        print("townId: $town");
+                      },
+                      items: Towns.Items.map((e) => DropdownMenuItem(
+                        value: e.id,
                         child: Text(
                           e.name.toString(),
-                          style: TextStyle(fontSize: 11),
+                          style:
+                          const TextStyle(fontSize: 15, color: Colors.black),
                         ),
-                        value: e.id,
                       )).toList(),
-                ),
+                    );
+                  }
               ),
             ),
             Divider(
@@ -773,48 +802,13 @@ class _add_business_viewState extends State<add_business_view> {
               height: 1,
               indent: 0,
             ),
-            ListTile(
-              leading: const Icon(FontAwesomeIcons.locationArrow),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
-              ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 10, bottom: 10),
-                child: DropdownButtonFormField(
-                  iconSize: 0.0,
-                  decoration:
-                      const InputDecoration.collapsed(hintText: 'Street'),
-                  value: value,
-                  onChanged: (value) {
-                    setState(() {
-                      country = value as int;
-                    });
-                  },
-                  items: Street.Items.map((e) => DropdownMenuItem(
-                        child: Text(
-                          e.name.toString(),
-                          style: TextStyle(fontSize: 11),
-                        ),
-                        value: e.id,
-                      )).toList(),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
+
 
             // address
-            SizedBox(
-              height: Get.height * 0.2,
-              // padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
               child: TextFormField(
                 controller: add_controller.address_controller,
-                minLines: 1,
-                maxLines: 4,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
@@ -824,7 +818,7 @@ class _add_business_viewState extends State<add_business_view> {
                   hintStyle: TextStyle(
                     color: Colors.black,
                   ),
-                  hintText: 'Address *',
+                  hintText: 'Street *',
                   suffixIcon: Icon(
                     color: Colors.black,
                     Icons.edit,

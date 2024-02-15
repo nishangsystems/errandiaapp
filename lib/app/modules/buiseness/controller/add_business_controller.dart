@@ -1,3 +1,6 @@
+import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/modal/Town.dart';
+import 'package:errandia/modal/category.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 class add_business_controller extends GetxController{
@@ -26,6 +29,11 @@ class add_business_controller extends GetxController{
     'Achal',
   ].obs;
   var group_value= 'Abhishek'.obs;
+  var categoryList = List<dynamic>.empty(growable: true).obs;
+
+  RxBool isRegionSelected = false.obs;
+  RxBool isTownsLoading = false.obs;
+
   void add_Manager(String manager)
   {
     managerList.add(manager);
@@ -37,6 +45,38 @@ class add_business_controller extends GetxController{
     // add_manager_first_name_controller.dispose();
     // add_manager_last_name_controller.dispose();
   }
+
+  void loadCategories() async {
+    var data = await api().getCategories();
+    print("categories data: $data");
+    if (data != null && data.isNotEmpty) {
+      categoryList.addAll(data);
+    }
+    categor.Items = List.from(data)
+        .map<Caegory>((category) => Caegory.fromJson(category))
+        .toList();
+    print("categoryList: $categoryList");
+  }
+
+  void loadTownsData(regionId) async {
+    isTownsLoading.value = true;
+    var data = await api().getTownsByRegion(regionId);
+    print("towns data: $data");
+
+    isTownsLoading.value = false;
+    // empty previous towns items
+    Towns.Items.clear();
+
+    if (data != null && data.isNotEmpty) {
+      Towns.Items = List.from(data)
+          .map<Town>((town) => Town.fromJson(town))
+          .toList();
+    }
+
+    update();
+    print("towns: $Towns.Items");
+  }
+
   void remove_Manager (String manager)
   {
     managerList.remove(manager);

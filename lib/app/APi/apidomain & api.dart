@@ -296,4 +296,50 @@ class api {
     }
   }
 
+  // get all categories
+  Future getCategories() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response =
+    await http.get(Uri.parse('${apiDomain().domain}/categories'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
+
+  // get towns by region
+  Future getTownsByRegion(int regionId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await http.get(
+        Uri.parse('${apiDomain().domain}/towns?region_id=$regionId'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+        }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
+
 }
