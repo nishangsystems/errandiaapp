@@ -18,11 +18,13 @@ String capitalizeAll(String s) {
 String getFirstLetter(String s) => s[0].toUpperCase();
 
 String getImagePath(String imagePath) {
-  if (imagePath.startsWith("http")) {
-    return imagePath;
+  String sanitizedPath = imagePath.trim().replaceAll(RegExp(r'^"|"$'), '');
+  if (sanitizedPath.startsWith("http")) {
+    return sanitizedPath;
   } else {
-    print('image: ${apiDomain().imageDomain}/$imagePath');
-    return '${apiDomain().imageDomain}/$imagePath';
+    String finalUrl = '${apiDomain().imageDomain}/$sanitizedPath';
+    print('image: $finalUrl');
+    return finalUrl;
   }
 }
 

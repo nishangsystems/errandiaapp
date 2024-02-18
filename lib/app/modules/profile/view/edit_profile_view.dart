@@ -9,6 +9,7 @@ import 'package:errandia/app/modules/global/Widgets/bottomsheet_item.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -35,6 +36,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
   final _formKey = GlobalKey<FormState>();
 
   late Map<String, dynamic> userData = {};
+  late String userProfileImage = "";
 
   bool isLoading = false;
 
@@ -44,15 +46,23 @@ class edit_profile_viewState extends State<edit_profile_view> {
   Future<void> getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user');
+    String? userProfileImg = prefs.getString('userProfileImg');
     if (userDataString != null) {
       print("user data: $userDataString");
       setState(() {
         userData = jsonDecode(userDataString);
+        userProfileImage = userProfileImg!;
       });
       fullNameController.text = userData['name'];
       emailController.text = userData['email'];
       phoneController.text = userData['phone'];
       whatsappController.text = userData['whatsapp_number'];
+      // var url = userData['photo'].substring(1);
+      // // remove any trailing quotes from url
+      // url = url.replaceAll('"', '');
+      imageController.image_path.value = getImagePath(userProfileImage);
+      // imageController.image_path.value = userData['photo'];
+      print("userData photo: ${userData['photo']}");
     }
   }
 
@@ -133,11 +143,10 @@ class edit_profile_viewState extends State<edit_profile_view> {
                             Radius.circular(25),
                           ),
                           color: Colors.grey,
-                          image: userData['photo'] != null
+                          image: userData['photo'] != null || userData['photo'].toString() != ""
                               ? DecorationImage(
                             image: NetworkImage(
-                              userData['profile'] ??
-                                  "http://placehold.it/200x200",
+                              userData['photo'],
                             ),
                             fit: BoxFit.fill,
                           )
@@ -169,12 +178,14 @@ class edit_profile_viewState extends State<edit_profile_view> {
                           ),
                           color: Colors.grey,
                           image: DecorationImage(
-                            image: FileImage(
-                              File(
-                                imageController.image_path.value,
-                              ),
-                            ),
-                            fit: BoxFit.fill,
+                            image: imageController.image_path.value.contains('http')
+                                ?
+                                  Image(
+                                    image: NetworkImage(imageController.image_path.value),
+                                    fit: BoxFit.cover,
+                                  ).image
+                                :
+                            FileImage(File(imageController.image_path.value)),
                           ),
                         ),
                       ),
@@ -628,10 +639,45 @@ class edit_profile_viewState extends State<edit_profile_view> {
                       // var value = {
                       //   "image": file
                       // };
+                      setState(() {
+                        isLoading = true;
+                      });
 
                       api().uploadProfileImage(file, context).then((response) {
                         print("Upload response: $response");
                         // Handle the response as needed
+
+                        if (response['image_path'] != '') {
+                          PopupBox popupBox = PopupBox(
+                            title: 'Success',
+                            description: 'Profile Image Updated',
+                            type: PopupType.success,
+                          );
+
+                          // 3 seconds delay
+                          Future.delayed(const Duration(seconds: 3), () {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          });
+
+                          popupBox.showPopup(context);
+                        } else {
+                          PopupBox popupBox = PopupBox(
+                            title: 'Error',
+                            description: 'Sorry, something went wrong',
+                            type: PopupType.error,
+                          );
+
+                          // 3 seconds delay
+                          Future.delayed(const Duration(seconds: 3), () {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          });
+
+                          popupBox.showPopup(context);
+                        }
                       });
                     } else {
                       print("No image selected.");

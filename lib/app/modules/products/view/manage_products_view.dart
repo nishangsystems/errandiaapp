@@ -1,5 +1,6 @@
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
+import 'package:errandia/app/modules/global/Widgets/myShopsDialog.dart';
 import 'package:errandia/app/modules/products/controller/manage_products_controller.dart';
 import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
@@ -29,7 +30,14 @@ class manage_product_view extends StatelessWidget {
     return Scaffold(
         floatingActionButton: InkWell(
           onTap: () {
-            Get.to(add_product_view());
+            // Get.to(add_product_view());
+            // showDialog(context: context, builder:
+            // (BuildContext context) {
+            //   return ShopSelectionDialog(onShopSelected: (shop) {
+            //     print("Selected shop: ${shop.name}");
+            //   });
+            // }
+            // );
           },
           child: Container(
             width: Get.width * 0.47,
@@ -200,7 +208,7 @@ Widget allProducts(BuildContext ctx) {
   return
   FutureBuilder(future: api().getProduct('products', 1), builder: (context,snapshot){
     if(snapshot.hasError){
-      return Center(child: Text('No data found'),);
+      return const Center(child: Text('No data found'),);
     }else if(snapshot.hasData){
       return  Column(
         children: [

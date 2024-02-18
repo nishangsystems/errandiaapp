@@ -83,7 +83,7 @@ class _Home_viewState extends State<Home_view> {
       home_view_1(),
       run_an_errand(),
       ErrandViewWithoutBar(),
-      Obx(() => homecontroller.loggedIn.value ? Profile_view() : signin_view_1())
+      Obx(() => homecontroller.loggedIn.value ? const Profile_view() : signin_view_1())
     ];
   }
 

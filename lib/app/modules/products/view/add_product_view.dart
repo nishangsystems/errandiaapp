@@ -23,7 +23,8 @@ add_product_cotroller product_controller = Get.put(add_product_cotroller());
 imagePickercontroller imageController = Get.put(imagePickercontroller());
 
 class add_product_view extends StatefulWidget {
-  add_product_view({super.key});
+  final String shopId;
+  add_product_view({super.key, required this.shopId});
 
   @override
   State<add_product_view> createState() => _add_product_viewState();

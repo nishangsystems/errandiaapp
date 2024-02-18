@@ -4,6 +4,9 @@ import 'package:errandia/app/modules/buiseness/controller/business_controller.da
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
 import 'package:errandia/app/modules/home/view/home_view_1.dart';
+import 'package:errandia/app/modules/products/view/add_product_view.dart';
+import 'package:errandia/app/modules/services/view/add_service_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -104,17 +107,17 @@ class manage_business_view extends StatelessWidget {
               tabs: [
                 Container(
                   height:Get.height* 0.05,
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text('All Businesses'),
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  child: const Text('All Businesses'),
                 ),
-                Container(
+                SizedBox(
                   height:Get.height* 0.05,
-                  child: Text('Published'),
                   width: Get.width * 0.26,
+                  child: const Text('Published'),
                 ),
-                Container(
+                SizedBox(
                     height:Get.height* 0.05,
-                    child: Text('Trashed')),
+                    child: const Text('Trashed')),
               ],
             ),
           ),
@@ -135,15 +138,17 @@ Widget allBusiness() {
     future: BusinessAPI.businesses(1),
       builder: (context, snapshot){
     if(snapshot.hasError){
-      return Center(child: CircularProgressIndicator(),);
+      return const Center(child: CircularProgressIndicator(),);
     }else if(snapshot.hasData){
       return ListView.builder(
         itemCount: snapshot.data.length,
         itemBuilder: (context, index) {
           var data = snapshot.data[index];
-          print("manage business : $data");
+          if (kDebugMode) {
+            print("manage business : $data");
+          }
           return Container(
-            margin: EdgeInsets.symmetric(
+            margin: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 10,
             ),
@@ -151,7 +156,7 @@ Widget allBusiness() {
               children: [
                 // image container
                 Container(
-                  margin: EdgeInsets.only(
+                  margin: const EdgeInsets.only(
                     right: 10,
                   ),
                   decoration: BoxDecoration(
@@ -190,14 +195,16 @@ Widget allBusiness() {
                     ],
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 InkWell(
                   onTap: () {
-                    print(index.toString());
+                    if (kDebugMode) {
+                      print(index.toString());
+                    }
                     Get.bottomSheet(
                       // backgroundColor: Colors.white,
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
 
                         color: Colors.white,
                         child: Wrap(
@@ -227,6 +234,8 @@ Widget allBusiness() {
                               callback: () async {
                                 print('add new product');
                                 Get.back();
+                                // show a popup with a dropdown to select the shop to add the product to
+
                               },
                             ),
                             bottomSheetWidgetitem(
@@ -236,6 +245,7 @@ Widget allBusiness() {
                               callback: () async {
                                 print('add new service');
                                 Get.back();
+                                Get.to(() => add_service_view());
                               },
                             ),
                             bottomSheetWidgetitem(

@@ -46,6 +46,12 @@ class home_view_1 extends StatefulWidget {
 class _home_view_1State extends State<home_view_1> {
   String? isLoggedIn;
   home_controller homeController = Get.put(home_controller());
+  List<dynamic> recentlyPostedItemsData = [];
+  List<dynamic> featuredBusinessesData = [];
+  bool _isRPILoading = true;
+  bool _isFBLLoading = true;
+  bool isRPIError = false;
+  bool isFBLError = false;
 
   Country() async {
     try {
@@ -171,6 +177,84 @@ class _home_view_1State extends State<home_view_1> {
     print('INIT: Is logged in: $isLoggedIn');
   }
 
+
+  // Method to fetch recently posted items data
+  void _fetchRecentlyPostedItemsData() async {
+    try {
+      var response = await api().getProduct('products', 1);
+      if (response.statusCode == 200) {
+        setState(() {
+          recentlyPostedItemsData = jsonDecode(response.body);
+          _isRPILoading = false;
+          isRPIError = false;
+        });
+      } else {
+        // Handle error
+        printError(info: 'Failed to load recently posted items');
+        setState(() {
+          _isRPILoading = false;
+          isRPIError = true;
+        });
+      }
+    } catch (e) {
+      // Handle exception
+      printError(info: e.toString());
+      setState(() {
+        _isRPILoading = false;
+        isRPIError = true;
+      });
+    }
+  }
+
+  // Method to fetch featured businesses data
+  void _fetchFeaturedBusinessesData() async {
+    try {
+      var businesses = await BusinessAPI.businesses(1);
+      print("response featured: $businesses");
+
+      if (businesses.isNotEmpty) {
+        setState(() {
+          featuredBusinessesData = businesses;
+          _isFBLLoading = false;
+          isFBLError = false;
+        });
+        // print("response featured: $featuredBusinessesData");
+      } else {
+        // Handle error
+        printError(info: 'Failed to load featured businesses');
+        setState(() {
+          _isFBLLoading = false;
+          isFBLError = true;
+        });
+      }
+    } catch (e) {
+      // Handle exception
+      printError(info: e.toString());
+      setState(() {
+        _isFBLLoading = false;
+        isFBLError = true;
+      });
+    }
+  }
+
+  // Reload function for recently posted items
+  void _reloadRecentlyPostedItems() {
+    setState(() {
+      recentlyPostedItemsData = [];
+      _isRPILoading = true;
+    });
+    _fetchRecentlyPostedItemsData();
+  }
+
+  // Reload function for featured businesses
+  void _reloadFeaturedBusinessesData() {
+    setState(() {
+      featuredBusinessesData = [];
+      _isFBLLoading = true;
+    });
+    _fetchFeaturedBusinessesData();
+  }
+
   Future<String?> checkLogin() async {
     var sharedpref = await SharedPreferences.getInstance();
     var isLoggedIn = sharedpref.getString('token');
@@ -188,6 +272,8 @@ class _home_view_1State extends State<home_view_1> {
     Country();
     street();
     subCategoryData();
+    _fetchRecentlyPostedItemsData();
+    _fetchFeaturedBusinessesData();
   }
 
   @override
@@ -207,6 +293,291 @@ class _home_view_1State extends State<home_view_1> {
       } else if (status.isGranted) {
         ScaffoldMessenger.of(scaffoldKey.currentContext!)
             .showSnackBar(const SnackBar(content: Text('Camera access granted')));
+      }
+    }
+
+    Widget _buildRPIErrorWidget(String message, VoidCallback onReload) {
+      return !_isRPILoading ? Container(
+        height: Get.height * 0.17,
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(message),
+              ElevatedButton(
+                onPressed: onReload,
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ): _buildLoadingWidget();
+    }
+
+    Widget _buildFBLErrorWidget(String message, VoidCallback onReload) {
+      return !_isFBLLoading ? Container(
+        height: Get.height * 0.17,
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(message),
+              ElevatedButton(
+                onPressed: onReload,
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ): _buildLoadingWidget();
+    }
+
+    Widget Recently_posted_items_Widget() {
+      if (isRPIError) {
+        return _buildRPIErrorWidget('Failed to load recently posted items', _reloadRecentlyPostedItems);
+      } else if (recentlyPostedItemsData.isEmpty) {
+        return _buildLoadingWidget();
+      } else {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          height: Get.height * 0.45,
+          color: Colors.white,
+          child: ListView.builder(
+            primary: false,
+            shrinkWrap: false,
+            scrollDirection: Axis.horizontal,
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              var data = recentlyPostedItemsData[index];
+
+              return InkWell(
+                onTap: () {
+                  // Get.to(Product_view(item: data,name: data['name'].toString(),));
+                  // Get.back();
+                  Get.to(() => errand_detail_view(
+                    data: data,
+                  ));
+                },
+                child: Card(
+                  child: Container(
+                    width: Get.width * 0.5,
+                    color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: Get.height * 0.09,
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 25,
+                                backgroundImage: AssetImage(
+                                  data['shop']['image'] != ''
+                                      ? data['shop']['image'].toString()
+                                      : Recently_item_List[index]
+                                      .avatarImage
+                                      .toString(),
+                                ),
+                              ),
+                              SizedBox(
+                                width: Get.width * 0.02,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    Recently_item_List[index].name.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    Recently_item_List[index].date.toString(),
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Divider(
+                          color: appcolor().mediumGreyColor,
+                        ),
+                        Container(
+                          height: Get.height * 0.2,
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 0),
+                          color: appcolor().lightgreyColor,
+                          child: Center(
+                            child: Image(
+                              image: AssetImage(Recently_item_List[index].imagePath.toString()),
+                              height: Get.height * 0.15,
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          color: appcolor().mediumGreyColor,
+                        ),
+                        SizedBox(
+                          height: Get.height * 0.009,
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Text(
+                              //   Featured_Businesses_Item_List[index]
+                              //       .servicetype
+                              //       .toString(),
+                              //   style: TextStyle(
+                              //       fontSize: 13,
+                              //       fontWeight: FontWeight.bold,
+                              //       color: appcolor().mediumGreyColor),
+                              // ),
+                              // SizedBox(
+                              //   height: Get.height * 0.001,
+                              // ),
+                              Text(
+                                data['name'].toString() != "null" ? data['name'].toString() : 'errand name',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: appcolor().mainColor),
+                              ),
+                              SizedBox(
+                                height: Get.height * 0.001,
+                              ),
+                              Row(
+                                children: [
+                                  Icon(Icons.location_on,
+                                    color: appcolor().mediumGreyColor,
+                                    size: 15,
+                                  ),
+                                  Text(
+                                    data['shop']['street'].toString(),
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: appcolor().mainColor),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }
+    }
+
+    Widget Featured_Businesses_List() {
+      if (isFBLError) {
+        return _buildFBLErrorWidget("Failed to load featured businesses", _reloadFeaturedBusinessesData);
+      } else if (featuredBusinessesData.isEmpty) {
+        return _buildLoadingWidget();
+      } else {
+        print("fbl: $featuredBusinessesData");
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          height: Get.height * 0.33,
+          color: Colors.white,
+          child: ListView.builder(
+            primary: false,
+            shrinkWrap: false,
+            scrollDirection: Axis.horizontal,
+            itemCount: 4,
+            itemBuilder: (context, index) {
+              var data = featuredBusinessesData[index];
+              print("sub data: ${data['street']}");
+              return InkWell(
+                onTap: () {
+                  Get.to(() => errandia_business_view(
+                      businessData: data)
+                  );
+                },
+                child: Container(
+                  margin:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  width: Get.width * 0.4,
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: Get.height * 0.005,
+                      ),
+                      Container(
+                        height: Get.height * 0.15,
+                        width: Get.width ,
+                        color: appcolor().lightgreyColor,
+                        child: Image(
+                          image: NetworkImage(
+                              data['image'] != ''
+                                  ? getImagePath(data['image'].toString())
+                                  : 'https://errandia.com/assets/images/logo-default.png'
+                          ),
+                          fit: BoxFit.fill,
+                          height: Get.height * 0.15,
+                          // width: Get.width * 0.3,
+                        ),
+                      ).paddingOnly(left: 10, right: 10, top: 10, bottom: 5),
+                      SizedBox(
+                        height: Get.height * 0.009,
+                      ),
+                      Text(
+                        data['category']['name'].toString(),
+                        style: TextStyle(
+                            fontSize: 12,
+                            // fontWeight: FontWeight.bold,
+                            color: appcolor().mediumGreyColor),
+                      ).paddingOnly(left: 3),
+                      SizedBox(
+                        height: Get.height * 0.001,
+                      ),
+                      Text(
+                        data['name'].toString(),
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: appcolor().mainColor),
+                      ).paddingOnly(left: 3),
+                      SizedBox(
+                        height: Get.height * 0.001,
+                      ),
+                      (data['street'] != '' && data['street'] != null) ? Row(
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            color: appcolor().mediumGreyColor,
+                            size: 15,
+                          ),
+                          const SizedBox(
+                            width: 1,
+                          ),
+                          Text(
+                            data['street'].toString(),
+                            style: const TextStyle(fontSize: 12),
+                          )
+                        ],
+                      ) : Container(),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
       }
     }
 
@@ -496,294 +867,18 @@ Widget Categories_List_Widget() {
       });
 }
 
-Widget Featured_Businesses_List() {
-  return FutureBuilder(
-      future: BusinessAPI.businesses(1),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: Text('Featured Businesses not found'),
-            ),
-          );
-        } else if (snapshot.hasData) {
-          if (kDebugMode) {
-            print("featured data: ${snapshot.data}");
-          }
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            height: Get.height * 0.33,
-            color: Colors.white,
-            child: ListView.builder(
-              primary: false,
-              shrinkWrap: false,
-              scrollDirection: Axis.horizontal,
-              itemCount: 4,
-              itemBuilder: (context, index) {
-                var data = snapshot.data[index];
-                print("sub data: ${data['street']}");
-                return InkWell(
-                  onTap: () {
-                    Get.to(() => errandia_business_view(
-                      businessData: data)
-                    );
-                  },
-                  child: Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    width: Get.width * 0.4,
-                    color: Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: Get.height * 0.005,
-                        ),
-                        Container(
-                          height: Get.height * 0.15,
-                          width: Get.width ,
-                          color: appcolor().lightgreyColor,
-                          child: Image(
-                            image: NetworkImage(
-                              data['image'] != ''
-                                  ? getImagePath(data['image'].toString())
-                                  : 'https://errandia.com/assets/images/logo-default.png'
-                            ),
-                            fit: BoxFit.fill,
-                            height: Get.height * 0.15,
-                            // width: Get.width * 0.3,
-                          ),
-                        ).paddingOnly(left: 10, right: 10, top: 10, bottom: 5),
-                        SizedBox(
-                          height: Get.height * 0.009,
-                        ),
-                        Text(
-                         data['category']['name'].toString(),
-                          style: TextStyle(
-                              fontSize: 12,
-                              // fontWeight: FontWeight.bold,
-                              color: appcolor().mediumGreyColor),
-                        ).paddingOnly(left: 3),
-                        SizedBox(
-                          height: Get.height * 0.001,
-                        ),
-                        Text(
-                          data['name'].toString(),
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: appcolor().mainColor),
-                        ).paddingOnly(left: 3),
-                        SizedBox(
-                          height: Get.height * 0.001,
-                        ),
-                        (data['street'] != '' && data['street'] != null) ? Row(
-                          children: [
-                             Icon(
-                              Icons.location_on,
-                            color: appcolor().mediumGreyColor,
-                            size: 15,
-                            ),
-                            const SizedBox(
-                              width: 1,
-                            ),
-                            Text(
-                              data['street'].toString(),
-                              style: const TextStyle(fontSize: 12),
-                            )
-                          ],
-                        ) : Container(),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        } else {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-      });
+
+
+void _reloadFeaturedBusinesses() {
+  print('Reloading featured businesses');
 }
 
-Widget Recently_posted_items_Widget() {
-  return FutureBuilder(
-      future: api().getProduct('products', 1),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: Text('Recently Posted Errands not found'),
-            ),
-          );
-        } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        } else if (snapshot.hasData) {
-          if (kDebugMode) {
-            print("recent errands data: ${snapshot.data}");
-          }
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            height: Get.height * 0.45,
-            color: Colors.white,
-            child: ListView.builder(
-              primary: false,
-              shrinkWrap: false,
-              scrollDirection: Axis.horizontal,
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                var data = snapshot.data[index];
 
-                return InkWell(
-                  onTap: () {
-                    // Get.to(Product_view(item: data,name: data['name'].toString(),));
-                    // Get.back();
-                    Get.to(() => errand_detail_view(
-                      data: data,
-                    ));
-                  },
-                  child: Card(
-                    child: Container(
-                      width: Get.width * 0.5,
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: Get.height * 0.09,
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 25,
-                                  backgroundImage: AssetImage(
-                                    data['shop']['image'] != ''
-                                        ? data['shop']['image'].toString()
-                                        : Recently_item_List[index]
-                                            .avatarImage
-                                            .toString(),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: Get.width * 0.02,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      Recently_item_List[index].name.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      Recently_item_List[index].date.toString(),
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Divider(
-                            color: appcolor().mediumGreyColor,
-                          ),
-                          Container(
-                            height: Get.height * 0.2,
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 0),
-                            color: appcolor().lightgreyColor,
-                            child: Center(
-                              child: Image(
-                                image: AssetImage(Recently_item_List[index].imagePath.toString()),
-                                height: Get.height * 0.15,
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            color: appcolor().mediumGreyColor,
-                          ),
-                          SizedBox(
-                            height: Get.height * 0.009,
-                          ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Text(
-                                //   Featured_Businesses_Item_List[index]
-                                //       .servicetype
-                                //       .toString(),
-                                //   style: TextStyle(
-                                //       fontSize: 13,
-                                //       fontWeight: FontWeight.bold,
-                                //       color: appcolor().mediumGreyColor),
-                                // ),
-                                // SizedBox(
-                                //   height: Get.height * 0.001,
-                                // ),
-                                Text(
-                                  data['name'].toString() != "null" ? data['name'].toString() : 'errand name',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: appcolor().mainColor),
-                                ),
-                                SizedBox(
-                                  height: Get.height * 0.001,
-                                ),
-                                Row(
-                                  children: [
-                                    Icon(Icons.location_on,
-                                      color: appcolor().mediumGreyColor,
-                                      size: 15,
-                                    ),
-                                    Text(
-                                      data['shop']['street'].toString(),
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color: appcolor().mainColor),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        } else {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-      });
+Widget _buildLoadingWidget() {
+  return Container(
+    height: Get.height * 0.17,
+    color: Colors.white,
+    child: const Center(child: CircularProgressIndicator()),
+  );
 }
+

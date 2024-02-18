@@ -36,10 +36,18 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
   Future<void> getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user');
+    // user image
+    String? userProfileImg = prefs.getString('userProfileImg');
     if (userDataString != null) {
       print("user data: $userDataString");
       setState(() {
         userData = jsonDecode(userDataString);
+      });
+    }
+
+    if (userProfileImg != null) {
+      setState(() {
+        userData['photo'] = getImagePath(userProfileImg);
       });
     }
   }
@@ -87,11 +95,13 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child:
-                          userData['profile'] == null ? Image.network(
-                            userData['profile'] ?? "",
+                          userData['photo'] != null ||  userData['photo'] != ""
+                          ? Image.network(
+                           getImagePath(userData['photo']?? ""),
                             height: Get.height * 0.13,
                             width: Get.width * 0.27,
                             fit: BoxFit.cover,
+                            key: UniqueKey(),
                           ) : Center(
                             child: Text(
                               getFirstLetter(userData['name']),
@@ -124,7 +134,10 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                           if (kDebugMode) {
                             print("edit profile");
                           }
-                          Get.to(() => edit_profile_view());
+                          Get.to(() => const edit_profile_view())?.then((_) {
+                            getUser();
+                          });
+
                         },
                         customBorder: const CircleBorder(),
                         splashColor: Colors.red,
