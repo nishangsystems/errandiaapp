@@ -1,7 +1,10 @@
 
 // capitalize string function
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
 
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
@@ -44,3 +47,10 @@ Future<void> mlaunchUrl(String url) async {
   }
 }
 
+Widget buildLoadingWidget() {
+  return Container(
+    height: Get.height * 0.17,
+    color: Colors.white,
+    child: const Center(child: CircularProgressIndicator()),
+  );
+}

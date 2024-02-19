@@ -298,7 +298,7 @@ class _home_view_1State extends State<home_view_1> {
 
     Widget _buildRPIErrorWidget(String message, VoidCallback onReload) {
       return !_isRPILoading ? Container(
-        height: Get.height * 0.17,
+        height: Get.height * 0.3,
         color: Colors.white,
         child: Center(
           child: Column(
@@ -307,17 +307,24 @@ class _home_view_1State extends State<home_view_1> {
               Text(message),
               ElevatedButton(
                 onPressed: onReload,
-                child: Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: Text('Retry',
+                  style: TextStyle(
+                      color: appcolor().lightgreyColor
+                  ),
+                ),
               ),
             ],
           ),
         ),
-      ): _buildLoadingWidget();
+      ): buildLoadingWidget();
     }
 
     Widget _buildFBLErrorWidget(String message, VoidCallback onReload) {
       return !_isFBLLoading ? Container(
-        height: Get.height * 0.17,
+        height: Get.height * 0.3,
         color: Colors.white,
         child: Center(
           child: Column(
@@ -326,19 +333,26 @@ class _home_view_1State extends State<home_view_1> {
               Text(message),
               ElevatedButton(
                 onPressed: onReload,
-                child: Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: Text('Retry',
+                  style: TextStyle(
+                      color: appcolor().lightgreyColor
+                  ),
+                ),
               ),
             ],
           ),
         ),
-      ): _buildLoadingWidget();
+      ): buildLoadingWidget();
     }
 
     Widget Recently_posted_items_Widget() {
       if (isRPIError) {
         return _buildRPIErrorWidget('Failed to load recently posted items', _reloadRecentlyPostedItems);
       } else if (recentlyPostedItemsData.isEmpty) {
-        return _buildLoadingWidget();
+        return buildLoadingWidget();
       } else {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -485,7 +499,7 @@ class _home_view_1State extends State<home_view_1> {
       if (isFBLError) {
         return _buildFBLErrorWidget("Failed to load featured businesses", _reloadFeaturedBusinessesData);
       } else if (featuredBusinessesData.isEmpty) {
-        return _buildLoadingWidget();
+        return buildLoadingWidget();
       } else {
         print("fbl: $featuredBusinessesData");
         return Container(
@@ -538,19 +552,24 @@ class _home_view_1State extends State<home_view_1> {
                       Text(
                         data['category']['name'].toString(),
                         style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             // fontWeight: FontWeight.bold,
                             color: appcolor().mediumGreyColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ).paddingOnly(left: 3),
                       SizedBox(
                         height: Get.height * 0.001,
                       ),
                       Text(
-                        data['name'].toString(),
+                        capitalizeAll(data['name'] ?? ""),
                         style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: appcolor().mainColor),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: appcolor().mainColor,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ).paddingOnly(left: 3),
                       SizedBox(
                         height: Get.height * 0.001,
@@ -570,7 +589,16 @@ class _home_view_1State extends State<home_view_1> {
                             style: const TextStyle(fontSize: 12),
                           )
                         ],
-                      ) : Container(),
+                      ) : Text(
+                        "No location provided",
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: appcolor().mediumGreyColor,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ),
@@ -733,7 +761,7 @@ class _home_view_1State extends State<home_view_1> {
                   const Spacer(),
                   TextButton(
                     onPressed: () {
-                      Get.to(BusinessesViewWithBar());
+                      Get.to(() => BusinessesViewWithBar());
                     },
                     child: const Text('See All'),
                   ),
@@ -874,11 +902,4 @@ void _reloadFeaturedBusinesses() {
 }
 
 
-Widget _buildLoadingWidget() {
-  return Container(
-    height: Get.height * 0.17,
-    color: Colors.white,
-    child: const Center(child: CircularProgressIndicator()),
-  );
-}
 

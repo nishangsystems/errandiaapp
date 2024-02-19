@@ -15,6 +15,8 @@ class business_controller extends GetxController {
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
   var itemList = List<dynamic>.empty(growable: true).obs;
+  // RxBool _isFBLLoading = false.obs;
+  RxBool isFBLError = false.obs;
 
   List<business_item> businessList = [
     business_item(
@@ -105,24 +107,28 @@ class business_controller extends GetxController {
   void loadBusinesses() async {
     print("loading busines");
     if (isLoading.isTrue || (itemList.isNotEmpty && itemList.length >= total.value)) return;
-    isLoading(true);
 
-    print("current page: ${currentPage.value}");
+    try {
+      isLoading.value = true;
+      print("current page: ${currentPage.value}");
 
-    var data = await BusinessAPI.businessList(currentPage.value);
-    if (kDebugMode) {
-      print('Fetched data: $data');
-    } // Debugging line
+      var data = await BusinessAPI.businessList(currentPage.value);
+      print("response: $data");
 
-    if (data != null && data.isNotEmpty) {
-      currentPage.value++;
+      if (data != null && data.isNotEmpty) {
+        currentPage.value++;
+        isLoading.value = false;
+        // parse total to an integer
+        total.value = data['total'];
+        // print("total_: ${total.value}");
+        itemList.addAll(data['items']);
+
+        print("itemList: $itemList");
+      }
+    } catch (e) {
+      isFBLError.value = true;
       isLoading.value = false;
-      // parse total to an integer
-      total.value = data['total'];
-      // print("total_: ${total.value}");
-      itemList.addAll(data['items']);
-
-      print("itemList: $itemList");
+      print("error loading businesses: $e");
     }
 
   }

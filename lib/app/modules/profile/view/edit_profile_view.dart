@@ -12,6 +12,7 @@ import 'package:errandia/app/modules/profile/controller/profile_controller.dart'
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -39,6 +40,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
   late String userProfileImage = "";
 
   bool isLoading = false;
+  bool isImageUpload = false;
 
   SharedPreferences? prefs;
 
@@ -51,16 +53,19 @@ class edit_profile_viewState extends State<edit_profile_view> {
       print("user data: $userDataString");
       setState(() {
         userData = jsonDecode(userDataString);
-        userProfileImage = userProfileImg!;
+        userData['photo'] =
+        userProfileImg == null || userProfileImg.toString() == ""
+            ? null
+            : getImagePath(userProfileImg);
       });
       fullNameController.text = userData['name'];
       emailController.text = userData['email'];
       phoneController.text = userData['phone'];
-      whatsappController.text = userData['whatsapp_number'];
+      whatsappController.text = userData['whatsapp_number'] ?? "";
       // var url = userData['photo'].substring(1);
       // // remove any trailing quotes from url
       // url = url.replaceAll('"', '');
-      imageController.image_path.value = getImagePath(userProfileImage);
+      // imageController.image_path.value = getImagePath(userProfileImage);
       // imageController.image_path.value = userData['photo'];
       print("userData photo: ${userData['photo']}");
     }
@@ -123,8 +128,8 @@ class edit_profile_viewState extends State<edit_profile_view> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Obx(() => imageController.image_path.value == ""
-                          ? Container(
+
+                          Container(
                         height: Get.height * 0.15,
                         width: Get.width * 0.30,
                         decoration: BoxDecoration(
@@ -142,54 +147,34 @@ class edit_profile_viewState extends State<edit_profile_view> {
                           borderRadius: const BorderRadius.all(
                             Radius.circular(25),
                           ),
-                          color: Colors.grey,
-                          image: userData['photo'] != null || userData['photo'].toString() != ""
-                              ? DecorationImage(
-                            image: NetworkImage(
-                              userData['photo'],
-                            ),
-                            fit: BoxFit.fill,
-                          )
-                              : const DecorationImage(
-                            image: AssetImage(
-                              'assets/images/profilePlaceholder.png',
-                            ),
-                            fit: BoxFit.fill,
-                          ),
                         ),
-                      )
-                          : Container(
-                      height: Get.height * 0.15,
-                      width: Get.width * 0.30,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 0.00,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 15,
-                              offset: Offset(10, 15),
-                            ),
-                          ],
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(25),
-                          ),
-                          color: Colors.grey,
-                          image: DecorationImage(
-                            image: imageController.image_path.value.contains('http')
-                                ?
-                                  Image(
-                                    image: NetworkImage(imageController.image_path.value),
-                                    fit: BoxFit.cover,
-                                  ).image
-                                :
-                            FileImage(File(imageController.image_path.value)),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: Obx(
+                                () => imageController.image_path.value == ""
+                                    ? (userData['photo'] != null
+                                    ? Image.network(
+                                  userData['photo'],
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Image(
+                                      image: AssetImage('assets/images/profilePlaceholder.png'),
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                )
+                                    : const Image(
+                                  image: AssetImage('assets/images/profilePlaceholder.png'),
+                                  fit: BoxFit.cover,
+                                ))
+                                    : Image.file(
+                                  File(imageController.image_path.value),
+                                  fit: BoxFit.cover,
+                                )
                           ),
                         ),
                       ),
-                    ),
+
                     Positioned(
                         bottom: 30,
                         right: Get.width * 0.33,
@@ -577,8 +562,22 @@ class edit_profile_viewState extends State<edit_profile_view> {
           ),
         if (isLoading)
            Center(
-            child: CircularProgressIndicator(
-              color: appcolor().mainColor,
+            child: !isImageUpload ? const CircularProgressIndicator() :  Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'Uploading Image...',
+                  style: TextStyle(
+                    color: appcolor().bluetextcolor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
             ),
           ),
       ]),
@@ -636,11 +635,11 @@ class edit_profile_viewState extends State<edit_profile_view> {
                     if (file != null) {
                       print("Selected image path: ${file.path}");
 
-                      // var value = {
-                      //   "image": file
-                      // };
+                      imageController.update();
+
                       setState(() {
                         isLoading = true;
+                        isImageUpload = true;
                       });
 
                       api().uploadProfileImage(file, context).then((response) {
@@ -658,6 +657,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                           Future.delayed(const Duration(seconds: 3), () {
                             setState(() {
                               isLoading = false;
+                              isImageUpload = false;
                             });
                           });
 
@@ -673,6 +673,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                           Future.delayed(const Duration(seconds: 3), () {
                             setState(() {
                               isLoading = false;
+                              isImageUpload = false;
                             });
                           });
 
@@ -709,6 +710,88 @@ class edit_profile_viewState extends State<edit_profile_view> {
                     Get.back();
                     var path = await imageController.getimagefromCamera();
                     print("photo path: ${path}");
+
+                    if (path != null) {
+                      File? file = File(path);
+
+                      print("Original file size: ${file.lengthSync()}");
+
+                      try {
+                        file = (await compressFile(file: file));
+                        print("Compressed file size: ${file.lengthSync()}");
+                      } catch (e) {
+                        print("Error compressing file: $e");
+                      }
+
+                      print("Selected image path: ${file?.path}");
+
+                      imageController.update();
+
+                      setState(() {
+                        isLoading = true;
+                        isImageUpload = true;
+                      });
+
+                      api().uploadProfileImage(file, context).then(
+                            (response) {
+                          print("Upload response: $response");
+                          // Handle the response as needed
+
+                          if (response['image_path'] != '') {
+                            PopupBox popupBox = PopupBox(
+                              title: 'Success',
+                              description: 'Profile Image Updated',
+                              type: PopupType.success,
+                            );
+
+                            // 3 seconds delay
+                            Future.delayed(const Duration(seconds: 3), () {
+                              setState(() {
+                                isLoading = false;
+                                isImageUpload = false;
+                              });
+                            });
+
+                            popupBox.showPopup(context);
+                          } else {
+                            PopupBox popupBox = PopupBox(
+                              title: 'Error',
+                              description: 'Sorry, something went wrong',
+                              type: PopupType.error,
+                            );
+
+                            // 3 seconds delay
+                            Future.delayed(const Duration(seconds: 3), () {
+                              setState(() {
+                                isLoading = false;
+                                isImageUpload = false;
+                              });
+                            });
+
+                            popupBox.showPopup(context);
+                          }
+                        },
+                      ).catchError((error) {
+                        print("Error: $error");
+                        PopupBox popupBox = PopupBox(
+                          title: 'Error',
+                          description: 'Sorry, something went wrong',
+                          type: PopupType.error,
+                        );
+
+                        // 3 seconds delay
+                        Future.delayed(const Duration(seconds: 2), () {
+                          setState(() {
+                            isLoading = false;
+                            isImageUpload = false;
+                          });
+                        });
+
+                        popupBox.showPopup(context);
+                      });
+                    } else {
+                      print("No image selected.");
+                    }
                   },
                   color: const Color(0xfffafafa),
                 ),
@@ -722,4 +805,20 @@ class edit_profile_viewState extends State<edit_profile_view> {
       ),
     );
   }
+}
+
+Future<File> compressFile({required File? file}) async {
+  final filePath = file!.path;
+
+  // Create output file path
+  // eg:- "Volume/VM/abcd_out.jpeg"
+  final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+  final splitted = filePath.substring(0, (lastIndex));
+  final outPath = '${splitted}_out${filePath.substring(lastIndex)}';
+  var result = await FlutterImageCompress.compressAndGetFile(
+    file.path,
+    outPath,
+    quality: 80,
+  );
+  return File(result!.path);
 }

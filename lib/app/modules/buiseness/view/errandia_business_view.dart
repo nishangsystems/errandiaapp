@@ -25,6 +25,8 @@ class errandia_business_view extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("bz data: ${businessData}");
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -179,7 +181,7 @@ class errandia_business_view extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        businessData['name'],
+                        businessData['name'] ?? "",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -195,10 +197,16 @@ class errandia_business_view extends StatelessWidget {
                     ],
                   ),
                 ),
-                businessData['street'] != '' ? Text(
+                businessData['street'] != null ? Text(
                   businessData['street'],
-                  style: TextStyle(),
-                ): Container(),
+                  style: const TextStyle(),
+                ): const Text(
+                  'No street provided',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
                 Row(
                   children: [
                     Icon(

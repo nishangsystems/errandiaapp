@@ -193,6 +193,8 @@ class api {
       print("user: $user");
       prefs.setString('token', data_['token']);
       prefs.setString("user", jsonEncode(user));
+      // save image profile
+      prefs.setString('userProfileImg', user['profile'] ?? user['photo'] ?? "");
 
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => navigator));

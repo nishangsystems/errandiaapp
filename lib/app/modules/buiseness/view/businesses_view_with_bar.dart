@@ -22,29 +22,93 @@ class BusinessesViewWithBar extends StatefulWidget {
 class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
   late business_controller busi_controller;
   late ScrollController scrollController;
+  List<dynamic> featuredBusinessesData = [];
+  bool _isFBLLoading = true;
+  // bool isFBLError = false;
+
+  // void _fetchFeaturedBusinessesData() async {
+  //   try {
+  //     var businesses = await BusinessAPI.businesses(1);
+  //     print("response featured: $businesses");
+  //
+  //     if (businesses.isNotEmpty) {
+  //       setState(() {
+  //         featuredBusinessesData = businesses;
+  //         _isFBLLoading = false;
+  //         isFBLError = false;
+  //       });
+  //       // print("response featured: $featuredBusinessesData");
+  //     } else {
+  //       // Handle error
+  //       printError(info: 'Failed to load featured businesses');
+  //       setState(() {
+  //         _isFBLLoading = false;
+  //         isFBLError = true;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     // Handle exception
+  //     printError(info: e.toString());
+  //     setState(() {
+  //       _isFBLLoading = false;
+  //       isFBLError = true;
+  //     });
+  //   }
+  // }
+
+  // Reload function for featured businesses
+  void _reloadFeaturedBusinessesData() {
+    busi_controller.itemList.clear();
+    busi_controller.loadBusinesses();
+  }
+
 
   @override
   void initState() {
     super.initState();
     busi_controller = Get.put(business_controller());
-    scrollController = ScrollController();
-    print("------------initializing--------");
 
+    scrollController = ScrollController();
     scrollController.addListener(() {
       if (scrollController.position.pixels >=
           scrollController.position.maxScrollExtent - 20) {
         busi_controller.loadBusinesses();
       }
-
-      // scrollController.position.maxScrollExtent ==
-      //     scrollController.offset &&
-      //     Get.find<business_controller>().itemList.length % 15 == 0
     });
   }
 
   @override
   Widget build(BuildContext context) {
     home_controller().atbusiness.value = true;
+
+
+    Widget _buildFBLErrorWidget(String message, VoidCallback onReload) {
+      return !busi_controller.isLoading.value ? Container(
+        height: Get.height * 0.9,
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(message),
+              ElevatedButton(
+                onPressed: onReload,
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: Text('Retry',
+                  style: TextStyle(
+                      color: appcolor().lightgreyColor
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ): buildLoadingWidget();
+    }
+
+
     return Scaffold(
       appBar: appbar(),
       body: Column(
@@ -314,6 +378,8 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
+              } else if (busi_controller.isFBLError.value) {
+                return _buildFBLErrorWidget('Failed to load businesses', _reloadFeaturedBusinessesData);
               } else {
                 return RefreshIndicator(
                     child: Obx(
@@ -327,7 +393,7 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                             gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              childAspectRatio: 1 / 1.7,
+                              childAspectRatio: 1 / 1.44,
                               crossAxisSpacing: 6,
                               mainAxisSpacing: 6,
                             ),
@@ -344,57 +410,78 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                   ));
                                 },
                                 child: Container(
+                                  height: Get.height * 0.4,
                                   decoration: const BoxDecoration(
                                     color: Colors.white,
                                     // border: Border.all(color: appcolor().greyColor)
                                   ),
                                   margin: const EdgeInsets.symmetric(
-                                      horizontal: 0, vertical: 0),
+                                      horizontal: 1, vertical: 1),
                                   // width: Get.width * 0.4,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 10),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    // mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
                                         color: appcolor().lightgreyColor,
                                         child: Image.network(
                                           getImagePath(business['image'].toString()),
-                                          // height: Get.height * 0.15,
-                                          // width: Get.width * 0.4,
+                                          height: Get.height * 0.17,
+                                          width: Get.width * 0.4,
                                           fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image.asset(
+                                              'assets/images/errandia_logo.png',
+                                              height: Get.height * 0.17,
+                                              width: Get.width * 0.4,
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
                                         ),
                                       ),
                                       SizedBox(
-                                        height: Get.height * 0.009,
+                                        height: Get.height * 0.02,
                                       ),
                                       business['category'] != null
                                           ? Text(
                                         business['category']['name'] ?? "",
                                         style: TextStyle(
-                                            fontSize: 13,
-                                            // fontWeight: FontWeight.bold,
+                                            fontSize: 11,
                                             color: appcolor().mediumGreyColor),
-                                      )
-                                          : Container(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                          ) : Text(
+                                        "No category provided",
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: appcolor().mediumGreyColor,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                       SizedBox(
                                         height: Get.height * 0.001,
                                       ),
                                       Text(
                                         capitalizeAll(business['name'] ?? ""),
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 14,
                                           fontWeight: FontWeight.w500,
                                           color: appcolor().mainColor,
                                         ),
-                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       SizedBox(
                                         height: Get.height * 0.001,
                                       ),
-                                      business['street'] != ''
+                                      business['street'] != null
                                           ? Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                        MainAxisAlignment.start,
                                         children: [
                                           Icon(
                                             Icons.location_on,
@@ -405,13 +492,24 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                             business['street'].toString(),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                              fontSize: 13,
+                                              fontSize: 12,
                                               color: appcolor().mediumGreyColor,
                                             ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           )
                                         ],
                                       )
-                                          : Container(),
+                                          : Text(
+                                        "No location provided",
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: appcolor().mediumGreyColor,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ],
                                   ),
                                 ),

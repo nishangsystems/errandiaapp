@@ -26,7 +26,8 @@ class Profile_view extends StatefulWidget {
   State<Profile_view> createState() => _Profile_viewState();
 }
 
-class _Profile_viewState extends State<Profile_view> with TickerProviderStateMixin {
+class _Profile_viewState extends State<Profile_view>
+    with TickerProviderStateMixin {
   late final TabController tabController =
       TabController(length: 3, vsync: this);
   late Map<String, dynamic> userData = {};
@@ -42,14 +43,14 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
       print("user data: $userDataString");
       setState(() {
         userData = jsonDecode(userDataString);
+        print("prof img: $userProfileImg");
+        userData['photo'] =
+            userProfileImg == null || userProfileImg.toString() == ""
+                ? null
+                : getImagePath(userProfileImg);
       });
     }
-
-    if (userProfileImg != null) {
-      setState(() {
-        userData['photo'] = getImagePath(userProfileImg);
-      });
-    }
+    print("user profile image: ${userData['photo']}");
   }
 
   @override
@@ -94,34 +95,59 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
-                        child:
-                          userData['photo'] != null ||  userData['photo'] != ""
-                          ? Image.network(
-                           getImagePath(userData['photo']?? ""),
-                            height: Get.height * 0.13,
-                            width: Get.width * 0.27,
-                            fit: BoxFit.cover,
-                            key: UniqueKey(),
-                          ) : Center(
-                            child: Text(
-                              getFirstLetter(userData['name']),
-                              style: const TextStyle(
-                                color: Color(0xffff0000),
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          ),
+                        child: userData['photo'] != null
+                            ? Image.network(userData['photo'], fit: BoxFit.fill,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                return Center(
+                                    child: Text(
+                                  userData["name"] != null
+                                      ? getFirstLetter(userData['name'])
+                                      : "",
+                                  style: const TextStyle(
+                                    color: Color(0xffff0000),
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ));
+                              })
+                            : Center(
+                                child: Text(
+                                userData["name"] != null
+                                    ? getFirstLetter(userData['name'])
+                                    : "",
+                                style: const TextStyle(
+                                  color: Color(0xffff0000),
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
                       ),
                     ),
                   ),
+
+                  // Image.network(
+                  //   getImagePath(userData['photo'] ?? ""),
+                  //   height: Get.height * 0.13,
+                  //   width: Get.width * 0.27,
+                  //   fit: BoxFit.cover,
+                  //   key: UniqueKey(),
+                  // ) : Center(
+                  //     child: Text(
+                  //       getFirstLetter(userData['name']),
+                  //       style: const TextStyle(
+                  //         color: Color(0xffff0000),
+                  //         fontSize: 40,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     )
+                  // ),
                   Align(
                     alignment: AlignmentDirectional.topEnd,
                     child: SizedBox(
                       width: Get.width * 0.3,
                       height: Get.height * 0.13,
                       // color: Colors.redAccent,
-
                     ),
                   ),
                   Positioned(
@@ -137,7 +163,6 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                           Get.to(() => const edit_profile_view())?.then((_) {
                             getUser();
                           });
-
                         },
                         customBorder: const CircleBorder(),
                         splashColor: Colors.red,
@@ -157,13 +182,14 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                 margin: const EdgeInsets.only(
                   top: 10,
                 ),
-                child:  Text(
-                    userData['name'] != null ? capitalizeAll(userData['name']) : "",
+                child: Text(
+                  userData['name'] != null
+                      ? capitalizeAll(userData['name'])
+                      : "",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-
                   ),
                 ),
               ),
@@ -380,7 +406,6 @@ Widget product_item_list() {
       crossAxisSpacing: 10,
       childAspectRatio: 1 / 1.5,
     ),
-
     itemBuilder: (context, index) {
       final item = Recently_item_List[index];
 
