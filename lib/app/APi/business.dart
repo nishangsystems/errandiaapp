@@ -160,4 +160,27 @@ class BusinessAPI {
       return da;
     }
   }
+
+  // get user shops except the current shop
+  static Future businessBranches(String shopSlug, int page) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.get(Uri.parse('${apiDomain().domain}/shops/$shopSlug/branches?page=$page'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print('user shop branches response: $data');
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
 }

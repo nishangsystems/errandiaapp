@@ -23,38 +23,6 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
   late business_controller busi_controller;
   late ScrollController scrollController;
   List<dynamic> featuredBusinessesData = [];
-  bool _isFBLLoading = true;
-  // bool isFBLError = false;
-
-  // void _fetchFeaturedBusinessesData() async {
-  //   try {
-  //     var businesses = await BusinessAPI.businesses(1);
-  //     print("response featured: $businesses");
-  //
-  //     if (businesses.isNotEmpty) {
-  //       setState(() {
-  //         featuredBusinessesData = businesses;
-  //         _isFBLLoading = false;
-  //         isFBLError = false;
-  //       });
-  //       // print("response featured: $featuredBusinessesData");
-  //     } else {
-  //       // Handle error
-  //       printError(info: 'Failed to load featured businesses');
-  //       setState(() {
-  //         _isFBLLoading = false;
-  //         isFBLError = true;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     // Handle exception
-  //     printError(info: e.toString());
-  //     setState(() {
-  //       _isFBLLoading = false;
-  //       isFBLError = true;
-  //     });
-  //   }
-  // }
 
   // Reload function for featured businesses
   void _reloadFeaturedBusinessesData() {

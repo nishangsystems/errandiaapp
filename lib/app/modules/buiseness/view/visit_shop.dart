@@ -11,6 +11,7 @@ import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/view/manage_products_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/view/service_details_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,7 @@ class _VisitShopState extends State<VisitShop> {
       print("businessData: ${widget.businessData['name']}");
     }
     return Scaffold(
-        appBar: titledAppBar(widget.businessData['name'], [
+        appBar: titledAppBar(capitalizeAll(widget.businessData['name'] ?? ''), [
           IconButton(
             onPressed: () {},
             icon: const Icon(
@@ -67,14 +68,19 @@ class _VisitShopState extends State<VisitShop> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              SizedBox(
                 height: Get.height * 0.3,
-                width: Get.width,
-                color: Colors.red,
-                child: Image.asset(
-                  widget.businessData['imagepath'],
-                  fit: BoxFit.fill,
-                ),
+                width: Get.width * 1,
+                child: Image.network(
+                  getImagePath(widget.businessData['image'].toString()),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/errandia_logo.png',
+                      fit: BoxFit.cover,
+                    );
+                  },
+                )
               ),
 
               Column(
@@ -307,13 +313,19 @@ Widget product_review_widget(Map<String, dynamic> data) {
      Text(
       data['name'].toString(),
       style: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
       ),
     ),
-    Text(
-      data['location'].toString(),
-      style: TextStyle(fontSize: 15, color: Colors.black),
+    data['street'] != null ? Text(
+      data['street'],
+      style: const TextStyle(),
+    ): const Text(
+      'No street provided',
+      style: TextStyle(
+        color: Colors.grey,
+        fontStyle: FontStyle.italic,
+      ),
     ),
     const SizedBox(
       height: 5,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/buiseness/controller/errandia_business_view_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
@@ -18,14 +19,67 @@ import 'package:get/get.dart';
 import '../../errands/view/Product/serivces.dart';
 import '../../global/Widgets/bottomsheet_item.dart';
 
-class errandia_business_view extends StatelessWidget {
+class errandia_business_view extends StatefulWidget {
   final Map<String, dynamic> businessData;
-  final business_controller controller = Get.put(business_controller());
+
   errandia_business_view({super.key, required this.businessData});
+
+  State<StatefulWidget> createState() => _errandia_business_viewState();
+}
+
+class _errandia_business_viewState extends State<errandia_business_view> {
+  final business_controller controller = Get.put(business_controller());
+  late final ErrandiaBusinessViewController errandiaBusinessViewController;
+  late ScrollController scrollController;
+  // List<dynamic> businessBranchesData = [];
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    errandiaBusinessViewController = Get.put(ErrandiaBusinessViewController());
+    errandiaBusinessViewController.loadBusinessBranches(widget.businessData['slug']);
+
+    scrollController = ScrollController();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 10) {
+        errandiaBusinessViewController.loadBusinessBranches(widget.businessData['slug']);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    print("bz data: ${businessData}");
+    print("bz data: ${widget.businessData}");
+    print("current slug: ${widget.businessData['slug']}");
+
+    Widget _buildBusinessBranchesErrorWidget(String message, VoidCallback onReload) {
+      return !errandiaBusinessViewController.isLoading.value ? Container(
+        height: Get.height * 0.9,
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(message),
+              ElevatedButton(
+                onPressed: onReload,
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: Text('Retry',
+                  style: TextStyle(
+                      color: appcolor().lightgreyColor
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ): buildLoadingWidget();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -44,7 +98,7 @@ class errandia_business_view extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              businessData['name'],
+              widget.businessData['name'],
               style: TextStyle(color: appcolor().bluetextcolor, fontSize: 15),
             ),
           ],
@@ -131,7 +185,7 @@ class errandia_business_view extends StatelessWidget {
                           color: appcolor().mainColor,
                         ),
                         Text(
-                          'Call ${businessData['phone']}',
+                          'Call ${widget.businessData['phone']}',
                           style: TextStyle(
                             fontSize: 10,
                             color: appcolor().mainColor,
@@ -141,7 +195,7 @@ class errandia_business_view extends StatelessWidget {
                     ),
                   ),
                   ontap: () {
-                    launchCaller(businessData['phone']);
+                    launchCaller(widget.businessData['phone']);
                   },
                   color: appcolor().skyblueColor,
                 ),
@@ -158,21 +212,19 @@ class errandia_business_view extends StatelessWidget {
         child: Column(
           // crossAxisAlignment: CrossAxisAlignment.sta,
           children: [
-            Container(
-              // padding: EdgeInsets.symmetric(
-              //   horizontal: 15,
-              //   vertical: 10,
-              // ),
+            SizedBox(
               height: Get.height * 0.3,
               width: Get.width,
               child: Image.network(
-                getImagePath(businessData['image'].toString()),
+                getImagePath(widget.businessData['image'].toString()),
                 fit: BoxFit.cover,
               )
             ),
 
+            SizedBox(
+              height: Get.height * 0.01,
+            ),
             // shop name
-
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -181,10 +233,10 @@ class errandia_business_view extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        businessData['name'] ?? "",
+                        capitalizeAll(widget.businessData['name'] ?? ""),
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
                         ),
                       ),
                       SizedBox(
@@ -197,8 +249,8 @@ class errandia_business_view extends StatelessWidget {
                     ],
                   ),
                 ),
-                businessData['street'] != null ? Text(
-                  businessData['street'],
+                widget.businessData['street'] != null ? Text(
+                  widget.businessData['street'],
                   style: const TextStyle(),
                 ): const Text(
                   'No street provided',
@@ -248,50 +300,7 @@ class errandia_business_view extends StatelessWidget {
                 SizedBox(
                   height: Get.height * 0.025,
                 ),
-                // blockButton(
-                //   title: Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       Icon(
-                //         FontAwesomeIcons.whatsapp,
-                //         color: Colors.white,
-                //       ),
-                //       Text(
-                //         '  Chat on Whatsapp',
-                //         style: TextStyle(
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                //   ontap: () async
-                //   {
-                //
-                //   },
-                //   color: appcolor().mainColor,
-                // ),
-                // SizedBox(
-                //   height: Get.height * 0.01,
-                // ),
-                // blockButton(
-                //   title: Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       Icon(
-                //         Icons.call,
-                //         color: appcolor().mainColor,
-                //       ),
-                //       Text(
-                //         '  Call 999999999',
-                //         style: TextStyle(
-                //           color: appcolor().mainColor,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                //   ontap: () {},
-                //   color: appcolor().skyblueColor,
-                // ),
+
                 SizedBox(
                   height: Get.height * 0.01,
                 ),
@@ -322,13 +331,13 @@ class errandia_business_view extends StatelessWidget {
                 ),
 
                 // follow us on social media
-                (businessData['facebook']!="" && businessData['instagram']!="") ? Row(
+                (widget.businessData['facebook']!="" && widget.businessData['instagram']!="") ? Row(
                   children: [
                     const Text('Follow us on social media'),
                     // fb
-                    businessData['facebook'] != "" ? InkWell(
+                    widget.businessData['facebook'] != "" ? InkWell(
                       onTap: ()async{
-                        mlaunchUrl(businessData['facebook']);
+                        mlaunchUrl(widget.businessData['facebook']);
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -347,9 +356,9 @@ class errandia_business_view extends StatelessWidget {
                     ): Container(),
 
                     // insta
-                    businessData['instagram'] != "" ? InkWell(
+                    widget.businessData['instagram'] != "" ? InkWell(
                       onTap: () async {
-                        mlaunchUrl(businessData['instagram']);
+                        mlaunchUrl(widget.businessData['instagram']);
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -377,8 +386,8 @@ class errandia_business_view extends StatelessWidget {
               height: Get.height * 0.01,
             ),
             Divider(),
-            // visit shop
 
+            // visit shop
             Container(
               height: Get.height * 0.08,
               decoration: BoxDecoration(
@@ -425,32 +434,31 @@ class errandia_business_view extends StatelessWidget {
               height: Get.height * 0.025,
             ),
             Divider(),
+
             // business branches
             Column(
               children: [
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       FontAwesomeIcons.buildingUser,
                       size: 20,
                     ),
                     SizedBox(
                       width: Get.width * 0.05,
                     ),
-                    RichText(
+                    Obx(() => RichText(
                       text: TextSpan(
-                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        style: const TextStyle(color: Colors.black, fontSize: 15),
                         children: [
-                          TextSpan(text: 'Business Branches  '),
+                          const TextSpan(text: 'Business Branches  '),
                           TextSpan(
-                            text: controller.businessList[2]
-                                .BusinessBranch_location!.length
-                                .toString(),
+                            text: '(${errandiaBusinessViewController.total.value})',
                             style: TextStyle(color: appcolor().mediumGreyColor),
                           ),
                         ],
                       ),
-                    ),
+                    ))
                   ],
                 ),
                 Divider(
@@ -460,70 +468,118 @@ class errandia_business_view extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   height: 280,
-                  child: ListView.builder(
-                    itemCount: controller.businessList[2]
-                        .BusinessBranch_location!.length,
-                    // physics: const NeverScrollableScrollPhysics(),
-
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          Get.to(() => VisitShop(businessData: controller.businessList[index].toJson()));
-                        },
-                        child: Container(
- padding: const EdgeInsets.symmetric( horizontal: 10),
-                          margin: const EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: appcolor().greyColor,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(),
-                                    ),
-                                    child: Image(
-                                      image: AssetImage(
-                                        controller.businessList[index].imagepath,
-                                      ),
+                  child: Obx(
+                      () {
+                        if (errandiaBusinessViewController.isLoading.value) {
+                          return buildLoadingWidget();
+                        } else if (errandiaBusinessViewController.isError.value) {
+                          return _buildBusinessBranchesErrorWidget(
+                            "An error occurred while fetching business branches",
+                            () {
+                              errandiaBusinessViewController.loadBusinessBranches(widget.businessData['slug']);
+                            },
+                          );
+                        } else if (errandiaBusinessViewController.itemList.isEmpty) {
+                          return _buildBusinessBranchesErrorWidget(
+                            "No business branches found",
+                            () {
+                              errandiaBusinessViewController.loadBusinessBranches(widget.businessData['slug']);
+                            },
+                          );
+                        } else {
+                          return ListView.builder(
+                            key: const PageStorageKey('businessBranches'),
+                            controller: scrollController,
+                            itemCount: errandiaBusinessViewController.isLoading.value
+                                ? errandiaBusinessViewController.itemList.length + 1
+                                : errandiaBusinessViewController.itemList.length,
+                            itemBuilder: (context, index) {
+                               var data = errandiaBusinessViewController.itemList[index];
+                              return InkWell(
+                                onTap: () {
+                                  Get.to(() => VisitShop(businessData: data));
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric( horizontal: 10),
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: appcolor().greyColor,
                                     ),
                                   ),
-                                  Column(
+                                  child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        controller.businessList[index].name,
-                                      ),
-                                      Text(
-                                        controller.businessList[index]
-                                            .BusinessBranch_location![0]
-                                            .toString(),
-                                      ),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            height: 60,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(),
+                                            ),
+                                            child: Image.network(
+                                              getImagePath(data['image'].toString()),
+                                              height: Get.height * 0.17,
+                                              width: Get.width * 0.2,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/errandia_logo.png',
+                                                  fit: BoxFit.cover,
+                                                  height: Get.height * 0.17,
+                                                  width: Get.width * 0.2,
+                                                );
+                                              },
+                                            )
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                capitalizeAll(data['name'] ?? ""),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              data['street'] != null ? Text(
+                                                data['street'],
+                                                style: TextStyle(
+                                                  color: appcolor().mediumGreyColor,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ): const Text(
+                                                'No street provided',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
+                                          ).paddingOnly(left: 10),
+                                          Spacer(),
+                                          IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(
+                                              Icons.arrow_forward_ios_outlined,
+                                              color: appcolor().bluetextcolor,
+                                            ),
+                                          ),
+                                        ],
+                                      ).paddingOnly(bottom: 10, top: 5),
                                     ],
-                                  ).paddingOnly(left: 10),
-                                  Spacer(),
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.arrow_forward_ios_outlined,
-                                      color: appcolor().bluetextcolor,
-                                    ),
                                   ),
-                                ],
-                              ).paddingOnly(bottom: 10, top: 5),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }
+                      }
+                  )
                 ),
               ],
             ).paddingSymmetric(
