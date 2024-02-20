@@ -34,6 +34,8 @@ class _Profile_viewState extends State<Profile_view>
   late SharedPreferences prefs;
   late profile_controller profileController;
   late ScrollController scrollController;
+  late ScrollController serviceScrollController;
+  late ScrollController productScrollController;
 
 
   // get user from sharedprefs
@@ -68,6 +70,22 @@ class _Profile_viewState extends State<Profile_view>
         profileController.loadMyBusinesses();
       }
     });
+
+    serviceScrollController = ScrollController();
+    serviceScrollController.addListener(() {
+      if (serviceScrollController.position.pixels >=
+          serviceScrollController.position.maxScrollExtent - 20) {
+        profileController.loadMyServices();
+      }
+    });
+
+    productScrollController = ScrollController();
+    productScrollController.addListener(() {
+      if (productScrollController.position.pixels >=
+          productScrollController.position.maxScrollExtent - 20) {
+        profileController.loadMyProducts();
+      }
+    });
   }
 
   void _reloadMyBusinesses() {
@@ -88,6 +106,58 @@ class _Profile_viewState extends State<Profile_view>
 
     Widget _buildMyBusinessesErrorWidget(String message, VoidCallback onReload) {
       return !profileController.isLoading.value ? Container(
+        height: Get.height * 0.9,
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(message),
+              ElevatedButton(
+                onPressed: onReload,
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: Text('Retry',
+                  style: TextStyle(
+                      color: appcolor().lightgreyColor
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ): buildLoadingWidget();
+    }
+
+    Widget _buildMyProductsErrorWidget(String message, VoidCallback onReload) {
+      return !profileController.isProductLoading.value ? Container(
+        height: Get.height * 0.9,
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(message),
+              ElevatedButton(
+                onPressed: onReload,
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: Text('Retry',
+                  style: TextStyle(
+                      color: appcolor().lightgreyColor
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ): buildLoadingWidget();
+    }
+
+    Widget _buildMyServicesErrorWidget(String message, VoidCallback onReload) {
+      return !profileController.isServiceLoading.value ? Container(
         height: Get.height * 0.9,
         color: Colors.white,
         child: Center(
@@ -152,6 +222,91 @@ class _Profile_viewState extends State<Profile_view>
               });
         }
       });
+    }
+
+    Widget product_item_list() {
+      return Obx(
+            () {
+          if (profile_controller().isProductLoading.value) {
+            return buildLoadingWidget();
+          } else if (profile_controller().isProductError.value) {
+            return _buildMyProductsErrorWidget(
+                'An error occurred while loading your products',
+                    () {
+                  profile_controller().loadMyProducts();
+                });
+          } else {
+            return GridView.builder(
+              itemCount: profile_controller().productItemList.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                childAspectRatio: 1 / 1.5,
+              ),
+              itemBuilder: (context, index) {
+                final item = profileController.productItemList[index];
+
+                return GestureDetector(
+                  onTap: () {
+                    if (kDebugMode) {
+                      print("product item clicked: ${item.name}");
+                    }
+                    Get.to(() => Product_view(item: item));
+                  },
+                  child: errandia_widget(
+                    cost: item['price'],
+                    imagePath: item['image'],
+                    name: item['name'],
+                    location: item['location'],
+                  )
+                );
+              },
+            );
+          }
+        },
+      );
+    }
+
+    Widget Service_item_list() {
+      return Obx(
+            () {
+          if (profileController.isServiceLoading.value) {
+            return buildLoadingWidget();
+          } else if (profile_controller().isServiceError.value) {
+            return _buildMyServicesErrorWidget(
+                'An error occurred while loading your services',
+                    () {
+                  profile_controller().loadMyServices();
+                });
+          } else {
+            return GridView.builder(
+              itemCount: profileController.serviceItemList.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                childAspectRatio: 1 / 1.5,
+              ),
+              itemBuilder: (context, index) {
+                final item = profileController.serviceItemList[index];
+                return GestureDetector(
+                  onTap: () {
+                    if (kDebugMode) {
+                      print("service item: ${item.name}");
+                    }
+                    Get.to(() => ServiceDetailsView(service: item));
+                  },
+                  child: errandia_widget(
+                    cost: item['price'],
+                    imagePath: item['image'],
+                    name: item['name'],
+                    location: item['location'],
+                  ),
+                );
+              },
+            );
+          }
+        },
+      );
     }
 
     return Scaffold(
@@ -392,10 +547,10 @@ class _Profile_viewState extends State<Profile_view>
             child: TabBarView(
               controller: tabController,
               children: [
-                profile_controller().product_list.isNotEmpty
+               profileController.productItemList.isNotEmpty
                     ? product_item_list()
                     : noProductsFound(),
-                profile_controller().service_list.isNotEmpty
+                profileController.serviceItemList.isNotEmpty
                     ? Service_item_list()
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -420,7 +575,7 @@ class _Profile_viewState extends State<Profile_view>
                           )
                         ],
                       ),
-                profile_controller().Buiseness_list.isNotEmpty
+                profileController.itemList.isNotEmpty
                     ? Buiseness_item_list()
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -480,53 +635,6 @@ Widget details_container_item_widget(
       ),
       Text(count.toString()),
     ],
-  );
-}
-
-Widget product_item_list() {
-  return GridView.builder(
-    itemCount: profile_controller().product_list.length,
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      crossAxisSpacing: 10,
-      childAspectRatio: 1 / 1.5,
-    ),
-    itemBuilder: (context, index) {
-      final item = Recently_item_List[index];
-
-      return GestureDetector(
-        onTap: () {
-          if (kDebugMode) {
-            print("product item clicked: ${item.name}");
-          }
-          Get.to(() => Product_view(item: item));
-        },
-        child: profile_controller().product_list[index],
-      );
-    },
-  );
-}
-
-Widget Service_item_list() {
-  return GridView.builder(
-    itemCount: profile_controller().service_list.length,
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      crossAxisSpacing: 10,
-      childAspectRatio: 1 / 1.5,
-    ),
-    itemBuilder: (context, index) {
-      final item = profile_controller().service_list[index];
-      return GestureDetector(
-        onTap: () {
-          if (kDebugMode) {
-            print("service item: ${item.name}");
-          }
-          Get.to(() => ServiceDetailsView(service: item));
-        },
-        child: profile_controller().service_list[index],
-      );
-    },
   );
 }
 

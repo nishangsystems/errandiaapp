@@ -12,10 +12,24 @@ class profile_controller extends GetxController {
   RxBool isWhatsappValid = false.obs;
 
   RxBool isLoading = false.obs;
+  RxBool isProductLoading = false.obs;
+  RxBool isServiceLoading = false.obs;
+
   RxInt currentPage = 1.obs;
+  RxInt productCurrentPage = 1.obs;
+  RxInt serviceCurrentPage = 1.obs;
+
   RxInt total = 0.obs;
+  RxInt productTotal = 0.obs;
+  RxInt serviceTotal = 0.obs;
+
   var itemList = List<dynamic>.empty(growable: true).obs;
+  var productItemList = List<dynamic>.empty(growable: true).obs;
+  var serviceItemList = List<dynamic>.empty(growable: true).obs;
+
   RxBool isError = false.obs;
+  RxBool isProductError = false.obs;
+  RxBool isServiceError = false.obs;
 
   @override
   void onInit() {
@@ -47,6 +61,60 @@ class profile_controller extends GetxController {
       isError.value = true;
       isLoading.value = false;
       print("error loading businesses: $e");
+    }
+  }
+
+  void loadMyProducts() async {
+    print("fetching my products");
+    if (isProductLoading.isTrue || (productItemList.isNotEmpty && productItemList.length >= productTotal.value)) return;
+
+    try {
+      isProductLoading.value = true;
+      print("current page: ${productCurrentPage.value}");
+
+      var data = await BusinessAPI.userProducts(productCurrentPage.value);
+      print("my products response: $data");
+
+      if (data != null && data.isNotEmpty) {
+        productCurrentPage.value++;
+        isProductLoading.value = false;
+        // parse total to an integer
+        productTotal.value = data['total'];
+        // print("total_: ${total.value}");
+        productItemList.addAll(data['items']);
+        print("productItemList: $productItemList");
+      }
+    } catch (e) {
+      isProductError.value = true;
+      isProductLoading.value = false;
+      print("error loading products: $e");
+    }
+  }
+
+  void loadMyServices() async {
+    print("fetching my services");
+    if (isServiceLoading.isTrue || (serviceItemList.isNotEmpty && serviceItemList.length >= serviceTotal.value)) return;
+
+    try {
+      isServiceLoading.value = true;
+      print("current page: ${serviceCurrentPage.value}");
+
+      var data = await BusinessAPI.userServices(serviceCurrentPage.value);
+      print("my services response: $data");
+
+      if (data != null && data.isNotEmpty) {
+        serviceCurrentPage.value++;
+        isServiceLoading.value = false;
+        // parse total to an integer
+        serviceTotal.value = data['total'];
+        // print("total_: ${total.value}");
+        serviceItemList.addAll(data['items']);
+        print("serviceItemList: $serviceItemList");
+      }
+    } catch (e) {
+      isServiceError.value = true;
+      isServiceLoading.value = false;
+      print("error loading services: $e");
     }
   }
 

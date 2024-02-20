@@ -183,4 +183,50 @@ class BusinessAPI {
       return da;
     }
   }
+
+  // get my products
+  static Future userProducts(int page) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.get(Uri.parse('${apiDomain().domain}/user/products?page=$page'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print('user products response: $data');
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
+
+  // get my services
+  static Future userServices(int page) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.get(Uri.parse('${apiDomain().domain}/user/services?page=$page'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print('user services response: $data');
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
 }
