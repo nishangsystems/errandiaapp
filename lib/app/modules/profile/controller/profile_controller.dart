@@ -1,3 +1,4 @@
+import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,45 @@ class profile_controller extends GetxController {
   RxBool isEmailValid = false.obs;
   RxBool isPhoneValid = false.obs;
   RxBool isWhatsappValid = false.obs;
+
+  RxBool isLoading = false.obs;
+  RxInt currentPage = 1.obs;
+  RxInt total = 0.obs;
+  var itemList = List<dynamic>.empty(growable: true).obs;
+  RxBool isError = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadMyBusinesses();
+  }
+
+  void loadMyBusinesses() async {
+    print("fetching my businesses");
+    if (isLoading.isTrue || (itemList.isNotEmpty && itemList.length >= total.value)) return;
+
+    try {
+      isLoading.value = true;
+      print("current page: ${currentPage.value}");
+
+      var data = await BusinessAPI.userShops_(currentPage.value);
+      print("my shops response: $data");
+
+      if (data != null && data.isNotEmpty) {
+        currentPage.value++;
+        isLoading.value = false;
+        // parse total to an integer
+        total.value = data['total'];
+        // print("total_: ${total.value}");
+        itemList.addAll(data['items']);
+        print("itemList: $itemList");
+      }
+    } catch (e) {
+      isError.value = true;
+      isLoading.value = false;
+      print("error loading businesses: $e");
+    }
+  }
 
   bool isEmail(String em) {
 

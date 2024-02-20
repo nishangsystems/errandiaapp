@@ -32,6 +32,9 @@ class _Profile_viewState extends State<Profile_view>
       TabController(length: 3, vsync: this);
   late Map<String, dynamic> userData = {};
   late SharedPreferences prefs;
+  late profile_controller profileController;
+  late ScrollController scrollController;
+
 
   // get user from sharedprefs
   Future<void> getUser() async {
@@ -57,6 +60,20 @@ class _Profile_viewState extends State<Profile_view>
   void initState() {
     super.initState();
     getUser();
+    profileController = Get.put(profile_controller());
+    scrollController = ScrollController();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 20) {
+        profileController.loadMyBusinesses();
+      }
+    });
+  }
+
+  void _reloadMyBusinesses() {
+    profileController.currentPage.value = 1;
+    profileController.itemList.clear();
+    profileController.loadMyBusinesses();
   }
 
   @override
@@ -67,6 +84,74 @@ class _Profile_viewState extends State<Profile_view>
 
     if (kDebugMode) {
       print("user: ${userData.toString}");
+    }
+
+    Widget _buildMyBusinessesErrorWidget(String message, VoidCallback onReload) {
+      return !profileController.isLoading.value ? Container(
+        height: Get.height * 0.9,
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(message),
+              ElevatedButton(
+                onPressed: onReload,
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: Text('Retry',
+                  style: TextStyle(
+                      color: appcolor().lightgreyColor
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ): buildLoadingWidget();
+    }
+
+    Widget Buiseness_item_list() {
+      return Obx(() {
+        if (profileController.isLoading.value) {
+          return buildLoadingWidget();
+        } else if (profile_controller().isError.value) {
+          return _buildMyBusinessesErrorWidget(
+              'An error occurred while loading your businesses',
+              _reloadMyBusinesses);
+        } else {
+          return GridView.builder(
+            key: const PageStorageKey('my-businesses'),
+            controller: scrollController,
+              itemCount: profileController.isLoading.value
+                  ? profileController.itemList.length + 1
+                  : profileController.itemList.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 5,
+                childAspectRatio: 1 / 1.4,
+              ),
+              itemBuilder: (context, index) {
+                // return Text(index.toString());
+                final businessData = profileController.itemList[index];
+                return GestureDetector(
+                  onTap: () {
+                    if (kDebugMode) {
+                      print("business item clicked: ${businessData.name}");
+                    }
+                    Get.to(() => VisitShop(businessData: businessData.toJson()));
+                  },
+                  child: errandia_widget(
+                    cost: businessData['name'],
+                    imagePath: businessData['image'],
+                    name: businessData['name'],
+                    location: businessData['location'],
+                  ),
+                );
+              });
+        }
+      });
     }
 
     return Scaffold(
@@ -289,7 +374,7 @@ class _Profile_viewState extends State<Profile_view>
                       text: "Services",
                     ),
                     Tab(
-                      text: "Business",
+                      text: "Businesses",
                     ),
                   ],
                 ),
@@ -301,7 +386,7 @@ class _Profile_viewState extends State<Profile_view>
         // tab bar view
         Expanded(
           child: Container(
-            color: Colors.white,
+            color: Colors.grey[200],
             padding: const EdgeInsets.symmetric(horizontal: 15),
             // height: Get.height * 0.2,
             child: TabBarView(
@@ -341,7 +426,7 @@ class _Profile_viewState extends State<Profile_view>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'No Business Yet',
+                            'No Businesses Yet',
                             style: TextStyle(
                               color: appcolor().mediumGreyColor,
                               fontSize: 16,
@@ -445,28 +530,7 @@ Widget Service_item_list() {
   );
 }
 
-Widget Buiseness_item_list() {
-  return GridView.builder(
-      itemCount: profile_controller().Buiseness_list.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 5,
-        childAspectRatio: 1 / 1.8,
-      ),
-      itemBuilder: (context, index) {
-        // return Text(index.toString());
-        final businessData = business_controller().businessList[index];
-        return GestureDetector(
-          onTap: () {
-            if (kDebugMode) {
-              print("business item clicked: ${businessData.name}");
-            }
-            Get.to(() => VisitShop(businessData: businessData.toJson()));
-          },
-          child: business_controller().businessList[index],
-        );
-      });
-}
+
 
 Widget noProductsFound() {
   return Container(

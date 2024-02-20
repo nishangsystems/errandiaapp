@@ -283,7 +283,9 @@ class edit_profile_viewState extends State<edit_profile_view> {
                             onPressed: () {
                               if (kDebugMode) {
                                 print(
-                                    "edit full name ${fullNameController.text}");
+                                    "edit full name ${fullNameController
+                                        .text}");
+                              }
                                 var value = {
                                   "field_name": "name",
                                   "field_value":
@@ -318,7 +320,6 @@ class edit_profile_viewState extends State<edit_profile_view> {
 
                                   popupBox.showPopup(context);
                                 });
-                              }
                             },
                             icon: const Icon(
                               Icons.save_sharp,
@@ -437,6 +438,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                             if (kDebugMode) {
                               print(
                                   "edit whatsapp ${whatsappController.text}");
+                            }
                               var value = {
                                 "field_name": "whatsapp_number",
                                 "field_value": whatsappController.text
@@ -469,7 +471,6 @@ class edit_profile_viewState extends State<edit_profile_view> {
 
                                 popupBox.showPopup(context);
                               });
-                            }
                           },
                           icon: const Icon(
                             Icons.save_sharp,

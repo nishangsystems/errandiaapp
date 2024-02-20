@@ -343,9 +343,7 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
           Expanded(
             child: Obx(() {
               if (busi_controller.isLoading.value == true) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return buildLoadingWidget();
               } else if (busi_controller.isFBLError.value) {
                 return _buildFBLErrorWidget('Failed to load businesses', _reloadFeaturedBusinessesData);
               } else {
@@ -462,6 +460,7 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: appcolor().mediumGreyColor,
+                                              fontStyle: FontStyle.italic,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,

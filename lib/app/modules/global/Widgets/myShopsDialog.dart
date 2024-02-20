@@ -26,7 +26,7 @@ class _ShopSelectionDialogState extends State<ShopSelectionDialog> {
   Future<void> fetchShops() async {
     // Placeholder for your API call
     // Replace this with your actual API call logic
-    var response = await BusinessAPI.userShops_();
+    var response = await BusinessAPI.userShops_(1);
     print("response my shops: ${response['items']}");
 
   // convert response['items'] to json

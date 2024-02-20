@@ -139,11 +139,11 @@ class BusinessAPI {
   }
 
   // get user shops
-  static Future userShops_() async {
+  static Future userShops_(int page) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
 
-    final response = await http.get(Uri.parse('${apiDomain().domain}/user/shops'),
+    final response = await http.get(Uri.parse('${apiDomain().domain}/user/shops?page=$page'),
         headers: ({
           'Content-Type': 'application/json; charset=UTF-8',
           'Accept': 'application/json',
