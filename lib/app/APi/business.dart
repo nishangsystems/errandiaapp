@@ -15,7 +15,7 @@ class BusinessAPI {
   static Future createBusiness(Object value, context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
-    final response = await http.post(Uri.parse('${apiDomain().domain}/shops'),
+    final response = await http.post(Uri.parse('${apiDomain().domain}/user/shops'),
         body: jsonEncode(value),
         headers: ({
           'Content-Type': 'application/json; charset=UTF-8',
@@ -50,7 +50,7 @@ class BusinessAPI {
     var token = prefs.getString('token');
 
     var request =
-        http.MultipartRequest('POST', Uri.parse('${apiDomain().domain}/shops'));
+        http.MultipartRequest('POST', Uri.parse('${apiDomain().domain}/user/shops'));
 
     request.headers.addAll({
       'Content-Type': 'multipart/form-data',

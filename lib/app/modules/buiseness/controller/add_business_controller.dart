@@ -77,6 +77,23 @@ class add_business_controller extends GetxController{
     print("towns: $Towns.Items");
   }
 
+  void resetFields() {
+    company_name_controller.clear();
+    Business_category_controller.clear();
+    Business_information_controller.clear();
+    website_address_controller.clear();
+    country_controller.clear();
+    region_controller.clear();
+    town_controller.clear();
+    address_controller.clear();
+    facebook_controller.clear();
+    instagram_controller.clear();
+    twitter_controller.clear();
+    add_manager_first_name_controller.clear();
+    add_manager_last_name_controller.clear();
+    phone_controller.clear();
+  }
+
   void remove_Manager (String manager)
   {
     managerList.remove(manager);

@@ -50,7 +50,7 @@ Future<void> mlaunchUrl(String url) async {
 Widget buildLoadingWidget() {
   return Container(
     height: Get.height * 0.17,
-    color: Colors.white,
+    color: Colors.transparent,
     child: const Center(child: CircularProgressIndicator()),
   );
 }

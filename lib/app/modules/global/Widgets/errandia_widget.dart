@@ -7,7 +7,7 @@ import '../constants/color.dart';
 class errandia_widget extends StatelessWidget {
   errandia_widget({
     super.key,
-    @required this.cost,
+     this.cost,
     @required this.imagePath,
     @required this.name,
     @required this.location,
@@ -59,7 +59,7 @@ class errandia_widget extends StatelessWidget {
                       Text(
                         location.toString(),
                         style: TextStyle(
-                            color: appcolor().mediumGreyColor, fontSize: 12,  fontStyle: FontStyle.italic,),
+                            color: appcolor().mediumGreyColor, fontSize: 12,),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       )
@@ -84,13 +84,13 @@ class errandia_widget extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            // Text(
-            //   cost.toString(),
-            //   style: TextStyle(
-            //       fontWeight: FontWeight.w600,
-            //       color: appcolor().mainColor,
-            //       fontSize: 16),
-            // )
+            cost != null ? Text(
+              cost.toString(),
+              style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: appcolor().mainColor,
+                  fontSize: 14),
+            ): Container()
           ],
         ));
   }

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/profile/view/edit_profile_view.dart';
@@ -36,7 +38,6 @@ class _Profile_viewState extends State<Profile_view>
   late ScrollController scrollController;
   late ScrollController serviceScrollController;
   late ScrollController productScrollController;
-
 
   // get user from sharedprefs
   Future<void> getUser() async {
@@ -94,6 +95,18 @@ class _Profile_viewState extends State<Profile_view>
     profileController.loadMyBusinesses();
   }
 
+  void _reloadMyProducts() {
+    profileController.productCurrentPage.value = 1;
+    profileController.productItemList.clear();
+    profileController.loadMyProducts();
+  }
+
+  void _reloadMyServices() {
+    profileController.serviceCurrentPage.value = 1;
+    profileController.serviceItemList.clear();
+    profileController.loadMyServices();
+  }
+
   @override
   Widget build(BuildContext context) {
     String prod_list_size = profile_controller().product_list.isNotEmpty
@@ -104,82 +117,86 @@ class _Profile_viewState extends State<Profile_view>
       print("user: ${userData.toString}");
     }
 
-    Widget _buildMyBusinessesErrorWidget(String message, VoidCallback onReload) {
-      return !profileController.isLoading.value ? Container(
-        height: Get.height * 0.9,
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(message),
-              ElevatedButton(
-                onPressed: onReload,
-                style: ElevatedButton.styleFrom(
-                  primary: appcolor().mainColor,
-                ),
-                child: Text('Retry',
-                  style: TextStyle(
-                      color: appcolor().lightgreyColor
-                  ),
+    Widget _buildMyBusinessesErrorWidget(
+        String message, VoidCallback onReload) {
+      return !profileController.isLoading.value
+          ? Container(
+              height: Get.height * 0.9,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ): buildLoadingWidget();
+            )
+          : buildLoadingWidget();
     }
 
     Widget _buildMyProductsErrorWidget(String message, VoidCallback onReload) {
-      return !profileController.isProductLoading.value ? Container(
-        height: Get.height * 0.9,
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(message),
-              ElevatedButton(
-                onPressed: onReload,
-                style: ElevatedButton.styleFrom(
-                  primary: appcolor().mainColor,
-                ),
-                child: Text('Retry',
-                  style: TextStyle(
-                      color: appcolor().lightgreyColor
-                  ),
+      return !profileController.isProductLoading.value
+          ? Container(
+              height: Get.height * 0.9,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ): buildLoadingWidget();
+            )
+          : buildLoadingWidget();
     }
 
     Widget _buildMyServicesErrorWidget(String message, VoidCallback onReload) {
-      return !profileController.isServiceLoading.value ? Container(
-        height: Get.height * 0.9,
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(message),
-              ElevatedButton(
-                onPressed: onReload,
-                style: ElevatedButton.styleFrom(
-                  primary: appcolor().mainColor,
-                ),
-                child: Text('Retry',
-                  style: TextStyle(
-                      color: appcolor().lightgreyColor
-                  ),
+      return !profileController.isServiceLoading.value
+          ? Container(
+              height: Get.height * 0.9,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ): buildLoadingWidget();
+            )
+          : buildLoadingWidget();
     }
 
     Widget Buiseness_item_list() {
@@ -190,77 +207,145 @@ class _Profile_viewState extends State<Profile_view>
           return _buildMyBusinessesErrorWidget(
               'An error occurred while loading your businesses',
               _reloadMyBusinesses);
-        } else {
-          return GridView.builder(
-            key: const PageStorageKey('my-businesses'),
-            controller: scrollController,
-              itemCount: profileController.isLoading.value
-                  ? profileController.itemList.length + 1
-                  : profileController.itemList.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 5,
-                childAspectRatio: 1 / 1.4,
+        } else if (profileController.itemList.isEmpty) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'No Businesses Yet',
+                style: TextStyle(
+                  color: appcolor().mediumGreyColor,
+                  fontSize: 16,
+                ),
               ),
-              itemBuilder: (context, index) {
-                // return Text(index.toString());
-                final businessData = profileController.itemList[index];
-                return GestureDetector(
-                  onTap: () {
-                    if (kDebugMode) {
-                      print("business item clicked: ${businessData.name}");
-                    }
-                    Get.to(() => VisitShop(businessData: businessData.toJson()));
-                  },
-                  child: errandia_widget(
-                    cost: businessData['name'],
-                    imagePath: businessData['image'],
-                    name: businessData['name'],
-                    location: businessData['location'],
+              ElevatedButton(
+                onPressed: () {
+                  Get.to(() => add_business_view());
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: const Text(
+                  'Add Business',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
-                );
-              });
+                ),
+              )
+            ],
+          );
+        } else {
+          return RefreshIndicator(
+            onRefresh: () async {
+              _reloadMyBusinesses();
+            },
+            child: GridView.builder(
+                key: const PageStorageKey('my-businesses'),
+                controller: scrollController,
+                itemCount: profileController.isLoading.value
+                    ? profileController.itemList.length + 1
+                    : profileController.itemList.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 5,
+                  childAspectRatio: 1 / 1.4,
+                ),
+                itemBuilder: (context, index) {
+                  // return Text(index.toString());
+                  final businessData = profileController.itemList[index];
+                  return GestureDetector(
+                    onTap: () {
+                      if (kDebugMode) {
+                        print("business item clicked: ${businessData.name}");
+                      }
+                      Get.to(
+                          () => VisitShop(businessData: businessData.toJson()));
+                    },
+                    child: errandia_widget(
+                      imagePath: businessData['image'],
+                      name: businessData['name'],
+                      location: businessData['street'],
+                    ),
+                  );
+                }),
+          );
         }
       });
     }
 
     Widget product_item_list() {
       return Obx(
-            () {
+        () {
           if (profile_controller().isProductLoading.value) {
             return buildLoadingWidget();
           } else if (profile_controller().isProductError.value) {
             return _buildMyProductsErrorWidget(
-                'An error occurred while loading your products',
-                    () {
-                  profile_controller().loadMyProducts();
-                });
-          } else {
-            return GridView.builder(
-              itemCount: profile_controller().productItemList.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                childAspectRatio: 1 / 1.5,
-              ),
-              itemBuilder: (context, index) {
-                final item = profileController.productItemList[index];
-
-                return GestureDetector(
-                  onTap: () {
-                    if (kDebugMode) {
-                      print("product item clicked: ${item.name}");
-                    }
-                    Get.to(() => Product_view(item: item));
+                'An error occurred while loading your products', () {
+              profile_controller().loadMyProducts();
+            });
+          } else if (profile_controller().productItemList.isEmpty) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'No Products Yet',
+                  style: TextStyle(
+                    color: appcolor().mediumGreyColor,
+                    fontSize: 16,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Get.to(() => add_product_view(shopId: shopId));
                   },
-                  child: errandia_widget(
-                    cost: item['price'],
-                    imagePath: item['image'],
-                    name: item['name'],
-                    location: item['location'],
-                  )
-                );
+                  style: ElevatedButton.styleFrom(
+                    primary: appcolor().mainColor,
+                  ),
+                  child: const Text(
+                    'Add Products',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
+              ],
+            );
+          } else {
+            return RefreshIndicator(
+              onRefresh: () async {
+                _reloadMyProducts();
               },
+              child: GridView.builder(
+                key: const PageStorageKey('my-products'),
+                controller: productScrollController,
+                itemCount: profileController.isProductLoading.value
+                    ? profileController.productItemList.length + 1
+                    : profileController.productItemList.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1 / 1.5,
+                ),
+                itemBuilder: (context, index) {
+                  final item = profileController.productItemList[index];
+
+                  return GestureDetector(
+                      onTap: () {
+                        if (kDebugMode) {
+                          print("product item clicked: ${item.name}");
+                        }
+                        Get.to(() => Product_view(item: item));
+                      },
+                      child: errandia_widget(
+                        cost: item['price'],
+                        imagePath: item['image'],
+                        name: item['name'],
+                        location: item['location'],
+                      ));
+                },
+              ),
             );
           }
         },
@@ -269,40 +354,76 @@ class _Profile_viewState extends State<Profile_view>
 
     Widget Service_item_list() {
       return Obx(
-            () {
+        () {
           if (profileController.isServiceLoading.value) {
             return buildLoadingWidget();
           } else if (profile_controller().isServiceError.value) {
             return _buildMyServicesErrorWidget(
-                'An error occurred while loading your services',
-                    () {
-                  profile_controller().loadMyServices();
-                });
-          } else {
-            return GridView.builder(
-              itemCount: profileController.serviceItemList.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                childAspectRatio: 1 / 1.5,
-              ),
-              itemBuilder: (context, index) {
-                final item = profileController.serviceItemList[index];
-                return GestureDetector(
-                  onTap: () {
-                    if (kDebugMode) {
-                      print("service item: ${item.name}");
-                    }
-                    Get.to(() => ServiceDetailsView(service: item));
-                  },
-                  child: errandia_widget(
-                    cost: item['price'],
-                    imagePath: item['image'],
-                    name: item['name'],
-                    location: item['location'],
+                'An error occurred while loading your services', () {
+              profile_controller().loadMyServices();
+            });
+          } else if (profileController.serviceItemList.isEmpty) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'No Services Yet',
+                  style: TextStyle(
+                    color: appcolor().mediumGreyColor,
+                    fontSize: 16,
                   ),
-                );
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Get.to(() => add_product_view(shopId: shopId));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: appcolor().mainColor,
+                  ),
+                  child: const Text(
+                    'Add Services',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
+              ],
+            );
+          } else {
+            return RefreshIndicator(
+              onRefresh: () async {
+                _reloadMyServices();
               },
+              child: GridView.builder(
+                key: const PageStorageKey('my-services'),
+                controller: serviceScrollController,
+                itemCount: profileController.isServiceLoading.value
+                    ? profileController.serviceItemList.length + 1
+                    : profileController.serviceItemList.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1 / 1.5,
+                ),
+                itemBuilder: (context, index) {
+                  final item = profileController.serviceItemList[index];
+                  return GestureDetector(
+                    onTap: () {
+                      if (kDebugMode) {
+                        print("service item: ${item.name}");
+                      }
+                      Get.to(() => ServiceDetailsView(service: item));
+                    },
+                    child: errandia_widget(
+                      cost: item['unit_price'],
+                      imagePath: item['featured_image'],
+                      name: item['name'],
+                      location: item['street'],
+                    ),
+                  );
+                },
+              ),
             );
           }
         },
@@ -547,59 +668,9 @@ class _Profile_viewState extends State<Profile_view>
             child: TabBarView(
               controller: tabController,
               children: [
-               profileController.productItemList.isNotEmpty
-                    ? product_item_list()
-                    : noProductsFound(),
-                profileController.serviceItemList.isNotEmpty
-                    ? Service_item_list()
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'No Services Yet',
-                            style: TextStyle(
-                              color: appcolor().mediumGreyColor,
-                              fontSize: 16,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              'Add Services',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                profileController.itemList.isNotEmpty
-                    ? Buiseness_item_list()
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'No Businesses Yet',
-                            style: TextStyle(
-                              color: appcolor().mediumGreyColor,
-                              fontSize: 16,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              'Add Business',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
+                product_item_list(),
+                Service_item_list(),
+                Buiseness_item_list()
               ],
             ),
           ),
@@ -637,8 +708,6 @@ Widget details_container_item_widget(
     ],
   );
 }
-
-
 
 Widget noProductsFound() {
   return Container(

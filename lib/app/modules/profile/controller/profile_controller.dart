@@ -35,6 +35,8 @@ class profile_controller extends GetxController {
   void onInit() {
     super.onInit();
     loadMyBusinesses();
+    loadMyProducts();
+    loadMyServices();
   }
 
   void loadMyBusinesses() async {

@@ -177,7 +177,6 @@ class _home_view_1State extends State<home_view_1> {
     print('INIT: Is logged in: $isLoggedIn');
   }
 
-
   // Method to fetch recently posted items data
   void _fetchRecentlyPostedItemsData() async {
     try {
@@ -285,74 +284,81 @@ class _home_view_1State extends State<home_view_1> {
     Future<void> locationPermission() async {
       var status = await Permission.location.request();
       if (status.isDenied) {
-        ScaffoldMessenger.of(scaffoldKey.currentContext!)
-            .showSnackBar(const SnackBar(content: Text('Camera access denied')));
+        ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
+            const SnackBar(content: Text('Camera access denied')));
       } else if (status.isPermanentlyDenied) {
         ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
             const SnackBar(content: Text('Camera access permanently denied')));
       } else if (status.isGranted) {
-        ScaffoldMessenger.of(scaffoldKey.currentContext!)
-            .showSnackBar(const SnackBar(content: Text('Camera access granted')));
+        ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
+            const SnackBar(content: Text('Camera access granted')));
       }
     }
 
     Widget _buildRPIErrorWidget(String message, VoidCallback onReload) {
-      return !_isRPILoading ? Container(
-        height: Get.height * 0.3,
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(message),
-              ElevatedButton(
-                onPressed: onReload,
-                style: ElevatedButton.styleFrom(
-                  primary: appcolor().mainColor,
-                ),
-                child: Text('Retry',
-                  style: TextStyle(
-                      color: appcolor().lightgreyColor
-                  ),
+      return !_isRPILoading
+          ? Container(
+              height: Get.height * 0.3,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ): buildLoadingWidget();
+            )
+          : buildLoadingWidget();
     }
 
     Widget _buildFBLErrorWidget(String message, VoidCallback onReload) {
-      return !_isFBLLoading ? Container(
-        height: Get.height * 0.3,
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(message),
-              ElevatedButton(
-                onPressed: onReload,
-                style: ElevatedButton.styleFrom(
-                  primary: appcolor().mainColor,
-                ),
-                child: Text('Retry',
-                  style: TextStyle(
-                      color: appcolor().lightgreyColor
-                  ),
+      return !_isFBLLoading
+          ? Container(
+              height: Get.height * 0.3,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ): buildLoadingWidget();
+            )
+          : buildLoadingWidget();
     }
 
     Widget Recently_posted_items_Widget() {
       if (isRPIError) {
-        return _buildRPIErrorWidget('Failed to load recently posted items', _reloadRecentlyPostedItems);
+        return _buildRPIErrorWidget(
+            'Failed to load recently posted items', _reloadRecentlyPostedItems);
       } else if (recentlyPostedItemsData.isEmpty) {
-        return buildLoadingWidget();
+        return Container(
+          height: Get.height * 0.45,
+          color: Colors.white,
+          child: buildLoadingWidget(),
+        );
       } else {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -371,8 +377,8 @@ class _home_view_1State extends State<home_view_1> {
                   // Get.to(Product_view(item: data,name: data['name'].toString(),));
                   // Get.back();
                   Get.to(() => errand_detail_view(
-                    data: data,
-                  ));
+                        data: data,
+                      ));
                 },
                 child: Card(
                   child: Container(
@@ -391,8 +397,8 @@ class _home_view_1State extends State<home_view_1> {
                                   data['shop']['image'] != ''
                                       ? data['shop']['image'].toString()
                                       : Recently_item_List[index]
-                                      .avatarImage
-                                      .toString(),
+                                          .avatarImage
+                                          .toString(),
                                 ),
                               ),
                               SizedBox(
@@ -427,7 +433,9 @@ class _home_view_1State extends State<home_view_1> {
                           color: appcolor().lightgreyColor,
                           child: Center(
                             child: Image(
-                              image: AssetImage(Recently_item_List[index].imagePath.toString()),
+                              image: AssetImage(Recently_item_List[index]
+                                  .imagePath
+                                  .toString()),
                               height: Get.height * 0.15,
                             ),
                           ),
@@ -458,7 +466,9 @@ class _home_view_1State extends State<home_view_1> {
                               //   height: Get.height * 0.001,
                               // ),
                               Text(
-                                data['name'].toString() != "null" ? data['name'].toString() : 'errand name',
+                                data['name'].toString() != "null"
+                                    ? data['name'].toString()
+                                    : 'errand name',
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
@@ -469,7 +479,8 @@ class _home_view_1State extends State<home_view_1> {
                               ),
                               Row(
                                 children: [
-                                  Icon(Icons.location_on,
+                                  Icon(
+                                    Icons.location_on,
                                     color: appcolor().mediumGreyColor,
                                     size: 15,
                                   ),
@@ -497,9 +508,14 @@ class _home_view_1State extends State<home_view_1> {
 
     Widget Featured_Businesses_List() {
       if (isFBLError) {
-        return _buildFBLErrorWidget("Failed to load featured businesses", _reloadFeaturedBusinessesData);
+        return _buildFBLErrorWidget("Failed to load featured businesses",
+            _reloadFeaturedBusinessesData);
       } else if (featuredBusinessesData.isEmpty) {
-        return buildLoadingWidget();
+        return Container(
+          height: Get.height * 0.33,
+          color: Colors.white,
+          child: buildLoadingWidget(),
+        );
       } else {
         print("fbl: $featuredBusinessesData");
         return Container(
@@ -516,13 +532,11 @@ class _home_view_1State extends State<home_view_1> {
               print("sub data: ${data['street']}");
               return InkWell(
                 onTap: () {
-                  Get.to(() => errandia_business_view(
-                      businessData: data)
-                  );
+                  Get.to(() => errandia_business_view(businessData: data));
                 },
                 child: Container(
                   margin:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   width: Get.width * 0.4,
                   color: Colors.white,
                   child: Column(
@@ -533,14 +547,12 @@ class _home_view_1State extends State<home_view_1> {
                       ),
                       Container(
                         height: Get.height * 0.15,
-                        width: Get.width ,
+                        width: Get.width,
                         color: appcolor().lightgreyColor,
                         child: Image(
-                          image: NetworkImage(
-                              data['image'] != ''
-                                  ? getImagePath(data['image'].toString())
-                                  : 'https://errandia.com/assets/images/logo-default.png'
-                          ),
+                          image: NetworkImage(data['image'] != ''
+                              ? getImagePath(data['image'].toString())
+                              : 'https://errandia.com/assets/images/logo-default.png'),
                           fit: BoxFit.fill,
                           height: Get.height * 0.15,
                           // width: Get.width * 0.3,
@@ -574,31 +586,33 @@ class _home_view_1State extends State<home_view_1> {
                       SizedBox(
                         height: Get.height * 0.001,
                       ),
-                      (data['street'] != '' && data['street'] != null) ? Row(
-                        children: [
-                          Icon(
-                            Icons.location_on,
-                            color: appcolor().mediumGreyColor,
-                            size: 15,
-                          ),
-                          const SizedBox(
-                            width: 1,
-                          ),
-                          Text(
-                            data['street'].toString(),
-                            style: const TextStyle(fontSize: 12),
-                          )
-                        ],
-                      ) : Text(
-                        "No location provided",
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: appcolor().mediumGreyColor,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      (data['street'] != '' && data['street'] != null)
+                          ? Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  color: appcolor().mediumGreyColor,
+                                  size: 15,
+                                ),
+                                const SizedBox(
+                                  width: 1,
+                                ),
+                                Text(
+                                  data['street'].toString(),
+                                  style: const TextStyle(fontSize: 12),
+                                )
+                              ],
+                            )
+                          : Text(
+                              "No location provided",
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: appcolor().mediumGreyColor,
+                                fontStyle: FontStyle.italic,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                     ],
                   ),
                 ),
@@ -690,16 +704,18 @@ class _home_view_1State extends State<home_view_1> {
                       homeController.loggedIn.value
                           ? 'Update Business Location'.tr
                           : 'Update Location'.tr,
-                      style: TextStyle(
-                          color: appcolor().mainColor, fontSize: 12),
+                      style:
+                          TextStyle(color: appcolor().mainColor, fontSize: 12),
                     ),
                   ),
                   TextButton(
                     onPressed: () async {
                       var status = await Permission.location.status;
                       if (status.isGranted) {
-                        ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(const SnackBar(
-                            content: Text('Camera access permanently denied')));
+                        ScaffoldMessenger.of(scaffoldKey.currentContext!)
+                            .showSnackBar(const SnackBar(
+                                content:
+                                    Text('Camera access permanently denied')));
                       } else {
                         locationPermission();
                       }
@@ -895,11 +911,6 @@ Widget Categories_List_Widget() {
       });
 }
 
-
-
 void _reloadFeaturedBusinesses() {
   print('Reloading featured businesses');
 }
-
-
-
