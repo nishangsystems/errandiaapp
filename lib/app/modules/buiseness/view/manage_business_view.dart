@@ -3,8 +3,10 @@ import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/home/view/home_view_1.dart';
 import 'package:errandia/app/modules/products/view/add_product_view.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/view/add_service_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +54,19 @@ class manage_business_view extends StatelessWidget {
           ),
         ),
       ),
-      endDrawer: customendDrawer(),
+      endDrawer: CustomEndDrawer(
+        onBusinessCreated: () {
+          home_controller().closeDrawer();
+          home_controller().featuredBusinessData.clear();
+          home_controller().fetchFeaturedBusinessesData();
+          business_controller().itemList.clear();
+          business_controller().loadBusinesses();
+          home_controller().recentlyPostedItemsData.clear();
+          home_controller().fetchRecentlyPostedItemsData();
+          profile_controller().itemList.clear();
+          profile_controller().loadMyBusinesses();
+        },
+      ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,

@@ -29,7 +29,7 @@ class Profile_view extends StatefulWidget {
 }
 
 class _Profile_viewState extends State<Profile_view>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   late final TabController tabController =
       TabController(length: 3, vsync: this);
   late Map<String, dynamic> userData = {};
@@ -62,6 +62,12 @@ class _Profile_viewState extends State<Profile_view>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      profileController.reloadMyBusinesses();
+      profileController.reloadMyProducts();
+      profileController.reloadMyServices();
+    });
     getUser();
     profileController = Get.put(profile_controller());
     scrollController = ScrollController();
@@ -89,22 +95,22 @@ class _Profile_viewState extends State<Profile_view>
     });
   }
 
-  void _reloadMyBusinesses() {
-    profileController.currentPage.value = 1;
-    profileController.itemList.clear();
-    profileController.loadMyBusinesses();
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    scrollController.dispose();
+    serviceScrollController.dispose();
+    productScrollController.dispose();
+    super.dispose();
   }
 
-  void _reloadMyProducts() {
-    profileController.productCurrentPage.value = 1;
-    profileController.productItemList.clear();
-    profileController.loadMyProducts();
-  }
-
-  void _reloadMyServices() {
-    profileController.serviceCurrentPage.value = 1;
-    profileController.serviceItemList.clear();
-    profileController.loadMyServices();
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      profileController.reloadMyBusinesses();
+      profileController.reloadMyProducts();
+      profileController.reloadMyServices();
+    }
   }
 
   @override
@@ -206,7 +212,7 @@ class _Profile_viewState extends State<Profile_view>
         } else if (profile_controller().isError.value) {
           return _buildMyBusinessesErrorWidget(
               'An error occurred while loading your businesses',
-              _reloadMyBusinesses);
+              profileController.reloadMyBusinesses);
         } else if (profileController.itemList.isEmpty) {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -220,7 +226,10 @@ class _Profile_viewState extends State<Profile_view>
               ),
               ElevatedButton(
                 onPressed: () {
-                  Get.to(() => add_business_view());
+                  Get.to(() => add_business_view())?.then((_) {
+                    business_controller().itemList.clear();
+                    business_controller().loadBusinesses();
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   primary: appcolor().mainColor,
@@ -238,10 +247,10 @@ class _Profile_viewState extends State<Profile_view>
         } else {
           return RefreshIndicator(
             onRefresh: () async {
-              _reloadMyBusinesses();
+              profileController.reloadMyBusinesses();
             },
             child: GridView.builder(
-                key: const PageStorageKey('my-businesses'),
+                key: UniqueKey(),
                 controller: scrollController,
                 itemCount: profileController.isLoading.value
                     ? profileController.itemList.length + 1
@@ -257,15 +266,15 @@ class _Profile_viewState extends State<Profile_view>
                   return GestureDetector(
                     onTap: () {
                       if (kDebugMode) {
-                        print("business item clicked: ${businessData.name}");
+                        print("business item clicked: ${businessData}");
                       }
                       Get.to(
-                          () => VisitShop(businessData: businessData.toJson()));
+                          () => VisitShop(businessData: businessData));
                     },
                     child: errandia_widget(
                       imagePath: businessData['image'],
                       name: businessData['name'],
-                      location: businessData['street'],
+                      location: businessData['street'] ?? "",
                     ),
                   );
                 }),
@@ -315,7 +324,7 @@ class _Profile_viewState extends State<Profile_view>
           } else {
             return RefreshIndicator(
               onRefresh: () async {
-                _reloadMyProducts();
+                profileController.reloadMyProducts();
               },
               child: GridView.builder(
                 key: const PageStorageKey('my-products'),
@@ -334,7 +343,7 @@ class _Profile_viewState extends State<Profile_view>
                   return GestureDetector(
                       onTap: () {
                         if (kDebugMode) {
-                          print("product item clicked: ${item.name}");
+                          print("product item clicked: ${item['name']}");
                         }
                         Get.to(() => Product_view(item: item));
                       },
@@ -393,7 +402,7 @@ class _Profile_viewState extends State<Profile_view>
           } else {
             return RefreshIndicator(
               onRefresh: () async {
-                _reloadMyServices();
+                profileController.reloadMyServices();
               },
               child: GridView.builder(
                 key: const PageStorageKey('my-services'),
@@ -411,7 +420,7 @@ class _Profile_viewState extends State<Profile_view>
                   return GestureDetector(
                     onTap: () {
                       if (kDebugMode) {
-                        print("service item: ${item.name}");
+                        print("service item: ${item['name']}");
                       }
                       Get.to(() => ServiceDetailsView(service: item));
                     },
@@ -487,22 +496,6 @@ class _Profile_viewState extends State<Profile_view>
                     ),
                   ),
 
-                  // Image.network(
-                  //   getImagePath(userData['photo'] ?? ""),
-                  //   height: Get.height * 0.13,
-                  //   width: Get.width * 0.27,
-                  //   fit: BoxFit.cover,
-                  //   key: UniqueKey(),
-                  // ) : Center(
-                  //     child: Text(
-                  //       getFirstLetter(userData['name']),
-                  //       style: const TextStyle(
-                  //         color: Color(0xffff0000),
-                  //         fontSize: 40,
-                  //         fontWeight: FontWeight.bold,
-                  //       ),
-                  //     )
-                  // ),
                   Align(
                     alignment: AlignmentDirectional.topEnd,
                     child: SizedBox(
@@ -666,6 +659,7 @@ class _Profile_viewState extends State<Profile_view>
             padding: const EdgeInsets.symmetric(horizontal: 15),
             // height: Get.height * 0.2,
             child: TabBarView(
+              key: UniqueKey(),
               controller: tabController,
               children: [
                 product_item_list(),

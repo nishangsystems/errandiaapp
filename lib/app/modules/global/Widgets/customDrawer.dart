@@ -1,47 +1,38 @@
-import 'package:errandia/app/modules/Billing/view/Billing_history_view.dart';
 import 'package:errandia/app/modules/Dashboard/view/dashboard_view.dart';
-import 'package:errandia/app/modules/Enquiries/view/enquiries_view.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
-import 'package:errandia/app/modules/categories/CategoryData.dart';
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/categories/view/categories.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
-import 'package:errandia/app/modules/errands/view/run_an_errand.dart';
 import 'package:errandia/app/modules/errands/view/run_an_errand_1.dart';
-import 'package:errandia/app/modules/errands/view/see_all_erands.dart';
 import 'package:errandia/app/modules/following/view/following_view.dart';
-
 import 'package:errandia/app/modules/global/constants/color.dart';
-import 'package:errandia/app/modules/home/view/home_view_1.dart';
 import 'package:errandia/app/modules/manage_review/view/manage_review_view.dart';
-import 'package:errandia/app/modules/products/view/manage_products_view.dart';
-import 'package:errandia/app/modules/services/view/manage_service_view.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/setting/view/setting_view.dart';
 import 'package:errandia/app/modules/subscribers/view/subscriber_view.dart';
 import 'package:errandia/auth_services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../uis/getStartedScreen.dart';
 import '../../buiseness/view/add_business_view.dart';
 import '../../buiseness/view/businesses_view.dart';
 import '../../buiseness/view/manage_business_view.dart';
 import '../../home/controller/home_controller.dart';
-import '../../home/view/home_view.dart';
-import '../../products/view/add_product_view.dart';
 
-class customendDrawer extends StatelessWidget {
-  customendDrawer({super.key});
+class CustomEndDrawer extends StatelessWidget {
+  final VoidCallback onBusinessCreated;
+  CustomEndDrawer({super.key, required this.onBusinessCreated});
 
-  final padding = EdgeInsets.symmetric(horizontal: 10);
-  home_controller homeController = Get.put(home_controller());
+  final padding = const EdgeInsets.symmetric(horizontal: 10);
+  final home_controller homeController = Get.put(home_controller());
 
   @override
   Widget build(BuildContext context) {
 
     return Drawer(
       shadowColor: Colors.grey,
+      key: UniqueKey(),
       child: ListView(
         children: [
           SizedBox(
@@ -67,7 +58,11 @@ class customendDrawer extends StatelessWidget {
                   text: 'Create Business',
                   imagePath: 'assets/images/sidebar_icon/create_shop.png',
                   callback: () {
-                    Get.to(() => add_business_view());
+                    homeController.closeDrawer();
+                    Get.to(() => add_business_view())?.then((_) {
+                      onBusinessCreated();
+                      profile_controller().reloadMyBusinesses();
+                    });
                   },
                 )
               : drawerItemWidget(

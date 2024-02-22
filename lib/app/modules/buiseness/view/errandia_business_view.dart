@@ -8,6 +8,7 @@ import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
 import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:errandia/utils/helper.dart';
@@ -132,7 +133,17 @@ class _errandia_business_viewState extends State<errandia_business_view> {
           size: 30,
         ),
       ),
-      endDrawer: customendDrawer(),
+      endDrawer: CustomEndDrawer(
+        onBusinessCreated: () {
+          home_controller().closeDrawer();
+          home_controller().featuredBusinessData.clear();
+          home_controller().fetchFeaturedBusinessesData();
+          business_controller().itemList.clear();
+          business_controller().loadBusinesses();
+          home_controller().recentlyPostedItemsData.clear();
+          home_controller().fetchRecentlyPostedItemsData();
+        },
+      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(12.0),
         child: SizedBox(

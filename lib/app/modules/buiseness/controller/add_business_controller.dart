@@ -20,6 +20,8 @@ class add_business_controller extends GetxController{
   TextEditingController add_manager_first_name_controller= TextEditingController();
   TextEditingController add_manager_last_name_controller= TextEditingController();
   TextEditingController phone_controller= TextEditingController();
+  TextEditingController email_controller= TextEditingController();
+  TextEditingController description_controller = TextEditingController();
   
   RxList<String> managerList=[
     'Abhishek',
@@ -92,6 +94,9 @@ class add_business_controller extends GetxController{
     add_manager_first_name_controller.clear();
     add_manager_last_name_controller.clear();
     phone_controller.clear();
+    email_controller.clear();
+    description_controller.clear();
+
   }
 
   void remove_Manager (String manager)

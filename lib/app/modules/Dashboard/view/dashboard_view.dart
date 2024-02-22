@@ -1,10 +1,10 @@
-import 'package:errandia/app/modules/Enquiries/view/enquiries_view.dart';
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
-import 'package:errandia/app/modules/following/view/following_view.dart';
 import 'package:errandia/app/modules/global/Widgets/account_suspended_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/manage_review/view/manage_review_view.dart';
 import 'package:errandia/app/modules/services/view/manage_service_view.dart';
 import 'package:errandia/app/modules/sms_plan/view/sms_plan_view.dart';
@@ -13,6 +13,7 @@ import 'package:errandia/app/modules/subscription/view/manage_subscription_view.
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
+
 import '../../buiseness/view/manage_business_view.dart';
 import '../../global/Widgets/bottomsheet_item.dart';
 import '../../products/view/manage_products_view.dart';
@@ -23,7 +24,7 @@ class dashboard_view extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xfffafafa),
+      backgroundColor: const Color(0xfffafafa),
       floatingActionButton: InkWell(
         onTap: () {
           custombottomsheet(context);
@@ -43,7 +44,17 @@ class dashboard_view extends StatelessWidget {
         ),
       ),
       appBar: appbar(),
-      endDrawer: customendDrawer(),
+      endDrawer: CustomEndDrawer(
+        onBusinessCreated: () {
+          home_controller().closeDrawer();
+          home_controller().featuredBusinessData.clear();
+          home_controller().fetchFeaturedBusinessesData();
+          business_controller().itemList.clear();
+          business_controller().loadBusinesses();
+          home_controller().recentlyPostedItemsData.clear();
+          home_controller().fetchRecentlyPostedItemsData();
+        },
+      ),
       body: SingleChildScrollView(
         child: Column(
           // mainAxisAlignment: MainAxisAlignment.start,

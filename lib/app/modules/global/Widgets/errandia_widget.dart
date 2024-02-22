@@ -7,7 +7,7 @@ import '../constants/color.dart';
 class errandia_widget extends StatelessWidget {
   errandia_widget({
     super.key,
-     this.cost,
+    this.cost,
     @required this.imagePath,
     @required this.name,
     @required this.location,
@@ -31,10 +31,13 @@ class errandia_widget extends StatelessWidget {
           children: [
             Container(
               color: appcolor().lightgreyColor,
-              child: Image.network(getImagePath(imagePath.toString()),
+              child: Image.network(
+                  getImagePath(imagePath.toString()
+                  ),
                   fit: BoxFit.cover,
                   height: Get.height * 0.17,
-                  width: Get.width * 0.4, errorBuilder: (BuildContext context,
+                  width: Get.width * 0.4,
+                  errorBuilder: (BuildContext context,
                       Object exception, StackTrace? stackTrace) {
                 return Image.asset(
                   'assets/images/errandia_logo.png',
@@ -47,7 +50,7 @@ class errandia_widget extends StatelessWidget {
             SizedBox(
               height: Get.height * 0.02,
             ),
-            location != null
+            location != null && location.toString().isNotEmpty == true
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -59,7 +62,9 @@ class errandia_widget extends StatelessWidget {
                       Text(
                         location.toString(),
                         style: TextStyle(
-                            color: appcolor().mediumGreyColor, fontSize: 12,),
+                          color: appcolor().mediumGreyColor,
+                          fontSize: 12,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       )
@@ -77,20 +82,23 @@ class errandia_widget extends StatelessWidget {
                   ),
             Text(
               capitalizeAll(name.toString() ?? ""),
-              style: TextStyle(fontSize: 14,
-                    fontWeight: FontWeight.w500,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                   color: appcolor().mainColor),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            cost != null ? Text(
-              cost.toString(),
-              style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: appcolor().mainColor,
-                  fontSize: 14),
-            ): Container()
+            cost != null
+                ? Text(
+                    cost.toString(),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: appcolor().mainColor,
+                        fontSize: 14),
+                  )
+                : Container()
           ],
         ));
   }

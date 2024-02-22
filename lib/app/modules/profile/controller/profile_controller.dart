@@ -43,8 +43,9 @@ class profile_controller extends GetxController {
     print("fetching my businesses");
     if (isLoading.isTrue || (itemList.isNotEmpty && itemList.length >= total.value)) return;
 
+    isLoading.value = true;
+
     try {
-      isLoading.value = true;
       print("current page: ${currentPage.value}");
 
       var data = await BusinessAPI.userShops_(currentPage.value);
@@ -57,8 +58,10 @@ class profile_controller extends GetxController {
         total.value = data['total'];
         // print("total_: ${total.value}");
         itemList.addAll(data['items']);
-        print("itemList: $itemList");
+        // itemList.sort((a, b) => a['name'].compareTo(b['name']));
+        print("my itemList: $itemList");
       }
+      update();
     } catch (e) {
       isError.value = true;
       isLoading.value = false;
@@ -86,6 +89,7 @@ class profile_controller extends GetxController {
         productItemList.addAll(data['items']);
         print("productItemList: $productItemList");
       }
+      update();
     } catch (e) {
       isProductError.value = true;
       isProductLoading.value = false;
@@ -113,11 +117,33 @@ class profile_controller extends GetxController {
         serviceItemList.addAll(data['items']);
         print("serviceItemList: $serviceItemList");
       }
+      update();
     } catch (e) {
       isServiceError.value = true;
       isServiceLoading.value = false;
       print("error loading services: $e");
     }
+  }
+
+  void reloadMyBusinesses() {
+    currentPage.value = 1;
+    itemList.clear();
+    loadMyBusinesses();
+    update();
+  }
+
+  void reloadMyProducts() {
+    productCurrentPage.value = 1;
+    productItemList.clear();
+    loadMyProducts();
+    update();
+  }
+
+  void reloadMyServices() {
+    serviceCurrentPage.value = 1;
+    serviceItemList.clear();
+    loadMyServices();
+    update();
   }
 
   bool isEmail(String em) {
