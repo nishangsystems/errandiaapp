@@ -412,7 +412,7 @@ class _errandia_business_viewState extends State<errandia_business_view> {
               padding: const EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
               child: InkWell(
                 onTap: () {
-                  var data = controller.businessList[2].toJson();
+                  var data = widget.businessData;
                   print("bz data: ${data}");
 
                   Get.to(() =>  VisitShop(

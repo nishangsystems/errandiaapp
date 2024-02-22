@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:errandia/app/APi/business.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
+import 'package:errandia/modal/category.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -33,6 +36,12 @@ class EditBusinessView extends StatefulWidget {
 }
 
 class EditBusinessViewState extends State<EditBusinessView> {
+  final business_controller controller = Get.put(business_controller());
+  final add_business_controller add_controller =
+  Get.put(add_business_controller());
+  final imagePickercontroller imageController =
+  Get.put(imagePickercontroller());
+
   var country;
   var value = null;
   var regionCode;
@@ -40,1036 +49,1117 @@ class EditBusinessViewState extends State<EditBusinessView> {
   List<String> selectedFilters = [];
   List<int> selectedFilters_ = [];
   var town;
+  var category;
 
-  Future<void> PanDocumentInfoupload(String title, description, websiteAddress,
-      address, facebook, instagram, twitter, businessInfo) async {
-    // var file;
-    // // Create a MultipartRequest
-    // final SharedPreferences prefs = await SharedPreferences.getInstance();
-    // var token = prefs.getString('token');
-    // var uri = Uri.parse('${apiDomain().domain}errands?image_count=${imageController.imageList.length}');
-    // var request = http.MultipartRequest("POST", uri)
-    //   ..headers['Authorization'] = 'Bearer $token';
-    // for (int i =0; i < imageController.imageList.length; i++) {
-    //   for (var image in imageController.imageList) {
-    //     request.files.add(
-    //       await http.MultipartFile.fromPath(
-    //         'image_${i + 1}', // Field name for each image
-    //         image.path,
-    //       ),
-    //     );
-    //   }
-    // }
-    //
-    // request.fields['title'] =  '$title';
-    // request.fields['description'] =  '$description';
-    // request.fields['categories'] =  '$category';
-    // request.fields['street'] =  '$streetid';
-    // request.fields['town'] =  '$townid';
-    // request.fields['region'] =  '$regionid';
-    // // Send the request
-    // try {
-    //   var response = await request.send();
-    //   if (response.statusCode == 200) {
-    //     Get.offAll(errand_view());
-    //     setState(() {
-    //       isLoading = false;
-    //       imageController.imageList.clear();
-    //     });
-    //     // Handle the API response here
-    //   } else {
-    //     print('Failed to upload images. Status code: ${response.statusCode}');
-    //   }
-    // } catch (e) {
-    //   print('Error uploading images: $e');
-    // }
-    //
-    var file = selectedFilters_[0].toString();
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      var token = prefs.getString('token');
-
-      for (int i = 1; i < selectedFilters_.length; i++) {
-        file = "$file,${selectedFilters_[i]}";
-      }
-      if (kDebugMode) {
-        print(file);
-      }
-      var uri = Uri.parse(
-          '${apiDomain().domain}shops?name=$title}&description=$description &is_branch=${controller.headmainSwitch.value}&parent_slug&slogan=$businessInfo &street_id=${country}&phone&whatsapp=whatsapp&address=${address}&facebook=${facebook}&instagram=$instagram&website=$websiteAddress&email&categories=${file}'); // Replace with your server's endpoint
-
-      var request = http.MultipartRequest("POST", uri)
-        ..headers['Authorization'] = 'Bearer $token';
-      // Add images to the request
-
-      if (imageController.image_path.toString() != '') {
-        request.files.add(await http.MultipartFile.fromPath(
-            'image', imageController.image_path.toString()));
-      }
-      // request.fields['name'] =  '$title';
-      // request.fields['description'] =  '$description';
-      // request.fields['categories'] =  '$selectedFilters';
-      // request.fields['street_id'] =  '$country';
-      // request.fields['town'] =  '$townid';
-      // request.fields['region'] =  '$regionid';
-      // request.fields['address'] =  '$streetid';
-      // request.fields['facebook'] =  '$townid';
-      // request.fields['instagram'] =  '$regionid';
-      // request.fields['website'] =  '$twitter';
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        final res = await http.Response.fromStream(response);
-        var rest = jsonDecode(res.body);
-        setState(() {
-          isLoading = false;
-        });
-        Get.offAll(() => manage_business_view());
-        add_controller.company_name_controller.clear();
-        add_controller.Business_information_controller.clear();
-        add_controller.website_address_controller.clear();
-        add_controller.address_controller.clear();
-        add_controller.facebook_controller.clear();
-        add_controller.instagram_controller.clear();
-        add_controller.twitter_controller.clear();
-        // imageController.image_path.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${rest['data']['message']}')));
-      } else {
-        // alertBoxdialogBox(context, 'Alert', 'P')
-        print("Failed to upload images. Status code: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
+  Map<String, dynamic> updatedData = {};
 
   void initState() {
     super.initState();
+    add_controller.loadCategories();
     add_controller.company_name_controller.text = widget.data['name'] ?? '';
     add_controller.Business_information_controller.text =
         widget.data['description'] ?? '';
     add_controller.website_address_controller.text = widget.data['website'] ?? '';
-    add_controller.address_controller.text = widget.data['address'] ?? '';
+    add_controller.address_controller.text = widget.data['street'] ?? '';
     add_controller.facebook_controller.text = widget.data['facebook'] ?? '';
     add_controller.instagram_controller.text = widget.data['instagram'] ?? '';
     add_controller.twitter_controller.text = widget.data['twitter'] ?? '';
-    add_controller.Business_category_controller.text =
-        widget.data['categories'] ?? '';
+    add_controller.phone_controller.text = widget.data['phone'] ?? '';
+    add_controller.email_controller.text = widget.data['email'] ?? '';
+    add_controller.description_controller.text = widget.data['description'] ?? '';
+
+
+    setState(() {
+      category = widget.data['category']['id'] as int;
+      regionCode = widget.data['region'] != null ? widget.data['region']['id'] as int : null;
+      town = widget.data['town'] != null ? widget.data['town']['id'] as int : null;
+    });
 
   }
 
   @override
   Widget build(BuildContext context) {
     print("Edit Data: ${widget.data}");
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        titleSpacing: 8,
-        title: Text(capitalizeAll(widget.data['name'])),
-        titleTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: appcolor().mediumGreyColor,
-            fontSize: 18),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(Icons.arrow_back_ios),
-          color: appcolor().greyColor,
-        ),
-        actions: [
-          TextButton(
-              onPressed: () {
-                var name =
-                add_controller.company_name_controller.text.toString();
-                var description = add_controller
-                    .Business_information_controller.text
-                    .toString();
-                var websiteAddress =
-                add_controller.website_address_controller.text.toString();
-                var address = add_controller.address_controller.text.toString();
-                var facebook =
-                add_controller.facebook_controller.text.toString();
-                var instagram =
-                add_controller.instagram_controller.text.toString();
-                var twitter = add_controller.twitter_controller.text.toString();
-                var businessInfo = add_controller
-                    .Business_information_controller.text
-                    .toString();
+    return WillPopScope(
+      onWillPop: () async {
+        Get.back(result: updatedData.isNotEmpty ? updatedData : null);
+        return updatedData.isNotEmpty;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          titleSpacing: 8,
+          title: Text(capitalizeAll(widget.data['name'])),
+          titleTextStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: appcolor().mediumGreyColor,
+              fontSize: 18),
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              Get.back();
+            },
+            icon: const Icon(Icons.arrow_back_ios),
+            color: appcolor().greyColor,
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  var name =
+                  add_controller.company_name_controller.text.toString();
+                  var description = add_controller
+                      .description_controller.text
+                      .toString();
+                  var websiteAddress =
+                  add_controller.website_address_controller.text.toString();
+                  var address = add_controller.address_controller.text.toString();
+                  // var facebook =
+                  //     add_controller.facebook_controller.text.toString();
+                  // var instagram =
+                  //     add_controller.instagram_controller.text.toString();
+                  // var twitter = add_controller.twitter_controller.text.toString();
+                  var businessInfo = add_controller
+                      .Business_information_controller.text
+                      .toString();
+                  var phone = add_controller.phone_controller.text.toString();
+                  // var categories =
+                  //     add_controller.Business_category_controller.text.toString();
+                  var email = add_controller.email_controller.text.toString();
 
-                if (name == '' || description == '' || country == null) {
-                  alertDialogBox(context, "Alert", 'Please Enter Fields');
-                } else {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  PanDocumentInfoupload(name, description, websiteAddress,
-                      address, facebook, instagram, twitter, businessInfo);
-                }
-              },
-              child: isLoading == false
-                  ? const Text(
-                'UPDATE',
-                style:
-                TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              )
-                  : const SizedBox(
-                  height: 10,
-                  width: 10,
-                  child: CircularProgressIndicator(
-                    color: Colors.blue,
-                  )))
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Wrap(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 15,
-                vertical: 15,
-              ),
-              child: Text(
-                'Company Details'.tr,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
+                  if (name == '') {
+                    alertDialogBox(context, "Error", 'Please enter company name');
+                  } else if (category == null) {
+                    alertDialogBox(context, "Error", 'Please select category');
+                  } else if (description == '') {
+                    alertDialogBox(context, "Error", 'Please enter description');
+                  } else if (phone == '') {
+                    alertDialogBox(context, "Error", 'Please enter phone number');
+                  }  else {
+                    var file = "";
 
-            // company name
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: TextFormField(
-                controller: add_controller.company_name_controller,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    FontAwesomeIcons.buildingUser,
-                    color: Colors.black,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Company Name *',
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
+                    for (int i = 1; i < selectedFilters_.length; i++) {
+                      file = "$file,${selectedFilters_[i]}";
+                    }
+                    if (kDebugMode) {
+                      print("logo to upload: $file");
+                    }
 
-            // Business categories
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-              child: TextFormField(
-                readOnly: true,
-                controller: add_controller.Business_category_controller,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    color: Colors.black,
-                    Icons.category,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Business Categories *',
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            subCetegoryData.Items.isNotEmpty
-                ? SizedBox(
-              height: 70,
-              child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: subCetegoryData.Items.length,
-                  itemBuilder: (context, index) {
-                    var data = subCetegoryData.Items[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Wrap(
-                        direction: Axis.vertical,
-                        spacing: 20.0, // gap between adjacent chips
-                        runSpacing: 4.0, // gap between lines
-                        children: <Widget>[
-                          InputChip(
-                            label: Text('${data.name}'),
-                            selectedColor: Colors.green,
-                            selected:
-                            selectedFilters.contains(data.name),
-                            onSelected: (value) {
-                              setState(() {
-                                if (value) {
-                                  selectedFilters
-                                      .add(data.name.toString());
-                                  selectedFilters_.add(
-                                      int.parse(data.id.toString()));
-                                } else if (!value) {
-                                  selectedFilters
-                                      .remove(data.name.toString());
-                                  selectedFilters_.remove(
-                                      int.parse(data.id.toString()));
-                                }
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-            )
-                : const Center(child: CircularProgressIndicator()),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
+                    setState(() {
+                      isLoading = true;
+                    });
 
-            // Business info
-            Container(
-              height: Get.height * 0.2,
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-              child: TextFormField(
-                controller: add_controller.Business_information_controller,
-                minLines: 1,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    color: Colors.black,
-                    FontAwesomeIcons.info,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Business Information *',
-                  suffixIcon: Icon(
-                    color: Colors.black,
-                    Icons.edit,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
+                    var value = {
+                      "name": name,
+                      "description": description,
+                      "slogan": businessInfo,
+                      "phone": phone,
+                      "whatsapp": "whatsapp",
+                      "category_id": category.toString(),
+                      // "image_path": imageController.image_path.toString(),
+                      "street": address ?? "",
+                      "email": email ?? "",
+                      // "facebook": facebook,
+                      // "instagram": instagram,
+                      // "twitter": twitter,
+                      "website": websiteAddress ?? "",
+                    };
 
-            // upload company logo
-            Obx(
-                  () => SizedBox(
-                height: imageController.image_path.isEmpty
-                    ? null
-                    : Get.height * 0.28,
-                child: imageController.image_path.isEmpty
-                    ? InkWell(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          insetPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 20,
-                          ),
-                          scrollable: true,
-                          content: SizedBox(
-                            // height: Get.height * 0.7,
-                            width: Get.width,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Upload Company Logo',
-                                  style: TextStyle(
-                                    color: appcolor().mainColor,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: Get.height * 0.05,
-                                ),
-                                Column(
-                                  children: [
-                                    blockButton(
-                                      title: Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            FontAwesomeIcons.image,
-                                            color: appcolor().mainColor,
-                                            size: 22,
-                                          ),
-                                          Text(
-                                            '  Image Gallery',
-                                            style: TextStyle(
-                                                color:
-                                                appcolor().mainColor),
-                                          ),
-                                        ],
-                                      ),
-                                      ontap: () {
-                                        Get.back();
-                                        imageController
-                                            .getImageFromGallery();
-                                      },
-                                      color: appcolor().greyColor,
-                                    ),
-                                    SizedBox(
-                                      height: Get.height * 0.015,
-                                    ),
-                                    blockButton(
-                                      title: Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            FontAwesomeIcons.camera,
-                                            color: appcolor().mainColor,
-                                            size: 22,
-                                          ),
-                                          Text(
-                                            '  Take Photo',
-                                            style: TextStyle(
-                                              color: appcolor().mainColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      ontap: () {
-                                        Get.back();
-                                        imageController
-                                            .getimagefromCamera();
-                                      },
-                                      color: Color(0xfffafafa),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ).paddingSymmetric(
-                              horizontal: 10,
-                              vertical: 10,
+                    if (regionCode != null) {
+                      value['region_id'] = regionCode.toString();
+                    }
+
+                    if (town != null) {
+                      value['town_id'] = town.toString();
+                    }
+
+                    PopupBox popup;
+                    var response;
+
+                    // check if logo image is empty
+                    if (imageController.image_path.toString() == '') {
+                      BusinessAPI.updateBusiness(value, context, widget.data['slug'])
+                          .then((response_) => {
+                        response = jsonDecode(response_),
+                        print("added business: $response"),
+                        if (response['status'] == 'success')
+                          {
+                            popup = PopupBox(
+                              title: 'Success',
+                              description: response['data']['message'],
+                              type: PopupType.success,
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: Container(
+
+                            setState(() {
+                              updatedData = response['data']['data']['item'];
+                            }),
+                            print('updated: ${response['data']['data']['item']}'),
+                          }
+                        else
+                          {
+                            popup = PopupBox(
+                              title: 'Error',
+                              description: response['data']['data']
+                              ['error'],
+                              type: PopupType.error,
+                            )
+                          },
+                        Future.delayed(const Duration(seconds: 3), () {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }),
+                        popup.showPopup(context),
+                      });
+                    } else {
+                      print(
+                          "image path: ${imageController.image_path.toString()}");
+                      BusinessAPI.updateBusinessWithImageLogo(value, context,
+                          imageController.image_path.toString(), widget.data['slug'])
+                          .then((response_) => {
+                        response = jsonDecode(response_),
+                        print("added business: $response"),
+                        if (response['status'] == 'success')
+                          {
+                            popup = PopupBox(
+                              title: 'Success',
+                              description: response['data']['message'],
+                              type: PopupType.success,
+                            ),
+                            setState(() {
+                              updatedData = response['data']['data']['item'];
+                            }),
+                            print('updated: ${response['data']['data']['item']}'),
+                          }
+                        else
+                          {
+                            popup = PopupBox(
+                              title: 'Error',
+                              description: response['data']['data']
+                              ['error'],
+                              type: PopupType.error,
+                            )
+                          },
+                        Future.delayed(const Duration(seconds: 3), () {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }),
+                        popup.showPopup(context),
+                      });
+                    }
+                  }
+                },
+                child: const Text(
+                  'UPDATE',
+
+                  style:
+                  TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ))
+          ],
+        ),
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Wrap(
+                children: [
+                  Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 20),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.image),
-                        Text('  Upload Company Logo *'),
-                        Spacer(),
-                        Icon(
-                          Icons.edit,
-                        )
-                      ],
+                      horizontal: 15,
+                      vertical: 15,
+                    ),
+                    child: Text(
+                      'Company Details'.tr,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                )
-                    : SizedBox(
-                  height: Get.height * 0.15,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.image),
-                          const Text(
-                            '  Company Logo *',
-                            style: TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                          const Spacer(),
-                          InkWell(
-                            onTap: () {},
-                            child: const Icon(
-                              Icons.edit,
-                            ),
-                          )
-                        ],
-                      ).paddingSymmetric(
-                        vertical: 15,
-                        horizontal: 15,
-                      ),
-                      Divider(
-                        color: appcolor().greyColor,
-                        thickness: 1,
-                        height: 1,
-                        indent: 0,
-                      ),
-                      Stack(
-                        children: [
-                          Image(
-                            image: FileImage(
-                              File(
-                                imageController.image_path.toString(),
-                              ),
-                            ),
-                            height: Get.height * 0.19,
-                            width: double.infinity,
-                            fit: BoxFit.fill,
-                          ).paddingSymmetric(horizontal: 20),
-                          SizedBox(
-                            height: Get.height * 0.19,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    imageController.getImageFromGallery();
-                                  },
-                                  child: Container(
-                                    height: 35,
-                                    width: 60,
-                                    color: Colors.lightGreen,
-                                    child: const Center(
-                                      child: Text(
-                                        'Edit',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    imageController.reset();
-                                  },
-                                  child: Container(
-                                    height: 35,
-                                    width: 60,
-                                    color: appcolor().greyColor,
-                                    child: const Center(
-                                      child: Text(
-                                        'Remove',
-                                        style: TextStyle(),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
                   ),
-                ),
-              ),
-            ),
 
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            // website address
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-              child: TextFormField(
-                controller: add_controller.website_address_controller,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    Icons.category,
-                    color: Colors.black,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Website Address *',
-                  suffixIcon: Icon(
-                    color: Colors.black,
-                    Icons.edit,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-            // shop head
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-              child: Row(
-                children: [
-                  const Text(
-                    'Shop Head/Main Office *',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  Spacer(),
-                  Obx(
-                        () => SizedBox(
-                      width: Get.width * 0.2,
-                      child: FittedBox(
-                        fit: BoxFit.fill,
-                        child: Switch(
-                          value: controller.headmainSwitch.value,
-                          onChanged: (val) {
-                            controller.headmainSwitch.value = val;
-                          },
+                  // company name
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: TextFormField(
+                      controller: add_controller.company_name_controller,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          FontAwesomeIcons.buildingUser,
+                          color: Colors.black,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Company Name *',
+                        suffixIcon: Icon(
+                          Icons.edit,
+                          color: Colors.black,
                         ),
                       ),
                     ),
                   ),
-                  const Text('Active')
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.only(left: 12, right: 0),
+                      child: const Icon(
+                        Icons.category,
+                        color: Colors.black,
+                      ),
+                    ),
+                    trailing: Container(
+                      padding: const EdgeInsets.only(left: 0, right: 12),
+                      child: const Icon(
+                        Icons.arrow_forward_ios_outlined,
+                        color: Colors.black,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    title: DropdownButtonFormField(
+                      iconSize: 0.0,
+                      isDense: true,
+                      isExpanded: true,
+                      padding: EdgeInsets.zero,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: 'Business Category *',
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      value: category,
+                      onChanged: (value) {
+                        setState(() {
+                          category = value as int;
+                        });
+                        print("category_id: $category");
+                      },
+                      items: categor.Items.map((e) => DropdownMenuItem(
+                        value: e.id,
+                        child: Text(
+                          e.name.toString(),
+                          style: const TextStyle(
+                              fontSize: 15, color: Colors.black),
+                        ),
+                      )).toList(),
+                    ),
+                  ),
+
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // business description
+                  Container(
+                    height: Get.height * 0.2,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 0,
+                      vertical: 10,
+                    ),
+                    child: TextFormField(
+                      controller: add_controller.description_controller,
+                      minLines: 1,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          color: Colors.black,
+                          Icons.info_outlined,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Business Description *',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // Business info
+                  Container(
+                    height: Get.height * 0.1,
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+                    child: TextFormField(
+                      controller: add_controller.Business_information_controller,
+                      minLines: 1,
+                      maxLines: 2,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          color: Colors.black,
+                          FontAwesomeIcons.info,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Business Slogan (optional)',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // update company logo
+                  Obx(
+                        () => SizedBox(
+                      height: imageController.image_path.isEmpty
+                          ? null
+                          : Get.height * 0.28,
+                      child: imageController.image_path.isEmpty
+                          ? InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                insetPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 20,
+                                ),
+                                scrollable: true,
+                                content: SizedBox(
+                                  // height: Get.height * 0.7,
+                                  width: Get.width,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Upload Company Logo',
+                                        style: TextStyle(
+                                          color: appcolor().mainColor,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: Get.height * 0.05,
+                                      ),
+                                      Column(
+                                        children: [
+                                          blockButton(
+                                            title: Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  FontAwesomeIcons.image,
+                                                  color:
+                                                  appcolor().mainColor,
+                                                  size: 22,
+                                                ),
+                                                Text(
+                                                  '  Image Gallery',
+                                                  style: TextStyle(
+                                                      color: appcolor()
+                                                          .mainColor),
+                                                ),
+                                              ],
+                                            ),
+                                            ontap: () {
+                                              Get.back();
+                                              imageController
+                                                  .getImageFromGallery();
+                                            },
+                                            color: appcolor().greyColor,
+                                          ),
+                                          SizedBox(
+                                            height: Get.height * 0.015,
+                                          ),
+                                          blockButton(
+                                            title: Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  FontAwesomeIcons.camera,
+                                                  color:
+                                                  appcolor().mainColor,
+                                                  size: 22,
+                                                ),
+                                                Text(
+                                                  '  Take Photo',
+                                                  style: TextStyle(
+                                                    color: appcolor()
+                                                        .mainColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            ontap: () {
+                                              Get.back();
+                                              imageController
+                                                  .getimagefromCamera();
+                                            },
+                                            color: Color(0xfffafafa),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ).paddingSymmetric(
+                                    horizontal: 10,
+                                    vertical: 10,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 20),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.image),
+                              Text('  Upload Company Logo (optional)'),
+                              Spacer(),
+                              Icon(
+                                Icons.edit,
+                              )
+                            ],
+                          ),
+                        ),
+                      )
+                          : SizedBox(
+                        height: Get.height * 0.15,
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.image),
+                                const Text(
+                                  '  Company Logo',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Spacer(),
+                                InkWell(
+                                  onTap: () {},
+                                  child: const Icon(
+                                    Icons.edit,
+                                  ),
+                                )
+                              ],
+                            ).paddingSymmetric(
+                              vertical: 15,
+                              horizontal: 15,
+                            ),
+                            Divider(
+                              color: appcolor().greyColor,
+                              thickness: 1,
+                              height: 1,
+                              indent: 0,
+                            ),
+                            Stack(
+                              children: [
+                                Obx(
+                                        () {
+                                      return imageController.image_path.isEmpty ? Container()
+                                          : imageController.image_path.contains("uploads/")
+                                          ? Image.network(
+                                        getImagePath(
+                                          imageController.image_path.toString(),
+                                        ),
+                                        height: Get.height * 0.19,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (BuildContext context,
+                                            Object exception,
+                                            StackTrace? stackTrace) {
+                                          return Container();
+                                        },
+                                      )
+                                          : Image(
+                                        image: FileImage(
+                                          File(
+                                            imageController.image_path.toString(),
+                                          ),
+                                        ),
+                                        height: Get.height * 0.19,
+                                        width: double.infinity,
+                                        fit: BoxFit.fill,
+                                      ).paddingSymmetric(horizontal: 20);
+                                    }
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.19,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.end,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          imageController
+                                              .getImageFromGallery();
+                                        },
+                                        child: Container(
+                                          height: 35,
+                                          width: 60,
+                                          color: Colors.lightGreen,
+                                          child: const Center(
+                                            child: Text(
+                                              'Edit',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          imageController.reset();
+                                        },
+                                        child: Container(
+                                          height: 35,
+                                          width: 60,
+                                          color: appcolor().greyColor,
+                                          child: const Center(
+                                            child: Text(
+                                              'Remove',
+                                              style: TextStyle(),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // website address
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: TextFormField(
+                      controller: add_controller.website_address_controller,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          Icons.category,
+                          color: Colors.black,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Website Address (optional)',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: TextFormField(
+                      controller: add_controller.phone_controller,
+                      keyboardType: TextInputType.phone,
+                      maxLength: 9,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          Icons.phone,
+                          color: Colors.black,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Phone Number *',
+                        counterText: '',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // email
+                  Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: TextFormField(
+                      controller: add_controller.email_controller,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          Icons.email,
+                          color: Colors.black,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Email Address (optional)',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  //Business Location
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 15,
+                    ),
+                    child: Text(
+                      'Business Location'.tr,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // regions
+                  ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.only(left: 15, right: 0),
+                      child: const Icon(
+                        FontAwesomeIcons.earthAmericas,
+                        color: Colors.black,
+                      ),
+                    ),
+                    trailing: Container(
+                      padding: const EdgeInsets.only(left: 0, right: 15),
+                      child: const Icon(
+                        Icons.arrow_forward_ios_outlined,
+                        color: Colors.black,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    title: DropdownButtonFormField(
+                      iconSize: 0.0,
+                      padding: EdgeInsets.zero,
+                      isDense: true,
+                      isExpanded: true,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: 'Region (optional)',
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      value: regionCode,
+                      onChanged: (value) async {
+                        setState(() {
+                          regionCode = value as int;
+                        });
+                        print("regionCode: $regionCode");
+                        add_controller.loadTownsData(regionCode);
+                      },
+                      items: Regions.Items.map((e) => DropdownMenuItem(
+                        value: e.id,
+                        child: Text(
+                          e.name.toString(),
+                          style: const TextStyle(
+                              fontSize: 15, color: Colors.black),
+                        ),
+                      )).toList(),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+                  ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.only(left: 15, right: 0),
+                      child: Icon(FontAwesomeIcons.city,
+                          color: regionCode == null ? Colors.grey : Colors.black),
+                    ),
+                    trailing: Container(
+                      padding: const EdgeInsets.only(left: 0, right: 15),
+                      child: Icon(Icons.arrow_forward_ios_outlined,
+                          color: regionCode == null ? Colors.grey : Colors.black),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    title: Obx(() {
+                      if (add_controller.isTownsLoading.value) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      return DropdownButtonFormField(
+                        iconSize: 0.0,
+                        isDense: true,
+                        isExpanded: true,
+                        padding: EdgeInsets.zero,
+                        decoration: InputDecoration.collapsed(
+                          hintText: 'Town (optional)',
+                          hintStyle: TextStyle(
+                              color: regionCode == null
+                                  ? Colors.grey
+                                  : Colors.black),
+                        ),
+                        value: town,
+                        onChanged: (value) {
+                          setState(() {
+                            town = value as int;
+                          });
+                          print("townId: $town");
+                        },
+                        items: Towns.Items.map((e) => DropdownMenuItem(
+                          value: e.id,
+                          child: Text(
+                            e.name.toString(),
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.black),
+                          ),
+                        )).toList(),
+                      );
+                    }),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+                  // address
+                  Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: TextFormField(
+                      controller: add_controller.address_controller,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          color: Colors.black,
+                          FontAwesomeIcons.mapLocationDot,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Location (optional)',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // // social links
+                  // Container(
+                  //   padding: const EdgeInsets.symmetric(
+                  //     horizontal: 15,
+                  //     vertical: 15,
+                  //   ),
+                  //   child: Text(
+                  //     'Social Links'.tr,
+                  //     style: const TextStyle(
+                  //       fontSize: 20,
+                  //       fontWeight: FontWeight.w600,
+                  //     ),
+                  //   ),
+                  // ),
+                  //
+                  // Divider(
+                  //   color: appcolor().greyColor,
+                  //   thickness: 1,
+                  //   height: 1,
+                  //   indent: 0,
+                  // ),
+                  //
+                  // //facebook
+                  // Container(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                  //   child: TextFormField(
+                  //     controller: add_controller.facebook_controller,
+                  //     decoration: const InputDecoration(
+                  //       border: InputBorder.none,
+                  //       prefixIcon: Icon(
+                  //         FontAwesomeIcons.facebookF,
+                  //         color: Colors.black,
+                  //       ),
+                  //       hintStyle: TextStyle(
+                  //         color: Colors.black,
+                  //       ),
+                  //       hintText: 'Facebook *',
+                  //       suffixIcon: Icon(
+                  //         Icons.edit,
+                  //         color: Colors.black,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // Divider(
+                  //   color: appcolor().greyColor,
+                  //   thickness: 1,
+                  //   height: 1,
+                  //   indent: 0,
+                  // ),
+                  //
+                  // //instagram
+                  //
+                  // Container(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                  //   child: TextFormField(
+                  //     controller: add_controller.instagram_controller,
+                  //     decoration: const InputDecoration(
+                  //       border: InputBorder.none,
+                  //       prefixIcon: Icon(
+                  //         FontAwesomeIcons.instagram,
+                  //         color: Colors.black,
+                  //       ),
+                  //       hintStyle: TextStyle(
+                  //         color: Colors.black,
+                  //       ),
+                  //       hintText: 'Instagram *',
+                  //       suffixIcon: Icon(
+                  //         Icons.edit,
+                  //         color: Colors.black,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // Divider(
+                  //   color: appcolor().greyColor,
+                  //   thickness: 1,
+                  //   height: 1,
+                  //   indent: 0,
+                  // ),
+                  // // twitter
+                  // Container(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                  //   child: TextFormField(
+                  //     controller: add_controller.twitter_controller,
+                  //     decoration: const InputDecoration(
+                  //       border: InputBorder.none,
+                  //       prefixIcon: Icon(
+                  //         FontAwesomeIcons.twitter,
+                  //         color: Colors.black,
+                  //       ),
+                  //       hintStyle: TextStyle(
+                  //         color: Colors.black,
+                  //       ),
+                  //       hintText: 'Twitter *',
+                  //       suffixIcon: Icon(
+                  //         Icons.edit,
+                  //         color: Colors.black,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // Divider(
+                  //   color: appcolor().greyColor,
+                  //   thickness: 1,
+                  //   height: 1,
+                  //   indent: 0,
+                  // ),
+
+                  // assign manager
+                  // Container(
+                  //   padding: EdgeInsets.symmetric(
+                  //     horizontal: 15,
+                  //     vertical: 15,
+                  //   ),
+                  //   child: Text(
+                  //     'Assign Manager'.tr,
+                  //     style: TextStyle(
+                  //       fontSize: 20,
+                  //       fontWeight: FontWeight.w600,
+                  //     ),
+                  //   ),
+                  // ),
+                  //
+                  // Divider(
+                  //   color: appcolor().greyColor,
+                  //   thickness: 1,
+                  //   height: 1,
+                  //   indent: 0,
+                  // ),
+                  //
+                  // // select manager
+                  // InkWell(
+                  //   onTap: () {
+                  //     showDialog(
+                  //       context: context,
+                  //       builder: (context) => AlertDialog(
+                  //         insetPadding: EdgeInsets.symmetric(horizontal: 0),
+                  //         scrollable: true,
+                  //         contentPadding:
+                  //             EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                  //         content: Container(
+                  //           width: Get.width,
+                  //           color: Colors.white,
+                  //           child: Column(
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               Text(
+                  //                 'Select Branch Manager'.tr,
+                  //                 style: TextStyle(
+                  //                   fontSize: 20,
+                  //                   fontWeight: FontWeight.bold,
+                  //                   color: appcolor().mainColor,
+                  //                 ),
+                  //               ),
+                  //               SizedBox(
+                  //                 height: Get.height * 0.03,
+                  //               ),
+                  //               Obx(() => BranchManagerListWidget(),)
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     );
+                  //   },
+                  //   child: Container(
+                  //     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  //     child: Row(
+                  //       children: [
+                  //         Icon(Icons.person),
+                  //         Text(
+                  //           '  Select Manager *',
+                  //           style: TextStyle(
+                  //             fontSize: 16,
+                  //           ),
+                  //         ),
+                  //         Spacer(),
+                  //         Icon(
+                  //           Icons.arrow_forward_ios_outlined,
+                  //         )
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                  //
+                  // Divider(
+                  //   color: appcolor().greyColor,
+                  //   thickness: 1,
+                  //   height: 1,
+                  //   indent: 0,
+                  // ),
+
+                  SizedBox(
+                    height: Get.height * 0.06,
+                  ),
                 ],
               ),
             ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            //Business Location
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 15,
-                vertical: 15,
-              ),
-              child: Text(
-                'Business Location'.tr,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+            if (isLoading)
+              const Opacity(
+                opacity: 0.6,
+                child: ModalBarrier(
+                  dismissible: false,
+                  color: Colors.black87,
                 ),
               ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            // country
-
-            ListTile(
-              leading: const Icon(
-                FontAwesomeIcons.earthAmericas,
-              ),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
-              ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 10, bottom: 10),
-                child: DropdownButtonFormField(
-                  iconSize: 0.0,
-                  decoration: const InputDecoration.collapsed(
-                    hintText: 'Region',
-                  ),
-                  value: value,
-                  onChanged: (value) {
-                    setState(() {
-                      regionCode = value as int;
-                    });
-                  },
-                  items: Regions.Items.map((e) => DropdownMenuItem(
-                    child: Text(
-                      e.name.toString(),
-                      style: TextStyle(fontSize: 11),
+            if (isLoading)
+              const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      height: 20,
                     ),
-                    value: e.id,
-                  )).toList(),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-            ListTile(
-              leading: const Icon(
-                FontAwesomeIcons.locationCrosshairs,
-              ),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
-              ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 10, bottom: 10),
-                child: DropdownButtonFormField(
-                  iconSize: 0.0,
-                  decoration: const InputDecoration.collapsed(
-                    hintText: 'Town',
-                  ),
-                  value: value,
-                  onChanged: (value) {
-                    setState(() {
-                      town = value as int;
-                    });
-                  },
-                  items: Towns.Items.map((e) => DropdownMenuItem(
-                    child: Text(
-                      e.name.toString(),
-                      style: TextStyle(fontSize: 11),
+                    Text(
+                      'We\'re updating your business profile,',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                    value: e.id,
-                  )).toList(),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-            ListTile(
-              leading: const Icon(FontAwesomeIcons.locationArrow),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
-              ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 10, bottom: 10),
-                child: DropdownButtonFormField(
-                  iconSize: 0.0,
-                  decoration:
-                  const InputDecoration.collapsed(hintText: 'Street'),
-                  value: value,
-                  onChanged: (value) {
-                    setState(() {
-                      country = value as int;
-                    });
-                  },
-                  items: Street.Items.map((e) => DropdownMenuItem(
-                    child: Text(
-                      e.name.toString(),
-                      style: TextStyle(fontSize: 11),
+                    Text(
+                      'Please wait...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                    value: e.id,
-                  )).toList(),
+                  ],
                 ),
               ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            // address
-            SizedBox(
-              height: Get.height * 0.2,
-              // padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-              child: TextFormField(
-                controller: add_controller.address_controller,
-                minLines: 1,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    color: Colors.black,
-                    FontAwesomeIcons.mapLocationDot,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Address *',
-                  suffixIcon: Icon(
-                    color: Colors.black,
-                    Icons.edit,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            // social links
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 15,
-                vertical: 15,
-              ),
-              child: Text(
-                'Social Links'.tr,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            //facebook
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: TextFormField(
-                controller: add_controller.facebook_controller,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    FontAwesomeIcons.facebookF,
-                    color: Colors.black,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Facebook *',
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            //instagram
-
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: TextFormField(
-                controller: add_controller.instagram_controller,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    FontAwesomeIcons.instagram,
-                    color: Colors.black,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Instagram *',
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            // twitter
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: TextFormField(
-                controller: add_controller.twitter_controller,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    FontAwesomeIcons.twitter,
-                    color: Colors.black,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Twitter *',
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            // assign manager
-            // Container(
-            //   padding: EdgeInsets.symmetric(
-            //     horizontal: 15,
-            //     vertical: 15,
-            //   ),
-            //   child: Text(
-            //     'Assign Manager'.tr,
-            //     style: TextStyle(
-            //       fontSize: 20,
-            //       fontWeight: FontWeight.w600,
-            //     ),
-            //   ),
-            // ),
-            //
-            // Divider(
-            //   color: appcolor().greyColor,
-            //   thickness: 1,
-            //   height: 1,
-            //   indent: 0,
-            // ),
-            //
-            // // select manager
-            // InkWell(
-            //   onTap: () {
-            //     showDialog(
-            //       context: context,
-            //       builder: (context) => AlertDialog(
-            //         insetPadding: EdgeInsets.symmetric(horizontal: 0),
-            //         scrollable: true,
-            //         contentPadding:
-            //             EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-            //         content: Container(
-            //           width: Get.width,
-            //           color: Colors.white,
-            //           child: Column(
-            //             crossAxisAlignment: CrossAxisAlignment.start,
-            //             children: [
-            //               Text(
-            //                 'Select Branch Manager'.tr,
-            //                 style: TextStyle(
-            //                   fontSize: 20,
-            //                   fontWeight: FontWeight.bold,
-            //                   color: appcolor().mainColor,
-            //                 ),
-            //               ),
-            //               SizedBox(
-            //                 height: Get.height * 0.03,
-            //               ),
-            //               Obx(() => BranchManagerListWidget(),)
-            //             ],
-            //           ),
-            //         ),
-            //       ),
-            //     );
-            //   },
-            //   child: Container(
-            //     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-            //     child: Row(
-            //       children: [
-            //         Icon(Icons.person),
-            //         Text(
-            //           '  Select Manager *',
-            //           style: TextStyle(
-            //             fontSize: 16,
-            //           ),
-            //         ),
-            //         Spacer(),
-            //         Icon(
-            //           Icons.arrow_forward_ios_outlined,
-            //         )
-            //       ],
-            //     ),
-            //   ),
-            // ),
-            //
-            // Divider(
-            //   color: appcolor().greyColor,
-            //   thickness: 1,
-            //   height: 1,
-            //   indent: 0,
-            // ),
-            // //add manager
-            // Container(
-            //   margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-            //   height: Get.height * 0.08,
-            //   width: Get.width * 0.7,
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(
-            //       10,
-            //     ),
-            //     border: Border.all(
-            //       color: appcolor().mainColor,
-            //     ),
-            //   ),
-            //   child: InkWell(
-            //     onTap: () {
-            //       showDialog(
-            //         context: context,
-            //         builder: (context) => addManager_Widget(),
-            //       );
-            //     },
-            //     child: Row(
-            //       children: [
-            //         Icon(
-            //           Icons.add_outlined,
-            //           color: appcolor().mainColor,
-            //         ),
-            //         Text(
-            //           '  Add New Manager',
-            //           style: TextStyle(
-            //             fontSize: 16,
-            //             color: appcolor().mainColor,
-            //           ),
-            //         ),
-            //       ],
-            //     ).paddingSymmetric(
-            //       horizontal: 10,
-            //     ),
-            //   ),
-            // ),
-            // Divider(
-            //   color: appcolor().greyColor,
-            //   thickness: 1,
-            //   height: 1,
-            //   indent: 0,
-            // ),
-
-            SizedBox(
-              height: Get.height * 0.06,
-            ),
           ],
-        ),
+        )
       ),
     );
   }

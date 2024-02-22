@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class profile_controller extends GetxController {
-
-  RxInt tabControllerindex= 0.obs;
+  RxInt tabControllerindex = 0.obs;
   RxBool isFullNameValid = false.obs;
   RxBool isEmailValid = false.obs;
   RxBool isPhoneValid = false.obs;
@@ -31,17 +34,34 @@ class profile_controller extends GetxController {
   RxBool isProductError = false.obs;
   RxBool isServiceError = false.obs;
 
+  RxMap<String, dynamic> userData = RxMap<String, dynamic>();
+
   @override
   void onInit() {
     super.onInit();
+    getUser();
     loadMyBusinesses();
     loadMyProducts();
     loadMyServices();
   }
 
+  Future<void> getUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userDataString = prefs.getString('user');
+    // user image
+    String? userProfileImg = prefs.getString('userProfileImg');
+    if (userDataString != null) {
+      print("user data: $userDataString");
+      userData.value = jsonDecode(userDataString);
+      print("prof img: ${userData.value}");
+    }
+    print("user profile image: ${userData['photo']}");
+  }
+
   void loadMyBusinesses() async {
     print("fetching my businesses");
-    if (isLoading.isTrue || (itemList.isNotEmpty && itemList.length >= total.value)) return;
+    if (isLoading.isTrue ||
+        (itemList.isNotEmpty && itemList.length >= total.value)) return;
 
     isLoading.value = true;
 
@@ -71,7 +91,9 @@ class profile_controller extends GetxController {
 
   void loadMyProducts() async {
     print("fetching my products");
-    if (isProductLoading.isTrue || (productItemList.isNotEmpty && productItemList.length >= productTotal.value)) return;
+    if (isProductLoading.isTrue ||
+        (productItemList.isNotEmpty &&
+            productItemList.length >= productTotal.value)) return;
 
     try {
       isProductLoading.value = true;
@@ -99,7 +121,9 @@ class profile_controller extends GetxController {
 
   void loadMyServices() async {
     print("fetching my services");
-    if (isServiceLoading.isTrue || (serviceItemList.isNotEmpty && serviceItemList.length >= serviceTotal.value)) return;
+    if (isServiceLoading.isTrue ||
+        (serviceItemList.isNotEmpty &&
+            serviceItemList.length >= serviceTotal.value)) return;
 
     try {
       isServiceLoading.value = true;
@@ -147,8 +171,8 @@ class profile_controller extends GetxController {
   }
 
   bool isEmail(String em) {
-
-    String p = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    String p =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
 
     RegExp regExp = RegExp(p);
 
@@ -192,7 +216,6 @@ class profile_controller extends GetxController {
       name: 'hello',
       location: 'Akwa, Douala',
     ),
-
   ];
   List<errandia_widget> service_list = [
     errandia_widget(
@@ -219,7 +242,6 @@ class profile_controller extends GetxController {
       name: 'hair dye',
       location: 'Akwa, Douala',
     ),
-
   ];
 
   List<errandia_widget> Buiseness_list = [
@@ -241,6 +263,5 @@ class profile_controller extends GetxController {
       name: 'wax',
       location: 'Akwa, Douala',
     ),
-
   ];
 }

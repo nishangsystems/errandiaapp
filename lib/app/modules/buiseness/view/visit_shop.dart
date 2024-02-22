@@ -3,11 +3,13 @@ import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/featured_buiseness/view/featured_list_item.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
+import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/errands/view/search_errand_prod.dart';
 import 'package:errandia/app/modules/errands/view/see_all_erands.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/products/view/manage_products_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/view/service_details_view.dart';
@@ -24,9 +26,9 @@ import '../../products/view/product_view.dart';
 import '../../recently_posted_item.dart/view/recently_posted_list.dart';
 
 class VisitShop extends StatefulWidget {
-  final Map<String, dynamic> businessData;
+  late Map<String, dynamic> businessData;
 
-  const VisitShop({super.key, required this.businessData});
+   VisitShop({super.key, required this.businessData});
 
   @override
   State<VisitShop> createState() => _VisitShopState();
@@ -34,299 +36,389 @@ class VisitShop extends StatefulWidget {
 
 class _VisitShopState extends State<VisitShop> {
   final business_controller controller = Get.put(business_controller());
+  final profile_controller profileController = Get.put(profile_controller());
+  final home_controller homeController = Get.put(home_controller());
+
+  @override
+  void initState() {
+    super.initState();
+    profile_controller().getUser();
+    print("userData: ${profile_controller().userData}");
+  }
+
+  void showPopupMenu(BuildContext context) {
+    var userIsOwner = profileController.userData.value['id'] ==
+        widget.businessData['user']['id'];
+    List<PopupMenuEntry<String>> menuItems = userIsOwner
+        ? [
+      const PopupMenuItem<String>(
+          value: 'share',
+          child: Row(
+            children: [
+              Icon(Icons.share, size: 14, color: Colors.black),
+              SizedBox(
+                width: 5,
+              ),
+              Text('Share', style: TextStyle(fontSize: 15)),
+            ],
+          )),
+            const PopupMenuItem<String>(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit, size: 14, color: Colors.black),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Edit', style: TextStyle(fontSize: 15)),
+                  ],
+                )),
+            const PopupMenuItem<String>(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete, size: 14, color: Colors.black),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Delete', style: TextStyle(fontSize: 15)),
+                  ],
+                )),
+          ]
+        : [
+            const PopupMenuItem<String>(value: 'share', child: Text('Share')),
+          ];
+
+    showMenu<String>(
+      context: context,
+      position: const RelativeRect.fromLTRB(100.0, 100.0, 0.0, 0.0),
+      // Position the menu
+      items: menuItems,
+      initialValue: null,
+    ).then((String? value) {
+      // Handle the action based on the value
+      if (value != null) {
+        switch (value) {
+          case 'edit':
+            Get.to(() => EditBusinessView(data: widget.businessData))?.then((value) {
+              print("value update: $value");
+              if (value != null) {
+                setState(() {
+                  widget.businessData = value;
+                });
+              }
+            });
+            break;
+          case 'delete':
+            // Handle delete action
+            break;
+          case 'share':
+            // Handle share action
+            break;
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) {
       print("businessData: ${widget.businessData['name']}");
     }
-    return Scaffold(
-        appBar: titledAppBar(capitalizeAll(widget.businessData['name'] ?? ''), [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.notifications,
-              size: 30,
-            ),
-            color: appcolor().mediumGreyColor,
-          ),
-          IconButton(
-            onPressed: () {
-              Share.share('text', subject: 'hello share');
-            },
-            // vertical 3 dots
-            icon: const Icon(
-              Icons.more_vert,
-              size: 30,
-            ),
-            color: appcolor().mediumGreyColor,
-          ),
-        ]),
-        body: SingleChildScrollView(
-          child:
-            Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: Get.height * 0.3,
-                width: Get.width * 1,
-                child: Image.network(
-                  getImagePath(widget.businessData['image'].toString()),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      'assets/images/errandia_logo.png',
-                      fit: BoxFit.cover,
-                    );
-                  },
-                )
+    return WillPopScope(
+      onWillPop: () async {
+        Get.back();
+        profileController.reloadMyBusinesses();
+        homeController.reloadFeaturedBusinessesData();
+        return true;
+      },
+      child: Scaffold(
+          appBar: titledAppBar(capitalizeAll(widget.businessData['name'] ?? ''), [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.notifications,
+                size: 30,
               ),
+              color: appcolor().mediumGreyColor,
+            ),
+            IconButton(
+              onPressed: () {
+                // Share.share('text', subject: 'hello share');
+                showPopupMenu(context);
+              },
+              // vertical 3 dots
+              icon: const Icon(
+                Icons.more_vert,
+                size: 30,
+              ),
+              color: appcolor().mediumGreyColor,
+            ),
+          ]),
+          body: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                    height: Get.height * 0.3,
+                    width: Get.width * 1,
+                    child: Image.network(
+                      getImagePath(widget.businessData['image'].toString()),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/images/errandia_logo.png',
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    )),
 
-              Column(
-                children: [
-                  product_review_widget(widget.businessData),
-                  SizedBox(
-                    height: Get.height * 0.02,
-                  ),
-                ],
-              ).paddingOnly(top: 20, left: 15, right: 15),
-
-              Padding(
-                padding: const EdgeInsets.only(left: 15, right: 15),
-                child: InkWell(
-                  onTap: () {
-                    // errandia_view_bottomsheet();
-                  },
-                  child: Container(
-                    height: Get.height * 0.08,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: const Color(0xffe6edf7),
+                Column(
+                  children: [
+                    product_review_widget(widget.businessData),
+                    SizedBox(
+                      height: Get.height * 0.02,
                     ),
-                    child: Center(
-                      child: Text(
-                        'Unfollow Shop',
-                        style: TextStyle(
-                            fontSize: 16, color: appcolor().bluetextcolor),
+                  ],
+                ).paddingOnly(top: 20, left: 15, right: 15),
+
+                Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  child: InkWell(
+                    onTap: () {
+                      // errandia_view_bottomsheet();
+                    },
+                    child: Container(
+                      height: Get.height * 0.08,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color(0xffe6edf7),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Unfollow Shop',
+                          style: TextStyle(
+                              fontSize: 16, color: appcolor().bluetextcolor),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              SizedBox(
-                height: Get.height * 0.025,
-              ),
+                SizedBox(
+                  height: Get.height * 0.025,
+                ),
 
-              // follow us on social media
-              Row(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 15, right: 15),
-                    child: Text(
-                      'Follow us on social media',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  // fb
-                  InkWell(
-                    onTap: () async {
-                      controller.myLaunchUrl('www.bmdu.net');
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          8,
+                // follow us on social media
+                Row(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 15, right: 15),
+                      child: Text(
+                        'Follow us on social media',
+                        style: TextStyle(
+                          fontSize: 16,
                         ),
                       ),
-                      padding: const EdgeInsets.only(
-                        left: 5,
-                      ),
-                      child: Icon(
-                        FontAwesomeIcons.squareFacebook,
-                        color: appcolor().bluetextcolor,
-                      ),
                     ),
-                  ),
-
-                  // insta
-                  InkWell(
-                    onTap: () async {
-                      controller.myLaunchUrl('www.google.com');
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          8,
+                    // fb
+                    InkWell(
+                      onTap: () async {
+                        controller.myLaunchUrl('www.bmdu.net');
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ),
+                        ),
+                        padding: const EdgeInsets.only(
+                          left: 5,
+                        ),
+                        child: Icon(
+                          FontAwesomeIcons.squareFacebook,
+                          color: appcolor().bluetextcolor,
                         ),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 5,
-                      ),
-                      child: const Icon(
-                        FontAwesomeIcons.instagram,
-                        color: Colors.pink,
-                      ),
                     ),
-                  ),
 
-                  // twitter
-                  InkWell(
-                    onTap: () async {
-                      controller.myLaunchUrl('www.instagram.com');
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          8,
+                    // insta
+                    InkWell(
+                      onTap: () async {
+                        controller.myLaunchUrl('www.google.com');
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                        ),
+                        child: const Icon(
+                          FontAwesomeIcons.instagram,
+                          color: Colors.pink,
                         ),
                       ),
-                      child: Icon(
-                        FontAwesomeIcons.squareTwitter,
-                        color: appcolor().bluetextcolor,
-                      ),
                     ),
-                  ),
-                ],
-              ),
 
-              SizedBox(
-                height: Get.height * 0.03,
-              ),
-
-              Container(
-                color: Colors.white,
-                child: Row(
-                  children: [
-                    Text(
-                      'Products',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                        color: appcolor().mainColor,
-                      ),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {
-                        Get.to(() => search_errand_prod());
+                    // twitter
+                    InkWell(
+                      onTap: () async {
+                        controller.myLaunchUrl('www.instagram.com');
                       },
-                      child: const Text('See All'),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ),
+                        ),
+                        child: Icon(
+                          FontAwesomeIcons.squareTwitter,
+                          color: appcolor().bluetextcolor,
+                        ),
+                      ),
                     ),
                   ],
-                ).paddingSymmetric(horizontal: 20),
-              ),
+                ),
 
-              product_item_list(),
+                SizedBox(
+                  height: Get.height * 0.03,
+                ),
 
-              SizedBox(
-                height: Get.height * 0.03,
-              ),
-
-              Container(
-                color: Colors.white,
-                child: Row(
-                  children: [
-                    Text(
-                      'Services',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                        color: appcolor().mainColor,
+                Container(
+                  color: Colors.white,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Products',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                          color: appcolor().mainColor,
+                        ),
                       ),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {
-                        // Get.to(() => manage_product_view());
-                      },
-                      child: const Text('See All'),
-                    ),
-                  ],
-                ).paddingSymmetric(horizontal: 20),
-              ),
-
-              Service_item_list(),
-
-              Container(
-                color: Colors.white,
-                child: Row(
-                  children: [
-                    Text(
-                      'Related Businesses',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                        color: appcolor().mainColor,
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          Get.to(() => search_errand_prod());
+                        },
+                        child: const Text('See All'),
                       ),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {
-                        Get.to(() => BusinessesViewWithBar());
-                      },
-                      child: const Text('See All'),
-                    ),
-                  ],
-                ).paddingSymmetric(horizontal: 20),
-              ),
+                    ],
+                  ).paddingSymmetric(horizontal: 20),
+                ),
 
-              businesses_item_list(),
+                product_item_list(),
 
-              Container(
-                color: Colors.white,
-                child: Row(
-                  children: [
-                    Text(
-                      'Recently Posted Errands',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                        color: appcolor().mainColor,
+                SizedBox(
+                  height: Get.height * 0.03,
+                ),
+
+                Container(
+                  color: Colors.white,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Services',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                          color: appcolor().mainColor,
+                        ),
                       ),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {
-                        Get.to(() => SeeAllErands());
-                      },
-                      child: const Text('See All'),
-                    ),
-                  ],
-                ).paddingSymmetric(horizontal: 20),
-              ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          // Get.to(() => manage_product_view());
+                        },
+                        child: const Text('See All'),
+                      ),
+                    ],
+                  ).paddingSymmetric(horizontal: 20),
+                ),
 
-              recently_posted_errands(),
-            ],
-          ),
+                Service_item_list(),
 
+                Container(
+                  color: Colors.white,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Related Businesses',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                          color: appcolor().mainColor,
+                        ),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          Get.to(() => BusinessesViewWithBar());
+                        },
+                        child: const Text('See All'),
+                      ),
+                    ],
+                  ).paddingSymmetric(horizontal: 20),
+                ),
 
-        ));
+                businesses_item_list(),
+
+                Container(
+                  color: Colors.white,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Recently Posted Errands',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                          color: appcolor().mainColor,
+                        ),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          Get.to(() => SeeAllErands());
+                        },
+                        child: const Text('See All'),
+                      ),
+                    ],
+                  ).paddingSymmetric(horizontal: 20),
+                ),
+
+                recently_posted_errands(),
+              ],
+            ),
+          )),
+    );
   }
 }
 
 Widget product_review_widget(Map<String, dynamic> data) {
   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-     Text(
+    Text(
       data['name'].toString(),
       style: const TextStyle(
         fontSize: 17,
         fontWeight: FontWeight.w600,
       ),
     ),
-    data['street'] != null ? Text(
-      data['street'],
-      style: const TextStyle(),
-    ): const Text(
-      'No street provided',
-      style: TextStyle(
-        color: Colors.grey,
-        fontStyle: FontStyle.italic,
-      ),
-    ),
+    data['street'] != null
+        ? Text(
+            data['street'],
+            style: const TextStyle(),
+          )
+        : const Text(
+            'No street provided',
+            style: TextStyle(
+              color: Colors.grey,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
     const SizedBox(
       height: 5,
     ),
@@ -377,23 +469,23 @@ Widget product_item_list() {
     height: Get.height * 0.3,
     color: Colors.white,
     child: ListView.builder(
-        itemCount: profile_controller().product_list.length,
+      itemCount: profile_controller().product_list.length,
       primary: false,
       shrinkWrap: false,
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index) {
-          final item = Recently_item_List[index];
+        final item = Recently_item_List[index];
 
-          return GestureDetector(
-              onTap: () {
-                if (kDebugMode) {
-                  print("product item clicked: ${item.name}");
-                }
-                Get.to(() => Product_view(item: item));
-              },
-              child: profile_controller().product_list[index]);
-        },
-      ),
+        return GestureDetector(
+            onTap: () {
+              if (kDebugMode) {
+                print("product item clicked: ${item.name}");
+              }
+              Get.to(() => Product_view(item: item));
+            },
+            child: profile_controller().product_list[index]);
+      },
+    ),
   );
 }
 
@@ -512,8 +604,8 @@ Widget recently_posted_errands() {
                                     data['shop']['image'] != ''
                                         ? data['shop']['image'].toString()
                                         : Recently_item_List[index]
-                                        .avatarImage
-                                        .toString(),
+                                            .avatarImage
+                                            .toString(),
                                   ),
                                 ),
                                 SizedBox(

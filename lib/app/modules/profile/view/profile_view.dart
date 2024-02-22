@@ -63,13 +63,13 @@ class _Profile_viewState extends State<Profile_view>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    profileController = Get.put(profile_controller());
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       profileController.reloadMyBusinesses();
       profileController.reloadMyProducts();
       profileController.reloadMyServices();
     });
     getUser();
-    profileController = Get.put(profile_controller());
     scrollController = ScrollController();
     scrollController.addListener(() {
       if (scrollController.position.pixels >=
@@ -250,7 +250,7 @@ class _Profile_viewState extends State<Profile_view>
               profileController.reloadMyBusinesses();
             },
             child: GridView.builder(
-                key: UniqueKey(),
+                key: const PageStorageKey('my-businesses'),
                 controller: scrollController,
                 itemCount: profileController.isLoading.value
                     ? profileController.itemList.length + 1
@@ -266,7 +266,7 @@ class _Profile_viewState extends State<Profile_view>
                   return GestureDetector(
                     onTap: () {
                       if (kDebugMode) {
-                        print("business item clicked: ${businessData}");
+                        print("business item clicked: ${businessData['name']}");
                       }
                       Get.to(
                           () => VisitShop(businessData: businessData));
@@ -274,7 +274,7 @@ class _Profile_viewState extends State<Profile_view>
                     child: errandia_widget(
                       imagePath: businessData['image'],
                       name: businessData['name'],
-                      location: businessData['street'] ?? "",
+                      location: businessData['street'],
                     ),
                   );
                 }),
@@ -496,6 +496,22 @@ class _Profile_viewState extends State<Profile_view>
                     ),
                   ),
 
+                  // Image.network(
+                  //   getImagePath(userData['photo'] ?? ""),
+                  //   height: Get.height * 0.13,
+                  //   width: Get.width * 0.27,
+                  //   fit: BoxFit.cover,
+                  //   key: UniqueKey(),
+                  // ) : Center(
+                  //     child: Text(
+                  //       getFirstLetter(userData['name']),
+                  //       style: const TextStyle(
+                  //         color: Color(0xffff0000),
+                  //         fontSize: 40,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     )
+                  // ),
                   Align(
                     alignment: AlignmentDirectional.topEnd,
                     child: SizedBox(
@@ -659,7 +675,6 @@ class _Profile_viewState extends State<Profile_view>
             padding: const EdgeInsets.symmetric(horizontal: 15),
             // height: Get.height * 0.2,
             child: TabBarView(
-              key: UniqueKey(),
               controller: tabController,
               children: [
                 product_item_list(),
