@@ -68,6 +68,8 @@ class EditBusinessViewState extends State<EditBusinessView> {
     add_controller.email_controller.text = widget.data['email'] ?? '';
     add_controller.description_controller.text = widget.data['description'] ?? '';
 
+    imageController.image_path.value = widget.data['image'] ?? '' ;
+    print("image path:  ${widget.data['image']}");
 
     setState(() {
       category = widget.data['category']['id'] as int;
@@ -115,11 +117,11 @@ class EditBusinessViewState extends State<EditBusinessView> {
                   var websiteAddress =
                   add_controller.website_address_controller.text.toString();
                   var address = add_controller.address_controller.text.toString();
-                  // var facebook =
-                  //     add_controller.facebook_controller.text.toString();
-                  // var instagram =
-                  //     add_controller.instagram_controller.text.toString();
-                  // var twitter = add_controller.twitter_controller.text.toString();
+                  var facebook =
+                      add_controller.facebook_controller.text.toString();
+                  var instagram =
+                      add_controller.instagram_controller.text.toString();
+                  var twitter = add_controller.twitter_controller.text.toString();
                   var businessInfo = add_controller
                       .Business_information_controller.text
                       .toString();
@@ -136,7 +138,11 @@ class EditBusinessViewState extends State<EditBusinessView> {
                     alertDialogBox(context, "Error", 'Please enter description');
                   } else if (phone == '') {
                     alertDialogBox(context, "Error", 'Please enter phone number');
-                  }  else {
+                  } else if (email == '') {
+                    alertDialogBox(context, "Error", 'Please enter an email address');
+                  } else if (regionCode == null) {
+                    alertDialogBox(context, "Error", 'Please select region');
+                  } else {
                     var file = "";
 
                     for (int i = 1; i < selectedFilters_.length; i++) {
@@ -172,6 +178,18 @@ class EditBusinessViewState extends State<EditBusinessView> {
 
                     if (town != null) {
                       value['town_id'] = town.toString();
+                    }
+
+                    if (facebook != '') {
+                      value['facebook'] = facebook;
+                    }
+
+                    if (instagram != '') {
+                      value['instagram'] = instagram;
+                    }
+
+                    if (twitter != '') {
+                      value['twitter'] = twitter;
                     }
 
                     PopupBox popup;
@@ -436,10 +454,10 @@ class EditBusinessViewState extends State<EditBusinessView> {
                   // update company logo
                   Obx(
                         () => SizedBox(
-                      height: imageController.image_path.isEmpty
+                      height: imageController.image_path.isEmpty || imageController.image_path.contains("default")
                           ? null
-                          : Get.height * 0.28,
-                      child: imageController.image_path.isEmpty
+                          : Get.height * 0.40,
+                      child: imageController.image_path.isEmpty || imageController.image_path.contains("default")
                           ? InkWell(
                         onTap: () {
                           showDialog(
@@ -464,7 +482,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
                                     CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Upload Company Logo',
+                                        'Update Company Logo',
                                         style: TextStyle(
                                           color: appcolor().mainColor,
                                           fontSize: 18,
@@ -525,10 +543,31 @@ class EditBusinessViewState extends State<EditBusinessView> {
                                                 ),
                                               ],
                                             ),
-                                            ontap: () {
+                                            ontap: () async {
                                               Get.back();
-                                              imageController
+                                              var path = await imageController
                                                   .getimagefromCamera();
+
+                                              print("image path: $path");
+
+                                             if (path != null) {
+                                               File? file = File(path);
+
+                                               print("original file size: ${file.lengthSync()}");
+
+                                               try {
+                                                 file = (await compressFile(file: file));
+                                                 print("Compressed file size: ${file.lengthSync()}");
+                                               } catch (e) {
+                                                 print("Error compressing file: $e");
+                                               }
+                                               imageController.image_path.value = file!.path;
+
+                                               imageController.update();
+
+                                               print("compressed file path: ${file.path}");
+
+                                              }
                                             },
                                             color: Color(0xfffafafa),
                                           ),
@@ -550,7 +589,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
                           child: const Row(
                             children: [
                               Icon(Icons.image),
-                              Text('  Upload Company Logo (optional)'),
+                              Text('  Update Company Logo (optional)'),
                               Spacer(),
                               Icon(
                                 Icons.edit,
@@ -560,7 +599,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
                         ),
                       )
                           : SizedBox(
-                        height: Get.height * 0.15,
+                        height: Get.height * 0.38,
                         child: Column(
                           children: [
                             Row(
@@ -600,29 +639,30 @@ class EditBusinessViewState extends State<EditBusinessView> {
                                         getImagePath(
                                           imageController.image_path.toString(),
                                         ),
-                                        height: Get.height * 0.19,
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
+                                        height: Get.height * 0.32,
+                                        width: Get.width * 0.9,
+                                        fit: BoxFit.fill,
                                         errorBuilder: (BuildContext context,
                                             Object exception,
                                             StackTrace? stackTrace) {
                                           return Container();
                                         },
-                                      )
+                                      ).paddingSymmetric(horizontal: 30) : imageController.image_path.contains("default") ?
+                                      Container()
                                           : Image(
                                         image: FileImage(
                                           File(
                                             imageController.image_path.toString(),
                                           ),
                                         ),
-                                        height: Get.height * 0.19,
-                                        width: double.infinity,
+                                        height: Get.height * 0.32,
+                                        width: Get.width * 0.9,
                                         fit: BoxFit.fill,
-                                      ).paddingSymmetric(horizontal: 20);
+                                      ).paddingSymmetric(horizontal: 30);
                                     }
                                 ),
                                 SizedBox(
-                                  height: Get.height * 0.19,
+                                  height: Get.height * 0.32,
                                   child: Row(
                                     mainAxisAlignment:
                                     MainAxisAlignment.center,
@@ -752,7 +792,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Email Address (optional)',
+                        hintText: 'Email Address *',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
@@ -811,7 +851,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
                       isDense: true,
                       isExpanded: true,
                       decoration: const InputDecoration.collapsed(
-                        hintText: 'Region (optional)',
+                        hintText: 'Region *',
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
@@ -924,201 +964,119 @@ class EditBusinessViewState extends State<EditBusinessView> {
                     indent: 0,
                   ),
 
-                  // // social links
-                  // Container(
-                  //   padding: const EdgeInsets.symmetric(
-                  //     horizontal: 15,
-                  //     vertical: 15,
-                  //   ),
-                  //   child: Text(
-                  //     'Social Links'.tr,
-                  //     style: const TextStyle(
-                  //       fontSize: 20,
-                  //       fontWeight: FontWeight.w600,
-                  //     ),
-                  //   ),
-                  // ),
-                  //
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
-                  //
-                  // //facebook
-                  // Container(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  //   child: TextFormField(
-                  //     controller: add_controller.facebook_controller,
-                  //     decoration: const InputDecoration(
-                  //       border: InputBorder.none,
-                  //       prefixIcon: Icon(
-                  //         FontAwesomeIcons.facebookF,
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintStyle: TextStyle(
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintText: 'Facebook *',
-                  //       suffixIcon: Icon(
-                  //         Icons.edit,
-                  //         color: Colors.black,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
-                  //
-                  // //instagram
-                  //
-                  // Container(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  //   child: TextFormField(
-                  //     controller: add_controller.instagram_controller,
-                  //     decoration: const InputDecoration(
-                  //       border: InputBorder.none,
-                  //       prefixIcon: Icon(
-                  //         FontAwesomeIcons.instagram,
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintStyle: TextStyle(
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintText: 'Instagram *',
-                  //       suffixIcon: Icon(
-                  //         Icons.edit,
-                  //         color: Colors.black,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
-                  // // twitter
-                  // Container(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  //   child: TextFormField(
-                  //     controller: add_controller.twitter_controller,
-                  //     decoration: const InputDecoration(
-                  //       border: InputBorder.none,
-                  //       prefixIcon: Icon(
-                  //         FontAwesomeIcons.twitter,
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintStyle: TextStyle(
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintText: 'Twitter *',
-                  //       suffixIcon: Icon(
-                  //         Icons.edit,
-                  //         color: Colors.black,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
+                  // social links
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 15,
+                    ),
+                    child: Text(
+                      'Social Links'.tr,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
 
-                  // assign manager
-                  // Container(
-                  //   padding: EdgeInsets.symmetric(
-                  //     horizontal: 15,
-                  //     vertical: 15,
-                  //   ),
-                  //   child: Text(
-                  //     'Assign Manager'.tr,
-                  //     style: TextStyle(
-                  //       fontSize: 20,
-                  //       fontWeight: FontWeight.w600,
-                  //     ),
-                  //   ),
-                  // ),
-                  //
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
-                  //
-                  // // select manager
-                  // InkWell(
-                  //   onTap: () {
-                  //     showDialog(
-                  //       context: context,
-                  //       builder: (context) => AlertDialog(
-                  //         insetPadding: EdgeInsets.symmetric(horizontal: 0),
-                  //         scrollable: true,
-                  //         contentPadding:
-                  //             EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-                  //         content: Container(
-                  //           width: Get.width,
-                  //           color: Colors.white,
-                  //           child: Column(
-                  //             crossAxisAlignment: CrossAxisAlignment.start,
-                  //             children: [
-                  //               Text(
-                  //                 'Select Branch Manager'.tr,
-                  //                 style: TextStyle(
-                  //                   fontSize: 20,
-                  //                   fontWeight: FontWeight.bold,
-                  //                   color: appcolor().mainColor,
-                  //                 ),
-                  //               ),
-                  //               SizedBox(
-                  //                 height: Get.height * 0.03,
-                  //               ),
-                  //               Obx(() => BranchManagerListWidget(),)
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     );
-                  //   },
-                  //   child: Container(
-                  //     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  //     child: Row(
-                  //       children: [
-                  //         Icon(Icons.person),
-                  //         Text(
-                  //           '  Select Manager *',
-                  //           style: TextStyle(
-                  //             fontSize: 16,
-                  //           ),
-                  //         ),
-                  //         Spacer(),
-                  //         Icon(
-                  //           Icons.arrow_forward_ios_outlined,
-                  //         )
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  //
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  //facebook
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: TextFormField(
+                      controller: add_controller.facebook_controller,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          FontAwesomeIcons.facebookF,
+                          color: Colors.black,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Facebook (optional)',
+                        suffixIcon: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  //instagram
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: TextFormField(
+                      controller: add_controller.instagram_controller,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          FontAwesomeIcons.instagram,
+                          color: Colors.black,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Instagram (optional)',
+                        suffixIcon: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+                  // twitter
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: TextFormField(
+                      controller: add_controller.twitter_controller,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          FontAwesomeIcons.twitter,
+                          color: Colors.black,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Twitter (optional)',
+                        suffixIcon: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
 
                   SizedBox(
                     height: Get.height * 0.06,
-                  ),
+                  )
+
                 ],
               ),
             ),

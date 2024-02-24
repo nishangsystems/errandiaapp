@@ -504,7 +504,7 @@ class _home_view_1State extends State<home_view_1> {
                                height: Get.height * 0.15,
                                // width: Get.width * 0.3,
                              ),
-                           ).paddingOnly(left: 10, right: 10, top: 10, bottom: 5),
+                           ).paddingOnly(left: 3, right: 3, top: 10, bottom: 5),
                            SizedBox(
                              height: Get.height * 0.009,
                            ),

@@ -5,6 +5,7 @@ import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/modal/category.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
@@ -112,7 +113,11 @@ class _add_business_viewState extends State<add_business_view> {
                     alertDialogBox(context, "Error", 'Please enter description');
                   } else if (phone == '') {
                     alertDialogBox(context, "Error", 'Please enter phone number');
-                  }  else {
+                  } else if (email == '') {
+                    alertDialogBox(context, "Error", 'Please enter an email address');
+                  } else if (regionCode == null) {
+                    alertDialogBox(context, "Error", 'Please select region');
+                  } else {
                     var file = "";
 
                     for (int i = 1; i < selectedFilters_.length; i++) {
@@ -433,7 +438,7 @@ class _add_business_viewState extends State<add_business_view> {
                     () => SizedBox(
                       height: imageController.image_path.isEmpty
                           ? null
-                          : Get.height * 0.28,
+                          : Get.height * 0.40,
                       child: imageController.image_path.isEmpty
                           ? InkWell(
                               onTap: () {
@@ -520,10 +525,31 @@ class _add_business_viewState extends State<add_business_view> {
                                                       ),
                                                     ],
                                                   ),
-                                                  ontap: () {
+                                                  ontap: () async {
                                                     Get.back();
-                                                    imageController
+                                                    var path = await imageController
                                                         .getimagefromCamera();
+
+                                                    print("image path: $path");
+
+                                                    if (path != null) {
+                                                      File? file = File(path);
+
+                                                      print("original file size: ${file.lengthSync()}");
+
+                                                      try {
+                                                        file = (await compressFile(file: file));
+                                                      print("Compressed file size: ${file.lengthSync()}");
+                                                      } catch (e) {
+                                                      print("Error compressing file: $e");
+                                                      }
+                                                      imageController.image_path.value = file!.path;
+
+                                                      imageController.update();
+
+                                                      print("compressed file path: ${file.path}");
+
+                                                    }
                                                   },
                                                   color: Color(0xfffafafa),
                                                 ),
@@ -555,7 +581,7 @@ class _add_business_viewState extends State<add_business_view> {
                               ),
                             )
                           : SizedBox(
-                              height: Get.height * 0.15,
+                              height: Get.height * 0.38,
                               child: Column(
                                 children: [
                                   Row(
@@ -597,14 +623,14 @@ class _add_business_viewState extends State<add_business_view> {
                                                   imageController.image_path.toString(),
                                                 ),
                                               ),
-                                              height: Get.height * 0.19,
-                                              width: double.infinity,
+                                              height: Get.height * 0.32,
+                                              width: Get.width * 0.9,
                                               fit: BoxFit.fill,
-                                            ).paddingSymmetric(horizontal: 20);
+                                            ).paddingSymmetric(horizontal: 60);
                                           }
                                       ),
                                       SizedBox(
-                                        height: Get.height * 0.19,
+                                        height: Get.height * 0.32,
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -742,7 +768,7 @@ class _add_business_viewState extends State<add_business_view> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Email Address (optional)',
+                        hintText: 'Email Address *',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
@@ -830,7 +856,7 @@ class _add_business_viewState extends State<add_business_view> {
                       isDense: true,
                       isExpanded: true,
                       decoration: const InputDecoration.collapsed(
-                        hintText: 'Region (optional)',
+                        hintText: 'Region *',
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
@@ -943,117 +969,6 @@ class _add_business_viewState extends State<add_business_view> {
                     height: 1,
                     indent: 0,
                   ),
-
-                  // social links
-                  // Container(
-                  //   padding: const EdgeInsets.symmetric(
-                  //     horizontal: 15,
-                  //     vertical: 15,
-                  //   ),
-                  //   child: Text(
-                  //     'Social Links'.tr,
-                  //     style: const TextStyle(
-                  //       fontSize: 20,
-                  //       fontWeight: FontWeight.w600,
-                  //     ),
-                  //   ),
-                  // ),
-                  //
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
-                  //
-                  // //facebook
-                  // Container(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  //   child: TextFormField(
-                  //     controller: add_controller.facebook_controller,
-                  //     decoration: const InputDecoration(
-                  //       border: InputBorder.none,
-                  //       prefixIcon: Icon(
-                  //         FontAwesomeIcons.facebookF,
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintStyle: TextStyle(
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintText: 'Facebook *',
-                  //       suffixIcon: Icon(
-                  //         Icons.edit,
-                  //         color: Colors.black,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  //
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
-                  //
-                  // //instagram
-                  //
-                  // Container(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  //   child: TextFormField(
-                  //     controller: add_controller.instagram_controller,
-                  //     decoration: const InputDecoration(
-                  //       border: InputBorder.none,
-                  //       prefixIcon: Icon(
-                  //         FontAwesomeIcons.instagram,
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintStyle: TextStyle(
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintText: 'Instagram *',
-                  //       suffixIcon: Icon(
-                  //         Icons.edit,
-                  //         color: Colors.black,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
-                  //
-                  // // twitter
-                  // Container(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  //   child: TextFormField(
-                  //     controller: add_controller.twitter_controller,
-                  //     decoration: const InputDecoration(
-                  //       border: InputBorder.none,
-                  //       prefixIcon: Icon(
-                  //         FontAwesomeIcons.twitter,
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintStyle: TextStyle(
-                  //         color: Colors.black,
-                  //       ),
-                  //       hintText: 'Twitter *',
-                  //       suffixIcon: Icon(
-                  //         Icons.edit,
-                  //         color: Colors.black,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  // Divider(
-                  //   color: appcolor().greyColor,
-                  //   thickness: 1,
-                  //   height: 1,
-                  //   indent: 0,
-                  // ),
 
                   SizedBox(
                     height: Get.height * 0.06,
