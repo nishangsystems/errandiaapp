@@ -1,7 +1,14 @@
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
+import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/home/view/home_view_1.dart';
+import 'package:errandia/app/modules/products/view/add_product_view.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
+import 'package:errandia/app/modules/services/view/add_service_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -10,6 +17,8 @@ import '../../global/Widgets/bottomsheet_item.dart';
 import '../../global/Widgets/customDrawer.dart';
 import '../../global/constants/color.dart';
 import '../../home/view/home_view.dart';
+
+enum BusinessAction { suspend, reinstate, delete }
 
 class manage_business_view extends StatelessWidget {
   manage_business_view({super.key});
@@ -45,7 +54,19 @@ class manage_business_view extends StatelessWidget {
           ),
         ),
       ),
-      endDrawer: customendDrawer(),
+      endDrawer: CustomEndDrawer(
+        onBusinessCreated: () {
+          home_controller().closeDrawer();
+          home_controller().featuredBusinessData.clear();
+          home_controller().fetchFeaturedBusinessesData();
+          business_controller().itemList.clear();
+          business_controller().loadBusinesses();
+          home_controller().recentlyPostedItemsData.clear();
+          home_controller().fetchRecentlyPostedItemsData();
+          profile_controller().itemList.clear();
+          profile_controller().loadMyBusinesses();
+        },
+      ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
@@ -100,17 +121,17 @@ class manage_business_view extends StatelessWidget {
               tabs: [
                 Container(
                   height:Get.height* 0.05,
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text('All Businesses'),
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  child: const Text('All Businesses'),
                 ),
-                Container(
+                SizedBox(
                   height:Get.height* 0.05,
-                  child: Text('Published'),
                   width: Get.width * 0.26,
+                  child: const Text('Published'),
                 ),
-                Container(
+                SizedBox(
                     height:Get.height* 0.05,
-                    child: Text('Trashed')),
+                    child: const Text('Trashed')),
               ],
             ),
           ),
@@ -128,18 +149,20 @@ class manage_business_view extends StatelessWidget {
 
 Widget allBusiness() {
  return FutureBuilder(
-    future: api().bussiness('shops', 1),
+    future: BusinessAPI.businesses(1),
       builder: (context, snapshot){
     if(snapshot.hasError){
-      return Center(child: CircularProgressIndicator(),);
+      return const Center(child: CircularProgressIndicator(),);
     }else if(snapshot.hasData){
       return ListView.builder(
         itemCount: snapshot.data.length,
         itemBuilder: (context, index) {
           var data = snapshot.data[index];
-          print("manage business : $data");
+          if (kDebugMode) {
+            print("manage business : $data");
+          }
           return Container(
-            margin: EdgeInsets.symmetric(
+            margin: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 10,
             ),
@@ -147,7 +170,7 @@ Widget allBusiness() {
               children: [
                 // image container
                 Container(
-                  margin: EdgeInsets.only(
+                  margin: const EdgeInsets.only(
                     right: 10,
                   ),
                   decoration: BoxDecoration(
@@ -157,9 +180,9 @@ Widget allBusiness() {
                   ),
                   width: Get.width * 0.16,
                   height: Get.height * 0.06,
-                  child: Image(
-                    image: NetworkImage(
-                      '${data['image']}',
+                  child: const Image(
+                    image: AssetImage(
+                      'assets/images/barber_logo.png',
                     ),
                     fit: BoxFit.fill,
                   ),
@@ -186,20 +209,22 @@ Widget allBusiness() {
                     ],
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 InkWell(
                   onTap: () {
-                    print(index.toString());
+                    if (kDebugMode) {
+                      print(index.toString());
+                    }
                     Get.bottomSheet(
                       // backgroundColor: Colors.white,
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
 
                         color: Colors.white,
                         child: Wrap(
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            Center(
+                            const Center(
                               child: Icon(
                                 Icons.horizontal_rule,
                                 size: 25,
@@ -213,6 +238,28 @@ Widget allBusiness() {
                               callback: () async {
                                 print('tapped');
                                 Get.back();
+                                Get.to(() => EditBusinessView(data: data,));
+                              },
+                            ),
+                            bottomSheetWidgetitem(
+                              title: 'Add New Product',
+                              imagepath:
+                              'assets/images/sidebar_icon/add_products.png',
+                              callback: () async {
+                                print('add new product');
+                                Get.back();
+                                // show a popup with a dropdown to select the shop to add the product to
+
+                              },
+                            ),
+                            bottomSheetWidgetitem(
+                              title: 'Add New Service',
+                              imagepath:
+                              'assets/images/sidebar_icon/services.png',
+                              callback: () async {
+                                print('add new service');
+                                Get.back();
+                                Get.to(() => add_service_view());
                               },
                             ),
                             bottomSheetWidgetitem(
@@ -224,133 +271,7 @@ Widget allBusiness() {
                                 showDialog(
                                   context: context,
                                   builder: (context) {
-                                    return AlertDialog(
-                                      insetPadding: EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                      ),
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 20,
-                                      ),
-                                      scrollable: true,
-                                      content: Container(
-                                        // height: Get.height * 0.7,
-                                        width: Get.width,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Suspend Business',
-                                              style: TextStyle(
-                                                color: appcolor().mainColor,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.symmetric(
-                                                vertical: 15,
-                                              ),
-                                              child: Text(
-                                                'Are you sure you want to suspend this Business ?',
-                                                textAlign: TextAlign.start,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: Get.height * 0.02,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  margin: EdgeInsets.only(
-                                                    right: 10,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                    BorderRadius.circular(
-                                                      8,
-                                                    ),
-                                                  ),
-                                                  width: Get.width * 0.16,
-                                                  height: Get.height * 0.06,
-                                                  child: Image(
-                                                    image: AssetImage(
-                                                      'assets/images/barber_logo.png',
-                                                    ),
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment
-                                                      .start,
-                                                  children: [
-                                                    Text(
-                                                      'Rubiliams Hair Clinic',
-                                                      style: TextStyle(
-                                                        color: appcolor()
-                                                            .mainColor,
-                                                        fontWeight:
-                                                        FontWeight.w500,
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'Molyko, Buea',
-                                                      style: TextStyle(
-                                                        color: appcolor()
-                                                            .mediumGreyColor,
-                                                        fontSize: 13,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: Get.height * 0.12,
-                                            ),
-                                            Column(
-                                              children: [
-                                                blockButton(
-                                                  title: Text(
-                                                    'Suspend Business',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  ontap: () {
-                                                    Get.back();
-                                                  },
-                                                  color: Color.fromARGB(
-                                                      255, 225, 146, 20),
-                                                ),
-                                                SizedBox(
-                                                  height: Get.height * 0.015,
-                                                ),
-                                                blockButton(
-                                                  title: Text(
-                                                    'Cancel',
-                                                    style: TextStyle(
-                                                        color: appcolor()
-                                                            .mediumGreyColor),
-                                                  ),
-                                                  ontap: () {
-                                                    Get.back();
-                                                  },
-                                                  color: Color(0xfffafafa),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ).paddingSymmetric(
-                                          horizontal: 10,
-                                          vertical: 10,
-                                        ),
-                                      ),
-                                    );
+                                    return businessDialog(BusinessAction.suspend);
                                   },
                                 );
                               },
@@ -366,6 +287,13 @@ Widget allBusiness() {
                               imagepath:
                               'assets/images/sidebar_icon/icon-trash.png',
                               callback: () {
+                                Get.back();
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return businessDialog(BusinessAction.delete);
+                                  },
+                                );
                               //   var value = {
                               //     "errand_id": data['id']
                               //   };
@@ -409,11 +337,175 @@ Widget allBusiness() {
         },
       );
     }else{
-      return Center(child: CircularProgressIndicator(),);
+      return const Center(child: CircularProgressIndicator(),);
     }
   },
   );
 
+}
+
+String getActionText(BusinessAction action) {
+  switch (action) {
+    case BusinessAction.suspend:
+      return 'Suspend Business';
+    case BusinessAction.reinstate:
+      return 'Reinstate Business';
+    case BusinessAction.delete:
+      return 'Delete Business';
+  }
+}
+
+String getActionPrompt(BusinessAction action) {
+  switch (action) {
+    case BusinessAction.suspend:
+      return 'Are you sure you want to suspend this Business ?';
+    case BusinessAction.reinstate:
+      return 'Are you sure you want to Reinstate this Business ?';
+    case BusinessAction.delete:
+      return 'Are you sure you want to Delete this Business ?';
+  }
+}
+
+// get action button color
+Color getActionButtonColor(BusinessAction action) {
+  switch (action) {
+    case BusinessAction.suspend:
+      return const Color.fromARGB(
+          255, 225, 146, 20);
+    case BusinessAction.reinstate:
+      return appcolor().mainColor;
+    case BusinessAction.delete:
+      return appcolor().redColor;
+  }
+}
+
+Widget businessDialog(BusinessAction action) {
+  return AlertDialog(
+    insetPadding: const EdgeInsets.symmetric(
+      horizontal: 10,
+    ),
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: 8,
+      vertical: 20,
+    ),
+    scrollable: true,
+    content: SizedBox(
+      // height: Get.height * 0.7,
+      width: Get.width,
+      child: Column(
+        mainAxisAlignment:
+        MainAxisAlignment.center,
+        crossAxisAlignment:
+        CrossAxisAlignment.start,
+        children: [
+          Text(
+            getActionText(action),
+            style: TextStyle(
+              color: appcolor().mainColor,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(
+              vertical: 15,
+            ),
+            child: Text(
+              getActionPrompt(action),
+              textAlign: TextAlign.start,
+            ),
+          ),
+          SizedBox(
+            height: Get.height * 0.02,
+          ),
+          Row(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(
+                  right: 10,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius:
+                  BorderRadius.circular(
+                    8,
+                  ),
+                ),
+                width: Get.width * 0.16,
+                height: Get.height * 0.06,
+                child: const Image(
+                  image: AssetImage(
+                    'assets/images/barber_logo.png',
+                  ),
+                  fit: BoxFit.fill,
+                ),
+              ),
+              Column(
+                crossAxisAlignment:
+                CrossAxisAlignment
+                    .start,
+                children: [
+                  Text(
+                    'Rubiliams Hair Clinic',
+                    style: TextStyle(
+                      color: appcolor()
+                          .mainColor,
+                      fontWeight:
+                      FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    'Molyko, Buea',
+                    style: TextStyle(
+                      color: appcolor()
+                          .mediumGreyColor,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(
+            height: Get.height * 0.12,
+          ),
+          Column(
+            children: [
+              blockButton(
+                title: Text(
+                 getActionText(action),
+                  style: const TextStyle(
+                      color: Colors.white),
+                ),
+                ontap: () {
+                  Get.back();
+                },
+                color: getActionButtonColor(action),
+              ),
+              SizedBox(
+                height: Get.height * 0.015,
+              ),
+              blockButton(
+                title: Text(
+                  'Cancel',
+                  style: TextStyle(
+                      color: appcolor()
+                          .mediumGreyColor),
+                ),
+                ontap: () {
+                  Get.back();
+                },
+                color: const Color(0xfffafafa),
+              ),
+            ],
+          )
+        ],
+      ).paddingSymmetric(
+        horizontal: 10,
+        vertical: 10,
+      ),
+    ),
+  );
 }
 
 Widget Published() {

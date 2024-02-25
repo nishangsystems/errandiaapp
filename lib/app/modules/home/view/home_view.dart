@@ -1,6 +1,7 @@
 import 'package:errandia/app/modules/auth/Register/register_signin_screen.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view_1.dart';
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_view_no_bar.dart';
@@ -11,6 +12,7 @@ import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/categories/view/categories.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/home/view/home_view_1.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/profile/view/profile_view.dart';
 import 'package:errandia/common/random_ui/ui_23.dart';
 import 'package:errandia/app/modules/errands/view/run_an_errand.dart';
@@ -38,16 +40,33 @@ class Home_view extends StatefulWidget {
   State<Home_view> createState() => _Home_viewState();
 }
 
-class _Home_viewState extends State<Home_view> {
+class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
   String? isLoggedIn;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     locationPermission();
     loadIsLoggedIn();
     _initTabList();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      homecontroller.featuredBusinessData.clear();
+      homecontroller.fetchFeaturedBusinessesData();
+      homecontroller.recentlyPostedItemsData.clear();
+      homecontroller.fetchRecentlyPostedItemsData();
+    }
   }
 
   void loadIsLoggedIn() async {
@@ -83,7 +102,7 @@ class _Home_viewState extends State<Home_view> {
       home_view_1(),
       run_an_errand(),
       ErrandViewWithoutBar(),
-      Obx(() => homecontroller.loggedIn.value ? Profile_view() : signin_view_1())
+      Obx(() => homecontroller.loggedIn.value ? const Profile_view() : signin_view_1())
     ];
   }
 
@@ -92,7 +111,17 @@ class _Home_viewState extends State<Home_view> {
     return Scaffold(
       appBar: appbar(),
       key: homecontroller.scaffoldkey,
-      endDrawer: customendDrawer(),
+      endDrawer: CustomEndDrawer(onBusinessCreated: () {
+        profile_controller().reloadMyBusinesses();
+        homecontroller.closeDrawer();
+        homecontroller.featuredBusinessData.clear();
+        homecontroller.fetchFeaturedBusinessesData();
+        business_controller().itemList.clear();
+        business_controller().loadBusinesses();
+        homecontroller.recentlyPostedItemsData.clear();
+        homecontroller.fetchRecentlyPostedItemsData();
+        profile_controller().reloadMyBusinesses();
+      },),
       body: Obx(
         () {
           return tabList[_index.value];
@@ -104,13 +133,13 @@ class _Home_viewState extends State<Home_view> {
             data: NavigationBarThemeData(
               backgroundColor: appcolor().mainColor,
               iconTheme: MaterialStateProperty.all(
-                IconThemeData(
+                const IconThemeData(
                   color: Colors.white,
                   size: 35,
                 ),
               ),
               labelTextStyle: MaterialStateProperty.all(
-                TextStyle(
+                const TextStyle(
                   fontWeight: FontWeight.w400,
                   fontSize: 12,
                   color: Colors.white,
@@ -123,7 +152,12 @@ class _Home_viewState extends State<Home_view> {
                 debugPrint(index.toString());
                 _index.value = index;
 
-                if (_index.value == 4) homecontroller.openDrawer();
+                if (_index.value == 4) {
+                  homecontroller.openDrawer();
+                } else if (_index.value == 3) { // Assuming index 3 is the profile tab
+                  print("profile tab selected");
+                  profile_controller().loadMyBusinesses(); // Reload businesses when the profile tab is selected
+                }
                 debugPrint(_index.value.toString());
               },
               destinations: [

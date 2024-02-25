@@ -1,5 +1,7 @@
+import 'package:errandia/app/modules/global/Widgets/notifications_view.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
+import 'package:errandia/app/modules/setting/view/notification_setting_view.dart';
 import 'package:errandia/app/modules/setting/view/setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -38,11 +40,13 @@ AppBar appbar() {
             width: Get.width * 0.3,
           ),
         ),
-        Spacer(),
+        const Spacer(),
         Obx(() => homeController.loggedIn.value
             ? IconButton(
-                onPressed: () {},
-                icon: Icon(
+                onPressed: () {
+                  Get.to(() => const NotificationsView());
+                },
+                icon: const Icon(
                   Icons.notifications,
                   size: 30,
                 ),
@@ -54,7 +58,7 @@ AppBar appbar() {
                 onPressed: () {
                   Get.to(() => setting_view());
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.settings,
                   size: 30,
                 ),

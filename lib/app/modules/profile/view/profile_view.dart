@@ -1,12 +1,17 @@
 import 'dart:convert';
 
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
+import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
+import 'package:errandia/app/modules/global/Widgets/myShopsDialog.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/profile/view/edit_profile_view.dart';
+import 'package:errandia/modal/Shop.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
 import 'package:errandia/app/modules/services/view/service_details_view.dart';
@@ -25,28 +30,91 @@ class Profile_view extends StatefulWidget {
   State<Profile_view> createState() => _Profile_viewState();
 }
 
-class _Profile_viewState extends State<Profile_view> with TickerProviderStateMixin {
+class _Profile_viewState extends State<Profile_view>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   late final TabController tabController =
       TabController(length: 3, vsync: this);
   late Map<String, dynamic> userData = {};
   late SharedPreferences prefs;
+  late profile_controller profileController;
+  late ScrollController scrollController;
+  late ScrollController serviceScrollController;
+  late ScrollController productScrollController;
+
+  late Shop shop;
 
   // get user from sharedprefs
   Future<void> getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userDataString = prefs.getString('user');
+    // user image
+    String? userProfileImg = prefs.getString('userProfileImg');
     if (userDataString != null) {
       print("user data: $userDataString");
       setState(() {
         userData = jsonDecode(userDataString);
+        print("prof img: $userProfileImg");
+        userData['photo'] =
+            userProfileImg == null || userProfileImg.toString() == ""
+                ? null
+                : getImagePath(userProfileImg);
       });
     }
+    print("user profile image: ${userData['photo']}");
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    profileController = Get.put(profile_controller());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      profileController.reloadMyBusinesses();
+      profileController.reloadMyProducts();
+      profileController.reloadMyServices();
+    });
     getUser();
+    scrollController = ScrollController();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 20) {
+        profileController.loadMyBusinesses();
+      }
+    });
+
+    serviceScrollController = ScrollController();
+    serviceScrollController.addListener(() {
+      if (serviceScrollController.position.pixels >=
+          serviceScrollController.position.maxScrollExtent - 20) {
+        profileController.loadMyServices();
+      }
+    });
+
+    productScrollController = ScrollController();
+    productScrollController.addListener(() {
+      if (productScrollController.position.pixels >=
+          productScrollController.position.maxScrollExtent - 20) {
+        profileController.loadMyProducts();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    scrollController.dispose();
+    serviceScrollController.dispose();
+    productScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      profileController.reloadMyBusinesses();
+      profileController.reloadMyProducts();
+      profileController.reloadMyServices();
+    }
   }
 
   @override
@@ -57,6 +125,338 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
 
     if (kDebugMode) {
       print("user: ${userData.toString}");
+    }
+
+    Widget _buildMyBusinessesErrorWidget(
+        String message, VoidCallback onReload) {
+      return !profileController.isLoading.value
+          ? Container(
+              height: Get.height * 0.9,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : buildLoadingWidget();
+    }
+
+    Widget _buildMyProductsErrorWidget(String message, VoidCallback onReload) {
+      return !profileController.isProductLoading.value
+          ? Container(
+              height: Get.height * 0.9,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : buildLoadingWidget();
+    }
+
+    Widget _buildMyServicesErrorWidget(String message, VoidCallback onReload) {
+      return !profileController.isServiceLoading.value
+          ? Container(
+              height: Get.height * 0.9,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : buildLoadingWidget();
+    }
+
+    Widget Buiseness_item_list() {
+      return Obx(() {
+        if (profileController.isLoading.value) {
+          return buildLoadingWidget();
+        } else if (profile_controller().isError.value) {
+          return _buildMyBusinessesErrorWidget(
+              'An error occurred while loading your businesses',
+              profileController.reloadMyBusinesses);
+        } else if (profileController.itemList.isEmpty) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'No Businesses Yet',
+                style: TextStyle(
+                  color: appcolor().mediumGreyColor,
+                  fontSize: 16,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Get.to(() => add_business_view())?.then((_) {
+                    business_controller().itemList.clear();
+                    business_controller().loadBusinesses();
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: const Text(
+                  'Add Business',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              )
+            ],
+          );
+        } else {
+          return RefreshIndicator(
+            onRefresh: () async {
+              profileController.reloadMyBusinesses();
+            },
+            child: GridView.builder(
+                key: const PageStorageKey('my-businesses'),
+                controller: scrollController,
+                itemCount: profileController.isLoading.value
+                    ? profileController.itemList.length + 1
+                    : profileController.itemList.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 5,
+                  childAspectRatio: 1 / 1.4,
+                ),
+                itemBuilder: (context, index) {
+                  // return Text(index.toString());
+                  final businessData = profileController.itemList[index];
+                  return GestureDetector(
+                    onTap: () {
+                      if (kDebugMode) {
+                        print("business item clicked: ${businessData['name']}");
+                      }
+                      Get.to(
+                          () => VisitShop(businessData: businessData));
+                    },
+                    child: errandia_widget(
+                      imagePath: businessData['image'],
+                      name: businessData['name'],
+                      location: businessData['street'],
+                    ),
+                  );
+                }),
+          );
+        }
+      });
+    }
+
+    Widget product_item_list(BuildContext context) {
+      return Obx(
+        () {
+          if (profile_controller().isProductLoading.value) {
+            return buildLoadingWidget();
+          } else if (profile_controller().isProductError.value) {
+            return _buildMyProductsErrorWidget(
+                'An error occurred while loading your products', () {
+              profile_controller().loadMyProducts();
+            });
+          } else if (profile_controller().productItemList.isEmpty) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'No Products Yet',
+                  style: TextStyle(
+                    color: appcolor().mediumGreyColor,
+                    fontSize: 16,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Get.to(() => add_product_view(shopId: shopId));
+                    showDialog(context: context, builder:
+                    (BuildContext ctx) {
+                      return ShopSelectionDialog(onShopSelected: (shop_) {
+                        print("Selected shop: ${shop_.id}");
+                        setState(() {
+                          shop = shop_;
+                        });
+                        // Navigator.of(context).pop();
+                        Get.back();
+                      }, desc: "Select a shop to add a product to");
+                    }
+                    ).then((_) {
+                      // This will execute after the dialog is closed
+                      Get.to(() => add_product_view(shop: shop));
+                    });
+
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: appcolor().mainColor,
+                  ),
+                  child: const Text(
+                    'Add Products',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
+              ],
+            );
+          } else {
+            return RefreshIndicator(
+              onRefresh: () async {
+                profileController.reloadMyProducts();
+              },
+              child: GridView.builder(
+                key: const PageStorageKey('my-products'),
+                controller: productScrollController,
+                itemCount: profileController.isProductLoading.value
+                    ? profileController.productItemList.length + 1
+                    : profileController.productItemList.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1 / 1.5,
+                ),
+                itemBuilder: (context, index) {
+                  final item = profileController.productItemList[index];
+
+                  return GestureDetector(
+                      onTap: () {
+                        if (kDebugMode) {
+                          print("product item clicked: ${item['name']}");
+                        }
+                        Get.to(() => Product_view(item: item));
+                      },
+                      child: errandia_widget(
+                        cost: item['price'],
+                        imagePath: item['image'],
+                        name: item['name'],
+                        location: item['location'],
+                      ));
+                },
+              ),
+            );
+          }
+        },
+      );
+    }
+
+    Widget Service_item_list() {
+      return Obx(
+        () {
+          if (profileController.isServiceLoading.value) {
+            return buildLoadingWidget();
+          } else if (profile_controller().isServiceError.value) {
+            return _buildMyServicesErrorWidget(
+                'An error occurred while loading your services', () {
+              profile_controller().loadMyServices();
+            });
+          } else if (profileController.serviceItemList.isEmpty) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'No Services Yet',
+                  style: TextStyle(
+                    color: appcolor().mediumGreyColor,
+                    fontSize: 16,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Get.to(() => add_product_view(shopId: shopId));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: appcolor().mainColor,
+                  ),
+                  child: const Text(
+                    'Add Services',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
+              ],
+            );
+          } else {
+            return RefreshIndicator(
+              onRefresh: () async {
+                profileController.reloadMyServices();
+              },
+              child: GridView.builder(
+                key: const PageStorageKey('my-services'),
+                controller: serviceScrollController,
+                itemCount: profileController.isServiceLoading.value
+                    ? profileController.serviceItemList.length + 1
+                    : profileController.serviceItemList.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1 / 1.5,
+                ),
+                itemBuilder: (context, index) {
+                  final item = profileController.serviceItemList[index];
+                  return GestureDetector(
+                    onTap: () {
+                      if (kDebugMode) {
+                        print("service item: ${item['name']}");
+                      }
+                      Get.to(() => ServiceDetailsView(service: item));
+                    },
+                    child: errandia_widget(
+                      cost: item['unit_price'],
+                      imagePath: item['featured_image'],
+                      name: item['name'],
+                      location: item['street'],
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+        },
+      );
     }
 
     return Scaffold(
@@ -85,32 +485,59 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
-                        child:
-                          userData['profile'] == null ? Image.network(
-                            userData['profile'] ?? "",
-                            height: Get.height * 0.13,
-                            width: Get.width * 0.27,
-                            fit: BoxFit.cover,
-                          ) : Center(
-                            child: Text(
-                              getFirstLetter(userData['name']),
-                              style: const TextStyle(
-                                color: Color(0xffff0000),
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          ),
+                        child: userData['photo'] != null
+                            ? Image.network(userData['photo'], fit: BoxFit.fill,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                return Center(
+                                    child: Text(
+                                  userData["name"] != null
+                                      ? getFirstLetter(userData['name'])
+                                      : "",
+                                  style: const TextStyle(
+                                    color: Color(0xffff0000),
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ));
+                              })
+                            : Center(
+                                child: Text(
+                                userData["name"] != null
+                                    ? getFirstLetter(userData['name'])
+                                    : "",
+                                style: const TextStyle(
+                                  color: Color(0xffff0000),
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
                       ),
                     ),
                   ),
+
+                  // Image.network(
+                  //   getImagePath(userData['photo'] ?? ""),
+                  //   height: Get.height * 0.13,
+                  //   width: Get.width * 0.27,
+                  //   fit: BoxFit.cover,
+                  //   key: UniqueKey(),
+                  // ) : Center(
+                  //     child: Text(
+                  //       getFirstLetter(userData['name']),
+                  //       style: const TextStyle(
+                  //         color: Color(0xffff0000),
+                  //         fontSize: 40,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     )
+                  // ),
                   Align(
                     alignment: AlignmentDirectional.topEnd,
                     child: SizedBox(
                       width: Get.width * 0.3,
                       height: Get.height * 0.13,
                       // color: Colors.redAccent,
-
                     ),
                   ),
                   Positioned(
@@ -123,7 +550,9 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                           if (kDebugMode) {
                             print("edit profile");
                           }
-                          Get.to(() => edit_profile_view());
+                          Get.to(() => const edit_profile_view())?.then((_) {
+                            getUser();
+                          });
                         },
                         customBorder: const CircleBorder(),
                         splashColor: Colors.red,
@@ -143,13 +572,14 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                 margin: const EdgeInsets.only(
                   top: 10,
                 ),
-                child:  Text(
-                    userData['name'] != null ? capitalizeAll(userData['name']) : "",
+                child: Text(
+                  userData['name'] != null
+                      ? capitalizeAll(userData['name'])
+                      : "",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-
                   ),
                 ),
               ),
@@ -249,7 +679,7 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
                       text: "Services",
                     ),
                     Tab(
-                      text: "Business",
+                      text: "Businesses",
                     ),
                   ],
                 ),
@@ -261,65 +691,15 @@ class _Profile_viewState extends State<Profile_view> with TickerProviderStateMix
         // tab bar view
         Expanded(
           child: Container(
-            color: Colors.white,
+            color: Colors.grey[200],
             padding: const EdgeInsets.symmetric(horizontal: 15),
             // height: Get.height * 0.2,
             child: TabBarView(
               controller: tabController,
               children: [
-                profile_controller().product_list.isNotEmpty
-                    ? product_item_list()
-                    : noProductsFound(),
-                profile_controller().service_list.isNotEmpty
-                    ? Service_item_list()
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'No Services Yet',
-                            style: TextStyle(
-                              color: appcolor().mediumGreyColor,
-                              fontSize: 16,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              'Add Services',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                profile_controller().Buiseness_list.isNotEmpty
-                    ? Buiseness_item_list()
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'No Business Yet',
-                            style: TextStyle(
-                              color: appcolor().mediumGreyColor,
-                              fontSize: 16,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              'Add Business',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
+                product_item_list(context),
+                Service_item_list(),
+                Buiseness_item_list()
               ],
             ),
           ),
@@ -356,68 +736,6 @@ Widget details_container_item_widget(
       Text(count.toString()),
     ],
   );
-}
-
-Widget product_item_list() {
-  return GridView.builder(
-    itemCount: profile_controller().product_list.length,
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      crossAxisSpacing: 10,
-      childAspectRatio: 1 / 1.5,
-    ),
-
-    itemBuilder: (context, index) {
-      final item = Recently_item_List[index];
-
-      return GestureDetector(
-        onTap: () {
-          if (kDebugMode) {
-            print("product item clicked: ${item.name}");
-          }
-          Get.to(() => Product_view(item: item));
-        },
-        child: profile_controller().product_list[index],
-      );
-    },
-  );
-}
-
-Widget Service_item_list() {
-  return GridView.builder(
-    itemCount: profile_controller().service_list.length,
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      crossAxisSpacing: 10,
-      childAspectRatio: 1 / 1.5,
-    ),
-    itemBuilder: (context, index) {
-      final item = profile_controller().service_list[index];
-      return GestureDetector(
-        onTap: () {
-          if (kDebugMode) {
-            print("service item: ${item.name}");
-          }
-          Get.to(() => ServiceDetailsView(service: item));
-        },
-        child: profile_controller().service_list[index],
-      );
-    },
-  );
-}
-
-Widget Buiseness_item_list() {
-  return GridView.builder(
-      itemCount: profile_controller().Buiseness_list.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 5,
-        childAspectRatio: 1 / 1.8,
-      ),
-      itemBuilder: (context, index) {
-        // return Text(index.toString());
-        return business_controller().businessList[index];
-      });
 }
 
 Widget noProductsFound() {

@@ -1,3 +1,4 @@
+import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/errands/view/Product/serivces.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
@@ -46,7 +47,9 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
               children: [
                 InkWell(
                   onTap: () {
-                    Get.to(const Product_serivices());
+                    Get.to(() => errandia_business_view(
+                      businessData: widget.service,
+                    ));
                   },
                   child: const Column(
                     mainAxisAlignment: MainAxisAlignment.end,

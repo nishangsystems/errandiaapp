@@ -3,8 +3,10 @@ import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/products/controller/manage_products_controller.dart';
 import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/controller/manage_service_controller.dart';
 import 'package:errandia/app/modules/services/view/add_service_view.dart';
+import 'package:errandia/app/modules/services/view/edit_service_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -47,7 +49,7 @@ class manage_service_view extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  'Add Product',
+                  'Add Service',
                   style: TextStyle(
                     fontSize: 16,
                     color: appcolor().mainColor,
@@ -456,11 +458,12 @@ Widget allServices(BuildContext ctx) {
                               ),
                               // Text(index.toString()),
                               managebottomSheetWidgetitem(
-                                title: 'Edit Product',
+                                title: 'Edit Service',
                                 icondata: Icons.edit,
                                 callback: () async {
                                   print('tapped');
                                   Get.back();
+                                  Get.to(() => EditServiceView(data: profile_controller().service_list[index].toJson(),));
                                 },
                               ),
                               managebottomSheetWidgetitem(

@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,12 +45,18 @@ class home_view_1 extends StatefulWidget {
 
 class _home_view_1State extends State<home_view_1> {
   String? isLoggedIn;
-  home_controller homeController = Get.put(home_controller());
+  late home_controller homeController;
+  // List<dynamic> recentlyPostedItemsData = [];
+  // List<dynamic> featuredBusinessesData = [];
+  // bool _isRPILoading = true;
+  // bool _isFBLLoading = true;
+  // bool isRPIError = false;
+  // bool isFBLError = false;
 
   Country() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}countries'),
+        Uri.parse('${apiDomain().domain}/countries'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -67,7 +75,7 @@ class _home_view_1State extends State<home_view_1> {
   CountryData() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}categories'),
+        Uri.parse('${apiDomain().domain}/categories'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -86,7 +94,7 @@ class _home_view_1State extends State<home_view_1> {
   RegionData() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}regions'),
+        Uri.parse('${apiDomain().domain}/regions'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -105,7 +113,7 @@ class _home_view_1State extends State<home_view_1> {
 
   TownData() async {
     try {
-      final response = await http.get(Uri.parse('${apiDomain().domain}towns'));
+      final response = await http.get(Uri.parse('${apiDomain().domain}/towns'));
       if (response.statusCode == 200) {
         final catalogJson = response.body;
         final decodedData = jsonDecode(catalogJson);
@@ -124,7 +132,7 @@ class _home_view_1State extends State<home_view_1> {
   street() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}streets'),
+        Uri.parse('${apiDomain().domain}/streets'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -144,7 +152,7 @@ class _home_view_1State extends State<home_view_1> {
   subCategoryData() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiDomain().domain}streets'),
+        Uri.parse('${apiDomain().domain}/streets'),
       );
       if (response.statusCode == 200) {
         final catalogJson = response.body;
@@ -178,36 +186,392 @@ class _home_view_1State extends State<home_view_1> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    homeController = Get.put(home_controller());
     CountryData();
     RegionData();
-    TownData();
+    // TownData();
     Country();
     street();
     subCategoryData();
+    homeController.featuredBusinessData();
+    homeController.recentlyPostedItemsData();
   }
 
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey =
         GlobalKey<ScaffoldState>(); // ADD THIS LINE
+    home_controller().atbusiness.value = false;
 
     Future<void> locationPermission() async {
       var status = await Permission.location.request();
       if (status.isDenied) {
-        ScaffoldMessenger.of(scaffoldKey.currentContext!)
-            .showSnackBar(const SnackBar(content: Text('Camera access denied')));
+        ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
+            const SnackBar(content: Text('Camera access denied')));
       } else if (status.isPermanentlyDenied) {
         ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
             const SnackBar(content: Text('Camera access permanently denied')));
       } else if (status.isGranted) {
-        ScaffoldMessenger.of(scaffoldKey.currentContext!)
-            .showSnackBar(const SnackBar(content: Text('Camera access granted')));
+        ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
+            const SnackBar(content: Text('Camera access granted')));
       }
     }
 
-    home_controller().atbusiness.value = false;
+    Widget _buildRPIErrorWidget(String message, VoidCallback onReload) {
+      return !homeController.isRPILoading.value
+          ? Container(
+              height: Get.height * 0.3,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : buildLoadingWidget();
+    }
+
+    Widget _buildFBLErrorWidget(String message, VoidCallback onReload) {
+      return !homeController.isFBLLoading.value
+          ? Container(
+              height: Get.height * 0.3,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : buildLoadingWidget();
+    }
+
+    Widget Recently_posted_items_Widget() {
+      return Obx(
+          () {
+            if (homeController.isRPIError.value) {
+              return _buildRPIErrorWidget(
+                  'Failed to load recently posted items', homeController.reloadRecentlyPostedItems);
+            } else if (homeController.isRPILoading.value) {
+              return Container(
+                height: Get.height * 0.45,
+                color: Colors.white,
+                child: buildLoadingWidget(),
+              );
+            } else if (homeController.recentlyPostedItemsData.isEmpty) {
+              return Container(
+                height: Get.height * 0.45,
+                color: Colors.white,
+                child: const Center(
+                  child: Text('No recently posted items'),
+                ),
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                height: Get.height * 0.45,
+                color: Colors.white,
+                child: ListView.builder(
+                  primary: false,
+                  shrinkWrap: false,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: homeController.recentlyPostedItemsData.length > 4 ? 4 : homeController.recentlyPostedItemsData.length,
+                  itemBuilder: (context, index) {
+                    var data = homeController.recentlyPostedItemsData[index];
+
+                    return InkWell(
+                      onTap: () {
+                        // Get.to(Product_view(item: data,name: data['name'].toString(),));
+                        // Get.back();
+                        Get.to(() => errand_detail_view(
+                          data: data,
+                        ));
+                      },
+                      child: Card(
+                        child: Container(
+                          width: Get.width * 0.5,
+                          color: Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: Get.height * 0.09,
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage: AssetImage(
+                                        data['shop']['image'] != ''
+                                            ? data['shop']['image'].toString()
+                                            : Recently_item_List[index]
+                                            .avatarImage
+                                            .toString(),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: Get.width * 0.02,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          Recently_item_List[index].name.toString(),
+                                          style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          Recently_item_List[index].date.toString(),
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Divider(
+                                color: appcolor().mediumGreyColor,
+                              ),
+                              Container(
+                                height: Get.height * 0.2,
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 0),
+                                color: appcolor().lightgreyColor,
+                                child: Center(
+                                  child: Image(
+                                    image: AssetImage(Recently_item_List[index]
+                                        .imagePath
+                                        .toString()),
+                                    height: Get.height * 0.15,
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                color: appcolor().mediumGreyColor,
+                              ),
+                              SizedBox(
+                                height: Get.height * 0.009,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Text(
+                                    //   Featured_Businesses_Item_List[index]
+                                    //       .servicetype
+                                    //       .toString(),
+                                    //   style: TextStyle(
+                                    //       fontSize: 13,
+                                    //       fontWeight: FontWeight.bold,
+                                    //       color: appcolor().mediumGreyColor),
+                                    // ),
+                                    // SizedBox(
+                                    //   height: Get.height * 0.001,
+                                    // ),
+                                    Text(
+                                      data['name'].toString() != "null"
+                                          ? data['name'].toString()
+                                          : 'errand name',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: appcolor().mainColor),
+                                    ),
+                                    SizedBox(
+                                      height: Get.height * 0.001,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.location_on,
+                                          color: appcolor().mediumGreyColor,
+                                          size: 15,
+                                        ),
+                                        Text(
+                                          data['shop']['street'].toString(),
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: appcolor().mainColor),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }
+          }
+      );
+    }
+
+    Widget Featured_Businesses_List() {
+     return Obx(
+         () {
+           if (homeController.isFBLError.value) {
+             return _buildFBLErrorWidget("Failed to load featured businesses",
+                 homeController.reloadFeaturedBusinessesData);
+           } else if (homeController.isFBLLoading.value) {
+             print("fbl: ${homeController.isFBLLoading.value
+             }");
+             return Container(
+               height: Get.height * 0.33,
+               color: Colors.white,
+               child: buildLoadingWidget(),
+             );
+           } else if (homeController.featuredBusinessData.isEmpty) {
+             return Container(
+               height: Get.height * 0.33,
+               color: Colors.white,
+               child: const Center(
+                 child: Text('No featured businesses'),
+               ),
+             );
+           } else {
+             print("fbl: ${homeController.featuredBusinessData}");
+             return Container(
+               padding: const EdgeInsets.symmetric(horizontal: 14),
+               height: Get.height * 0.33,
+               color: Colors.white,
+               child: ListView.builder(
+                 primary: false,
+                 shrinkWrap: false,
+                 scrollDirection: Axis.horizontal,
+                 itemCount: homeController.featuredBusinessData.length > 4 ? 4 : homeController.featuredBusinessData.length,
+                 itemBuilder: (context, index) {
+                   var data = homeController.featuredBusinessData[index];
+                   print("sub data: ${data['street']}");
+                   return InkWell(
+                     onTap: () {
+                       Get.to(() => errandia_business_view(businessData: data));
+                     },
+                     child: Container(
+                       margin:
+                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                       width: Get.width * 0.4,
+                       color: Colors.white,
+                       child: Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           SizedBox(
+                             height: Get.height * 0.005,
+                           ),
+                           Container(
+                             height: Get.height * 0.15,
+                             width: Get.width,
+                             color: appcolor().lightgreyColor,
+                             child: Image(
+                               image: NetworkImage(data['image'] != ''
+                                   ? getImagePath(data['image'].toString())
+                                   : 'https://errandia.com/assets/images/logo-default.png'),
+                               fit: BoxFit.fill,
+                               height: Get.height * 0.15,
+                               // width: Get.width * 0.3,
+                             ),
+                           ).paddingOnly(left: 3, right: 3, top: 10, bottom: 5),
+                           SizedBox(
+                             height: Get.height * 0.009,
+                           ),
+                           Text(
+                             data['category']['name'].toString(),
+                             style: TextStyle(
+                                 fontSize: 11,
+                                 // fontWeight: FontWeight.bold,
+                                 color: appcolor().mediumGreyColor),
+                             maxLines: 1,
+                             overflow: TextOverflow.ellipsis,
+                           ).paddingOnly(left: 3),
+                           SizedBox(
+                             height: Get.height * 0.001,
+                           ),
+                           Text(
+                             capitalizeAll(data['name'] ?? ""),
+                             style: TextStyle(
+                               fontSize: 14,
+                               fontWeight: FontWeight.w500,
+                               color: appcolor().mainColor,
+                             ),
+                             maxLines: 2,
+                             overflow: TextOverflow.ellipsis,
+                           ).paddingOnly(left: 3),
+                           SizedBox(
+                             height: Get.height * 0.001,
+                           ),
+                           (data['street'] != '' && data['street'] != null)
+                               ? Row(
+                             children: [
+                               Icon(
+                                 Icons.location_on,
+                                 color: appcolor().mediumGreyColor,
+                                 size: 15,
+                               ),
+                               const SizedBox(
+                                 width: 1,
+                               ),
+                               Text(
+                                 data['street'].toString(),
+                                 style: const TextStyle(fontSize: 12),
+                               )
+                             ],
+                           )
+                               : Text(
+                             "No location provided",
+                             style: TextStyle(
+                               fontSize: 11,
+                               color: appcolor().mediumGreyColor,
+                               fontStyle: FontStyle.italic,
+                             ),
+                             maxLines: 1,
+                             overflow: TextOverflow.ellipsis,
+                           ),
+                         ],
+                       ),
+                     ),
+                   );
+                 },
+               ),
+             );
+           }
+         }
+     );
+    }
+
     return Stack(
       children: [
         Image(
@@ -289,16 +653,18 @@ class _home_view_1State extends State<home_view_1> {
                       homeController.loggedIn.value
                           ? 'Update Business Location'.tr
                           : 'Update Location'.tr,
-                      style: TextStyle(
-                          color: appcolor().mainColor, fontSize: 12),
+                      style:
+                          TextStyle(color: appcolor().mainColor, fontSize: 12),
                     ),
                   ),
                   TextButton(
                     onPressed: () async {
                       var status = await Permission.location.status;
                       if (status.isGranted) {
-                        ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(const SnackBar(
-                            content: Text('Camera access permanently denied')));
+                        ScaffoldMessenger.of(scaffoldKey.currentContext!)
+                            .showSnackBar(const SnackBar(
+                                content:
+                                    Text('Camera access permanently denied')));
                       } else {
                         locationPermission();
                       }
@@ -318,30 +684,30 @@ class _home_view_1State extends State<home_view_1> {
 
             // categories widget
 
-            Container(
-              color: Colors.white,
-              child: Row(
-                children: [
-                  Text(
-                    'Categories',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                      color: appcolor().mainColor,
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      Get.to(const categories_view());
-                    },
-                    child: const Text('See All'),
-                  ),
-                ],
-              ).paddingSymmetric(horizontal: 20),
-            ),
-
-            Categories_List_Widget(),
+            // Container(
+            //   color: Colors.white,
+            //   child: Row(
+            //     children: [
+            //       Text(
+            //         'Categories',
+            //         style: TextStyle(
+            //           fontWeight: FontWeight.w700,
+            //           fontSize: 18,
+            //           color: appcolor().mainColor,
+            //         ),
+            //       ),
+            //       const Spacer(),
+            //       TextButton(
+            //         onPressed: () {
+            //           Get.to(const categories_view());
+            //         },
+            //         child: const Text('See All'),
+            //       ),
+            //     ],
+            //   ).paddingSymmetric(horizontal: 20),
+            // ),
+            //
+            // Categories_List_Widget(),
 
             // Featured Businesses
 
@@ -360,7 +726,10 @@ class _home_view_1State extends State<home_view_1> {
                   const Spacer(),
                   TextButton(
                     onPressed: () {
-                      Get.to(BusinessesViewWithBar());
+                      Get.to(() => BusinessesViewWithBar())?.then((_) {
+                        homeController.featuredBusinessData.clear();
+                        homeController.fetchFeaturedBusinessesData();
+                      });
                     },
                     child: const Text('See All'),
                   ),
@@ -385,7 +754,7 @@ class _home_view_1State extends State<home_view_1> {
                   const Spacer(),
                   TextButton(
                     onPressed: () {
-                      Get.to(() => SeeAllErands());
+                      Get.to(() => SeeAllErrands());
                     },
                     child: const Text('See All'),
                   ),
@@ -458,8 +827,9 @@ Widget Categories_List_Widget() {
                                     // colorFilter: ColorFilter.mode( BlendMode.srcIn),
                                     semanticsLabel: 'A red up arrow')
                                 : Image(
-                                    image: const NetworkImage(
-                                        "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"),
+                                    image: const AssetImage(
+                                      'assets/images/errandia_logo.png',
+                                    ),
                                     height: Get.height * 0.05,
                                     width: Get.width * 0.1,
                                   ),
@@ -493,281 +863,6 @@ Widget Categories_List_Widget() {
       });
 }
 
-Widget Featured_Businesses_List() {
-  return FutureBuilder(
-      future: api().bussiness('shops', 1),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: Text('Featured Businesses not found'),
-            ),
-          );
-        } else if (snapshot.hasData) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            height: Get.height * 0.23,
-            color: Colors.white,
-            child: ListView.builder(
-              primary: false,
-              shrinkWrap: false,
-              scrollDirection: Axis.horizontal,
-              itemCount: 4,
-              itemBuilder: (context, index) {
-                var data = snapshot.data[index];
-                return InkWell(
-                  onTap: () {
-                    Get.to(errandia_business_view(index: index));
-                  },
-                  child: Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    width: Get.width * 0.4,
-                    color: Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: Get.height * 0.09,
-                          color: appcolor().lightgreyColor,
-                          child: Image(
-                            image: NetworkImage(
-                              data['image'] != ''
-                                  ? data['image'].toString()
-                                  : Featured_Businesses_Item_List[index]
-                                      .imagePath
-                                      .toString(),
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        SizedBox(
-                          height: Get.height * 0.009,
-                        ),
-                        Text(
-                          Featured_Businesses_Item_List[index]
-                              .servicetype
-                              .toString(),
-                          style: TextStyle(
-                              fontSize: 12,
-                              // fontWeight: FontWeight.bold,
-                              color: appcolor().mediumGreyColor),
-                        ),
-                        SizedBox(
-                          height: Get.height * 0.001,
-                        ),
-                        Text(
-                          data['name'].toString(),
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: appcolor().mainColor),
-                        ),
-                        SizedBox(
-                          height: Get.height * 0.001,
-                        ),
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on),
-                            Text(
-                              data['street'],
-                              style: const TextStyle(fontSize: 12),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        } else {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-      });
-}
-
-Widget Recently_posted_items_Widget() {
-  return FutureBuilder(
-      future: api().getProduct('products', 1),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: Text('Recently Posted Errands not found'),
-            ),
-          );
-        } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        } else if (snapshot.hasData) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            height: Get.height * 0.45,
-            color: Colors.white,
-            child: ListView.builder(
-              primary: false,
-              shrinkWrap: false,
-              scrollDirection: Axis.horizontal,
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                var data = snapshot.data[index];
-                if (kDebugMode) {
-                  print("data: $data");
-                }
-
-                return InkWell(
-                  onTap: () {
-                    // Get.to(Product_view(item: data,name: data['name'].toString(),));
-                    // Get.back();
-                    Get.to(errand_detail_view(
-                      data: data,
-                    ));
-                  },
-                  child: Card(
-                    child: Container(
-                      width: Get.width * 0.5,
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: Get.height * 0.09,
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 25,
-                                  backgroundImage: AssetImage(
-                                    data['shop']['image'] != ''
-                                        ? data['shop']['image'].toString()
-                                        : Recently_item_List[index]
-                                            .avatarImage
-                                            .toString(),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: Get.width * 0.02,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      data['shop']['name'].toString(),
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    // Text(
-                                    //   Recently_item_List[index].date.toString(),
-                                    //   style: TextStyle(fontSize: 12),
-                                    // ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Divider(
-                            color: appcolor().mediumGreyColor,
-                          ),
-                          Container(
-                            height: Get.height * 0.2,
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 0),
-                            color: appcolor().lightgreyColor,
-                            child: Center(
-                              child: Image(
-                                image: NetworkImage(
-                                  data['featured_image'] != ''
-                                      ? data['featured_image'].toString()
-                                      : Featured_Businesses_Item_List[index]
-                                          .imagePath
-                                          .toString(),
-                                ),
-                                height: Get.height * 0.15,
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            color: appcolor().mediumGreyColor,
-                          ),
-                          SizedBox(
-                            height: Get.height * 0.009,
-                          ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Text(
-                                //   Featured_Businesses_Item_List[index]
-                                //       .servicetype
-                                //       .toString(),
-                                //   style: TextStyle(
-                                //       fontSize: 13,
-                                //       fontWeight: FontWeight.bold,
-                                //       color: appcolor().mediumGreyColor),
-                                // ),
-                                // SizedBox(
-                                //   height: Get.height * 0.001,
-                                // ),
-                                Text(
-                                  data['name'].toString(),
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: appcolor().mainColor),
-                                ),
-                                SizedBox(
-                                  height: Get.height * 0.001,
-                                ),
-                                Row(
-                                  children: [
-                                    Icon(Icons.location_on),
-                                    Text(
-                                      data['shop']['street'].toString(),
-                                      style: TextStyle(
-                                          color: appcolor().mainColor),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        } else {
-          return Container(
-            height: Get.height * 0.17,
-            color: Colors.white,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-      });
+void _reloadFeaturedBusinesses() {
+  print('Reloading featured businesses');
 }

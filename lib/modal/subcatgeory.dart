@@ -1,7 +1,6 @@
 
 class subCetegoryData{
   static  List<Sub> Items = [
-
   ];
 }
 

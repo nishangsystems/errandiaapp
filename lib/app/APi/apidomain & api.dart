@@ -11,6 +11,7 @@ import 'package:http_parser/http_parser.dart';
 
 class apiDomain {
   final domain = 'https://errandia.com/api';
+  final imageDomain = 'https://errandia.com';
 }
 
 class api {
@@ -89,12 +90,12 @@ class api {
     var token = prefs.getString('token');
 
     final response =
-        await http.get(Uri.parse('${apiDomain().domain}/categories'),
-            headers: ({
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token'
-            }));
+    await http.get(Uri.parse('${apiDomain().domain}/categories'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (kDebugMode) {
@@ -123,10 +124,8 @@ class api {
     }
   }
 
-  Future bussiness(
-    String url,
-    int value,
-  ) async {
+  Future getProduct(String url,
+      int value,) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token;
     if (value == 1) {
@@ -140,29 +139,7 @@ class api {
         }));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      // print('sdaf$data');
-      return data['data']['shops'];
-    }
-  }
-
-  Future getProduct(
-    String url,
-    int value,
-  ) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token;
-    if (value == 1) {
-      token = prefs.getString('token');
-    }
-    final response = await http.get(Uri.parse('${apiDomain().domain}/$url'),
-        headers: ({
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token'
-        }));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      // print('sdaf$data');
+      print("{data['data']['products']}");
       return data['data']['products'];
     }
   }
@@ -216,6 +193,8 @@ class api {
       print("user: $user");
       prefs.setString('token', data_['token']);
       prefs.setString("user", jsonEncode(user));
+      // save image profile
+      prefs.setString('userProfileImg', user['profile'] ?? user['photo'] ?? "");
 
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => navigator));
@@ -259,8 +238,7 @@ class api {
       // customSnackBar(Text('${data['message']}'));
 
       return data;
-
-      } else {
+    } else {
       var da = jsonDecode(response.body);
       await alertDialogBox(context, 'Alert', '${da['data']['message']}');
     }
@@ -279,8 +257,8 @@ class api {
     // Add image file to the request
     request.files.add(
       await http.MultipartFile.fromPath(
-        'image',
-        image.path
+          'image',
+          image.path
       ),
     );
 
@@ -299,7 +277,7 @@ class api {
     var responseData = jsonDecode(responseBody);
 
     if (kDebugMode) {
-      print("upload profile image response: ${responseBody}");
+      print("upload profile image response: $responseBody");
     }
     if (response.statusCode == 400) {
       if (kDebugMode) {
@@ -319,4 +297,51 @@ class api {
       return null;
     }
   }
+
+  // get all categories
+  Future getCategories() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response =
+    await http.get(Uri.parse('${apiDomain().domain}/categories'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
+
+  // get towns by region
+  Future getTownsByRegion(int regionId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await http.get(
+        Uri.parse('${apiDomain().domain}/towns?region_id=$regionId'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+        }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
+
 }

@@ -92,7 +92,7 @@ class registration_successful_view extends StatelessWidget {
                             Column(
                               children: [
                                 const Text(
-                                  'Lorem Ipsum is simply dummy text the printing and typesetting industry',
+                                  'Welcome to Errandia, your trusted companion in running errands. Let\'s get things done together!',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,

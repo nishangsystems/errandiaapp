@@ -25,6 +25,78 @@ class ErrandViewWithoutBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            // InkWell(
+            //   onTap: ()async {
+            //     final SharedPreferences prefs = await SharedPreferences.getInstance();
+            //     var token = prefs.getString('token');
+            //     if(token == ''){
+            //       Get.to(const register_signin_screen());
+            //     }else{
+            //       Get.offAll(New_Errand());
+            //     }
+            //   },
+            //   child: Container(
+            //     width: Get.width * 0.44,
+            //     padding: const EdgeInsets.all(15),
+            //     decoration: BoxDecoration(
+            //       color: appcolor().skyblueColor,
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //     // child: Row(
+            //     //   children: [
+            //     //     Icon(
+            //     //       Icons.add,
+            //     //       color: appcolor().mainColor,
+            //     //       size: 28,
+            //     //     ),
+            //     //     Spacer(),
+            //     //     Text(
+            //     //       'New Errand',
+            //     //       style: TextStyle(
+            //     //         fontSize: 16,
+            //     //         color: appcolor().mainColor,
+            //     //       ),
+            //     //     ),
+            //     //   ],
+            //     // ),
+            //   ),
+            // ),
+            // SizedBox(height: 20,),
+            InkWell(
+              onTap: () {
+                Get.to(() => New_Errand());
+              },
+              child: Container(
+                width: Get.width * 0.44,
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: appcolor().skyblueColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.search,
+                      color: appcolor().mainColor,
+                      size: 28,
+                    ),
+                    const Spacer(),
+                    Text(
+                      'New Errand',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: appcolor().mainColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
         endDrawer: Drawer(
           width: Get.width * 0.7,
           child: SafeArea(

@@ -1,14 +1,17 @@
 import 'dart:convert';
 
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/buiseness/controller/errandia_business_view_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
 import 'package:errandia/app/modules/reviews/views/review_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,54 +20,108 @@ import 'package:get/get.dart';
 import '../../errands/view/Product/serivces.dart';
 import '../../global/Widgets/bottomsheet_item.dart';
 
-class errandia_business_view extends StatelessWidget {
-  int index;
+class errandia_business_view extends StatefulWidget {
+  final Map<String, dynamic> businessData;
+
+  errandia_business_view({super.key, required this.businessData});
+
+  State<StatefulWidget> createState() => _errandia_business_viewState();
+}
+
+class _errandia_business_viewState extends State<errandia_business_view> {
   final business_controller controller = Get.put(business_controller());
-  errandia_business_view({super.key, required this.index});
+  late final ErrandiaBusinessViewController errandiaBusinessViewController;
+  late ScrollController scrollController;
+  // List<dynamic> businessBranchesData = [];
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    errandiaBusinessViewController = Get.put(ErrandiaBusinessViewController());
+    errandiaBusinessViewController.loadBusinessBranches(widget.businessData['slug']);
+
+    scrollController = ScrollController();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 10) {
+        errandiaBusinessViewController.loadBusinessBranches(widget.businessData['slug']);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    print("bz data: ${widget.businessData}");
+    print("current slug: ${widget.businessData['slug']}");
+
+    Widget _buildBusinessBranchesErrorWidget(String message, VoidCallback onReload) {
+      return !errandiaBusinessViewController.isLoading.value ? Container(
+        height: Get.height * 0.9,
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(message),
+              ElevatedButton(
+                onPressed: onReload,
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: Text('Retry',
+                  style: TextStyle(
+                      color: appcolor().lightgreyColor
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ): buildLoadingWidget();
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         titleSpacing: 0,
-        leading: Container(
-            child: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
+        leading: IconButton(
+          icon: const Icon(
+        Icons.arrow_back_ios,
           ),
           onPressed: () {
-            Get.back();
+        Get.back();
           },
-        )),
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              controller.businessList[index].name,
+              widget.businessData['name'],
               style: TextStyle(color: appcolor().bluetextcolor, fontSize: 15),
             ),
           ],
         ),
         actions: [
           IconButton(
-            constraints: BoxConstraints(),
-            padding: EdgeInsets.symmetric(horizontal: 10),
+            constraints: const BoxConstraints(),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.notifications,
               size: 30,
             ),
             color: appcolor().mediumGreyColor,
           ),
           IconButton(
-            constraints: BoxConstraints(),
-            padding: EdgeInsets.only(right: 10),
+            constraints: const BoxConstraints(),
+            padding: const EdgeInsets.only(right: 10),
             onPressed: () {
               errandia_view_bottomsheet();
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.more_vert,
               size: 30,
             ),
@@ -76,40 +133,31 @@ class errandia_business_view extends StatelessWidget {
           size: 30,
         ),
       ),
-      endDrawer: customendDrawer(),
+      endDrawer: CustomEndDrawer(
+        onBusinessCreated: () {
+          home_controller().closeDrawer();
+          home_controller().featuredBusinessData.clear();
+          home_controller().fetchFeaturedBusinessesData();
+          business_controller().itemList.clear();
+          business_controller().loadBusinesses();
+          home_controller().recentlyPostedItemsData.clear();
+          home_controller().fetchRecentlyPostedItemsData();
+        },
+      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Container(
+        child: SizedBox(
           height: 52,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              InkWell(
-                onTap: (){
-                  Get.to(Product_serivices());
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    FaIcon(FontAwesomeIcons.store),
-                    Text(
-                      'Store',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 10
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 10,),
               SizedBox(
-                width: Get.width * 0.4,
+                width: Get.width * 0.45,
                 height: 50,
                 child: blockButton(
-                  title: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  title: const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -135,7 +183,7 @@ class errandia_business_view extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: Get.width * 0.4,
+                width: Get.width * 0.45,
                 height: 50,
                 child: blockButton(
                   title: Padding(
@@ -148,7 +196,7 @@ class errandia_business_view extends StatelessWidget {
                           color: appcolor().mainColor,
                         ),
                         Text(
-                          '  Call 999999999',
+                          'Call ${widget.businessData['phone']}',
                           style: TextStyle(
                             fontSize: 10,
                             color: appcolor().mainColor,
@@ -157,7 +205,9 @@ class errandia_business_view extends StatelessWidget {
                       ],
                     ),
                   ),
-                  ontap: () {},
+                  ontap: () {
+                    launchCaller(widget.businessData['phone']);
+                  },
                   color: appcolor().skyblueColor,
                 ),
               ),
@@ -173,21 +223,19 @@ class errandia_business_view extends StatelessWidget {
         child: Column(
           // crossAxisAlignment: CrossAxisAlignment.sta,
           children: [
-            Container(
-              // padding: EdgeInsets.symmetric(
-              //   horizontal: 15,
-              //   vertical: 10,
-              // ),
+            SizedBox(
               height: Get.height * 0.3,
               width: Get.width,
-              child: Image(
-                image: AssetImage(controller.businessList[index].imagepath),
-                fit: BoxFit.fill,
-              ),
+              child: Image.network(
+                getImagePath(widget.businessData['image'].toString()),
+                fit: BoxFit.cover,
+              )
             ),
 
+            SizedBox(
+              height: Get.height * 0.01,
+            ),
             // shop name
-
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -196,10 +244,10 @@ class errandia_business_view extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        controller.businessList[index].name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                        capitalizeAll(widget.businessData['name'] ?? ""),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
                         ),
                       ),
                       SizedBox(
@@ -212,9 +260,15 @@ class errandia_business_view extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text(
-                  controller.businessList[index].location,
-                  style: TextStyle(),
+                widget.businessData['street'] != null ? Text(
+                  widget.businessData['street'],
+                  style: const TextStyle(),
+                ): const Text(
+                  'No street provided',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
                 Row(
                   children: [
@@ -224,20 +278,20 @@ class errandia_business_view extends StatelessWidget {
                       color: appcolor().mediumGreyColor,
                     ),
                     Text(
-                      '  Member Since 2010',
+                      'Member Since 2010',
                       style: TextStyle(
                         fontSize: 12,
                         color: appcolor().mediumGreyColor,
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     RatingBar.builder(
                       initialRating: 3.5,
                       allowHalfRating: true,
                       ignoreGestures: true,
                       itemSize: 18,
                       itemBuilder: (context, index) {
-                        return Icon(
+                        return const Icon(
                           Icons.star_rate_rounded,
                           color: Colors.amber,
                         );
@@ -257,50 +311,7 @@ class errandia_business_view extends StatelessWidget {
                 SizedBox(
                   height: Get.height * 0.025,
                 ),
-                // blockButton(
-                //   title: Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       Icon(
-                //         FontAwesomeIcons.whatsapp,
-                //         color: Colors.white,
-                //       ),
-                //       Text(
-                //         '  Chat on Whatsapp',
-                //         style: TextStyle(
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                //   ontap: () async
-                //   {
-                //
-                //   },
-                //   color: appcolor().mainColor,
-                // ),
-                // SizedBox(
-                //   height: Get.height * 0.01,
-                // ),
-                // blockButton(
-                //   title: Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       Icon(
-                //         Icons.call,
-                //         color: appcolor().mainColor,
-                //       ),
-                //       Text(
-                //         '  Call 999999999',
-                //         style: TextStyle(
-                //           color: appcolor().mainColor,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                //   ontap: () {},
-                //   color: appcolor().skyblueColor,
-                // ),
+
                 SizedBox(
                   height: Get.height * 0.01,
                 ),
@@ -331,13 +342,13 @@ class errandia_business_view extends StatelessWidget {
                 ),
 
                 // follow us on social media
-                Row(
+                (widget.businessData['facebook']!="" && widget.businessData['instagram']!="") ? Row(
                   children: [
-                    Text('Follow us on social media'),
+                    const Text('Follow us on social media'),
                     // fb
-                    InkWell(
+                    widget.businessData['facebook'] != "" ? InkWell(
                       onTap: ()async{
-                        controller.mylaunchUrl('www.bmdu.net');
+                        mlaunchUrl(widget.businessData['facebook']);
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -353,12 +364,12 @@ class errandia_business_view extends StatelessWidget {
                           color: appcolor().bluetextcolor,
                         ),
                       ),
-                    ),
+                    ): Container(),
 
                     // insta
-                    InkWell(
+                    widget.businessData['instagram'] != "" ? InkWell(
                       onTap: () async {
-                        controller.mylaunchUrl('www.google.com');
+                        mlaunchUrl(widget.businessData['instagram']);
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -366,35 +377,17 @@ class errandia_business_view extends StatelessWidget {
                             8,
                           ),
                         ),
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 5,
                         ),
-                        child: Icon(
+                        child: const Icon(
                           FontAwesomeIcons.instagram,
                           color: Colors.pink,
                         ),
                       ),
-                    ),
-
-                    // twitter
-                    InkWell(
-                      onTap: ()async{
-                        controller.mylaunchUrl('www.instagram.com');
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            8,
-                          ),
-                        ),
-                        child: Icon(
-                          FontAwesomeIcons.squareTwitter,
-                          color: appcolor().bluetextcolor,
-                        ),
-                      ),
-                    ),
+                    ): Container(),
                   ],
-                ),
+                ): Container(),
               ],
             ).paddingSymmetric(
               horizontal: 15,
@@ -404,8 +397,8 @@ class errandia_business_view extends StatelessWidget {
               height: Get.height * 0.01,
             ),
             Divider(),
-            // visit shop
 
+            // visit shop
             Container(
               height: Get.height * 0.08,
               decoration: BoxDecoration(
@@ -419,7 +412,7 @@ class errandia_business_view extends StatelessWidget {
               padding: const EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
               child: InkWell(
                 onTap: () {
-                  var data = controller.businessList[index].toJson();
+                  var data = widget.businessData;
                   print("bz data: ${data}");
 
                   Get.to(() =>  VisitShop(
@@ -452,32 +445,31 @@ class errandia_business_view extends StatelessWidget {
               height: Get.height * 0.025,
             ),
             Divider(),
+
             // business branches
             Column(
               children: [
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       FontAwesomeIcons.buildingUser,
                       size: 20,
                     ),
                     SizedBox(
                       width: Get.width * 0.05,
                     ),
-                    RichText(
+                    Obx(() => RichText(
                       text: TextSpan(
-                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        style: const TextStyle(color: Colors.black, fontSize: 15),
                         children: [
-                          TextSpan(text: 'Business Branches  '),
+                          const TextSpan(text: 'Business Branches  '),
                           TextSpan(
-                            text: controller.businessList[index]
-                                .BusinessBranch_location!.length
-                                .toString(),
+                            text: '(${errandiaBusinessViewController.total.value})',
                             style: TextStyle(color: appcolor().mediumGreyColor),
                           ),
                         ],
                       ),
-                    ),
+                    ))
                   ],
                 ),
                 Divider(
@@ -485,138 +477,125 @@ class errandia_business_view extends StatelessWidget {
                   thickness: 1.5,
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                  padding: const EdgeInsets.symmetric(vertical: 5),
                   height: 280,
-                  child: ListView(
-                    physics: NeverScrollableScrollPhysics(),
-                    children: [
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                              ),
-                              child: Image(
-                                image: AssetImage(
-                                  controller.businessList[index].imagepath,
+                  child: Obx(
+                      () {
+                        if (errandiaBusinessViewController.isLoading.value) {
+                          return buildLoadingWidget();
+                        } else if (errandiaBusinessViewController.isError.value) {
+                          return _buildBusinessBranchesErrorWidget(
+                            "An error occurred while fetching business branches",
+                            () {
+                              errandiaBusinessViewController.loadBusinessBranches(widget.businessData['slug']);
+                            },
+                          );
+                        } else if (errandiaBusinessViewController.itemList.isEmpty) {
+                          return _buildBusinessBranchesErrorWidget(
+                            "No business branches found",
+                            () {
+                              errandiaBusinessViewController.loadBusinessBranches(widget.businessData['slug']);
+                            },
+                          );
+                        } else {
+                          return ListView.builder(
+                            key: const PageStorageKey('businessBranches'),
+                            controller: scrollController,
+                            itemCount: errandiaBusinessViewController.isLoading.value
+                                ? errandiaBusinessViewController.itemList.length + 1
+                                : errandiaBusinessViewController.itemList.length,
+                            itemBuilder: (context, index) {
+                               var data = errandiaBusinessViewController.itemList[index];
+                              return InkWell(
+                                onTap: () {
+                                  Get.to(() => VisitShop(businessData: data));
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric( horizontal: 10),
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: appcolor().greyColor,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            height: 60,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(),
+                                            ),
+                                            child: Image.network(
+                                              getImagePath(data['image'].toString()),
+                                              height: Get.height * 0.17,
+                                              width: Get.width * 0.2,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/errandia_logo.png',
+                                                  fit: BoxFit.cover,
+                                                  height: Get.height * 0.17,
+                                                  width: Get.width * 0.2,
+                                                );
+                                              },
+                                            )
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                capitalizeAll(data['name'] ?? ""),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              data['street'] != null ? Text(
+                                                data['street'],
+                                                style: TextStyle(
+                                                  color: appcolor().mediumGreyColor,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ): const Text(
+                                                'No street provided',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
+                                          ).paddingOnly(left: 10),
+                                          Spacer(),
+                                          IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(
+                                              Icons.arrow_forward_ios_outlined,
+                                              color: appcolor().bluetextcolor,
+                                            ),
+                                          ),
+                                        ],
+                                      ).paddingOnly(bottom: 10, top: 5),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  controller.businessList[index].name,
-                                ),
-                                Text(
-                                  controller.businessList[index]
-                                      .BusinessBranch_location![0]
-                                      .toString(),
-                                ),
-                              ],
-                            ).paddingOnly(left: 10),
-                            Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                color: appcolor().bluetextcolor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ).paddingOnly(bottom: 10, top: 5),
-                      Divider(),
-
-                      //
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                              ),
-                              child: Image(
-                                image: AssetImage(
-                                  controller.businessList[index].imagepath,
-                                ),
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  controller.businessList[index].name,
-                                ),
-                                Text(
-                                  controller.businessList[index]
-                                      .BusinessBranch_location![0]
-                                      .toString(),
-                                ),
-                              ],
-                            ).paddingOnly(left: 10),
-                            Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                color: appcolor().bluetextcolor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ).paddingOnly(bottom: 10, top: 5),
-                      Divider(),
-
-                      //
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                              ),
-                              child: Image(
-                                image: AssetImage(
-                                  controller.businessList[index].imagepath,
-                                ),
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  controller.businessList[index].name,
-                                ),
-                                Text(
-                                  controller.businessList[index]
-                                      .BusinessBranch_location![0]
-                                      .toString(),
-                                ),
-                              ],
-                            ).paddingOnly(left: 10),
-                            Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                color: appcolor().bluetextcolor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ).paddingOnly(bottom: 10, top: 5),
-                    ],
-                  ),
+                              );
+                            },
+                          );
+                        }
+                      }
+                  )
                 ),
               ],
             ).paddingSymmetric(
               horizontal: 15,
-              vertical: 5,
+              vertical: 3,
             ),
 
             //supplier review
@@ -661,60 +640,58 @@ class errandia_business_view extends StatelessWidget {
                 ),
                 color: Colors.white,
               ),
-              padding: EdgeInsets.only(left: 20, right: 15, top: 15, bottom: 5),
+              padding: const EdgeInsets.only(left: 20, right: 15, top: 15, bottom: 5),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(right: 8),
-                              height: Get.height * 0.05,
-                              width: Get.width * 0.1,
-                              color: Colors.white,
-                              child: Image.asset(Recently_item_List[index].avatarImage.toString()),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Name of supplier',
-                                ),
-                                Text('location'),
-                              ],
-                            ),
-                            // Spacer(),
-                            SizedBox(
-                              width: Get.width * 0.13,
-                            ),
-                            RatingBar.builder(
-                              itemCount: 5,
-                              direction: Axis.horizontal,
-                              initialRating: 1,
-                              itemSize: 22,
-                              maxRating: 5,
-                              allowHalfRating: true,
-                              glow: true,
-                              itemBuilder: (context, _) {
-                                return Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                );
-                              },
-                              onRatingUpdate: (value) {
-                                debugPrint(value.toString());
-                              },
-                            ),
-                          ],
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            height: Get.height * 0.05,
+                            width: Get.width * 0.1,
+                            color: Colors.white,
+                            child: Image.asset(Recently_item_List[2].avatarImage.toString()),
+                          ),
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Name of supplier',
+                              ),
+                              Text('location'),
+                            ],
+                          ),
+                          // Spacer(),
+                          SizedBox(
+                            width: Get.width * 0.13,
+                          ),
+                          RatingBar.builder(
+                            itemCount: 5,
+                            direction: Axis.horizontal,
+                            initialRating: 1,
+                            itemSize: 22,
+                            maxRating: 5,
+                            allowHalfRating: true,
+                            glow: true,
+                            itemBuilder: (context, _) {
+                              return const Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                              );
+                            },
+                            onRatingUpdate: (value) {
+                              debugPrint(value.toString());
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  Container(
+                  SizedBox(
                     height: Get.height * 0.15,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
@@ -722,7 +699,7 @@ class errandia_business_view extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return Container(
                           margin:
-                              EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                              const EdgeInsets.only(right: 10, top: 10, bottom: 10),
                           height: Get.height * 0.2,
                           color: Colors.white,
                           width: Get.width * 0.2,
@@ -734,8 +711,8 @@ class errandia_business_view extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(bottom: 10),
-                    child: Text(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: const Text(
                       'Praesentium quo impedit eaque ut. Aperiam qui illum. Porro quis autem dolorum saepe dolor ipsa ut.',
                     ),
                   ),
@@ -757,12 +734,12 @@ void errandia_view_bottomsheet() {
     isScrollControlled: true,
     // backgroundColor: Colors.white,
     Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      color: Color(0xFFFFFFFF),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      color: const Color(0xFFFFFFFF),
       child: Wrap(
         alignment: WrapAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.horizontal_rule,
             size: 25,
           ),
@@ -802,13 +779,13 @@ void errandia_view_bottomsheet() {
                   child: Wrap(
                     crossAxisAlignment: WrapCrossAlignment.start,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.horizontal_rule,
                         size: 25,
                       ),
                       Text(
                         'Report Shop'.tr,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       Divider(
@@ -819,7 +796,7 @@ void errandia_view_bottomsheet() {
                         children: [
                           Text(
                             'Title'.tr,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15,
                             ),
                           ),
@@ -835,18 +812,18 @@ void errandia_view_bottomsheet() {
                               decoration: InputDecoration(
                                 hintText: 'This is My Product'.tr,
                                 contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 10),
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 disabledBorder: InputBorder.none,
                                 border: InputBorder.none,
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 15,
                           ),
                           Text(
                             'Why are you reporting this business'.tr,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                             ),
                           ),
@@ -863,7 +840,7 @@ void errandia_view_bottomsheet() {
                               decoration: InputDecoration(
                                 hintText: ''.tr,
                                 contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 10),
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 disabledBorder: InputBorder.none,
                                 border: InputBorder.none,
                               ),
@@ -884,7 +861,7 @@ void errandia_view_bottomsheet() {
                                 child: Center(
                                   child: Text(
                                     'Submit Report'.tr,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
                                     ),
@@ -922,17 +899,17 @@ void errandia_view_bottomsheet() {
             },
             child: Row(
               children: [
-                Container(
+                SizedBox(
                   height: 24,
                   child: Image(
-                    image: AssetImage(
+                    image: const AssetImage(
                       'assets/images/sidebar_icon/icon-trash.png',
                     ),
                     color: appcolor().redColor,
                     fit: BoxFit.fill,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 18,
                 ),
                 Text(

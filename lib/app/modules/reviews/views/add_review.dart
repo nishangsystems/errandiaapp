@@ -23,6 +23,8 @@ class add_review_view extends StatefulWidget {
 }
 
 class _add_review_viewState extends State<add_review_view> {
+  imagePickercontroller imageController = Get.put(imagePickercontroller());
+
   TextEditingController reviewText = TextEditingController();
   var rating = 0.0;
   bool isLoading =false;
