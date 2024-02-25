@@ -5,11 +5,13 @@ import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
+import 'package:errandia/app/modules/global/Widgets/myShopsDialog.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/profile/view/edit_profile_view.dart';
+import 'package:errandia/modal/Shop.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
 import 'package:errandia/app/modules/services/view/service_details_view.dart';
@@ -38,6 +40,8 @@ class _Profile_viewState extends State<Profile_view>
   late ScrollController scrollController;
   late ScrollController serviceScrollController;
   late ScrollController productScrollController;
+
+  late Shop shop;
 
   // get user from sharedprefs
   Future<void> getUser() async {
@@ -283,7 +287,7 @@ class _Profile_viewState extends State<Profile_view>
       });
     }
 
-    Widget product_item_list() {
+    Widget product_item_list(BuildContext context) {
       return Obx(
         () {
           if (profile_controller().isProductLoading.value) {
@@ -307,6 +311,22 @@ class _Profile_viewState extends State<Profile_view>
                 ElevatedButton(
                   onPressed: () {
                     // Get.to(() => add_product_view(shopId: shopId));
+                    showDialog(context: context, builder:
+                    (BuildContext ctx) {
+                      return ShopSelectionDialog(onShopSelected: (shop_) {
+                        print("Selected shop: ${shop_.id}");
+                        setState(() {
+                          shop = shop_;
+                        });
+                        // Navigator.of(context).pop();
+                        Get.back();
+                      }, desc: "Select a shop to add a product to");
+                    }
+                    ).then((_) {
+                      // This will execute after the dialog is closed
+                      Get.to(() => add_product_view(shop: shop));
+                    });
+
                   },
                   style: ElevatedButton.styleFrom(
                     primary: appcolor().mainColor,
@@ -677,7 +697,7 @@ class _Profile_viewState extends State<Profile_view>
             child: TabBarView(
               controller: tabController,
               children: [
-                product_item_list(),
+                product_item_list(context),
                 Service_item_list(),
                 Buiseness_item_list()
               ],
