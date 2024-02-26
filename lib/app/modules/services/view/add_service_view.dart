@@ -1,9 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:errandia/app/APi/product.dart';
+import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
+import 'package:errandia/modal/Shop.dart';
+import 'package:errandia/modal/category.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -16,6 +24,7 @@ add_product_cotroller product_controller = Get.put(add_product_cotroller());
 imagePickercontroller imageController = Get.put(imagePickercontroller());
 
 class add_service_view extends StatefulWidget {
+
   add_service_view({super.key});
 
   @override
@@ -23,210 +32,440 @@ class add_service_view extends StatefulWidget {
 }
 
 class _add_service_viewState extends State<add_service_view> {
+  late add_product_cotroller product_controller;
+  late imagePickercontroller imageController;
+  late profile_controller profileController;
+
+  List<String> selectedFilters = [];
+  List<int> selectedFilters_ = [];
+  bool isLoading = false;
+  Shop? selectedShop;
+  var category;
+
+  @override
+  void initState() {
+    super.initState();
+    product_controller = Get.put(add_product_cotroller());
+    profileController = Get.put(profile_controller());
+    imageController = Get.put(imagePickercontroller());
+    product_controller.loadShops();
+    product_controller.loadCategories();
+  }
+
+  void createService(BuildContext context) {
+    var name = product_controller.product_name_controller.text.toString();
+    var shopId = selectedShop?.id.toString();
+    var unitPrice = product_controller.unit_price_controller.text;
+    var productDescription = product_controller.product_desc_controller.text.toString();
+    var tags = product_controller.product_tags_controller.text.toString();
+    var qty = product_controller.quantity_controller.text.toString();
+
+    if(name == '') {
+      alertDialogBox(context, "Error", "Product name is required");
+    } else if (shopId == null) {
+      alertDialogBox(context, "Error", "Shop is required");
+    } else if (unitPrice == '') {
+      alertDialogBox(context, "Error", "Unit price is required");
+    } else if (productDescription == '') {
+      alertDialogBox(context, "Error", "Product description is required");
+    } else if (tags == '') {
+      alertDialogBox(context, "Error", "Product tags is required");
+    } else if (category == null) {
+      alertDialogBox(context, "Error", "Category is required");
+    } else if (qty == "null" || qty == "") {
+      alertDialogBox(context, "Error", "Quantity is required");
+    } else {
+      var value = {
+        "name": name,
+        "shop_id": shopId,
+        "unit_price": unitPrice,
+        "description": productDescription,
+        "tags": tags,
+        "category_id": category.toString(),
+        "quantity": qty,
+        "service": "1"
+      };
+
+      setState(() {
+        isLoading = true;
+      });
+
+      PopupBox popup;
+      var response;
+
+      try {
+        print("product data: $value");
+        ProductAPI.createProductOrService(value, context, imageController.image_path.value).then((response_) {
+          response = jsonDecode(response_);
+          print("product response: $response");
+          if (response['status'] == "success") {
+            popup = PopupBox(
+              title: "Success",
+              description: response['data']['message'],
+              type: PopupType.success,
+            );
+            product_controller.resetFields();
+            setState(() {
+              isLoading = false;
+              category = null;
+              selectedShop = null;
+            });
+            imageController.reset();
+            profileController.reloadMyProducts();
+          } else {
+            popup = PopupBox(
+              title: "Error",
+              description: response['data']['message'],
+              type: PopupType.error,
+            );
+            setState(() {
+              isLoading = false;
+            });
+          }
+          popup.showPopup(context);
+        });
+
+
+      } catch (e) {
+        print("error creating product: $e");
+        popup = PopupBox(
+          title: "Error",
+          description: "Error creating product",
+          type: PopupType.error,
+        );
+        setState(() {
+          isLoading = false;
+        });
+        popup.showPopup(context);
+      }
+
+
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        titleSpacing: 8,
-        title: Text('Add Service'.tr, style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Color(0xff113d6b),
-        ),),
-        titleTextStyle: TextStyle(
+    return WillPopScope(
+      onWillPop: () async {
+       Get.back();
+       profileController.reloadMyServices();
+          return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          titleSpacing: 8,
+          title: Text('Add Service'.tr, style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: appcolor().mediumGreyColor,
-            fontSize: 18),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(Icons.arrow_back_ios),
-          color: Color(0xff113d6b),
+            color: Color(0xff113d6b),
+          ),),
+          titleTextStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: appcolor().mediumGreyColor,
+              fontSize: 18),
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              Get.back();
+            },
+            icon: const Icon(Icons.arrow_back_ios),
+            color: const Color(0xff113d6b),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  createService(context);
+                },
+                child: const Text(
+                  'Publish',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ))
+          ],
         ),
-        actions: [
-          TextButton(
-              onPressed: () {},
-              child: Text(
-                'Publish',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ))
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Wrap(
+        body: Stack(
           children: [
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 15,
-                vertical: 15,
-              ),
-              child: Text(
-                'New Service Detail'.tr,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
+            SingleChildScrollView(
+              child: Wrap(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 15,
+                    ),
+                    child: Text(
+                      'New Service Detail'.tr,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
 
-            // company name
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: TextFormField(
-                controller: product_controller.product_name_controller,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    FontAwesomeIcons.buildingUser,
-                    color: Colors.black,
+                  // company name
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: TextFormField(
+                      controller: product_controller.product_name_controller,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          FontAwesomeIcons.buildingUser,
+                          color: Colors.black,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Service Name *',
+                        suffixIcon: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
                   ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
                   ),
-                  hintText: 'Service Name *',
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
 
-            // service categories
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-              child: TextFormField(
-                controller: product_controller.category_controller,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    color: Colors.black,
-                    Icons.category,
+                  // select a shop
+                  ListTile(
+                    leading: Container(
+                        padding: const EdgeInsets.only(left: 12, right: 0),
+                        child: const Icon(
+                          FontAwesomeIcons.store,
+                          color: Colors.black,
+                        )
+                    ),
+                    trailing: Container(
+                      padding: const EdgeInsets.only(left: 0, right: 12),
+                      child: const Icon(
+                        Icons.arrow_forward_ios_outlined,
+                        color: Colors.black,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    title: Obx(
+                          () => DropdownButtonFormField<Shop>(
+                        value: selectedShop,
+                        iconSize: 0.0,
+                        isDense: true,
+                        isExpanded: true,
+                        padding: EdgeInsets.zero,
+                        decoration: const InputDecoration.collapsed(
+                          hintText: 'Select a Shop *',
+                          hintStyle: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                        onChanged: (Shop? newValue) {
+                          setState(() {
+                            selectedShop = newValue;
+                          });
+                          print("selected shop: ${selectedShop?.name}");
+                        },
+                        items: product_controller.shopList.map<DropdownMenuItem<Shop>>((Shop shop) {
+                          return DropdownMenuItem<Shop>(
+                            value: shop,
+                            child: Text(capitalizeAll(shop.name),
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.black,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Categories *',
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
 
-            //  price
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-              child: TextFormField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    color: Colors.black,
-                    FontAwesomeIcons.dollarSign,
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
                   ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Unit Price *',
-                  suffix: Text('XAF'),
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
 
-            //  info
-            Container(
-              height: Get.height * 0.2,
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-              child: TextFormField(
-                minLines: 1,
-                maxLines: 4,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    color: Colors.black,
-                    FontAwesomeIcons.info,
+                  // service category
+                  ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.only(left: 12, right: 0),
+                      child: const Icon(
+                        Icons.category,
+                        color: Colors.black,
+                      ),
+                    ),
+                    trailing: Container(
+                      padding: const EdgeInsets.only(left: 0, right: 12),
+                      child: const Icon(
+                        Icons.arrow_forward_ios_outlined,
+                        color: Colors.black,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    title: DropdownButtonFormField(
+                      iconSize: 0.0,
+                      isDense: true,
+                      isExpanded: true,
+                      padding: EdgeInsets.zero,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: 'Service Category *',
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      value: category,
+                      onChanged: (value) {
+                        setState(() {
+                          category = value as int;
+                        });
+                        print("category_id: $category");
+                      },
+                      items: categor.Items.map((e) => DropdownMenuItem(
+                        value: e.id,
+                        child: Text(
+                          e.name.toString(),
+                          style: const TextStyle(
+                              fontSize: 15, color: Colors.black),
+                        ),
+                      )).toList(),
+                    ),
                   ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Service Description *',
-                  suffixIcon: Icon(
-                    color: Colors.black,
-                    Icons.edit,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
 
-            // cover image 
-            Obx(
-              () => Container(
-                height: imageController.image_path.isEmpty
-                    ? null
-                    : Get.height * 0.28,
-                child: imageController.image_path.isEmpty
-                    ? InkWell(
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  //  price
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: TextFormField(
+                      controller: product_controller.unit_price_controller,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          color: Colors.black,
+                          FontAwesomeIcons.dollarSign,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Unit Price *',
+                        suffix: Text('XAF'),
+                        suffixIcon: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // product quantity
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: TextFormField(
+                      controller: product_controller.quantity_controller,
+                      keyboardType: TextInputType.number,
+
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          color: Colors.black,
+                          FontAwesomeIcons.cubes,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Quantity *',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  //  info
+                  Container(
+                    height: Get.height * 0.2,
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: TextFormField(
+                      controller: product_controller.product_desc_controller,
+                      minLines: 1,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          color: Colors.black,
+                          FontAwesomeIcons.info,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Service Description *',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // cover image
+                  Obx(
+                        () => SizedBox(
+                      height: imageController.image_path.isEmpty
+                          ? null
+                          : Get.height * 0.40,
+                      child: imageController.image_path.isEmpty
+                          ? InkWell(
                         onTap: () {
                           showDialog(
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                insetPadding: EdgeInsets.symmetric(
+                                insetPadding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 20,
                                 ),
                                 scrollable: true,
-                                content: Container(
+                                content: SizedBox(
                                   // height: Get.height * 0.7,
                                   width: Get.width,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Cover Image',
@@ -244,7 +483,7 @@ class _add_service_viewState extends State<add_service_view> {
                                           blockButton(
                                             title: Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                              MainAxisAlignment.center,
                                               children: [
                                                 Icon(
                                                   FontAwesomeIcons.image,
@@ -255,14 +494,13 @@ class _add_service_viewState extends State<add_service_view> {
                                                   '  Image Gallery',
                                                   style: TextStyle(
                                                       color:
-                                                          appcolor().mainColor),
+                                                      appcolor().mainColor),
                                                 ),
                                               ],
                                             ),
                                             ontap: () {
+                                              imageController.getImageFromGallery();
                                               Get.back();
-                                              imageController
-                                                  .getImageFromGallery();
                                             },
                                             color: appcolor().greyColor,
                                           ),
@@ -272,7 +510,7 @@ class _add_service_viewState extends State<add_service_view> {
                                           blockButton(
                                             title: Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                              MainAxisAlignment.center,
                                               children: [
                                                 Icon(
                                                   FontAwesomeIcons.camera,
@@ -287,12 +525,34 @@ class _add_service_viewState extends State<add_service_view> {
                                                 ),
                                               ],
                                             ),
-                                            ontap: () {
+                                            ontap: () async {
                                               Get.back();
-                                              imageController
+
+                                              var path = await imageController
                                                   .getimagefromCamera();
+
+                                              print("image path: $path");
+
+                                              if (path != null) {
+                                                File? file = File(path);
+
+                                                print("original file size: ${file.lengthSync()}");
+
+                                                try {
+                                                  file = (await compressFile(file: file));
+                                                  print("Compressed file size: ${file.lengthSync()}");
+                                                } catch (e) {
+                                                  print("Error compressing file: $e");
+                                                }
+                                                imageController.image_path.value = file!.path;
+
+                                                imageController.update();
+
+                                                print("compressed file path: ${file.path}");
+
+                                              }
                                             },
-                                            color: Color(0xfffafafa),
+                                            color: const Color(0xfffafafa),
                                           ),
                                         ],
                                       )
@@ -307,12 +567,12 @@ class _add_service_viewState extends State<add_service_view> {
                           );
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 15, vertical: 20),
-                          child: Row(
+                          child: const Row(
                             children: [
                               Icon(Icons.image),
-                              Text('  Cover Image *'),
+                              Text('  Cover Image'),
                               Spacer(),
                               Icon(
                                 Icons.edit,
@@ -321,23 +581,23 @@ class _add_service_viewState extends State<add_service_view> {
                           ),
                         ),
                       )
-                    : Container(
-                        height: Get.height * 0.15,
+                          : SizedBox(
+                        height: Get.height * 0.38,
                         child: Column(
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.image),
-                                Text(
-                                  '  Company Logo *',
+                                const Icon(Icons.image),
+                                const Text(
+                                  '   Cover Image *',
                                   style: TextStyle(
                                     fontSize: 16,
                                   ),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 InkWell(
                                   onTap: () {},
-                                  child: Icon(
+                                  child: const Icon(
                                     Icons.edit,
                                   ),
                                 )
@@ -354,18 +614,19 @@ class _add_service_viewState extends State<add_service_view> {
                             ),
                             Stack(
                               children: [
-                                Image(
-                                  image: FileImage(
-                                    File(
-                                      imageController.image_path.toString(),
-                                    ),
-                                  ),
-                                  height: Get.height * 0.19,
-                                  width: double.infinity,
-                                  fit: BoxFit.fill,
-                                ).paddingSymmetric(horizontal: 20),
-                                Container(
-                                  height: Get.height * 0.19,
+                                Obx(
+                                        () {
+                                      return imageController.image_path.isEmpty
+                                          ? Container() : Image(
+                                        image: FileImage(File(imageController.image_path.toString())),
+                                        fit: BoxFit.fill,
+                                        height: Get.height * 0.32,
+                                        width: Get.width * 0.9,
+                                      ).paddingSymmetric(horizontal: 40);
+                                    }
+                                ),
+                                SizedBox(
+                                  height: Get.height * 0.32,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -378,7 +639,7 @@ class _add_service_viewState extends State<add_service_view> {
                                           height: 35,
                                           width: 60,
                                           color: Colors.lightGreen,
-                                          child: Center(
+                                          child: const Center(
                                             child: Text(
                                               'Edit',
                                               style: TextStyle(
@@ -396,7 +657,7 @@ class _add_service_viewState extends State<add_service_view> {
                                           height: 35,
                                           width: 60,
                                           color: appcolor().greyColor,
-                                          child: Center(
+                                          child: const Center(
                                             child: Text(
                                               'Remove',
                                               style: TextStyle(),
@@ -412,344 +673,98 @@ class _add_service_viewState extends State<add_service_view> {
                           ],
                         ),
                       ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-           
-            // multiple image 
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.image,
+                    ),
                   ),
-                  Text(
-                    '  Service Image Gallery',
+
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
                   ),
-                  Spacer(),
-                  Icon(Icons.edit),
+
+                  // service tags
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: TextFormField(
+                      controller: product_controller.product_tags_controller,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          FontAwesomeIcons.tags,
+                          color: Color.fromARGB(255, 108, 105, 105),
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Service Tags *',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  const Text(
+                    'Enter words related to service separated by comma',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ).paddingSymmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  SizedBox(
+                    height: Get.height * 0.1,
+                  ),
                 ],
               ),
             ),
 
-            Obx(
-              () => Container(
-                height: imageController.imageList.isEmpty ? null : null,
-                child: imageController.imageList.isEmpty
-                    ? InkWell(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                insetPadding: EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 20,
-                                ),
-                                scrollable: true,
-                                content: Container(
-                                  // height: Get.height * 0.7,
-                                  width: Get.width,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Select Images',
-                                        style: TextStyle(
-                                          color: appcolor().mainColor,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: Get.height * 0.05,
-                                      ),
-                                      Column(
-                                        children: [
-                                          blockButton(
-                                            title: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FontAwesomeIcons.image,
-                                                  color: appcolor().mainColor,
-                                                  size: 22,
-                                                ),
-                                                Text(
-                                                  '  Image Gallery',
-                                                  style: TextStyle(
-                                                      color:
-                                                          appcolor().mainColor),
-                                                ),
-                                              ],
-                                            ),
-                                            ontap: () {
-                                              Get.back();
-                                              imageController
-                                                  .getmultipleImage();
-                                            },
-                                            color: appcolor().greyColor,
-                                          ),
-                                          SizedBox(
-                                            height: Get.height * 0.015,
-                                          ),
-                                          blockButton(
-                                            title: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FontAwesomeIcons.camera,
-                                                  color: appcolor().mainColor,
-                                                  size: 22,
-                                                ),
-                                                Text(
-                                                  '  Take Photo',
-                                                  style: TextStyle(
-                                                    color: appcolor().mainColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            ontap: () {
-                                              Get.back();
-                                              imageController
-                                                  .getimagefromCamera();
-                                            },
-                                            color: Color(0xfffafafa),
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ).paddingSymmetric(
-                                    horizontal: 10,
-                                    vertical: 10,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: Container(
-                            child: Column(
-                          children: [
-                            Container(
-                              color: appcolor().greyColor,
-                              height: Get.height * 0.22,
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  // SizedBox(height: Get.height*0.05,),
-                                  Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          FontAwesomeIcons.images,
-                                          size: 60,
-                                          color: appcolor().mediumGreyColor,
-                                        ),
-                                        Text(
-                                          '     Browse Images',
-                                          style: TextStyle(
-                                            color: appcolor().bluetextcolor,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  // SizedBox(
-                                  //   height: Get.height * 0.05,
-                                  // ),
-                                  Text(
-                                    'Other variations of the main product image',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: appcolor().mediumGreyColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )),
-                      )
-                    : Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        height: Get.height * 0.24,
-                        child: Center(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: imageController.imageList.length,
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  Container(
-                                    height: Get.height * 0.15,
-                                    width: Get.width * 0.40,
-                                    decoration:
-                                        BoxDecoration(border: Border.all()),
-                                    child: Image(
-                                      image: FileImage(
-                                        File(
-                                          imageController.imageList[index].path
-                                              .toString(),
-                                        ),
-                                      ),
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                  Container(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            imageController.edit(index);
-                                          },
-                                          child: Container(
-                                            height: 35,
-                                            width: Get.width * 0.20,
-                                            color: Colors.lightGreen,
-                                            child: Center(
-                                              child: Text(
-                                                'Edit',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            imageController.removeat(index);
-                                          },
-                                          child: Container(
-                                            height: 35,
-                                            width: Get.width * 0.2,
-                                            color: appcolor().greyColor,
-                                            child: Center(
-                                              child: Text(
-                                                'Remove',
-                                                style: TextStyle(),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ).paddingSymmetric(horizontal: 5);
-                            },
-                          ),
-                        ),
-                      ),
-              ),
-            ),
-            
-            //  image container
-            Obx(
-              () => Container(
-                child: imageController.imageList.isEmpty
-                    ? null
-                    : InkWell(
-                      onTap: (){
-                        imageController.getmultipleImage();
-                      },
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 15),
-                        decoration: BoxDecoration(
-                          color: appcolor().skyblueColor,
-                          borderRadius: BorderRadius.circular(10,),
-                        ),
-                        height: Get.height*0.08,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.image,
-                              ),
-                              Text(
-                                '   Add more images',
-                              ),
-                            ],
-                          ),
-                        ),
-                    ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            // product tags
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    FontAwesomeIcons.tags,
-                    color: Color.fromARGB(255, 108, 105, 105),
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Service Tags *',
-                  suffixIcon: Icon(
-                    color: Colors.black,
-                    Icons.edit,
-                  ),
+            if (isLoading)
+              const Opacity(
+                opacity: 0.6,
+                child: ModalBarrier(
+                  dismissible: false,
+                  color: Colors.black87,
                 ),
               ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            Text(
-              'Enter words related to service separated by comma',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey,
+            if (isLoading)
+              const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'We\'re creating your service,',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    Text(
+                      'Please wait...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ).paddingSymmetric(
-              horizontal: 16,
-              vertical: 10,
-            ),
-            SizedBox(
-              height: Get.height * 0.1,
-            ),
           ],
         ),
       ),

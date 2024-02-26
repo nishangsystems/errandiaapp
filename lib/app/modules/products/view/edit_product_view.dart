@@ -394,7 +394,7 @@ class EditProductViewState extends State<EditProductView> {
                   indent: 0,
                 ),
 
-                // Business categories
+                // unit price
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                   child: TextFormField(
@@ -1038,7 +1038,7 @@ class EditProductViewState extends State<EditProductView> {
                   indent: 0,
                 ),
 
-                Text(
+                const Text(
                   'Enter words related to product separated by comma',
                   textAlign: TextAlign.center,
                   style: TextStyle(

@@ -36,6 +36,7 @@ class add_product_view extends StatefulWidget {
 class _add_product_viewState extends State<add_product_view> {
   late add_product_cotroller product_controller;
   late imagePickercontroller imageController;
+  late profile_controller profileController;
 
   List<String> selectedFilters = [];
   List<int> selectedFilters_ = [];
@@ -147,7 +148,7 @@ class _add_product_viewState extends State<add_product_view> {
     return WillPopScope(
       onWillPop: () async {
         Get.back();
-        profile_controller().reloadMyProducts();
+        profileController.reloadMyProducts();
         return true;
       },
       child: Scaffold(
@@ -342,7 +343,7 @@ class _add_product_viewState extends State<add_product_view> {
                     indent: 0,
                   ),
 
-                  // Business categories
+                  // unit price
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                     child: TextFormField(

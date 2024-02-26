@@ -11,6 +11,7 @@ import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/profile/view/edit_profile_view.dart';
+import 'package:errandia/app/modules/services/view/add_service_view.dart';
 import 'package:errandia/modal/Shop.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
@@ -391,7 +392,9 @@ class _Profile_viewState extends State<Profile_view>
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Get.to(() => add_product_view(shopId: shopId));
+                    Get.to(() => add_service_view())?.then((_) {
+                      profileController.loadMyServices();
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     primary: appcolor().mainColor,
@@ -412,7 +415,7 @@ class _Profile_viewState extends State<Profile_view>
                 profileController.reloadMyServices();
               },
               child: GridView.builder(
-                key: const PageStorageKey('my-services'),
+                key: UniqueKey(),
                 controller: serviceScrollController,
                 itemCount: profileController.isServiceLoading.value
                     ? profileController.serviceItemList.length + 1
@@ -432,10 +435,10 @@ class _Profile_viewState extends State<Profile_view>
                       Get.to(() => ServiceDetailsView(service: item));
                     },
                     child: errandia_widget(
-                      cost: item['unit_price'],
+                      cost: item['unit_price'].toString(),
                       imagePath: item['featured_image'],
                       name: item['name'],
-                      location: item['street'],
+                      location: item['shop'] != null ? item['shop']['street'] : "",
                     ),
                   );
                 },

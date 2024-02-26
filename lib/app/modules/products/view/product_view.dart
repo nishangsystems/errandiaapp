@@ -38,8 +38,6 @@ class _Product_viewState extends State<Product_view>
   final profile_controller profileController = Get.find<profile_controller>();
   late PopupBox popup;
 
-  // _Product_viewState(this.item);
-
   void showPopupMenu(BuildContext context) {
     var userIsOwner =
         profileController.userData.value['id'] == widget.item['user']['id'];
@@ -486,7 +484,7 @@ class _Product_viewState extends State<Product_view>
                   ),
                   color: Colors.white,
                 ),
-                padding: EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
+                padding: const EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
                 child: InkWell(
                   onTap: () {
                     Get.to(product_send_enquiry());
@@ -525,10 +523,10 @@ class _Product_viewState extends State<Product_view>
                   ),
                   color: Colors.white,
                 ),
-                padding: EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
+                padding: const EdgeInsets.only(left: 20, right: 15, top: 5, bottom: 5),
                 child: Row(
                   children: [
-                    Text(
+                    const Text(
                       'Supplier Review',
                       style: TextStyle(fontSize: 15),
                     ),
@@ -904,7 +902,7 @@ Widget image_select_widget(BuildContext context, final item) {
       ),
 
       item['images'].length > 0
-          ? Container(
+          ? SizedBox(
               height: Get.height * 0.15,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,

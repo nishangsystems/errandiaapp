@@ -1,4 +1,5 @@
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/global/Widgets/account_suspended_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
@@ -8,6 +9,7 @@ import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/manage_review/view/manage_review_view.dart';
 import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
+import 'package:errandia/app/modules/services/view/add_service_view.dart';
 import 'package:errandia/app/modules/services/view/manage_service_view.dart';
 import 'package:errandia/app/modules/sms_plan/view/sms_plan_view.dart';
 import 'package:errandia/app/modules/subscribers/view/subscriber_view.dart';
@@ -21,6 +23,9 @@ import '../../global/Widgets/bottomsheet_item.dart';
 import '../../products/view/manage_products_view.dart';
 
 profile_controller profileController = Get.put(profile_controller());
+home_controller homeController = Get.put(home_controller());
+business_controller businessController = Get.put(business_controller());
+
 
 class dashboard_view extends StatelessWidget {
   const dashboard_view({super.key});
@@ -341,19 +346,32 @@ void custombottomsheet(BuildContext context) {
             callback: () {
               Get.back();
               Get.to(() => add_product_view())?.then((_) {
-                profile_controller().reloadMyProducts();
+                profileController.reloadMyProducts();
               });
             },
           ),
           bottomSheetWidgetitem(
             title: 'Add New Service',
             imagepath: 'assets/images/sidebar_icon/services.png',
-            callback: () {},
+            callback: () {
+              Get.back();
+              Get.to(() => add_service_view())?.then((_) {
+                profileController.reloadMyProducts();
+              });
+            },
           ),
           bottomSheetWidgetitem(
             title: 'Add New Business',
             imagepath: 'assets/images/sidebar_icon/create_shop.png',
-            callback: () {},
+            callback: () {
+              Get.back();
+              Get.to(() => add_business_view())?.then((_) {
+               businessController.reloadBusinesses();
+               profileController.reloadMyBusinesses();
+                homeController.featuredBusinessData.clear();
+               homeController.fetchFeaturedBusinessesData();
+              });
+            },
           ),
           bottomSheetWidgetitem(
             title: 'Add New Manager',
