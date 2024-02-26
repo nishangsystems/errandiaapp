@@ -61,6 +61,10 @@ class PopupBox extends StatelessWidget {
     ).show();
   }
 
+  void dismissPopup(BuildContext context) {
+    Navigator.of(context).pop();
+  }
+
   DialogType _getDialogType() {
     switch (type) {
       case PopupType.success:

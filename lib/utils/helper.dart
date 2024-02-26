@@ -6,6 +6,7 @@ import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 
@@ -72,4 +73,9 @@ Future<File> compressFile({required File? file}) async {
     quality: 80,
   );
   return File(result!.path);
+}
+
+String formatPrice(double price) {
+  final format = NumberFormat.currency(locale: "fr_CM", symbol: "XAF", decimalDigits: 0);
+  return format.format(price);
 }

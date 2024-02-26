@@ -208,14 +208,15 @@ class ErrandViewWithoutBar extends StatelessWidget {
 
 Widget PostedErrands(BuildContext ctx) {
   return FutureBuilder(
-      future: api().productnew('errands', 1),
+      future: api().getErrands('errands', 1),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Center(
             child: Text('No data Fond'),
           );
         } else if (snapshot.hasData) {
-          var data = snapshot.data['errands'];
+          print("snapshot: ${snapshot.data[0]['items']}");
+          var data = snapshot.data[0]['items'];
           return Column(
             children: [
               filter_sort_container(
@@ -428,7 +429,16 @@ Widget PostedErrands(BuildContext ctx) {
                                   itemBuilder: (context, index) {
                                     var image = data_['images'][index];
                                     return Image.network(
-                                        image['url'].toString());
+                                        image['url'].toString(),
+                                      errorBuilder: (BuildContext context,
+                                          Object exception,
+                                          StackTrace? stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/errandia_logo.png',
+                                          fit: BoxFit.fill,
+                                        );
+                                      },
+                                    );
                                   })),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

@@ -71,6 +71,7 @@ dependencies:
   path_provider: any
   awesome_dialog: ^3.2.0
   http_parser: any
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

@@ -551,7 +551,7 @@ class _add_business_viewState extends State<add_business_view> {
 
                                                     }
                                                   },
-                                                  color: Color(0xfffafafa),
+                                                  color: const Color(0xfffafafa),
                                                 ),
                                               ],
                                             )
@@ -626,7 +626,7 @@ class _add_business_viewState extends State<add_business_view> {
                                               height: Get.height * 0.32,
                                               width: Get.width * 0.9,
                                               fit: BoxFit.fill,
-                                            ).paddingSymmetric(horizontal: 60);
+                                            ).paddingSymmetric(horizontal: 50);
                                           }
                                       ),
                                       SizedBox(

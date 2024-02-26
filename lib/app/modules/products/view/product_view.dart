@@ -7,6 +7,7 @@ import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_pos
 import 'package:errandia/app/modules/reviews/views/add_review.dart';
 import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:errandia/common/random_ui/ui_23.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import 'package:get/get.dart';
 import 'package:share/share.dart';
 import '../../errands/view/Product/serivces.dart';
 import '../../global/constants/color.dart';
+import '../../profile/controller/profile_controller.dart';
 
 class Product_view extends StatefulWidget {
   final item;
@@ -32,13 +34,157 @@ class _Product_viewState extends State<Product_view>
   late final TabController tabController =
       TabController(length: 2, vsync: this);
   final item;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  final profile_controller profileController = Get.find<profile_controller>();
 
   _Product_viewState(this.item);
+
+  void showPopupMenu(BuildContext context) {
+    var userIsOwner = profileController.userData.value['id'] ==
+        widget.item['user']['id'];
+    List<PopupMenuEntry<String>> menuItems = userIsOwner
+        ? [
+      // const PopupMenuItem<String>(
+      //     value: 'share',
+      //     child: Row(
+      //       children: [
+      //         Icon(Icons.share, size: 14, color: Colors.black),
+      //         SizedBox(
+      //           width: 5,
+      //         ),
+      //         Text('Share', style: TextStyle(fontSize: 15)),
+      //       ],
+      //     )),
+      const PopupMenuItem<String>(
+          value: 'edit',
+          child: Row(
+            children: [
+              Icon(Icons.edit, size: 14, color: Colors.black),
+              SizedBox(
+                width: 5,
+              ),
+              Text('Edit', style: TextStyle(fontSize: 15)),
+            ],
+          )),
+      const PopupMenuItem<String>(
+          value: 'delete',
+          child: Row(
+            children: [
+              Icon(Icons.delete, size: 14, color: Colors.black),
+              SizedBox(
+                width: 5,
+              ),
+              Text('Delete', style: TextStyle(fontSize: 15)),
+            ],
+          )),
+    ]
+        : [
+      // const PopupMenuItem<String>(value: 'share', child: Text('Share')),
+    ];
+
+    showMenu<String>(
+      context: context,
+      position: const RelativeRect.fromLTRB(100.0, 100.0, 0.0, 0.0),
+      // Position the menu
+      items: menuItems,
+      initialValue: null,
+    ).then((String? value) {
+      // Handle the action based on the value
+      if (value != null) {
+        switch (value) {
+          case 'edit':
+            // Get.to(() => EditBusinessView(data: widget.businessData))
+            //     ?.then((value) {
+            //   print("value update: $value");
+            //   if (value != null) {
+            //     setState(() {
+            //       widget.businessData = value;
+            //     });
+            //   }
+            // });
+            break;
+          case 'delete':
+            // showDialog(
+            //   context: context,
+            //   builder: (BuildContext dialogContext) {
+            //     // Use dialogContext
+            //     var response;
+            //     return CustomAlertDialog(
+            //         title: "Delete Business",
+            //         message: "Are you sure you want to delete this business?",
+            //         dialogType: MyDialogType.error,
+            //         onConfirm: () {
+            //           // delete product
+            //           print("delete business: ${widget.businessData['slug']}");
+            //           BusinessAPI.deleteBusiness(widget.businessData['slug'])
+            //               .then((response_) {
+            //             if (response_ != null) {
+            //               response = jsonDecode(response_);
+            //               print("delete business response: $response");
+            //
+            //               if (mounted) {
+            //                 // Check if the widget is still in the tree
+            //                 if (response["status"] == 'success') {
+            //                   Navigator.of(dialogContext)
+            //                       .pop(); // Close the dialog
+            //                   Navigator.of(context)
+            //                       .pop(true); // Navigate back with result
+            //
+            //                   // Show success popup
+            //                   popup = PopupBox(
+            //                     title: 'Success',
+            //                     description: response['data']['message'],
+            //                     type: PopupType.success,
+            //                   );
+            //                 } else {
+            //                   Navigator.of(dialogContext)
+            //                       .pop(); // Close the dialog
+            //
+            //                   // Show error popup
+            //                   popup = PopupBox(
+            //                     title: 'Error',
+            //                     description: response['data']['data'],
+            //                     type: PopupType.error,
+            //                   );
+            //                 }
+            //
+            //                 popup.showPopup(context); // Show the popup
+            //               }
+            //             }
+            //           });
+            //         },
+            //         onCancel: () {
+            //           // cancel delete
+            //           print("cancel delete");
+            //           Navigator.of(dialogContext).pop(); // Close the dialog
+            //         });
+            //   },
+            // ).then((_) {
+            //   if (mounted) {
+            //     try {
+            //       popup.dismissPopup(
+            //           navigatorKey.currentContext!); // Dismiss the popup
+            //     } catch (e) {
+            //       print("error dismissing popup: $e");
+            //     }
+            //     profileController.reloadMyBusinesses();
+            //     Get.back();
+            //   }
+            // });
+            break;
+        // case 'share':
+        //   // Handle share action
+        //   break;
+        }
+      }
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
     //  print(widget.item.product_name);
-    print("product item: ${widget.item.id}");
+    print("product item: ${widget.item}");
     return Scaffold(
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -139,9 +285,9 @@ class _Product_viewState extends State<Product_view>
           },
         ),
         title: Text(
-          "${widget.item.name}",
+          capitalizeAll(widget.item['name'].toString()),
           style: TextStyle(
-            color: appcolor().mainColor,
+            color: appcolor().mediumGreyColor,
           ),
         ),
         actions: [
@@ -155,10 +301,12 @@ class _Product_viewState extends State<Product_view>
           ),
           IconButton(
             onPressed: () {
-              Share.share('text', subject: 'hello share');
+              // Share.share('text', subject: 'hello share');
+              showPopupMenu(context);
             },
+            // vertical 3 dots
             icon: const Icon(
-              Icons.share,
+              Icons.more_vert,
               size: 30,
             ),
             color: appcolor().mediumGreyColor,
@@ -172,9 +320,9 @@ class _Product_viewState extends State<Product_view>
           children: [
             Column(
               children: [
-                image_select_widget(
+                image_select_widget(context,
                     // widget.item['images']
-                  widget.item.imagePath
+                    widget.item
                 ),
                 product_review_widget(widget.item),
                 // SizedBox(
@@ -225,10 +373,6 @@ class _Product_viewState extends State<Product_view>
                 //   color: appcolor().skyblueColor,
                 // ),
               ],
-            ).paddingOnly(
-              left: 15,
-              right: 15,
-              top: 20,
             ),
 
             // tab bar view
@@ -284,7 +428,12 @@ class _Product_viewState extends State<Product_view>
                       controller: tabController,
                       children: [
                         // Text('${widget.item['description']}'),
-                        const Text('Some description'),
+                         Text(
+                          widget.item['description'],
+                          style: const TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -401,13 +550,23 @@ class _Product_viewState extends State<Product_view>
                         child: Row(
                           children: [
                             Container(
-                              margin: EdgeInsets.only(right: 8),
+                              margin: const EdgeInsets.only(right: 8),
                               height: Get.height * 0.05,
                               width: Get.width * 0.1,
                               color: Colors.white,
                               // child: Image.asset(widget.item['featured_image']),
-                              child: Image.asset(
-                                widget.item.imagePath,
+                              child: Image.network(
+                                getImagePath(widget.item['featured_image'].toString()),
+                                fit: BoxFit.fill,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/errandia_logo.png',
+                                    fit: BoxFit.cover,
+                                    height: Get.height * 0.17,
+                                    width: Get.width * 0.4,
+                                  );
+                                },
                               ),
                             ),
                             const Column(
@@ -665,107 +824,127 @@ class _Product_viewState extends State<Product_view>
   }
 }
 
-Widget image_select_widget(final item) {
-  return Container(
-    child: Column(
-      children: [
-        Container(
-          height: Get.height * 0.4,
-          color: Colors.white,
-          //  child: Image.asset(item.imagePath.toString()),
-          child: CarouselSlider.builder(
-            options: CarouselOptions(
-              enableInfiniteScroll: true,
-              aspectRatio: 2.0,
-              viewportFraction: 1.0,
-              scrollDirection: Axis.horizontal,
-              // aspectRatio: 2,
-            ),
-            itemCount: item.length,
-            itemBuilder: (context, index, realIndex) {
-              // var image = item[index];
-              // return Image.network(
-              //   image['url'].toString(),
-              //   fit: BoxFit.cover,
-              // );
-              print("image path: ${item}");
-              return Image.asset(
-                item.toString(),
-                fit: BoxFit.cover,
-              );
-            },
-          ),
-        ),
-        Container(
-          height: Get.height * 0.15,
-          child: ListView.builder(
+Widget image_select_widget(BuildContext context, final item) {
+  return Column(
+    children: [
+      Container(
+        height: Get.height * 0.3,
+        width: Get.width,
+        child: CarouselSlider.builder(
+          options: CarouselOptions(
+            enableInfiniteScroll: true,
+            aspectRatio: MediaQuery.of(context).size.aspectRatio,
+            viewportFraction: 1.0,
             scrollDirection: Axis.horizontal,
-            itemCount: item.length,
-            itemBuilder: (context, index) {
-              var image = item[index];
-              return Container(
-                margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                height: Get.height * 0.2,
-                color: Colors.white,
-                width: Get.width * 0.2,
-                // child: Center(child: Image.network(image['url'].toString())),
-                child: Center(child: Image.network(image.toString())),
-              );
-            },
+            height: Get.height * 0.3,
           ),
+          itemCount: item.length,
+          itemBuilder: (context, index, realIndex) {
+            // var image = item[index];
+            // return Image.network(
+            //   image['url'].toString(),
+            //   fit: BoxFit.cover,
+            // );
+            print("image path: ${item}");
+            return Image.network(
+              getImagePath(item['featured_image'].toString()),
+              fit: BoxFit.cover,
+              errorBuilder: (BuildContext context, Object exception,
+                  StackTrace? stackTrace) {
+                return Image.asset(
+                  'assets/images/errandia_logo.png',
+                  fit: BoxFit.fill,
+                );
+              }
+            );
+          },
         ),
-      ],
-    ),
+      ),
+      item['images'].length > 0 ? Container(
+        height: Get.height * 0.15,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: item['images'].length,
+          itemBuilder: (context, index) {
+            var image = item['images'][index];
+            return Container(
+              margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
+              height: Get.height * 0.2,
+              color: Colors.white,
+              width: Get.width * 0.2,
+              // child: Center(child: Image.network(image['url'].toString())),
+              child: Center(child: Image.network(
+                  getImagePath(image['url'].toString()),
+                  fit: BoxFit.fill,
+                  errorBuilder: (BuildContext context,
+                      Object exception, StackTrace? stackTrace) {
+                    return Image.asset(
+                      'assets/images/errandia_logo.png',
+                      fit: BoxFit.fill,
+                    );
+                  }
+              )),
+            );
+          },
+        ),
+      ) : Container(),
+    ],
   );
 }
 
 Widget product_review_widget(item) {
-  return Container(
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        '${item.name}',
-        style: TextStyle(
-          fontSize: 16,
+  return Column(crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+    SizedBox(
+      height: Get.height * 0.01,
+    ),
+    Text(
+      capitalizeAll(item['name'].toString()),
+      style: const TextStyle(
+        fontSize: 17,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
+    SizedBox(
+      height: Get.height * 0.01,
+    ),
+    Text(
+      formatPrice(double.parse(item['unit_price'].toString())),
+      style: TextStyle(
+          fontSize: 20,
           fontWeight: FontWeight.bold,
+          color: appcolor().mediumGreyColor),
+    ),
+    Row(
+      children: [
+        RatingBar.builder(
+          itemCount: 5,
+          direction: Axis.horizontal,
+          initialRating: 1,
+          itemSize: 22,
+          maxRating: 5,
+          allowHalfRating: true,
+          glow: true,
+          itemBuilder: (context, _) {
+            return const Icon(
+              Icons.star,
+              color: Colors.amber,
+            );
+          },
+          onRatingUpdate: (value) {
+            debugPrint(value.toString());
+          },
         ),
-      ),
-      Text(
-        'XAF ${item.price}',
-        style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: appcolor().mediumGreyColor),
-      ),
-      Row(
-        children: [
-          RatingBar.builder(
-            itemCount: 5,
-            direction: Axis.horizontal,
-            initialRating: 1,
-            itemSize: 22,
-            maxRating: 5,
-            allowHalfRating: true,
-            glow: true,
-            itemBuilder: (context, _) {
-              return Icon(
-                Icons.star,
-                color: Colors.amber,
-              );
-            },
-            onRatingUpdate: (value) {
-              debugPrint(value.toString());
-            },
-          ),
-          SizedBox(
-            width: Get.width * 0.01,
-          ),
-          Text(
-            // '${item['reviews']} Supplier Reviews',
-            '{} Supplier Reviews',
-            style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
-          ),
-        ],
-      ),
-    ]),
-  );
+        SizedBox(
+          width: Get.width * 0.01,
+        ),
+        Text(
+          // '${item['reviews']} Supplier Reviews',
+          '{} Supplier Reviews',
+          style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
+        ),
+      ],
+    ),
+  ]
+  ).paddingOnly(left: 15, right: 15);
 }

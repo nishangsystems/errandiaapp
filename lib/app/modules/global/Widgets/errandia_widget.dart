@@ -90,14 +90,15 @@ class errandia_widget extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            cost != null
-                ? Text(
-                    cost.toString(),
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: appcolor().mainColor,
-                        fontSize: 14),
-                  )
+            cost.toString() != "null" && cost.toString().isNotEmpty == true
+                ? // text with suffix XAF 2000
+            Text(
+              formatPrice(double.parse(cost!)),
+              style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  color: appcolor().mainColor,
+                  fontSize: 14),
+            )
                 : Container()
           ],
         ));
