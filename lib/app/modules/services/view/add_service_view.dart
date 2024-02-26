@@ -15,8 +15,14 @@ add_product_cotroller product_controller = Get.put(add_product_cotroller());
 
 imagePickercontroller imageController = Get.put(imagePickercontroller());
 
-class add_service_view extends StatelessWidget {
+class add_service_view extends StatefulWidget {
   add_service_view({super.key});
+
+  @override
+  State<add_service_view> createState() => _add_service_viewState();
+}
+
+class _add_service_viewState extends State<add_service_view> {
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,7 @@ class add_service_view extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         titleSpacing: 8,
-        title: Text('Add Service'.tr, style: TextStyle(
+        title: Text('Add Service'.tr, style: const TextStyle(
           fontWeight: FontWeight.bold,
           color: Color(0xff113d6b),
         ),),
@@ -39,7 +45,7 @@ class add_service_view extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
           color: Color(0xff113d6b),
         ),
         actions: [

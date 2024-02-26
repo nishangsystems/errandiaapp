@@ -1,49 +1,44 @@
 import 'dart:convert';
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:errandia/app/APi/product.dart';
-import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
+import 'package:errandia/app/modules/products/view/edit_product_view.dart';
 import 'package:errandia/app/modules/products/view/products_send_enquiry.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
 import 'package:errandia/app/modules/reviews/views/add_review.dart';
 import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:errandia/common/random_ui/ui_23.dart';
 import 'package:errandia/utils/helper.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:share/share.dart';
-import '../../errands/view/Product/serivces.dart';
+
 import '../../global/constants/color.dart';
 import '../../profile/controller/profile_controller.dart';
 
 class Product_view extends StatefulWidget {
-  final item;
+  var item;
   final name;
 
   Product_view({super.key, required this.item, this.name});
 
   @override
-  State<Product_view> createState() => _Product_viewState(item);
+  State<Product_view> createState() => _Product_viewState();
 }
 
 class _Product_viewState extends State<Product_view>
     with TickerProviderStateMixin {
   late final TabController tabController =
       TabController(length: 2, vsync: this);
-  final item;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final profile_controller profileController = Get.find<profile_controller>();
   late PopupBox popup;
 
-  _Product_viewState(this.item);
+  // _Product_viewState(this.item);
 
   void showPopupMenu(BuildContext context) {
     var userIsOwner =
@@ -99,15 +94,15 @@ class _Product_viewState extends State<Product_view>
       if (value != null) {
         switch (value) {
           case 'edit':
-            // Get.to(() => EditBusinessView(data: widget.businessData))
-            //     ?.then((value) {
-            //   print("value update: $value");
-            //   if (value != null) {
-            //     setState(() {
-            //       widget.businessData = value;
-            //     });
-            //   }
-            // });
+            Get.to(() => EditProductView(data: widget.item))
+                ?.then((value) {
+              print("value update: $value");
+              if (value != null) {
+                setState(() {
+                  widget.item = value;
+                });
+              }
+            });
             break;
           case 'delete':
             showDialog(
@@ -444,7 +439,7 @@ class _Product_viewState extends State<Product_view>
                     ),
                     Container(
                       color: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                       height: Get.height * 0.2,
                       child: TabBarView(
                         controller: tabController,
@@ -663,14 +658,14 @@ class _Product_viewState extends State<Product_view>
               InkWell(
                 onTap: () {
                   var item_ = {
-                    'name': item.name,
-                    'price': item.price,
-                    'image': item.imagePath,
+                    'name': widget.item.name,
+                    'price': widget.item.price,
+                    'image': widget.item.imagePath,
                     'location': 'location',
                     'address': 'Molyko, Buea',
                     'featured_image': 'https://picsum.photos/250?image=9'
                   };
-                  print("item: $item");
+                  print("item: ${widget.item}");
                   Get.to(add_review_view(
                     review: item_,
                   ));

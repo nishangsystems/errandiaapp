@@ -22,7 +22,9 @@ class add_business_controller extends GetxController{
   TextEditingController phone_controller= TextEditingController();
   TextEditingController email_controller= TextEditingController();
   TextEditingController description_controller = TextEditingController();
-  
+
+  RxBool emailValid = false.obs;
+
   RxList<String> managerList=[
     'Abhishek',
     'Ram',

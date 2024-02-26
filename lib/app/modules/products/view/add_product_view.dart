@@ -41,7 +41,6 @@ class _add_product_viewState extends State<add_product_view> {
   List<int> selectedFilters_ = [];
   bool isLoading = false;
   Shop? selectedShop;
-  var categoryValue;
   var category;
 
   void createProduct(BuildContext context) {
@@ -319,7 +318,7 @@ class _add_product_viewState extends State<add_product_view> {
                           color: Colors.black,
                         ),
                       ),
-                      value: categoryValue,
+                      value: category,
                       onChanged: (value) {
                         setState(() {
                           category = value as int;
@@ -359,7 +358,7 @@ class _add_product_viewState extends State<add_product_view> {
                           color: Colors.black,
                         ),
                         hintText: 'Unit Price *',
-                        suffix: Text('XAF 0'),
+                        suffix: Text('XAF'),
                         suffixIcon: Icon(
                           Icons.edit,
                           color: Colors.black,

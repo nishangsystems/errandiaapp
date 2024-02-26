@@ -21,10 +21,10 @@ class add_product_cotroller extends GetxController{
   @override
   void onInit() {
     super.onInit();
-    loadShops();
+    // loadShops();
   }
 
-  void loadShops() async {
+  Future<void> loadShops() async {
     var response = await BusinessAPI.userShops_(1);
     print("response my shops: ${response['items']}");
 
@@ -33,7 +33,7 @@ class add_product_cotroller extends GetxController{
         return Shop.fromJson(shopData); // Assuming Shop has a fromJson method
       }).toList();
       shopList.addAll(fetchedShops);
-      print("shopList: $shopList");
+      print("shopList: ${shopList}");
     }
   }
 
@@ -57,6 +57,16 @@ class add_product_cotroller extends GetxController{
     product_tags_controller.clear();
     unit_price_controller.clear();
     quantity_controller.clear();
+  }
+
+  void reloadShops() {
+    shopList.clear();
+    loadShops();
+  }
+
+  void reloadCategories() {
+    categoryList.clear();
+    loadCategories();
   }
 
   @override
