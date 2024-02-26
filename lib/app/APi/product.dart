@@ -29,11 +29,6 @@ class ProductAPI {
       request.fields[key] = value[key];
     }
 
-    // Add the cover image if it exists
-    // if (value.containsKey('featured_image')) {
-    //   var coverImagePath = value['featured_image'] as String;
-    //   request.files.add(await http.MultipartFile.fromPath('featured_image', coverImagePath));
-    // }
     if (imagePath != '' && await File(imagePath).exists()) {
       request.files.add(await http.MultipartFile.fromPath('featured_image', imagePath));
     }
@@ -54,6 +49,36 @@ class ProductAPI {
       }
       final errorData = await response.stream.bytesToString();
       return jsonEncode({'status': 'error', 'data': json.decode(errorData)});
+    }
+  }
+
+
+  // delete product or service
+  static Future deleteProductOrService(String itemSlug) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    var response = await http.delete(
+      Uri.parse('${apiDomain().domain}/user/items/$itemSlug'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (kDebugMode) {
+        print("delete product response: $responseData");
+      }
+      return jsonEncode({'status': 'success', 'data': responseData});
+    } else {
+      if (kDebugMode) {
+        print("delete product error: ${response.statusCode}");
+      }
+      final errorData = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'data': errorData});
     }
   }
 }

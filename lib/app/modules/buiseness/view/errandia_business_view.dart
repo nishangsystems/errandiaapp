@@ -59,7 +59,7 @@ class _errandia_business_viewState extends State<errandia_business_view> {
   @override
   Widget build(BuildContext context) {
     print("bz data: ${widget.businessData}");
-    print("current slug: ${widget.businessData['slug']}");
+    print("current slug: ${widget.businessData['image']}");
 
     Widget _buildBusinessBranchesErrorWidget(String message, VoidCallback onReload) {
       return !errandiaBusinessViewController.isLoading.value ? Container(
@@ -105,7 +105,10 @@ class _errandia_business_viewState extends State<errandia_business_view> {
           children: [
             Text(
               capitalizeAll(widget.businessData['name']),
-              style: const TextStyle(color: Colors.black, fontSize: 16),
+              style: TextStyle(
+                color: appcolor().mediumGreyColor,
+                fontSize: 20,
+              ),
             ),
           ],
         ),
@@ -232,8 +235,14 @@ class _errandia_business_viewState extends State<errandia_business_view> {
               height: Get.height * 0.3,
               width: Get.width,
               child: Image.network(
-                getImagePath(widget.businessData['image'].toString()),
+                getImagePath(widget.businessData['image'].toString() ?? ""),
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/errandia_logo.png',
+                    fit: BoxFit.fill,
+                  );
+                },
               )
             ),
 
