@@ -447,7 +447,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                         ),
                                       ),
                                       Text(
-                                        widget.service['shop']['name'],
+                                        capitalizeAll(widget.service['shop']['name']),
                                         style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w400,

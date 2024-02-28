@@ -424,7 +424,7 @@ class _Product_viewState extends State<Product_view>
                           fontSize: 18,
                         ),
                         controller: tabController,
-                        labelColor: appcolor().darkBlueColor,
+                        labelColor: appcolor().mainColor,
                         tabs: const [
                           Tab(
                             text: "Description",
@@ -452,17 +452,116 @@ class _Product_viewState extends State<Product_view>
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('supplier image'),
+                              Container(
+                                height: Get.height * 0.1,
+                                width: Get.width * 0.2,
+                                color: Colors.white,
+                                child: Image.network(
+                                  getImagePath(widget.item['shop']['image']),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/errandia_logo.png',
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                ),
+                              ),
+
                               SizedBox(
                                 width: Get.width * 0.08,
                               ),
-                              const Column(
+
+                              widget.item['shop'] != null ? Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('supplier info  1'),
-                                  Text('supplier info  1'),
-                                  Text('supplier info  1'),
+                                  Text(
+                                    'Business Name',
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.grey[700]
+                                    ),
+                                  ),
+                                  Text(
+                                    capitalizeAll(widget.item['shop']['name']),
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+
+                                  SizedBox(
+                                    height: Get.height * 0.01,
+                                  ),
+
+                                  widget.item['shop']['street'] != "" || widget.item['shop']['town'] != null || widget.item['shop']['region'] != null ? Text(
+                                    'Address',
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.grey[700]
+                                    ),
+                                  ) : Container(),
+
+                                  widget.item['shop']['street'] != "" && widget.item['shop']['town'] != null && widget.item['shop']['region'] != null
+                                      ? SizedBox(
+                                    width: Get.width * 0.5,
+                                    child: Text(
+                                      widget.item['shop']['street']+", "+widget.item['shop']['town']['name']+ ", "+widget.item['shop']['region']['name'],
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ) : Container(),
+
+                                  widget.item['shop']['street'] != "" && widget.item['shop']['town'] == null && widget.item['shop']['region'] != null
+                                      ? SizedBox(
+                                    width: Get.width * 0.5,
+                                    child: Text(
+                                      widget.item['shop']['street']+ ", "+widget.item['shop']['region']['name'],
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ) : Container(),
+
+                                  widget.item['shop']['street'] == "" && widget.item['shop']['town'] != null && widget.item['shop']['region'] != null
+                                      ? SizedBox(
+                                    width: Get.width * 0.5,
+                                    child: Text(
+                                      widget.item['shop']['town']['name']+ ", "+widget.item['shop']['region']['name'],
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ) : Container(),
+
+                                  widget.item['shop']['street'] == "" && widget.item['shop']['town'] == null && widget.item['shop']['region'] != null
+                                      ? SizedBox(
+                                    width: Get.width * 0.5,
+                                    child: Text(
+                                      widget.item['shop']['region']['name'],
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ) : Container(),
                                 ],
-                              )
+                              ): Container(),
                             ],
                           ),
                         ],
