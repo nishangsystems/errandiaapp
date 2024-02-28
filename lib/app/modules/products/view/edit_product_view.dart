@@ -176,7 +176,7 @@ class EditProductViewState extends State<EditProductView> {
         } else {
           ProductAPI.updateProductOrServiceWithImage(value, context, imageController.image_path.toString(), widget.data?['slug']).then((response_) {
             response = jsonDecode(response_);
-            print("product response: $response");
+            print("product response img: $response");
             if (response['status'] == "success") {
               popup = PopupBox(
                 title: "Success",
@@ -1083,7 +1083,7 @@ class EditProductViewState extends State<EditProductView> {
                     ),
                   ),
                 ),
-        Obx(
+                Obx(
               () => Container(
             margin: const EdgeInsets.symmetric(horizontal: 10),
             child: imageController.imageList.isEmpty
@@ -1134,7 +1134,7 @@ class EditProductViewState extends State<EditProductView> {
                        builder: (BuildContext dialogContext) {
                          return  CustomAlertDialog(
                            title: "Delete all images",
-                           message: "Are you sure you want to delete all images?",
+                           message: "Are you sure you want to delete all images of this product?",
                            dialogType: MyDialogType.error,
                            onConfirm: () {
                              Get.back();

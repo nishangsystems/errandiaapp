@@ -191,22 +191,6 @@ print("selectedImages: $selectedImages");
     }
   }
 
-  Future<void> uploadImages(String itemSlug) async {
-    for (int i = 0; i < imageList.length; i++) {
-      if (uploadStatusList[i] == UploadStatus.pending) {
-        uploadStatusList[i] = UploadStatus.uploading;
-        print("uploading image: ${imageList[i].path}");
-        final response = await ProductAPI.addItemImage(imageList[i].path, itemSlug);
-        final data = jsonDecode(response);
-        if (data['status'] == 'success') {
-          uploadStatusList[i] = UploadStatus.success;
-        } else {
-          uploadStatusList[i] = UploadStatus.failed;
-        }
-      }
-    }
-  }
-
   Future deleteOneImage(String itemSlug, index) async {
     var imageId = imageList[index]['id'].toString();
 

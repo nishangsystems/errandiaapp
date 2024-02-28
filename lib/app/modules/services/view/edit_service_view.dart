@@ -5,6 +5,7 @@ import 'package:errandia/app/APi/product.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
@@ -33,7 +34,8 @@ class EditServiceViewState extends State<EditServiceView> {
   late add_product_cotroller product_controller;
   late profile_controller profileController;
   late imagePickercontroller imageController;
-
+  late imagePickercontroller imageController2;
+  late ScrollController _scrollController;
 
   List<String> selectedFilters = [];
   List<int> selectedFilters_ = [];
@@ -50,7 +52,9 @@ class EditServiceViewState extends State<EditServiceView> {
     super.initState();
     product_controller = Get.put(add_product_cotroller());
     imageController = Get.put(imagePickercontroller());
+    imageController2 = Get.put(imagePickercontroller());
     profileController = Get.put(profile_controller());
+    _scrollController = ScrollController();
 
     setState(() {
       isLoadingData = true;
@@ -156,7 +160,7 @@ class EditServiceViewState extends State<EditServiceView> {
         } else {
           ProductAPI.updateProductOrServiceWithImage(value, context, imageController.image_path.toString(), widget.data?['slug']).then((response_) {
             response = jsonDecode(response_);
-            print("product response: $response");
+            print("product response img: $response");
             if (response['status'] == "success") {
               popup = PopupBox(
                 title: "Success",
@@ -733,8 +737,8 @@ class EditServiceViewState extends State<EditServiceView> {
                   // service image gallery
                   Obx(
                         () => SizedBox(
-                      height: imageController.imageList.isEmpty ? null : null,
-                      child: imageController.imageList.isEmpty
+                      height: imageController2.imageList.isEmpty ? null : null,
+                      child: imageController2.imageList.isEmpty
                           ? InkWell(
                         onTap: () {
                           showDialog(
@@ -790,9 +794,10 @@ class EditServiceViewState extends State<EditServiceView> {
                                             ),
                                             ontap: () {
                                               Get.back();
-                                              imageController
-                                                  .getmultipleImage();
-                                              print('image list: ${imageController.imageList}');
+                                              // imageController
+                                              //     .getmultipleImage();
+                                              imageController2.addImageFromGallery(widget.data?['slug']);
+                                              print('image list: ${imageController2.imageList}');
                                             },
                                             color: appcolor().greyColor,
                                           ),
@@ -819,10 +824,10 @@ class EditServiceViewState extends State<EditServiceView> {
                                             ),
                                             ontap: () {
                                               Get.back();
-                                              imageController
+                                              imageController2
                                                   .getimagefromCamera();
                                             },
-                                            color: Color(0xfffafafa),
+                                            color: const Color(0xfffafafa),
                                           ),
                                         ],
                                       )
@@ -871,7 +876,7 @@ class EditServiceViewState extends State<EditServiceView> {
                                       //   height: Get.height * 0.05,
                                       // ),
                                       Text(
-                                        'Other variations of the main service image',
+                                        'Other variations of the main product image',
                                         style: TextStyle(
                                           fontSize: 10,
                                           color: appcolor().mediumGreyColor,
@@ -886,77 +891,175 @@ class EditServiceViewState extends State<EditServiceView> {
                       )
                           : Container(
                         padding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                         height: Get.height * 0.24,
                         child: Center(
                           child: ListView.builder(
+                            controller: _scrollController,
                             shrinkWrap: true,
-                            itemCount: imageController.imageList.length,
+                            itemCount: imageController2.imageList.length,
                             scrollDirection: Axis.horizontal,
                             itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  Container(
-                                    height: Get.height * 0.15,
-                                    width: Get.width * 0.40,
-                                    decoration:
-                                    BoxDecoration(border: Border.all()),
-                                    child: Image(
-                                      image: FileImage(
-                                        File(
-                                          imageController.imageList[index].path
-                                              .toString(),
+                              UploadStatus? uploadStatus;
+                              if (index < imageController2.uploadStatusList.length) {
+                                uploadStatus = imageController2.uploadStatusList[index];
+                              }
+
+                              return Stack(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: Get.height * 0.15,
+                                          width: Get.width * 0.40,
+                                          decoration:
+                                          BoxDecoration(border: Border.all()),
+                                          child:  imageController2.imageList[index] is Map && imageController2.imageList[index].containsKey('url')
+                                              ? Image.network(
+                                            getImagePath(
+                                              imageController2.imageList[index]['url'],
+                                            ),
+                                            fit: BoxFit.fill,
+                                            errorBuilder: (BuildContext context,
+                                                Object exception,
+                                                StackTrace? stackTrace) {
+                                              return Container();
+                                            },
+                                          )
+                                              : Image(
+                                            image: FileImage(
+                                              File(
+                                                imageController2.imageList[index].path
+                                                    .toString(),
+                                              ),
+                                            ),
+                                            fit: BoxFit.fill,
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                imageController2.replace(index, widget.data?['slug']);
+                                              },
+                                              child: Container(
+                                                height: 35,
+                                                width: Get.width * 0.20,
+                                                color: uploadStatus == UploadStatus.uploading
+                                                    ? Colors.grey
+                                                    : Colors.lightGreen,
+                                                child: Center(
+                                                  child: uploadStatus == UploadStatus.uploading
+                                                      ? const CircularProgressIndicator(
+                                                    color: Colors.white,
+                                                  )
+                                                      : const Text(
+                                                    'Edit',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            InkWell(
+                                              onTap: () {
+                                                // imageController.removeat(index);
+                                                if (uploadStatus != UploadStatus.pending) {
+                                                  imageController2.deleteOneImage(widget.data?['slug'], index);
+                                                }
+                                              },
+                                              child: Container(
+                                                height: 35,
+                                                width: Get.width * 0.2,
+                                                color: uploadStatus == UploadStatus.pending
+                                                    ? Colors.grey
+                                                    : appcolor().greyColor,
+                                                child: Center(
+                                                  child: uploadStatus == UploadStatus.pending
+                                                      ? const Text(
+                                                    'Uploading...',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                    ),
+                                                  )
+                                                      : const Text(
+                                                    'Remove',
+                                                    style: TextStyle(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ).paddingSymmetric(horizontal: 5),
+
+                                    if (uploadStatus == UploadStatus.failed)
+                                      Positioned(
+                                        top: 0,
+                                        left: 5,
+                                        child: Container(
+                                          height: Get.height * 0.15,
+                                          width: Get.width * 0.40,
+                                          color: Colors.red.withOpacity(0.5),
+                                          child: const Padding(
+                                            padding: EdgeInsets.all(5.0),
+                                            child: Center(
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    'Failed',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+
+                                                  Text(
+                                                    'Remove & try again',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                  Container(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.end,
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            imageController.edit(index);
-                                          },
-                                          child: Container(
-                                            height: 35,
-                                            width: Get.width * 0.20,
-                                            color: Colors.lightGreen,
-                                            child: const Center(
+
+                                    if (uploadStatus == UploadStatus.pending)
+                                      Positioned(
+                                        top: 0,
+                                        left: 5,
+                                        child: Container(
+                                          height: Get.height * 0.15,
+                                          width: Get.width * 0.40,
+                                          color: appcolor().mainColor.withOpacity(0.5),
+                                          child: const Padding(
+                                            padding: EdgeInsets.all(5.0),
+                                            child: Center(
                                               child: Text(
-                                                'Edit',
+                                                'Uploading...',
                                                 style: TextStyle(
                                                   color: Colors.white,
+                                                  fontSize: 12,
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                        InkWell(
-                                          onTap: () {
-                                            imageController.removeat(index);
-                                          },
-                                          child: Container(
-                                            height: 35,
-                                            width: Get.width * 0.2,
-                                            color: appcolor().greyColor,
-                                            child: const Center(
-                                              child: Text(
-                                                'Remove',
-                                                style: TextStyle(),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ).paddingSymmetric(horizontal: 5);
+                                      ),
+                                  ]
+                              );
                             },
                           ),
                         ),
@@ -965,32 +1068,102 @@ class EditServiceViewState extends State<EditServiceView> {
                   ),
                   Obx(
                         () => Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
                       child: imageController.imageList.isEmpty
                           ? null
-                          : InkWell(
-                        onTap: (){
-                          imageController.getmultipleImage();
-                        },
-                        child: Container(
-                          margin:const  EdgeInsets.symmetric(horizontal: 15),
-                          decoration: BoxDecoration(
-                            color: appcolor().skyblueColor,
-                            borderRadius: BorderRadius.circular(10,),
-                          ),
-                          height: Get.height*0.08,
-                          child: const Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.image,
+                          : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Add more images button
+                          InkWell(
+                            onTap: () async {
+                              await imageController.addImageFromGallery(widget.data?['slug']).then((_) {
+                                print("image list: ${imageController.imageList}");
+                                // Scroll to the end of the list after the state update
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  if (_scrollController.hasClients) {
+                                    _scrollController.animateTo(
+                                      _scrollController.position.maxScrollExtent,
+                                      duration: const Duration(milliseconds: 300),
+                                      curve: Curves.easeOut,
+                                    );
+                                  }
+                                });
+                              });
+                            },
+                            child: Container(
+                              width: Get.width * 0.52,
+                              decoration: BoxDecoration(
+                                color: appcolor().skyblueColor,
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              Text(
-                                '   Add more images',
+                              height: Get.height * 0.08,
+                              child: const Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.image),
+                                  Text('   Add more images'),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                          // Delete all images button
+                          InkWell(
+                            onTap: () {
+                              // Call a method to clear the image list
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext dialogContext) {
+                                    return  CustomAlertDialog(
+                                      title: "Delete all images",
+                                      message: "Are you sure you want to delete all images of this service?",
+                                      dialogType: MyDialogType.error,
+                                      onConfirm: () {
+                                        Get.back();
+                                        print("deleting all images");
+                                        imageController.deleteAllImages(widget.data?['slug']).then((response) {
+                                          print("***deleted all images response ****: $response");
+                                        });
+                                      },
+                                      onCancel: () {
+                                        Get.back();
+                                      },
+                                    );
+                                  }
+                              ).then((_) {
+                                print("**** 8888 **8 deleted all images *****888***88888");
+                              });
+                              // imageController.deleteAllImages(widget.data?['slug']).then((response) {
+                              //   print("delete all images response: $response");
+                              // });
+                            },
+                            child: Container(
+                              width: Get.width * 0.4,
+                              decoration: BoxDecoration(
+                                  color: Colors.white, // Consider a different color for delete action
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                      color: appcolor().redColor,
+                                      width: 1.5
+                                  )
+                              ),
+                              height: Get.height * 0.08,
+                              child:  Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.delete, color: Colors.red[300],),
+                                  Text('   Delete all',
+                                    style: TextStyle(
+                                      color: Colors.red[300],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
