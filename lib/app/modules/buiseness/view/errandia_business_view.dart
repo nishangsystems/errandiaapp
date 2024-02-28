@@ -9,6 +9,7 @@ import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
 import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:errandia/utils/helper.dart';
@@ -17,11 +18,15 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
+import '../../../APi/business.dart';
 import '../../errands/view/Product/serivces.dart';
+import '../../global/Widgets/CustomDialog.dart';
 import '../../global/Widgets/bottomsheet_item.dart';
+import '../../global/Widgets/popupBox.dart';
+import 'edit_business_view.dart';
 
 class errandia_business_view extends StatefulWidget {
-  final Map<String, dynamic> businessData;
+  late final Map<String, dynamic> businessData;
 
   errandia_business_view({super.key, required this.businessData});
 
@@ -32,9 +37,9 @@ class _errandia_business_viewState extends State<errandia_business_view> {
   final business_controller controller = Get.put(business_controller());
   late final ErrandiaBusinessViewController errandiaBusinessViewController;
   late ScrollController scrollController;
+  late final profile_controller profileController = Get.put(profile_controller());
   // List<dynamic> businessBranchesData = [];
-
-
+  late PopupBox popup;
 
   @override
   void initState() {
@@ -54,7 +59,7 @@ class _errandia_business_viewState extends State<errandia_business_view> {
   @override
   Widget build(BuildContext context) {
     print("bz data: ${widget.businessData}");
-    print("current slug: ${widget.businessData['slug']}");
+    print("current slug: ${widget.businessData['image']}");
 
     Widget _buildBusinessBranchesErrorWidget(String message, VoidCallback onReload) {
       return !errandiaBusinessViewController.isLoading.value ? Container(
@@ -99,8 +104,11 @@ class _errandia_business_viewState extends State<errandia_business_view> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              widget.businessData['name'],
-              style: TextStyle(color: appcolor().bluetextcolor, fontSize: 15),
+              capitalizeAll(widget.businessData['name']),
+              style: TextStyle(
+                color: appcolor().mediumGreyColor,
+                fontSize: 20,
+              ),
             ),
           ],
         ),
@@ -227,8 +235,14 @@ class _errandia_business_viewState extends State<errandia_business_view> {
               height: Get.height * 0.3,
               width: Get.width,
               child: Image.network(
-                getImagePath(widget.businessData['image'].toString()),
+                getImagePath(widget.businessData['image'].toString() ?? ""),
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/errandia_logo.png',
+                    fit: BoxFit.fill,
+                  );
+                },
               )
             ),
 
@@ -270,73 +284,109 @@ class _errandia_business_viewState extends State<errandia_business_view> {
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person,
-                      size: 18,
-                      color: appcolor().mediumGreyColor,
-                    ),
-                    Text(
-                      'Member Since 2010',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: appcolor().mediumGreyColor,
-                      ),
-                    ),
-                    const Spacer(),
-                    RatingBar.builder(
-                      initialRating: 3.5,
-                      allowHalfRating: true,
-                      ignoreGestures: true,
-                      itemSize: 18,
-                      itemBuilder: (context, index) {
-                        return const Icon(
-                          Icons.star_rate_rounded,
-                          color: Colors.amber,
-                        );
-                      },
-                      onRatingUpdate: (val) {},
-                    ),
-                    Text(
-                      '10 Reviews',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: appcolor().mediumGreyColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: Get.height * 0.025,
+
+                // divider
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
                 ),
 
                 SizedBox(
                   height: Get.height * 0.01,
                 ),
-                InkWell(
-                  onTap: () {
-                    errandia_view_bottomsheet();
-                  },
-                  child: Container(
-                    height: Get.height * 0.08,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: appcolor().bluetextcolor,
-                      ),
-                      color: Colors.white10,
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Follow Shop',
-                        style: TextStyle(
-                            fontSize: 16, color: appcolor().bluetextcolor),
-                      ),
-                    ),
+
+                // Row(
+                //   children: [
+                //     Icon(
+                //       Icons.person,
+                //       size: 18,
+                //       color: appcolor().mediumGreyColor,
+                //     ),
+                //     Text(
+                //       'Member Since 2010',
+                //       style: TextStyle(
+                //         fontSize: 12,
+                //         color: appcolor().mediumGreyColor,
+                //       ),
+                //     ),
+                //     const Spacer(),
+                //     RatingBar.builder(
+                //       initialRating: 3.5,
+                //       allowHalfRating: true,
+                //       ignoreGestures: true,
+                //       itemSize: 18,
+                //       itemBuilder: (context, index) {
+                //         return const Icon(
+                //           Icons.star_rate_rounded,
+                //           color: Colors.amber,
+                //         );
+                //       },
+                //       onRatingUpdate: (val) {},
+                //     ),
+                //     Text(
+                //       '10 Reviews',
+                //       style: TextStyle(
+                //         fontSize: 11,
+                //         color: appcolor().mediumGreyColor,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // SizedBox(
+                //   height: Get.height * 0.025,
+                // ),
+                //
+                // SizedBox(
+                //   height: Get.height * 0.01,
+                // ),
+                // InkWell(
+                //   onTap: () {
+                //     errandia_view_bottomsheet();
+                //   },
+                //   child: Container(
+                //     height: Get.height * 0.08,
+                //     decoration: BoxDecoration(
+                //       borderRadius: BorderRadius.circular(10),
+                //       border: Border.all(
+                //         color: appcolor().bluetextcolor,
+                //       ),
+                //       color: Colors.white10,
+                //     ),
+                //     child: Center(
+                //       child: Text(
+                //         'Follow Shop',
+                //         style: TextStyle(
+                //             fontSize: 16, color: appcolor().bluetextcolor),
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                // SizedBox(
+                //   height: Get.height * 0.025,
+                // ),
+
+                // description text
+                const Text(
+                  'Description',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+
+                SizedBox(
+                  height: Get.height * 0.01,
+                ),
+
+                // description of the shop
+                Text(
+                  widget.businessData['description'] ?? "No description provided",
+                  style: const TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+
                 SizedBox(
                   height: Get.height * 0.025,
                 ),
@@ -396,7 +446,7 @@ class _errandia_business_viewState extends State<errandia_business_view> {
             SizedBox(
               height: Get.height * 0.01,
             ),
-            Divider(),
+            // Divider(),
 
             // visit shop
             Container(
@@ -744,14 +794,14 @@ void errandia_view_bottomsheet() {
             size: 25,
           ),
           // Text(index.toString()),
-          bottomSheetWidgetitem(
-            title: 'Follow this shop',
-            imagepath: 'assets/images/sidebar_icon/icon-profile-following.png',
-            callback: () async {
-              print('tapped');
-              Get.back();
-            },
-          ),
+          // bottomSheetWidgetitem(
+          //   title: 'Follow this shop',
+          //   imagepath: 'assets/images/sidebar_icon/icon-profile-following.png',
+          //   callback: () async {
+          //     print('tapped');
+          //     Get.back();
+          //   },
+          // ),
           bottomSheetWidgetitem(
             title: 'Call Suplier',
             imagepath: 'assets/images/sidebar_icon/icon-move.png',

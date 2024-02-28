@@ -133,6 +133,12 @@ class business_controller extends GetxController {
 
   }
 
+  void reloadBusinesses() {
+    itemList.clear();
+    currentPage.value = 1;
+    loadBusinesses();
+  }
+
   bool shouldLoadMore(int index) {
     return index == itemList.length - 1 &&
         itemList.length < total.value &&

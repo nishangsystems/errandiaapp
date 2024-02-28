@@ -11,6 +11,7 @@ import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/profile/view/edit_profile_view.dart';
+import 'package:errandia/app/modules/services/view/add_service_view.dart';
 import 'package:errandia/modal/Shop.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
@@ -213,7 +214,7 @@ class _Profile_viewState extends State<Profile_view>
       return Obx(() {
         if (profileController.isLoading.value) {
           return buildLoadingWidget();
-        } else if (profile_controller().isError.value) {
+        } else if (profileController.isError.value) {
           return _buildMyBusinessesErrorWidget(
               'An error occurred while loading your businesses',
               profileController.reloadMyBusinesses);
@@ -287,17 +288,17 @@ class _Profile_viewState extends State<Profile_view>
       });
     }
 
-    Widget product_item_list(BuildContext context) {
+    Widget product_item_list() {
       return Obx(
         () {
-          if (profile_controller().isProductLoading.value) {
+          if (profileController.isProductLoading.value) {
             return buildLoadingWidget();
-          } else if (profile_controller().isProductError.value) {
+          } else if (profileController.isProductError.value) {
             return _buildMyProductsErrorWidget(
                 'An error occurred while loading your products', () {
-              profile_controller().loadMyProducts();
+              profile_controller().reloadMyBusinesses();
             });
-          } else if (profile_controller().productItemList.isEmpty) {
+          } else if (profileController.productItemList.isEmpty) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -310,21 +311,8 @@ class _Profile_viewState extends State<Profile_view>
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Get.to(() => add_product_view(shopId: shopId));
-                    showDialog(context: context, builder:
-                    (BuildContext ctx) {
-                      return ShopSelectionDialog(onShopSelected: (shop_) {
-                        print("Selected shop: ${shop_.id}");
-                        setState(() {
-                          shop = shop_;
-                        });
-                        // Navigator.of(context).pop();
-                        Get.back();
-                      }, desc: "Select a shop to add a product to");
-                    }
-                    ).then((_) {
-                      // This will execute after the dialog is closed
-                      Get.to(() => add_product_view(shop: shop));
+                    Get.to(() => add_product_view())?.then((_) {
+                      profile_controller().loadMyProducts();
                     });
 
                   },
@@ -347,7 +335,7 @@ class _Profile_viewState extends State<Profile_view>
                 profileController.reloadMyProducts();
               },
               child: GridView.builder(
-                key: const PageStorageKey('my-products'),
+                key: UniqueKey(),
                 controller: productScrollController,
                 itemCount: profileController.isProductLoading.value
                     ? profileController.productItemList.length + 1
@@ -368,10 +356,10 @@ class _Profile_viewState extends State<Profile_view>
                         Get.to(() => Product_view(item: item));
                       },
                       child: errandia_widget(
-                        cost: item['price'],
-                        imagePath: item['image'],
+                        cost: item['unit_price'].toString(),
+                        imagePath: item['featured_image'],
                         name: item['name'],
-                        location: item['location'],
+                        location: item['shop'] != null ? item['shop']['street'] : "",
                       ));
                 },
               ),
@@ -386,10 +374,10 @@ class _Profile_viewState extends State<Profile_view>
         () {
           if (profileController.isServiceLoading.value) {
             return buildLoadingWidget();
-          } else if (profile_controller().isServiceError.value) {
+          } else if (profileController.isServiceError.value) {
             return _buildMyServicesErrorWidget(
                 'An error occurred while loading your services', () {
-              profile_controller().loadMyServices();
+              profileController.loadMyServices();
             });
           } else if (profileController.serviceItemList.isEmpty) {
             return Column(
@@ -404,7 +392,9 @@ class _Profile_viewState extends State<Profile_view>
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Get.to(() => add_product_view(shopId: shopId));
+                    Get.to(() => add_service_view())?.then((_) {
+                      profileController.loadMyServices();
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     primary: appcolor().mainColor,
@@ -425,7 +415,7 @@ class _Profile_viewState extends State<Profile_view>
                 profileController.reloadMyServices();
               },
               child: GridView.builder(
-                key: const PageStorageKey('my-services'),
+                key: UniqueKey(),
                 controller: serviceScrollController,
                 itemCount: profileController.isServiceLoading.value
                     ? profileController.serviceItemList.length + 1
@@ -445,10 +435,10 @@ class _Profile_viewState extends State<Profile_view>
                       Get.to(() => ServiceDetailsView(service: item));
                     },
                     child: errandia_widget(
-                      cost: item['unit_price'],
+                      cost: item['unit_price'].toString(),
                       imagePath: item['featured_image'],
                       name: item['name'],
-                      location: item['street'],
+                      location: item['shop'] != null ? item['shop']['street'] : "",
                     ),
                   );
                 },
@@ -697,7 +687,7 @@ class _Profile_viewState extends State<Profile_view>
             child: TabBarView(
               controller: tabController,
               children: [
-                product_item_list(context),
+                product_item_list(),
                 Service_item_list(),
                 Buiseness_item_list()
               ],

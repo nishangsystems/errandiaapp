@@ -111,7 +111,7 @@ class profile_controller extends GetxController {
         productItemList.addAll(data['items']);
         print("productItemList: $productItemList");
       }
-      update();
+      // update();
     } catch (e) {
       isProductError.value = true;
       isProductLoading.value = false;
@@ -181,37 +181,37 @@ class profile_controller extends GetxController {
 
   List<errandia_widget> product_list = [
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/er2.png',
       name: 'wax',
       location: 'Akwa, Douala',
     ),
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/ui_23_item.png',
       name: 'wax',
       location: 'Akwa, Douala',
     ),
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/ui_23_item.png',
       name: 'wax',
       location: 'Akwa, Douala',
     ),
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/er2.png',
       name: 'hello',
       location: 'Akwa, Douala',
     ),
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/ui_23_item.png',
       name: 'wax',
       location: 'Akwa, Douala',
     ),
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/er2.png',
       name: 'hello',
       location: 'Akwa, Douala',
@@ -219,25 +219,25 @@ class profile_controller extends GetxController {
   ];
   List<errandia_widget> service_list = [
     errandia_widget(
-      cost: 'XAF 5000',
+      cost: '5000',
       imagePath: 'assets/images/service-image.png',
       name: 'Low Cut',
       location: 'Molyko, Buea',
     ),
     errandia_widget(
-      cost: 'XAF 5000',
+      cost: '5000',
       imagePath: 'assets/images/boy2.png',
       name: 'Hair Dye',
       location: 'Akwa, Douala',
     ),
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/boy3.png',
       name: 'Low cut',
       location: 'Molyko, Buea',
     ),
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/boy4.png',
       name: 'hair dye',
       location: 'Akwa, Douala',
@@ -246,19 +246,19 @@ class profile_controller extends GetxController {
 
   List<errandia_widget> Buiseness_list = [
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/er2.png',
       name: 'wax',
       location: 'Akwa, Douala',
     ),
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/ui_23_item.png',
       name: 'wax',
       location: 'Akwa, Douala',
     ),
     errandia_widget(
-      cost: 'XAF 1000',
+      cost: '1000',
       imagePath: 'assets/images/er2.png',
       name: 'wax',
       location: 'Akwa, Douala',

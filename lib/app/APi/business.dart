@@ -311,4 +311,35 @@ class BusinessAPI {
       return da;
     }
   }
+
+  // delete business
+  static Future deleteBusiness(String shopSlug) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    final response = await http.delete(Uri.parse('${apiDomain().domain}/user/shops/$shopSlug'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (kDebugMode) {
+      print("delete business response: ${response.body}");
+    }
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      var data_ = data;
+      if (kDebugMode) {
+        print("data: $data_");
+      }
+      var item = data_;
+      print("delete business response: $item");
+      // prefs.setString("business", jsonEncode(user));
+      // customSnackBar(Text('${data['message']}'));
+      return jsonEncode({'status': 'success', 'data': item});
+    } else {
+      var da = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'data': da});
+      // await alertDialogBox(context, 'Alert', '${da['data']['error']}');
+    }
+  }
 }

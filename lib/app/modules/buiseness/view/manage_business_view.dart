@@ -889,15 +889,15 @@ Widget Trashed() {
                                     context: context,
                                     builder: (context) {
                                       return AlertDialog(
-                                        insetPadding: EdgeInsets.symmetric(
+                                        insetPadding: const EdgeInsets.symmetric(
                                           horizontal: 10,
                                         ),
-                                        contentPadding: EdgeInsets.symmetric(
+                                        contentPadding: const EdgeInsets.symmetric(
                                           horizontal: 8,
                                           vertical: 20,
                                         ),
                                         scrollable: true,
-                                        content: Container(
+                                        content: SizedBox(
                                           // height: Get.height * 0.7,
                                           width: Get.width,
                                           child: Column(
@@ -915,10 +915,10 @@ Widget Trashed() {
                                                 ),
                                               ),
                                               Container(
-                                                margin: EdgeInsets.symmetric(
+                                                margin: const EdgeInsets.symmetric(
                                                   vertical: 15,
                                                 ),
-                                                child: Text(
+                                                child: const Text(
                                                   'Are you sure you want to Delete this Business ?',
                                                   textAlign: TextAlign.start,
                                                 ),
@@ -929,7 +929,7 @@ Widget Trashed() {
                                               Row(
                                                 children: [
                                                   Container(
-                                                    margin: EdgeInsets.only(
+                                                    margin: const EdgeInsets.only(
                                                       right: 10,
                                                     ),
                                                     decoration: BoxDecoration(
@@ -940,7 +940,7 @@ Widget Trashed() {
                                                     ),
                                                     width: Get.width * 0.16,
                                                     height: Get.height * 0.06,
-                                                    child: Image(
+                                                    child: const Image(
                                                       image: AssetImage(
                                                         'assets/images/barber_logo.png',
                                                       ),
@@ -980,14 +980,14 @@ Widget Trashed() {
                                               Column(
                                                 children: [
                                                   blockButton(
-                                                    title: Text(
+                                                    title: const Text(
                                                       'Delete Business',
                                                       style: TextStyle(
                                                           color: Colors.white),
                                                     ),
                                                     ontap: () {
                                                       Get.back();
-                                                      
+
                                                     },
                                                     color: appcolor().redColor,
                                                   ),
@@ -1005,7 +1005,7 @@ Widget Trashed() {
                                                     ontap: () {
                                                       Get.back();
                                                     },
-                                                    color: Color(0xfffafafa),
+                                                    color: const Color(0xfffafafa),
                                                   ),
                                                 ],
                                               )

@@ -51,7 +51,7 @@ dependencies:
   url_launcher: ^6.2.4
 
   #for image pick
-  image_picker: ^1.0.0  
+  image_picker: ^1.0.7
 
   #for date pick
   syncfusion_flutter_datepicker:
@@ -71,6 +71,7 @@ dependencies:
   path_provider: any
   awesome_dialog: ^3.2.0
   http_parser: any
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

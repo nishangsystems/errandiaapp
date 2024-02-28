@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/featured_buiseness/view/featured_list_item.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
@@ -7,7 +10,10 @@ import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/errands/view/search_errand_prod.dart';
 import 'package:errandia/app/modules/errands/view/see_all_erands.dart';
+import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
+import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/products/view/manage_products_view.dart';
@@ -28,7 +34,7 @@ import '../../recently_posted_item.dart/view/recently_posted_list.dart';
 class VisitShop extends StatefulWidget {
   late Map<String, dynamic> businessData;
 
-   VisitShop({super.key, required this.businessData});
+  VisitShop({super.key, required this.businessData});
 
   @override
   State<VisitShop> createState() => _VisitShopState();
@@ -38,6 +44,9 @@ class _VisitShopState extends State<VisitShop> {
   final business_controller controller = Get.put(business_controller());
   final profile_controller profileController = Get.put(profile_controller());
   final home_controller homeController = Get.put(home_controller());
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  late PopupBox popup;
 
   @override
   void initState() {
@@ -51,17 +60,17 @@ class _VisitShopState extends State<VisitShop> {
         widget.businessData['user']['id'];
     List<PopupMenuEntry<String>> menuItems = userIsOwner
         ? [
-      const PopupMenuItem<String>(
-          value: 'share',
-          child: Row(
-            children: [
-              Icon(Icons.share, size: 14, color: Colors.black),
-              SizedBox(
-                width: 5,
-              ),
-              Text('Share', style: TextStyle(fontSize: 15)),
-            ],
-          )),
+            // const PopupMenuItem<String>(
+            //     value: 'share',
+            //     child: Row(
+            //       children: [
+            //         Icon(Icons.share, size: 14, color: Colors.black),
+            //         SizedBox(
+            //           width: 5,
+            //         ),
+            //         Text('Share', style: TextStyle(fontSize: 15)),
+            //       ],
+            //     )),
             const PopupMenuItem<String>(
                 value: 'edit',
                 child: Row(
@@ -86,7 +95,7 @@ class _VisitShopState extends State<VisitShop> {
                 )),
           ]
         : [
-            const PopupMenuItem<String>(value: 'share', child: Text('Share')),
+            // const PopupMenuItem<String>(value: 'share', child: Text('Share')),
           ];
 
     showMenu<String>(
@@ -100,7 +109,8 @@ class _VisitShopState extends State<VisitShop> {
       if (value != null) {
         switch (value) {
           case 'edit':
-            Get.to(() => EditBusinessView(data: widget.businessData))?.then((value) {
+            Get.to(() => EditBusinessView(data: widget.businessData))
+                ?.then((value) {
               print("value update: $value");
               if (value != null) {
                 setState(() {
@@ -110,11 +120,77 @@ class _VisitShopState extends State<VisitShop> {
             });
             break;
           case 'delete':
-            // Handle delete action
+            showDialog(
+              context: context,
+              builder: (BuildContext dialogContext) {
+                // Use dialogContext
+                var response;
+                return CustomAlertDialog(
+                    title: "Delete Business",
+                    message: "Are you sure you want to delete this business?",
+                    dialogType: MyDialogType.error,
+                    onConfirm: () {
+                      // delete product
+                      print("delete business: ${widget.businessData['slug']}");
+                      BusinessAPI.deleteBusiness(widget.businessData['slug'])
+                          .then((response_) {
+                        if (response_ != null) {
+                          response = jsonDecode(response_);
+                          print("delete business response: $response");
+
+                          if (mounted) {
+                            // Check if the widget is still in the tree
+                            if (response["status"] == 'success') {
+                              Navigator.of(dialogContext)
+                                  .pop(); // Close the dialog
+                              Navigator.of(context)
+                                  .pop(true); // Navigate back with result
+
+                              // Show success popup
+                              popup = PopupBox(
+                                title: 'Success',
+                                description: response['data']['message'],
+                                type: PopupType.success,
+                              );
+                            } else {
+                              Navigator.of(dialogContext)
+                                  .pop(); // Close the dialog
+
+                              // Show error popup
+                              popup = PopupBox(
+                                title: 'Error',
+                                description: response['data']['data'],
+                                type: PopupType.error,
+                              );
+                            }
+
+                            popup.showPopup(context); // Show the popup
+                          }
+                        }
+                      });
+                    },
+                    onCancel: () {
+                      // cancel delete
+                      print("cancel delete");
+                      Navigator.of(dialogContext).pop(); // Close the dialog
+                    });
+              },
+            ).then((_) {
+              if (mounted) {
+                try {
+                  popup.dismissPopup(
+                      navigatorKey.currentContext!); // Dismiss the popup
+                } catch (e) {
+                  print("error dismissing popup: $e");
+                }
+                profileController.reloadMyBusinesses();
+                Get.back();
+              }
+            });
             break;
-          case 'share':
-            // Handle share action
-            break;
+          // case 'share':
+          //   // Handle share action
+          //   break;
         }
       }
     });
@@ -133,7 +209,8 @@ class _VisitShopState extends State<VisitShop> {
         return true;
       },
       child: Scaffold(
-          appBar: titledAppBar(capitalizeAll(widget.businessData['name'] ?? ''), [
+          appBar:
+              titledAppBar(capitalizeAll(widget.businessData['name'] ?? ''), [
             IconButton(
               onPressed: () {},
               icon: const Icon(
@@ -183,110 +260,110 @@ class _VisitShopState extends State<VisitShop> {
                   ],
                 ).paddingOnly(top: 20, left: 15, right: 15),
 
-                Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  child: InkWell(
-                    onTap: () {
-                      // errandia_view_bottomsheet();
-                    },
-                    child: Container(
-                      height: Get.height * 0.08,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color(0xffe6edf7),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Unfollow Shop',
-                          style: TextStyle(
-                              fontSize: 16, color: appcolor().bluetextcolor),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 15, right: 15),
+                //   child: InkWell(
+                //     onTap: () {
+                //       // errandia_view_bottomsheet();
+                //     },
+                //     child: Container(
+                //       height: Get.height * 0.08,
+                //       decoration: BoxDecoration(
+                //         borderRadius: BorderRadius.circular(10),
+                //         color: const Color(0xffe6edf7),
+                //       ),
+                //       child: Center(
+                //         child: Text(
+                //           'Unfollow Shop',
+                //           style: TextStyle(
+                //               fontSize: 16, color: appcolor().bluetextcolor),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
 
-                SizedBox(
-                  height: Get.height * 0.025,
-                ),
-
-                // follow us on social media
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 15, right: 15),
-                      child: Text(
-                        'Follow us on social media',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    // fb
-                    InkWell(
-                      onTap: () async {
-                        controller.myLaunchUrl('www.bmdu.net');
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            8,
-                          ),
-                        ),
-                        padding: const EdgeInsets.only(
-                          left: 5,
-                        ),
-                        child: Icon(
-                          FontAwesomeIcons.squareFacebook,
-                          color: appcolor().bluetextcolor,
-                        ),
-                      ),
-                    ),
-
-                    // insta
-                    InkWell(
-                      onTap: () async {
-                        controller.myLaunchUrl('www.google.com');
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            8,
-                          ),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 5,
-                        ),
-                        child: const Icon(
-                          FontAwesomeIcons.instagram,
-                          color: Colors.pink,
-                        ),
-                      ),
-                    ),
-
-                    // twitter
-                    InkWell(
-                      onTap: () async {
-                        controller.myLaunchUrl('www.instagram.com');
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            8,
-                          ),
-                        ),
-                        child: Icon(
-                          FontAwesomeIcons.squareTwitter,
-                          color: appcolor().bluetextcolor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(
-                  height: Get.height * 0.03,
-                ),
+                // SizedBox(
+                //   height: Get.height * 0.025,
+                // ),
+                //
+                // // follow us on social media
+                // Row(
+                //   children: [
+                //     const Padding(
+                //       padding: EdgeInsets.only(left: 15, right: 15),
+                //       child: Text(
+                //         'Follow us on social media',
+                //         style: TextStyle(
+                //           fontSize: 16,
+                //         ),
+                //       ),
+                //     ),
+                //     // fb
+                //     InkWell(
+                //       onTap: () async {
+                //         controller.myLaunchUrl('www.bmdu.net');
+                //       },
+                //       child: Container(
+                //         decoration: BoxDecoration(
+                //           borderRadius: BorderRadius.circular(
+                //             8,
+                //           ),
+                //         ),
+                //         padding: const EdgeInsets.only(
+                //           left: 5,
+                //         ),
+                //         child: Icon(
+                //           FontAwesomeIcons.squareFacebook,
+                //           color: appcolor().bluetextcolor,
+                //         ),
+                //       ),
+                //     ),
+                //
+                //     // insta
+                //     InkWell(
+                //       onTap: () async {
+                //         controller.myLaunchUrl('www.google.com');
+                //       },
+                //       child: Container(
+                //         decoration: BoxDecoration(
+                //           borderRadius: BorderRadius.circular(
+                //             8,
+                //           ),
+                //         ),
+                //         padding: const EdgeInsets.symmetric(
+                //           horizontal: 5,
+                //         ),
+                //         child: const Icon(
+                //           FontAwesomeIcons.instagram,
+                //           color: Colors.pink,
+                //         ),
+                //       ),
+                //     ),
+                //
+                //     // twitter
+                //     InkWell(
+                //       onTap: () async {
+                //         controller.myLaunchUrl('www.instagram.com');
+                //       },
+                //       child: Container(
+                //         decoration: BoxDecoration(
+                //           borderRadius: BorderRadius.circular(
+                //             8,
+                //           ),
+                //         ),
+                //         child: Icon(
+                //           FontAwesomeIcons.squareTwitter,
+                //           color: appcolor().bluetextcolor,
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                //
+                // SizedBox(
+                //   height: Get.height * 0.03,
+                // ),
 
                 Container(
                   color: Colors.white,
@@ -399,68 +476,112 @@ class _VisitShopState extends State<VisitShop> {
 }
 
 Widget product_review_widget(Map<String, dynamic> data) {
-  return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(
-      data['name'].toString(),
-      style: const TextStyle(
-        fontSize: 17,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-    data['street'] != null
-        ? Text(
-            data['street'],
-            style: const TextStyle(),
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              capitalizeAll(data['name'].toString() ?? ''),
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            data['street'] != null
+                ? Text(
+              data['street'],
+              style: const TextStyle(),
+            )
+                : const Text(
+              'No street provided',
+              style: TextStyle(
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            // Row(
+            //   children: [
+            //     Icon(
+            //       Icons.person,
+            //       size: 18,
+            //       color: appcolor().mediumGreyColor,
+            //     ),
+            //     Text(
+            //       '  Member Since 2010',
+            //       style: TextStyle(
+            //         fontSize: 13,
+            //         color: appcolor().mediumGreyColor,
+            //       ),
+            //     ),
+            //     const Spacer(),
+            //     RatingBar.builder(
+            //       initialRating: 3.5,
+            //       allowHalfRating: true,
+            //       ignoreGestures: true,
+            //       itemSize: 18,
+            //       itemBuilder: (context, index) {
+            //         return const Icon(
+            //           Icons.star_rate_rounded,
+            //           color: Colors.amber,
+            //         );
+            //       },
+            //       onRatingUpdate: (val) {},
+            //     ),
+            //     Text(
+            //       '10 Reviews',
+            //       style: TextStyle(
+            //         fontSize: 11,
+            //         color: appcolor().mediumGreyColor,
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+          ]),
+
+      // region and town
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+         data['region'] != null || data['region'].toString() != 'null'
+              ? Text(
+            data['region']['name'],
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[800],
+            ),
           )
-        : const Text(
-            'No street provided',
+              : const Text(
+            'No region provided',
             style: TextStyle(
               color: Colors.grey,
               fontStyle: FontStyle.italic,
             ),
           ),
-    const SizedBox(
-      height: 5,
-    ),
-    Row(
-      children: [
-        Icon(
-          Icons.person,
-          size: 18,
-          color: appcolor().mediumGreyColor,
-        ),
-        Text(
-          '  Member Since 2010',
-          style: TextStyle(
-            fontSize: 13,
-            color: appcolor().mediumGreyColor,
+          data['town'] != null || data['town'].toString() != 'null'
+              ? Text(
+            data['town']['name'],
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
+            ),
+          )
+              : const Text(
+            'No town provided',
+            style: TextStyle(
+              color: Colors.grey,
+              fontStyle: FontStyle.italic,
+            ),
           ),
-        ),
-        const Spacer(),
-        RatingBar.builder(
-          initialRating: 3.5,
-          allowHalfRating: true,
-          ignoreGestures: true,
-          itemSize: 18,
-          itemBuilder: (context, index) {
-            return const Icon(
-              Icons.star_rate_rounded,
-              color: Colors.amber,
-            );
-          },
-          onRatingUpdate: (val) {},
-        ),
-        Text(
-          '10 Reviews',
-          style: TextStyle(
-            fontSize: 11,
-            color: appcolor().mediumGreyColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    ),
-  ]);
+        ],
+      ),
+    ],
+  );
 }
 
 Widget product_item_list() {

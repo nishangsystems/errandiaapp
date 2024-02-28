@@ -38,15 +38,18 @@ class _add_business_viewState extends State<add_business_view> {
       Get.put(add_business_controller());
   final imagePickercontroller imageController =
       Get.put(imagePickercontroller());
+  final profile_controller profileController = Get.put(profile_controller());
 
   var country;
-  var value = null;
+  // var value = null;
   var regionCode;
   bool isLoading = false;
   List<String> selectedFilters = [];
   List<int> selectedFilters_ = [];
   var town;
   var category;
+  // var regionValue;
+  // var townValue;
 
   @override
   void initState() {
@@ -54,12 +57,184 @@ class _add_business_viewState extends State<add_business_view> {
     add_controller.loadCategories();
   }
 
+  void createBusiness(BuildContext context) {
+    var name =
+    add_controller.company_name_controller.text.toString();
+    var description = add_controller
+        .description_controller.text
+        .toString();
+    var websiteAddress =
+    add_controller.website_address_controller.text.toString();
+    var address = add_controller.address_controller.text.toString();
+    // var facebook =
+    //     add_controller.facebook_controller.text.toString();
+    // var instagram =
+    //     add_controller.instagram_controller.text.toString();
+    // var twitter = add_controller.twitter_controller.text.toString();
+    var businessInfo = add_controller
+        .Business_information_controller.text
+        .toString();
+    var phone = add_controller.phone_controller.text.toString();
+    // var categories =
+    //     add_controller.Business_category_controller.text.toString();
+    var email = add_controller.email_controller.text.toString();
+
+    if (name == '') {
+      alertDialogBox(context, "Error", 'Please enter company name');
+    } else if (category == null) {
+      alertDialogBox(context, "Error", 'Please select category');
+    } else if (description == '') {
+      alertDialogBox(context, "Error", 'Please enter description');
+    } else if (phone == '') {
+      alertDialogBox(context, "Error", 'Please enter phone number');
+    } else if (email == '') {
+      alertDialogBox(context, "Error", 'Please enter an email address');
+    } else if (add_controller.emailValid.value == false) {
+      alertDialogBox(context, "Error", 'Please enter a valid email address');
+    } else if (regionCode == null) {
+      alertDialogBox(context, "Error", 'Please select region');
+    } else {
+      var file = "";
+
+      for (int i = 1; i < selectedFilters_.length; i++) {
+        file = "$file,${selectedFilters_[i]}";
+      }
+      if (kDebugMode) {
+        print("logo to upload: $file");
+      }
+
+      setState(() {
+        isLoading = true;
+      });
+
+      var value = {
+        "name": name,
+        "description": description,
+        "slogan": businessInfo,
+        "phone": phone,
+        "whatsapp": "whatsapp",
+        "category_id": category.toString(),
+        // "image_path": imageController.image_path.toString(),
+        "street": address ?? "",
+        "email": email ?? "",
+        // "facebook": facebook,
+        // "instagram": instagram,
+        // "twitter": twitter,
+        "website": websiteAddress ?? "",
+      };
+
+      if (regionCode != null) {
+        value['region_id'] = regionCode.toString();
+      }
+
+      if (town != null) {
+        value['town_id'] = town.toString();
+      }
+
+      PopupBox popup;
+      var response;
+
+      // check if logo image is empty
+      if (imageController.image_path.toString() == '') {
+        BusinessAPI.createBusiness(value, context)
+            .then((response_) => {
+          response = jsonDecode(response_),
+          print("added business: $response"),
+          if (response['status'] == 'success')
+            {
+              popup = PopupBox(
+                title: 'Success',
+                description: response['data']['message'],
+                type: PopupType.success,
+              ),
+              // reset all form fields
+              add_controller.resetFields(),
+              setState(() {
+                regionCode = null;
+                town = null;
+                category = null;
+                selectedFilters_.clear();
+              }),
+              imageController.reset(),
+              // home_controller()
+              //     .featuredBusinessData
+              //     .clear(),
+              // home_controller()
+              //     .fetchFeaturedBusinessesData(),
+              profileController.reloadMyBusinesses(),
+            }
+          else
+            {
+              popup = PopupBox(
+                title: 'Error',
+                description: response['data']['data']
+                ['error'],
+                type: PopupType.error,
+              )
+            },
+          Future.delayed(const Duration(seconds: 2), () {
+            setState(() {
+              isLoading = false;
+            });
+          }),
+          popup.showPopup(context),
+        });
+      } else {
+        print(
+            "image path: ${imageController.image_path.toString()}");
+        BusinessAPI.createBusinessWithImageLogo(value, context,
+            imageController.image_path.toString())
+            .then((response_) => {
+          response = jsonDecode(response_),
+          print("added business: $response"),
+          if (response['status'] == 'success')
+            {
+              popup = PopupBox(
+                title: 'Success',
+                description: response['data']['message'],
+                type: PopupType.success,
+              ),
+              add_controller.resetFields(),
+              setState(() {
+                regionCode = null;
+                town = null;
+                category = null;
+                selectedFilters_.clear();
+              }),
+              imageController.reset(),
+              // home_controller()
+              //     .featuredBusinessData
+              //     .clear(),
+              // home_controller()
+              //     .fetchFeaturedBusinessesData(),
+              profileController.reloadMyBusinesses(),
+            }
+          else
+            {
+              popup = PopupBox(
+                title: 'Error',
+                description: response['data']['data']
+                ['error'],
+                type: PopupType.error,
+              )
+            },
+          Future.delayed(const Duration(seconds: 3), () {
+            setState(() {
+              isLoading = false;
+            });
+          }),
+          popup.showPopup(context),
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
         Get.back();
-        profile_controller().reloadMyBusinesses();
+        profileController.reloadMyBusinesses();
         return true;
       },
       child: Scaffold(
@@ -84,173 +259,7 @@ class _add_business_viewState extends State<add_business_view> {
           actions: [
             TextButton(
                 onPressed: () {
-                  var name =
-                      add_controller.company_name_controller.text.toString();
-                  var description = add_controller
-                      .description_controller.text
-                      .toString();
-                  var websiteAddress =
-                      add_controller.website_address_controller.text.toString();
-                  var address = add_controller.address_controller.text.toString();
-                  // var facebook =
-                  //     add_controller.facebook_controller.text.toString();
-                  // var instagram =
-                  //     add_controller.instagram_controller.text.toString();
-                  // var twitter = add_controller.twitter_controller.text.toString();
-                  var businessInfo = add_controller
-                      .Business_information_controller.text
-                      .toString();
-                  var phone = add_controller.phone_controller.text.toString();
-                  // var categories =
-                  //     add_controller.Business_category_controller.text.toString();
-                  var email = add_controller.email_controller.text.toString();
-
-                  if (name == '') {
-                    alertDialogBox(context, "Error", 'Please enter company name');
-                  } else if (category == null) {
-                    alertDialogBox(context, "Error", 'Please select category');
-                  } else if (description == '') {
-                    alertDialogBox(context, "Error", 'Please enter description');
-                  } else if (phone == '') {
-                    alertDialogBox(context, "Error", 'Please enter phone number');
-                  } else if (email == '') {
-                    alertDialogBox(context, "Error", 'Please enter an email address');
-                  } else if (regionCode == null) {
-                    alertDialogBox(context, "Error", 'Please select region');
-                  } else {
-                    var file = "";
-
-                    for (int i = 1; i < selectedFilters_.length; i++) {
-                      file = "$file,${selectedFilters_[i]}";
-                    }
-                    if (kDebugMode) {
-                      print("logo to upload: $file");
-                    }
-
-                    setState(() {
-                      isLoading = true;
-                    });
-
-                    var value = {
-                      "name": name,
-                      "description": description,
-                      "slogan": businessInfo,
-                      "phone": phone,
-                      "whatsapp": "whatsapp",
-                      "category_id": category.toString(),
-                      // "image_path": imageController.image_path.toString(),
-                      "street": address ?? "",
-                      "email": email ?? "",
-                      // "facebook": facebook,
-                      // "instagram": instagram,
-                      // "twitter": twitter,
-                      "website": websiteAddress ?? "",
-                    };
-
-                    if (regionCode != null) {
-                      value['region_id'] = regionCode.toString();
-                    }
-
-                    if (town != null) {
-                      value['town_id'] = town.toString();
-                    }
-
-                    PopupBox popup;
-                    var response;
-
-                    // check if logo image is empty
-                    if (imageController.image_path.toString() == '') {
-                      BusinessAPI.createBusiness(value, context)
-                          .then((response_) => {
-                                response = jsonDecode(response_),
-                                print("added business: $response"),
-                                if (response['status'] == 'success')
-                                  {
-                                    popup = PopupBox(
-                                      title: 'Success',
-                                      description: response['data']['message'],
-                                      type: PopupType.success,
-                                    ),
-                                    // reset all form fields
-                                    add_controller.resetFields(),
-                                    setState(() {
-                                      regionCode = null;
-                                      town = null;
-                                      category = null;
-                                      selectedFilters_.clear();
-                                    }),
-                                    imageController.reset(),
-                                    // home_controller()
-                                    //     .featuredBusinessData
-                                    //     .clear(),
-                                    // home_controller()
-                                    //     .fetchFeaturedBusinessesData(),
-                                    // profile_controller().reloadMyBusinesses(),
-                                  }
-                                else
-                                  {
-                                    popup = PopupBox(
-                                      title: 'Error',
-                                      description: response['data']['data']
-                                          ['error'],
-                                      type: PopupType.error,
-                                    )
-                                  },
-                                Future.delayed(const Duration(seconds: 3), () {
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                }),
-                                popup.showPopup(context),
-                              });
-                    } else {
-                      print(
-                          "image path: ${imageController.image_path.toString()}");
-                      BusinessAPI.createBusinessWithImageLogo(value, context,
-                              imageController.image_path.toString())
-                          .then((response_) => {
-                                response = jsonDecode(response_),
-                                print("added business: $response"),
-                                if (response['status'] == 'success')
-                                  {
-                                    popup = PopupBox(
-                                      title: 'Success',
-                                      description: response['data']['message'],
-                                      type: PopupType.success,
-                                    ),
-                                    add_controller.resetFields(),
-                                    setState(() {
-                                      regionCode = null;
-                                      town = null;
-                                      category = null;
-                                      selectedFilters_.clear();
-                                    }),
-                                    imageController.reset(),
-                                    // home_controller()
-                                    //     .featuredBusinessData
-                                    //     .clear(),
-                                    // home_controller()
-                                    //     .fetchFeaturedBusinessesData(),
-                                    // profile_controller().reloadMyBusinesses(),
-                                  }
-                                else
-                                  {
-                                    popup = PopupBox(
-                                      title: 'Error',
-                                      description: response['data']['data']
-                                          ['error'],
-                                      type: PopupType.error,
-                                    )
-                                  },
-                                Future.delayed(const Duration(seconds: 3), () {
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                }),
-                                popup.showPopup(context),
-                              });
-                    }
-                  }
+                  createBusiness(context);
                 },
                 child: const Text(
                   'Publish',
@@ -340,7 +349,7 @@ class _add_business_viewState extends State<add_business_view> {
                           color: Colors.black,
                         ),
                       ),
-                      value: value,
+                      value: category,
                       onChanged: (value) {
                         setState(() {
                           category = value as int;
@@ -551,7 +560,7 @@ class _add_business_viewState extends State<add_business_view> {
 
                                                     }
                                                   },
-                                                  color: Color(0xfffafafa),
+                                                  color: const Color(0xfffafafa),
                                                 ),
                                               ],
                                             )
@@ -626,7 +635,7 @@ class _add_business_viewState extends State<add_business_view> {
                                               height: Get.height * 0.32,
                                               width: Get.width * 0.9,
                                               fit: BoxFit.fill,
-                                            ).paddingSymmetric(horizontal: 60);
+                                            ).paddingSymmetric(horizontal: 50);
                                           }
                                       ),
                                       SizedBox(
@@ -759,6 +768,14 @@ class _add_business_viewState extends State<add_business_view> {
                     child: TextFormField(
                       controller: add_controller.email_controller,
                       keyboardType: TextInputType.emailAddress,
+                      onChanged: (val) {
+                        // if it's a valid email address
+                        if (val.contains('@') && val.contains('.')) {
+                          add_controller.emailValid.value = true;
+                        } else {
+                          add_controller.emailValid.value = false;
+                        }
+                      },
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
@@ -775,6 +792,23 @@ class _add_business_viewState extends State<add_business_view> {
                         ),
                       ),
                     ),
+                  ),
+
+                  // show invalid email error
+                  Obx(
+                    () => add_controller.emailValid.value
+                        ? Container()
+                        : Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 5),
+                            child: const Text(
+                              'Invalid email address',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
                   ),
 
                   // shop head
@@ -861,7 +895,7 @@ class _add_business_viewState extends State<add_business_view> {
                           color: Colors.black,
                         ),
                       ),
-                      value: value,
+                      value: regionCode,
                       onChanged: (value) async {
                         setState(() {
                           regionCode = value as int;
@@ -915,7 +949,7 @@ class _add_business_viewState extends State<add_business_view> {
                                   ? Colors.grey
                                   : Colors.black),
                         ),
-                        value: value,
+                        value: town,
                         onChanged: (value) {
                           setState(() {
                             town = value as int;

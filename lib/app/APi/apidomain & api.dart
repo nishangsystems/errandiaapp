@@ -105,7 +105,7 @@ class api {
     }
   }
 
-  Future productnew(String url, int value) async {
+  Future getErrands(String url, int value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token;
     if (value == 1) {
@@ -117,10 +117,16 @@ class api {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token'
         }));
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      // print(data);
+      if (kDebugMode) {
+        print("errands: $data");
+      }
       return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
     }
   }
 

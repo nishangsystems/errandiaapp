@@ -1,31 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:errandia/app/APi/business.dart';
+import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
+import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/modal/category.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
-import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
-import 'package:errandia/app/modules/global/constants/color.dart';
-import 'package:errandia/modal/subcatgeory.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../modal/Region.dart';
-import '../../../../modal/Street.dart';
 import '../../../../modal/Town.dart';
-import '../../../APi/apidomain & api.dart';
 import '../../../AlertDialogBox/alertBoxContent.dart';
 import '../../global/Widgets/blockButton.dart';
 import '../controller/add_business_controller.dart';
-import 'manage_business_view.dart';
-
-business_controller controller = Get.put(business_controller());
-add_business_controller add_controller = Get.put(add_business_controller());
-imagePickercontroller imageController = Get.put(imagePickercontroller());
 
 class EditBusinessView extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -43,7 +35,6 @@ class EditBusinessViewState extends State<EditBusinessView> {
   Get.put(imagePickercontroller());
 
   var country;
-  var value = null;
   var regionCode;
   bool isLoading = false;
   List<String> selectedFilters = [];
@@ -51,11 +42,14 @@ class EditBusinessViewState extends State<EditBusinessView> {
   var town;
   var category;
 
+  String? businessTitle;
+
   Map<String, dynamic> updatedData = {};
 
   void initState() {
     super.initState();
     add_controller.loadCategories();
+    businessTitle = capitalizeAll(widget.data['name']) ?? "Edit Business";
     add_controller.company_name_controller.text = widget.data['name'] ?? '';
     add_controller.Business_information_controller.text =
         widget.data['description'] ?? '';
@@ -79,6 +73,170 @@ class EditBusinessViewState extends State<EditBusinessView> {
 
   }
 
+  void updateBusiness(BuildContext context) {
+    var name =
+    add_controller.company_name_controller.text.toString();
+    var description = add_controller
+        .description_controller.text
+        .toString();
+    var websiteAddress =
+    add_controller.website_address_controller.text.toString();
+    var address = add_controller.address_controller.text.toString();
+    var facebook =
+    add_controller.facebook_controller.text.toString();
+    var instagram =
+    add_controller.instagram_controller.text.toString();
+    var twitter = add_controller.twitter_controller.text.toString();
+    var businessInfo = add_controller
+        .Business_information_controller.text
+        .toString();
+    var phone = add_controller.phone_controller.text.toString();
+    // var categories =
+    //     add_controller.Business_category_controller.text.toString();
+    var email = add_controller.email_controller.text.toString();
+
+    if (name == '') {
+      alertDialogBox(context, "Error", 'Please enter company name');
+    } else if (category == null) {
+      alertDialogBox(context, "Error", 'Please select category');
+    } else if (description == '') {
+      alertDialogBox(context, "Error", 'Please enter description');
+    } else if (phone == '') {
+      alertDialogBox(context, "Error", 'Please enter phone number');
+    } else if (email == '') {
+      alertDialogBox(context, "Error", 'Please enter an email address');
+    } else if (regionCode == null) {
+      alertDialogBox(context, "Error", 'Please select region');
+    } else {
+      var file = "";
+
+      for (int i = 1; i < selectedFilters_.length; i++) {
+        file = "$file,${selectedFilters_[i]}";
+      }
+      if (kDebugMode) {
+        print("logo to upload: $file");
+      }
+
+      setState(() {
+        isLoading = true;
+      });
+
+      var value = {
+        "name": name,
+        "description": description,
+        "slogan": businessInfo,
+        "phone": phone,
+        "whatsapp": "whatsapp",
+        "category_id": category.toString(),
+        // "image_path": imageController.image_path.toString(),
+        "street": address ?? "",
+        "email": email ?? "",
+        // "facebook": facebook,
+        // "instagram": instagram,
+        // "twitter": twitter,
+        "website": websiteAddress ?? "",
+      };
+
+      if (regionCode != null) {
+        value['region_id'] = regionCode.toString();
+      }
+
+      if (town != null) {
+        value['town_id'] = town.toString();
+      }
+
+      if (facebook != '') {
+        value['facebook'] = facebook;
+      }
+
+      if (instagram != '') {
+        value['instagram'] = instagram;
+      }
+
+      if (twitter != '') {
+        value['twitter'] = twitter;
+      }
+
+      PopupBox popup;
+      var response;
+
+      // check if logo image is empty
+      if (imageController.image_path.toString() == '') {
+        BusinessAPI.updateBusiness(value, context, widget.data['slug'])
+            .then((response_) => {
+          response = jsonDecode(response_),
+          print("added business: $response"),
+          if (response['status'] == 'success')
+            {
+              popup = PopupBox(
+                title: 'Success',
+                description: response['data']['message'],
+                type: PopupType.success,
+              ),
+
+              setState(() {
+                updatedData = response['data']['data']['item'];
+                businessTitle = updatedData['name'];
+              }),
+              print('updated: ${response['data']['data']['item']}'),
+            }
+          else
+            {
+              popup = PopupBox(
+                title: 'Error',
+                description: response['data']['data']
+                ['error'],
+                type: PopupType.error,
+              )
+            },
+          Future.delayed(const Duration(seconds: 3), () {
+            setState(() {
+              isLoading = false;
+            });
+          }),
+          popup.showPopup(context),
+        });
+      } else {
+        print(
+            "image path: ${imageController.image_path.toString()}");
+        BusinessAPI.updateBusinessWithImageLogo(value, context,
+            imageController.image_path.toString(), widget.data['slug'])
+            .then((response_) => {
+          response = jsonDecode(response_),
+          print("added business: $response"),
+          if (response['status'] == 'success')
+            {
+              popup = PopupBox(
+                title: 'Success',
+                description: response['data']['message'],
+                type: PopupType.success,
+              ),
+              setState(() {
+                updatedData = response['data']['data']['item'];
+                businessTitle = updatedData['name'];
+              }),
+              print('updated: ${response['data']['data']['item']}'),
+            }
+          else
+            {
+              popup = PopupBox(
+                title: 'Error',
+                description: response['data']['data']
+                ['error'],
+                type: PopupType.error,
+              )
+            },
+          Future.delayed(const Duration(seconds: 3), () {
+            setState(() {
+              isLoading = false;
+            });
+          }),
+          popup.showPopup(context),
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print("Edit Data: ${widget.data}");
@@ -92,11 +250,11 @@ class EditBusinessViewState extends State<EditBusinessView> {
           elevation: 0,
           backgroundColor: Colors.white,
           titleSpacing: 8,
-          title: Text(capitalizeAll(widget.data['name'])),
+          title: Text(businessTitle!),
           titleTextStyle: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
               color: appcolor().mediumGreyColor,
-              fontSize: 18),
+              fontSize: 20),
           automaticallyImplyLeading: false,
           leading: IconButton(
             padding: EdgeInsets.zero,
@@ -104,170 +262,12 @@ class EditBusinessViewState extends State<EditBusinessView> {
               Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios),
-            color: appcolor().greyColor,
+            color: appcolor().mediumGreyColor,
           ),
           actions: [
             TextButton(
                 onPressed: () {
-                  var name =
-                  add_controller.company_name_controller.text.toString();
-                  var description = add_controller
-                      .description_controller.text
-                      .toString();
-                  var websiteAddress =
-                  add_controller.website_address_controller.text.toString();
-                  var address = add_controller.address_controller.text.toString();
-                  var facebook =
-                      add_controller.facebook_controller.text.toString();
-                  var instagram =
-                      add_controller.instagram_controller.text.toString();
-                  var twitter = add_controller.twitter_controller.text.toString();
-                  var businessInfo = add_controller
-                      .Business_information_controller.text
-                      .toString();
-                  var phone = add_controller.phone_controller.text.toString();
-                  // var categories =
-                  //     add_controller.Business_category_controller.text.toString();
-                  var email = add_controller.email_controller.text.toString();
-
-                  if (name == '') {
-                    alertDialogBox(context, "Error", 'Please enter company name');
-                  } else if (category == null) {
-                    alertDialogBox(context, "Error", 'Please select category');
-                  } else if (description == '') {
-                    alertDialogBox(context, "Error", 'Please enter description');
-                  } else if (phone == '') {
-                    alertDialogBox(context, "Error", 'Please enter phone number');
-                  } else if (email == '') {
-                    alertDialogBox(context, "Error", 'Please enter an email address');
-                  } else if (regionCode == null) {
-                    alertDialogBox(context, "Error", 'Please select region');
-                  } else {
-                    var file = "";
-
-                    for (int i = 1; i < selectedFilters_.length; i++) {
-                      file = "$file,${selectedFilters_[i]}";
-                    }
-                    if (kDebugMode) {
-                      print("logo to upload: $file");
-                    }
-
-                    setState(() {
-                      isLoading = true;
-                    });
-
-                    var value = {
-                      "name": name,
-                      "description": description,
-                      "slogan": businessInfo,
-                      "phone": phone,
-                      "whatsapp": "whatsapp",
-                      "category_id": category.toString(),
-                      // "image_path": imageController.image_path.toString(),
-                      "street": address ?? "",
-                      "email": email ?? "",
-                      // "facebook": facebook,
-                      // "instagram": instagram,
-                      // "twitter": twitter,
-                      "website": websiteAddress ?? "",
-                    };
-
-                    if (regionCode != null) {
-                      value['region_id'] = regionCode.toString();
-                    }
-
-                    if (town != null) {
-                      value['town_id'] = town.toString();
-                    }
-
-                    if (facebook != '') {
-                      value['facebook'] = facebook;
-                    }
-
-                    if (instagram != '') {
-                      value['instagram'] = instagram;
-                    }
-
-                    if (twitter != '') {
-                      value['twitter'] = twitter;
-                    }
-
-                    PopupBox popup;
-                    var response;
-
-                    // check if logo image is empty
-                    if (imageController.image_path.toString() == '') {
-                      BusinessAPI.updateBusiness(value, context, widget.data['slug'])
-                          .then((response_) => {
-                        response = jsonDecode(response_),
-                        print("added business: $response"),
-                        if (response['status'] == 'success')
-                          {
-                            popup = PopupBox(
-                              title: 'Success',
-                              description: response['data']['message'],
-                              type: PopupType.success,
-                            ),
-
-                            setState(() {
-                              updatedData = response['data']['data']['item'];
-                            }),
-                            print('updated: ${response['data']['data']['item']}'),
-                          }
-                        else
-                          {
-                            popup = PopupBox(
-                              title: 'Error',
-                              description: response['data']['data']
-                              ['error'],
-                              type: PopupType.error,
-                            )
-                          },
-                        Future.delayed(const Duration(seconds: 3), () {
-                          setState(() {
-                            isLoading = false;
-                          });
-                        }),
-                        popup.showPopup(context),
-                      });
-                    } else {
-                      print(
-                          "image path: ${imageController.image_path.toString()}");
-                      BusinessAPI.updateBusinessWithImageLogo(value, context,
-                          imageController.image_path.toString(), widget.data['slug'])
-                          .then((response_) => {
-                        response = jsonDecode(response_),
-                        print("added business: $response"),
-                        if (response['status'] == 'success')
-                          {
-                            popup = PopupBox(
-                              title: 'Success',
-                              description: response['data']['message'],
-                              type: PopupType.success,
-                            ),
-                            setState(() {
-                              updatedData = response['data']['data']['item'];
-                            }),
-                            print('updated: ${response['data']['data']['item']}'),
-                          }
-                        else
-                          {
-                            popup = PopupBox(
-                              title: 'Error',
-                              description: response['data']['data']
-                              ['error'],
-                              type: PopupType.error,
-                            )
-                          },
-                        Future.delayed(const Duration(seconds: 3), () {
-                          setState(() {
-                            isLoading = false;
-                          });
-                        }),
-                        popup.showPopup(context),
-                      });
-                    }
-                  }
+                  updateBusiness(context);
                 },
                 child: const Text(
                   'UPDATE',
