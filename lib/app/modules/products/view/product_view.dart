@@ -960,32 +960,32 @@ Widget product_review_widget(item) {
     ),
     Row(
       children: [
-        RatingBar.builder(
-          itemCount: 5,
-          direction: Axis.horizontal,
-          initialRating: 1,
-          itemSize: 22,
-          maxRating: 5,
-          allowHalfRating: true,
-          glow: true,
-          itemBuilder: (context, _) {
-            return const Icon(
-              Icons.star,
-              color: Colors.amber,
-            );
-          },
-          onRatingUpdate: (value) {
-            debugPrint(value.toString());
-          },
-        ),
+        // RatingBar.builder(
+        //   itemCount: 5,
+        //   direction: Axis.horizontal,
+        //   initialRating: 1,
+        //   itemSize: 22,
+        //   maxRating: 5,
+        //   allowHalfRating: true,
+        //   glow: true,
+        //   itemBuilder: (context, _) {
+        //     return const Icon(
+        //       Icons.star,
+        //       color: Colors.amber,
+        //     );
+        //   },
+        //   onRatingUpdate: (value) {
+        //     debugPrint(value.toString());
+        //   },
+        // ),
         SizedBox(
           width: Get.width * 0.01,
         ),
-        Text(
-          // '${item['reviews']} Supplier Reviews',
-          '{} Supplier Reviews',
-          style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
-        ),
+        // Text(
+        //   // '${item['reviews']} Supplier Reviews',
+        //   '{} Supplier Reviews',
+        //   style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
+        // ),
       ],
     ),
   ]).paddingOnly(left: 15, right: 15);
