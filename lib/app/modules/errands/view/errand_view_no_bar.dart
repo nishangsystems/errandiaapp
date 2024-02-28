@@ -215,8 +215,8 @@ Widget PostedErrands(BuildContext ctx) {
             child: Text('No data Fond'),
           );
         } else if (snapshot.hasData) {
-          print("snapshot: ${snapshot.data[0]['items']}");
-          var data = snapshot.data[0]['items'];
+          print("snapshot: ${snapshot.data['items']}");
+          var data = snapshot.data['items'];
           return Column(
             children: [
               filter_sort_container(

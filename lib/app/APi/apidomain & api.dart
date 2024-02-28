@@ -130,8 +130,7 @@ class api {
     }
   }
 
-  Future getProduct(String url,
-      int value,) async {
+  Future getProduct(String url, int value,) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token;
     if (value == 1) {
