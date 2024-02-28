@@ -172,6 +172,65 @@ class ProductAPI {
     }
   }
 
+  // delete item image
+  static Future deleteItemImage(String itemSlug, String imageId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    var response = await http.delete(
+      Uri.parse('${apiDomain().domain}/user/items/$itemSlug/images/delete'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: jsonEncode({'image_id': imageId}),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (kDebugMode) {
+        print("delete item image response: $responseData");
+      }
+      return jsonEncode({'status': 'success', 'data': responseData});
+    } else {
+      if (kDebugMode) {
+        print("delete item image error: ${response.statusCode}");
+      }
+      final errorData = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'data': errorData});
+    }
+  }
+
+  // delete all item images
+  static Future deleteAllItemImages(String itemSlug) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    var response = await http.delete(
+      Uri.parse('${apiDomain().domain}/user/items/$itemSlug/images/delete-all'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (kDebugMode) {
+        print("delete all item images response: $responseData");
+      }
+      return jsonEncode({'status': 'success', 'data': responseData});
+    } else {
+      if (kDebugMode) {
+        print("delete all item images error: ${response.statusCode}");
+      }
+      final errorData = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'data': errorData});
+    }
+  }
+
   // delete product or service
   static Future deleteProductOrService(String itemSlug) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
