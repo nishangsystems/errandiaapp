@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:errandia/app/APi/product.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,8 +36,18 @@ class imagePickercontroller extends GetxController {
       source: ImageSource.gallery,
     );
     if (image != null) {
-      final File imageFile = File(image.path);
-      image_path.value = image.path;
+      File imageFile = File(image.path);
+
+      print("original file size: ${imageFile.lengthSync()}");
+
+      try {
+        imageFile = (await compressFile(file: imageFile));
+        print("Compressed file size: ${imageFile.lengthSync()}");
+      } catch (e) {
+        print("Error compressing file: $e");
+      }
+
+      image_path.value = imageFile.path;
       print("imagePath: $image_path");
 
       return imageFile;
@@ -55,6 +66,7 @@ class imagePickercontroller extends GetxController {
      // imageList.add(image);
     }
   }
+
   Future getMultipleimagefromCamera() async {
     final ImagePicker _picker = ImagePicker();
     final image = await _picker.pickImage(source: ImageSource.camera);
@@ -64,7 +76,6 @@ class imagePickercontroller extends GetxController {
        imageList.add(image);
     }
   }
-
 
   Future reset() async {
     image_path.value = '';
@@ -159,6 +170,38 @@ print("selectedImages: $selectedImages");
       print("uploadStatusList ADD: $uploadStatusList");
     }
   }
+
+  // add multiple images from camera and upload
+  Future addImageFromCamera(String slug) async {
+    final XFile? image = await picker.pickImage(source: ImageSource.camera);
+
+    // compress image
+    if (image != null) {
+      File imageFile = File(image.path);
+
+      print("original file size: ${imageFile.lengthSync()}");
+
+      try {
+        imageFile = (await compressFile(file: imageFile));
+        print("Compressed file size: ${imageFile.lengthSync()}");
+      } catch (e) {
+        print("Error compressing file: $e");
+      }
+
+      print("uploadStatus List: $uploadStatusList");
+      imageList.add(imageFile);
+      // assign success to the previous images index
+      int currentIndex = imageList.indexOf(imageFile);
+      // uploadStatusList[currentIndex] = UploadStatus.pending;
+
+      uploadStatusList.add(UploadStatus.pending);
+
+      uploadImage(imageFile.path, slug, currentIndex);
+      print("imageList: $imageList");
+      print("uploadStatusList ADD: $uploadStatusList");
+    }
+  }
+
 
   // upload one image to the server and update the upload status
   Future<void> uploadImage(String imagePath, String itemSlug, int index) async {

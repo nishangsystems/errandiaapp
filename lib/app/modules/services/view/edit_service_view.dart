@@ -825,7 +825,7 @@ class EditServiceViewState extends State<EditServiceView> {
                                             ontap: () {
                                               Get.back();
                                               imageController2
-                                                  .getimagefromCamera();
+                                                  .addImageFromCamera(widget.data?['slug']);
                                             },
                                             color: const Color(0xfffafafa),
                                           ),

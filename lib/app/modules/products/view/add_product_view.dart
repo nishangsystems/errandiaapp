@@ -138,6 +138,7 @@ class _add_product_viewState extends State<add_product_view> {
   void initState() {
     super.initState();
     product_controller = Get.put(add_product_cotroller());
+    profileController = Get.put(profile_controller());
     imageController = Get.put(imagePickercontroller());
     product_controller.loadShops();
     product_controller.loadCategories();

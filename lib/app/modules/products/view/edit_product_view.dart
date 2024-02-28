@@ -811,8 +811,6 @@ class EditProductViewState extends State<EditProductView> {
                                           ),
                                           ontap: () {
                                             Get.back();
-                                            // imageController
-                                            //     .getmultipleImage();
                                             imageController2.addImageFromGallery(widget.data?['slug']);
                                             print('image list: ${imageController2.imageList}');
                                           },
@@ -839,10 +837,12 @@ class EditProductViewState extends State<EditProductView> {
                                               ),
                                             ],
                                           ),
-                                          ontap: () {
+                                          ontap: ()   {
                                             Get.back();
                                             imageController2
-                                                .getimagefromCamera();
+                                                .addImageFromCamera(widget.data?['slug']);
+
+
                                           },
                                           color: const Color(0xfffafafa),
                                         ),

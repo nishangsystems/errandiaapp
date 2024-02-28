@@ -4,6 +4,7 @@ import 'package:errandia/app/modules/buiseness/view/businesses_view.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
@@ -46,6 +47,7 @@ class home_view_1 extends StatefulWidget {
 class _home_view_1State extends State<home_view_1> {
   String? isLoggedIn;
   late home_controller homeController;
+  late profile_controller profileController;
   // List<dynamic> recentlyPostedItemsData = [];
   // List<dynamic> featuredBusinessesData = [];
   // bool _isRPILoading = true;
@@ -188,6 +190,7 @@ class _home_view_1State extends State<home_view_1> {
   void initState() {
     super.initState();
     homeController = Get.put(home_controller());
+    profileController = Get.put(profile_controller());
     CountryData();
     RegionData();
     // TownData();
@@ -196,6 +199,9 @@ class _home_view_1State extends State<home_view_1> {
     subCategoryData();
     homeController.featuredBusinessData();
     homeController.recentlyPostedItemsData();
+    if (homeController.loggedIn.value) {
+      profileController.getUser();
+    }
   }
 
   @override
@@ -601,7 +607,7 @@ class _home_view_1State extends State<home_view_1> {
                         children: [
                           Text(
                             homeController.loggedIn.value
-                                ? 'Welcome Kris'
+                                ? 'Welcome ${capitalizeAll(getLastName(profileController.userData['name']))}'
                                 : 'Welcome',
                             style: const TextStyle(
                                 color: Colors.white,
@@ -636,51 +642,51 @@ class _home_view_1State extends State<home_view_1> {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              color: appcolor().skyblueColor,
-              height: Get.height * 0.06,
-              child: Row(
-                children: [
-                  Image(
-                    image: const AssetImage(
-                      'assets/images/refresh_location.png',
-                    ),
-                    color: appcolor().mainColor,
-                  ),
-                  Expanded(
-                    child: Text(
-                      homeController.loggedIn.value
-                          ? 'Update Business Location'.tr
-                          : 'Update Location'.tr,
-                      style:
-                          TextStyle(color: appcolor().mainColor, fontSize: 12),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      var status = await Permission.location.status;
-                      if (status.isGranted) {
-                        ScaffoldMessenger.of(scaffoldKey.currentContext!)
-                            .showSnackBar(const SnackBar(
-                                content:
-                                    Text('Camera access permanently denied')));
-                      } else {
-                        locationPermission();
-                      }
-                    },
-                    child: Text(
-                      'Verify Location'.tr,
-                      style: TextStyle(
-                        color: appcolor().mainColor,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Container(
+            //   padding: const EdgeInsets.symmetric(horizontal: 6),
+            //   color: appcolor().skyblueColor,
+            //   height: Get.height * 0.06,
+            //   child: Row(
+            //     children: [
+            //       Image(
+            //         image: const AssetImage(
+            //           'assets/images/refresh_location.png',
+            //         ),
+            //         color: appcolor().mainColor,
+            //       ),
+            //       Expanded(
+            //         child: Text(
+            //           homeController.loggedIn.value
+            //               ? 'Update Business Location'.tr
+            //               : 'Update Location'.tr,
+            //           style:
+            //               TextStyle(color: appcolor().mainColor, fontSize: 12),
+            //         ),
+            //       ),
+            //       TextButton(
+            //         onPressed: () async {
+            //           var status = await Permission.location.status;
+            //           if (status.isGranted) {
+            //             ScaffoldMessenger.of(scaffoldKey.currentContext!)
+            //                 .showSnackBar(const SnackBar(
+            //                     content:
+            //                         Text('Camera access permanently denied')));
+            //           } else {
+            //             locationPermission();
+            //           }
+            //         },
+            //         child: Text(
+            //           'Verify Location'.tr,
+            //           style: TextStyle(
+            //             color: appcolor().mainColor,
+            //             fontSize: 10,
+            //             fontWeight: FontWeight.w600,
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // categories widget
 
