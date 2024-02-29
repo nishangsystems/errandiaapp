@@ -13,6 +13,7 @@ import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:errandia/common/random_ui/ui_23.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -335,10 +336,7 @@ class _Product_viewState extends State<Product_view>
             children: [
               Column(
                 children: [
-                  image_select_widget(
-                      context,
-                      // widget.item['images']
-                      widget.item),
+                  image_select_widget(context, widget.item),
                   product_review_widget(widget.item),
                   // SizedBox(
                   //   height: Get.height * 0.03,
@@ -466,10 +464,6 @@ class _Product_viewState extends State<Product_view>
                                     );
                                   },
                                 ),
-                              ),
-
-                              SizedBox(
-                                width: Get.width * 0.08,
                               ),
 
                               widget.item['shop'] != null ? Column(
@@ -983,26 +977,78 @@ Widget image_select_widget(BuildContext context, final item) {
       //   ),
       // ),
       // featured image
+      // SizedBox(
+      //   height: Get.height * 0.3,
+      //   width: Get.width,
+      //   child: ClipRRect(
+      //     child: Image.network(getImagePath(item['featured_image'].toString()),
+      //         fit: BoxFit.cover, errorBuilder: (BuildContext context,
+      //             Object exception, StackTrace? stackTrace) {
+      //       return Image.asset(
+      //         'assets/images/errandia_logo.png',
+      //         fit: BoxFit.fill,
+      //         height: Get.height * 0.17,
+      //         width: Get.width * 0.4,
+      //       );
+      //     }),
+      //   ),
+      // ),
       SizedBox(
-        height: Get.height * 0.3,
+        height: Get.height * 0.4,
         width: Get.width,
-        child: ClipRRect(
-          child: Image.network(getImagePath(item['featured_image'].toString()),
-              fit: BoxFit.cover, errorBuilder: (BuildContext context,
-                  Object exception, StackTrace? stackTrace) {
-            return Image.asset(
-              'assets/images/errandia_logo.png',
-              fit: BoxFit.fill,
-              height: Get.height * 0.17,
-              width: Get.width * 0.4,
+        child: FlutterCarousel.builder(
+          itemCount: item['images'].length + 1,
+          itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
+            String imageUrl;
+            if (itemIndex == 0) {
+              // First item is the featured image
+              imageUrl = getImagePath(item['featured_image'].toString());
+            } else {
+              // Subsequent items are the other images
+              imageUrl = getImagePath(item['images'][itemIndex - 1]['url'].toString());
+            }
+
+            return Container(
+              margin: const EdgeInsets.all(0.0),
+              width: Get.width,
+              height: Get.height * 0.43,
+              color: Colors.red,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(0),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (BuildContext context, Object exception,
+                      StackTrace? stackTrace) {
+                    return Image.asset(
+                      'assets/images/errandia_logo.png',
+                      fit: BoxFit.fill,
+                    );
+                  },
+                ),
+              ),
             );
-          }),
+          },
+          options: CarouselOptions(
+            height: Get.height * 0.4,
+            autoPlay: true,
+            aspectRatio: 16 / 9,
+            enlargeCenterPage: true,
+            viewportFraction: 1,
+            autoPlayInterval: const Duration(seconds: 8),
+            autoPlayAnimationDuration: const Duration(milliseconds: 1000),
+            autoPlayCurve: Curves.easeOutExpo,
+            floatingIndicator: false,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            showIndicator: false,
+          ),
         ),
       ),
 
       item['images'].length > 0
           ? SizedBox(
-              height: Get.height * 0.15,
+              height: Get.height * 0.1,
+              width: Get.width,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: item['images'].length,
@@ -1010,10 +1056,11 @@ Widget image_select_widget(BuildContext context, final item) {
                   var image = item['images'][index];
                   return Container(
                     margin:
-                        const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                    height: Get.height * 0.2,
+                        const EdgeInsets.only(right: 5, top: 5, bottom: 5),
+                    padding: const EdgeInsets.all(2.0),
+                    height: Get.height * 0.23,
                     color: Colors.white,
-                    width: Get.width * 0.2,
+                    width: Get.width * 0.18,
                     // child: Center(child: Image.network(image['url'].toString())),
                     child: Center(
                         child: Image.network(
@@ -1037,9 +1084,6 @@ Widget image_select_widget(BuildContext context, final item) {
 
 Widget product_review_widget(item) {
   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    SizedBox(
-      height: Get.height * 0.01,
-    ),
     Text(
       capitalizeAll(item['name'].toString()),
       style: const TextStyle(
