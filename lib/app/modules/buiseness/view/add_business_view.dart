@@ -203,6 +203,7 @@ class _add_business_viewState extends State<add_business_view> {
               }),
               imageController.reset(),
               // home_controller()
+
               //     .featuredBusinessData
               //     .clear(),
               // home_controller()

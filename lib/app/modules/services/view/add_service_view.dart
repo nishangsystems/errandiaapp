@@ -255,36 +255,47 @@ class _add_service_viewState extends State<add_service_view> {
                     ),
                     contentPadding: EdgeInsets.zero,
                     title: Obx(
-                          () => DropdownButtonFormField<Shop>(
-                        value: selectedShop,
-                        iconSize: 0.0,
-                        isDense: true,
-                        isExpanded: true,
-                        padding: EdgeInsets.zero,
-                        decoration: const InputDecoration.collapsed(
-                          hintText: 'Select a Shop *',
-                          hintStyle: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                        onChanged: (Shop? newValue) {
-                          setState(() {
-                            selectedShop = newValue;
-                          });
-                          print("selected shop: ${selectedShop?.name}");
-                        },
-                        items: product_controller.shopList.map<DropdownMenuItem<Shop>>((Shop shop) {
-                          return DropdownMenuItem<Shop>(
-                            value: shop,
-                            child: Text(capitalizeAll(shop.name),
-                              style: const TextStyle(
-                                fontSize: 15,
-                                color: Colors.black,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                          () {
+                            if (product_controller.isLoadingShops.value) {
+                              return Text('Loading Shops...',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[600],
+                                ),
+                              );
+                            } else {
+                              return DropdownButtonFormField<Shop>(
+                                value: selectedShop,
+                                iconSize: 0.0,
+                                isDense: true,
+                                isExpanded: true,
+                                padding: EdgeInsets.zero,
+                                decoration: const InputDecoration.collapsed(
+                                  hintText: 'Select a Shop *',
+                                  hintStyle: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                onChanged: (Shop? newValue) {
+                                  setState(() {
+                                    selectedShop = newValue;
+                                  });
+                                  print("selected shop: ${selectedShop?.name}");
+                                },
+                                items: product_controller.shopList.map<DropdownMenuItem<Shop>>((Shop shop) {
+                                  return DropdownMenuItem<Shop>(
+                                    value: shop,
+                                    child: Text(capitalizeAll(shop.name),
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              );
+                            }
+                          }
                     ),
                   ),
 
