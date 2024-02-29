@@ -13,6 +13,7 @@ import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:errandia/common/random_ui/ui_23.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -335,10 +336,7 @@ class _Product_viewState extends State<Product_view>
             children: [
               Column(
                 children: [
-                  image_select_widget(
-                      context,
-                      // widget.item['images']
-                      widget.item),
+                  image_select_widget(context, widget.item),
                   product_review_widget(widget.item),
                   // SizedBox(
                   //   height: Get.height * 0.03,
@@ -424,7 +422,7 @@ class _Product_viewState extends State<Product_view>
                           fontSize: 18,
                         ),
                         controller: tabController,
-                        labelColor: appcolor().darkBlueColor,
+                        labelColor: appcolor().mainColor,
                         tabs: const [
                           Tab(
                             text: "Description",
@@ -452,17 +450,112 @@ class _Product_viewState extends State<Product_view>
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('supplier image'),
-                              SizedBox(
-                                width: Get.width * 0.08,
+                              Container(
+                                height: Get.height * 0.1,
+                                width: Get.width * 0.2,
+                                color: Colors.white,
+                                child: Image.network(
+                                  getImagePath(widget.item['shop']['image']),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/errandia_logo.png',
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                ),
                               ),
-                              const Column(
+
+                              widget.item['shop'] != null ? Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('supplier info  1'),
-                                  Text('supplier info  1'),
-                                  Text('supplier info  1'),
+                                  Text(
+                                    'Business Name',
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.grey[700]
+                                    ),
+                                  ),
+                                  Text(
+                                    capitalizeAll(widget.item['shop']['name']),
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+
+                                  SizedBox(
+                                    height: Get.height * 0.01,
+                                  ),
+
+                                  widget.item['shop']['street'] != "" || widget.item['shop']['town'] != null || widget.item['shop']['region'] != null ? Text(
+                                    'Address',
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.grey[700]
+                                    ),
+                                  ) : Container(),
+
+                                  widget.item['shop']['street'] != "" && widget.item['shop']['town'] != null && widget.item['shop']['region'] != null
+                                      ? SizedBox(
+                                    width: Get.width * 0.5,
+                                    child: Text(
+                                      widget.item['shop']['street']+", "+widget.item['shop']['town']['name']+ ", "+widget.item['shop']['region']['name'],
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ) : Container(),
+
+                                  widget.item['shop']['street'] != "" && widget.item['shop']['town'] == null && widget.item['shop']['region'] != null
+                                      ? SizedBox(
+                                    width: Get.width * 0.5,
+                                    child: Text(
+                                      widget.item['shop']['street']+ ", "+widget.item['shop']['region']['name'],
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ) : Container(),
+
+                                  widget.item['shop']['street'] == "" && widget.item['shop']['town'] != null && widget.item['shop']['region'] != null
+                                      ? SizedBox(
+                                    width: Get.width * 0.5,
+                                    child: Text(
+                                      widget.item['shop']['town']['name']+ ", "+widget.item['shop']['region']['name'],
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ) : Container(),
+
+                                  widget.item['shop']['street'] == "" && widget.item['shop']['town'] == null && widget.item['shop']['region'] != null
+                                      ? SizedBox(
+                                    width: Get.width * 0.5,
+                                    child: Text(
+                                      widget.item['shop']['region']['name'],
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ) : Container(),
                                 ],
-                              )
+                              ): Container(),
                             ],
                           ),
                         ],
@@ -884,26 +977,77 @@ Widget image_select_widget(BuildContext context, final item) {
       //   ),
       // ),
       // featured image
+      // SizedBox(
+      //   height: Get.height * 0.3,
+      //   width: Get.width,
+      //   child: ClipRRect(
+      //     child: Image.network(getImagePath(item['featured_image'].toString()),
+      //         fit: BoxFit.cover, errorBuilder: (BuildContext context,
+      //             Object exception, StackTrace? stackTrace) {
+      //       return Image.asset(
+      //         'assets/images/errandia_logo.png',
+      //         fit: BoxFit.fill,
+      //         height: Get.height * 0.17,
+      //         width: Get.width * 0.4,
+      //       );
+      //     }),
+      //   ),
+      // ),
       SizedBox(
         height: Get.height * 0.3,
         width: Get.width,
-        child: ClipRRect(
-          child: Image.network(getImagePath(item['featured_image'].toString()),
-              fit: BoxFit.cover, errorBuilder: (BuildContext context,
-                  Object exception, StackTrace? stackTrace) {
-            return Image.asset(
-              'assets/images/errandia_logo.png',
-              fit: BoxFit.fill,
-              height: Get.height * 0.17,
-              width: Get.width * 0.4,
+        child: FlutterCarousel.builder(
+          itemCount: item['images'].length + 1,
+          itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
+            String imageUrl;
+            if (itemIndex == 0) {
+              // First item is the featured image
+              imageUrl = getImagePath(item['featured_image'].toString());
+            } else {
+              // Subsequent items are the other images
+              imageUrl = getImagePath(item['images'][itemIndex - 1]['url'].toString());
+            }
+
+            return Container(
+              margin: const EdgeInsets.all(0.0),
+              width: Get.width,
+              height: Get.height * 0.3,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(0),
+                child: FadeInImage.assetNetwork(
+                  placeholder: 'assets/images/errandia_logo.png',
+                  image: imageUrl,
+                  fit: BoxFit.fill,
+                  imageErrorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/errandia_logo.png',
+                      fit: BoxFit.fill,
+                    );
+                  }
+                ),
+              ),
             );
-          }),
+          },
+          options: CarouselOptions(
+            height: Get.height * 0.4,
+            autoPlay: true,
+            aspectRatio: 16 / 9,
+            enlargeCenterPage: true,
+            viewportFraction: 1,
+            autoPlayInterval: const Duration(seconds: 8),
+            autoPlayAnimationDuration: const Duration(milliseconds: 1000),
+            autoPlayCurve: Curves.easeOutExpo,
+            floatingIndicator: false,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            showIndicator: false,
+          ),
         ),
       ),
 
       item['images'].length > 0
           ? SizedBox(
-              height: Get.height * 0.15,
+              height: Get.height * 0.1,
+              width: Get.width,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: item['images'].length,
@@ -911,10 +1055,11 @@ Widget image_select_widget(BuildContext context, final item) {
                   var image = item['images'][index];
                   return Container(
                     margin:
-                        const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                    height: Get.height * 0.2,
+                        const EdgeInsets.only(right: 5, top: 5, bottom: 5),
+                    padding: const EdgeInsets.all(2.0),
+                    height: Get.height * 0.23,
                     color: Colors.white,
-                    width: Get.width * 0.2,
+                    width: Get.width * 0.18,
                     // child: Center(child: Image.network(image['url'].toString())),
                     child: Center(
                         child: Image.network(
@@ -938,9 +1083,6 @@ Widget image_select_widget(BuildContext context, final item) {
 
 Widget product_review_widget(item) {
   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    SizedBox(
-      height: Get.height * 0.01,
-    ),
     Text(
       capitalizeAll(item['name'].toString()),
       style: const TextStyle(
@@ -960,32 +1102,32 @@ Widget product_review_widget(item) {
     ),
     Row(
       children: [
-        RatingBar.builder(
-          itemCount: 5,
-          direction: Axis.horizontal,
-          initialRating: 1,
-          itemSize: 22,
-          maxRating: 5,
-          allowHalfRating: true,
-          glow: true,
-          itemBuilder: (context, _) {
-            return const Icon(
-              Icons.star,
-              color: Colors.amber,
-            );
-          },
-          onRatingUpdate: (value) {
-            debugPrint(value.toString());
-          },
-        ),
+        // RatingBar.builder(
+        //   itemCount: 5,
+        //   direction: Axis.horizontal,
+        //   initialRating: 1,
+        //   itemSize: 22,
+        //   maxRating: 5,
+        //   allowHalfRating: true,
+        //   glow: true,
+        //   itemBuilder: (context, _) {
+        //     return const Icon(
+        //       Icons.star,
+        //       color: Colors.amber,
+        //     );
+        //   },
+        //   onRatingUpdate: (value) {
+        //     debugPrint(value.toString());
+        //   },
+        // ),
         SizedBox(
           width: Get.width * 0.01,
         ),
-        Text(
-          // '${item['reviews']} Supplier Reviews',
-          '{} Supplier Reviews',
-          style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
-        ),
+        // Text(
+        //   // '${item['reviews']} Supplier Reviews',
+        //   '{} Supplier Reviews',
+        //   style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
+        // ),
       ],
     ),
   ]).paddingOnly(left: 15, right: 15);

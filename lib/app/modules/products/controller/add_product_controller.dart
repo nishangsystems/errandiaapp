@@ -18,23 +18,59 @@ class add_product_cotroller extends GetxController{
   var shopList = List<Shop>.empty(growable: true).obs;
   var categoryList = List<dynamic>.empty(growable: true).obs;
 
+  RxBool isLoadingShops = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     // loadShops();
   }
 
+  // Future<void> loadShops() async {
+  //   var response = await BusinessAPI.userShops_(1);
+  //   print("response my shops: ${response['items']}");
+  //
+  //   if (response != null && response['items'].isNotEmpty) {
+  //     List<Shop> fetchedShops = (response['items'] as List).map((shopData) {
+  //       return Shop.fromJson(shopData); // Assuming Shop has a fromJson method
+  //     }).toList();
+  //     shopList.addAll(fetchedShops);
+  //     print("shopList: ${shopList}");
+  //   }
+  // }
   Future<void> loadShops() async {
-    var response = await BusinessAPI.userShops_(1);
-    print("response my shops: ${response['items']}");
+    int currentPage = 1;
+    bool hasMore = true;
+    List<Shop> allShops = [];
+    isLoadingShops.value = true;
 
-    if (response != null && response['items'].isNotEmpty) {
-      List<Shop> fetchedShops = (response['items'] as List).map((shopData) {
-        return Shop.fromJson(shopData); // Assuming Shop has a fromJson method
-      }).toList();
-      shopList.addAll(fetchedShops);
-      print("shopList: ${shopList}");
+    while (hasMore) {
+      var response = await BusinessAPI.userShops_(currentPage);
+      if (response != null && response['items'] != null && response['items'].isNotEmpty) {
+        List<Shop> fetchedShops = (response['items'] as List).map((shopData) {
+          return Shop.fromJson(shopData); // Assuming Shop has a fromJson method
+        }).toList();
+
+        allShops.addAll(fetchedShops);
+
+        // Check if we've reached the last page
+        int totalShops = response['total'];
+        int perPage = response['per_page'];
+        int totalLoadedShops = currentPage * perPage;
+
+        hasMore = totalLoadedShops < totalShops;
+        currentPage++;
+      } else {
+        hasMore = false; // Stop if there are no items or if it's the last page
+      }
     }
+
+    // Once done, update your observable list
+    shopList.addAll(allShops);
+    Future.delayed(const Duration(seconds: 5), () {
+      isLoadingShops.value = false;
+    });
+    print("All shops loaded: ${shopList.length}");
   }
 
   void loadCategories() async {

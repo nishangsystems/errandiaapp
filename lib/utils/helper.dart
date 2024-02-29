@@ -24,6 +24,12 @@ String capitalizeAll(String s) {
 // get the first letter of a string
 String getFirstLetter(String s) => s[0].toUpperCase();
 
+// get last name if the name is has multiple spaces
+String getLastName(String s) {
+  List<String> words = s.split(' ');
+  return words[words.length - 1];
+}
+
 String getImagePath(String imagePath) {
   String sanitizedPath = imagePath.trim().replaceAll(RegExp(r'^"|"$'), '');
   if (sanitizedPath.startsWith("http")) {

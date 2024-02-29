@@ -31,21 +31,21 @@ class errandia_widget extends StatelessWidget {
           children: [
             Container(
               color: appcolor().lightgreyColor,
-              child: Image.network(
-                  getImagePath(imagePath.toString()
-                  ),
-                  fit: BoxFit.cover,
-                  height: Get.height * 0.17,
-                  width: Get.width * 0.4,
-                  errorBuilder: (BuildContext context,
-                      Object exception, StackTrace? stackTrace) {
-                return Image.asset(
-                  'assets/images/errandia_logo.png',
-                  fit: BoxFit.cover,
-                  height: Get.height * 0.17,
-                  width: Get.width * 0.4,
-                );
-              }),
+              child: FadeInImage.assetNetwork(
+                placeholder: 'assets/images/errandia_logo.png', // Local asset image
+                image: getImagePath(imagePath.toString()),
+                fit: BoxFit.cover,
+                height: Get.height * 0.17,
+                width: Get.width * 0.4,
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/errandia_logo.png', // Your fallback image
+                    fit: BoxFit.cover,
+                    height: Get.height * 0.17,
+                    width: Get.width * 0.4,
+                  );
+                },
+              ),
             ),
             SizedBox(
               height: Get.height * 0.02,

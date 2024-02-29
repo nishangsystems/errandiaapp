@@ -58,7 +58,7 @@ class _add_service_viewState extends State<add_service_view> {
     var unitPrice = product_controller.unit_price_controller.text;
     var productDescription = product_controller.product_desc_controller.text.toString();
     var tags = product_controller.product_tags_controller.text.toString();
-    var qty = product_controller.quantity_controller.text.toString();
+    // var qty = product_controller.quantity_controller.text.toString();
 
     if(name == '') {
       alertDialogBox(context, "Error", "Product name is required");
@@ -72,8 +72,6 @@ class _add_service_viewState extends State<add_service_view> {
       alertDialogBox(context, "Error", "Product tags is required");
     } else if (category == null) {
       alertDialogBox(context, "Error", "Category is required");
-    } else if (qty == "null" || qty == "") {
-      alertDialogBox(context, "Error", "Quantity is required");
     } else {
       var value = {
         "name": name,
@@ -82,7 +80,7 @@ class _add_service_viewState extends State<add_service_view> {
         "description": productDescription,
         "tags": tags,
         "category_id": category.toString(),
-        "quantity": qty,
+        "quantity": "0",
         "service": "1"
       };
 
@@ -257,36 +255,47 @@ class _add_service_viewState extends State<add_service_view> {
                     ),
                     contentPadding: EdgeInsets.zero,
                     title: Obx(
-                          () => DropdownButtonFormField<Shop>(
-                        value: selectedShop,
-                        iconSize: 0.0,
-                        isDense: true,
-                        isExpanded: true,
-                        padding: EdgeInsets.zero,
-                        decoration: const InputDecoration.collapsed(
-                          hintText: 'Select a Shop *',
-                          hintStyle: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                        onChanged: (Shop? newValue) {
-                          setState(() {
-                            selectedShop = newValue;
-                          });
-                          print("selected shop: ${selectedShop?.name}");
-                        },
-                        items: product_controller.shopList.map<DropdownMenuItem<Shop>>((Shop shop) {
-                          return DropdownMenuItem<Shop>(
-                            value: shop,
-                            child: Text(capitalizeAll(shop.name),
-                              style: const TextStyle(
-                                fontSize: 15,
-                                color: Colors.black,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                          () {
+                            if (product_controller.isLoadingShops.value) {
+                              return Text('Loading Shops...',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[600],
+                                ),
+                              );
+                            } else {
+                              return DropdownButtonFormField<Shop>(
+                                value: selectedShop,
+                                iconSize: 0.0,
+                                isDense: true,
+                                isExpanded: true,
+                                padding: EdgeInsets.zero,
+                                decoration: const InputDecoration.collapsed(
+                                  hintText: 'Select a Shop *',
+                                  hintStyle: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                onChanged: (Shop? newValue) {
+                                  setState(() {
+                                    selectedShop = newValue;
+                                  });
+                                  print("selected shop: ${selectedShop?.name}");
+                                },
+                                items: product_controller.shopList.map<DropdownMenuItem<Shop>>((Shop shop) {
+                                  return DropdownMenuItem<Shop>(
+                                    value: shop,
+                                    child: Text(capitalizeAll(shop.name),
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              );
+                            }
+                          }
                     ),
                   ),
 
@@ -382,29 +391,29 @@ class _add_service_viewState extends State<add_service_view> {
                   ),
 
                   // product quantity
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                    child: TextFormField(
-                      controller: product_controller.quantity_controller,
-                      keyboardType: TextInputType.number,
-
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          color: Colors.black,
-                          FontAwesomeIcons.cubes,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Quantity *',
-                        suffixIcon: Icon(
-                          color: Colors.black,
-                          Icons.edit,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Container(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                  //   child: TextFormField(
+                  //     controller: product_controller.quantity_controller,
+                  //     keyboardType: TextInputType.number,
+                  //
+                  //     decoration: const InputDecoration(
+                  //       border: InputBorder.none,
+                  //       prefixIcon: Icon(
+                  //         color: Colors.black,
+                  //         FontAwesomeIcons.cubes,
+                  //       ),
+                  //       hintStyle: TextStyle(
+                  //         color: Colors.black,
+                  //       ),
+                  //       hintText: 'Quantity *',
+                  //       suffixIcon: Icon(
+                  //         color: Colors.black,
+                  //         Icons.edit,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
 
                   //  info
                   Container(

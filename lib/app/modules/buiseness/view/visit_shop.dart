@@ -201,6 +201,203 @@ class _VisitShopState extends State<VisitShop> {
     if (kDebugMode) {
       print("businessData: ${widget.businessData['name']}");
     }
+
+    Widget _buildRPIErrorWidget(String message, VoidCallback onReload) {
+      return !homeController.isRPILoading.value
+          ? Container(
+        height: Get.height * 0.3,
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(message),
+              ElevatedButton(
+                onPressed: onReload,
+                style: ElevatedButton.styleFrom(
+                  primary: appcolor().mainColor,
+                ),
+                child: Text(
+                  'Retry',
+                  style: TextStyle(color: appcolor().lightgreyColor),
+                ),
+              ),
+            ],
+          ),
+        ),
+      )
+          : buildLoadingWidget();
+    }
+
+    Widget Recently_posted_items_Widget() {
+      return Obx(
+              () {
+            if (homeController.isRPIError.value) {
+              return _buildRPIErrorWidget(
+                  'Failed to load recently posted items', homeController.reloadRecentlyPostedItems);
+            } else if (homeController.isRPILoading.value) {
+              return Container(
+                height: Get.height * 0.45,
+                color: Colors.white,
+                child: buildLoadingWidget(),
+              );
+            } else if (homeController.recentlyPostedItemsData.isEmpty) {
+              return Container(
+                height: Get.height * 0.45,
+                color: Colors.white,
+                child: const Center(
+                  child: Text('No recently posted items'),
+                ),
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                height: Get.height * 0.45,
+                color: Colors.white,
+                child: ListView.builder(
+                  primary: false,
+                  shrinkWrap: false,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: homeController.recentlyPostedItemsData.length > 4 ? 4 : homeController.recentlyPostedItemsData.length,
+                  itemBuilder: (context, index) {
+                    var data = homeController.recentlyPostedItemsData[index];
+
+                    return InkWell(
+                      onTap: () {
+                        // Get.to(Product_view(item: data,name: data['name'].toString(),));
+                        // Get.back();
+                        Get.to(() => errand_detail_view(
+                          data: data,
+                        ));
+                      },
+                      child: Card(
+                        child: Container(
+                          width: Get.width * 0.5,
+                          color: Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: Get.height * 0.09,
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage: AssetImage(
+                                        data['shop']['image'] != ''
+                                            ? data['shop']['image'].toString()
+                                            : Recently_item_List[index]
+                                            .avatarImage
+                                            .toString(),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: Get.width * 0.02,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          Recently_item_List[index].name.toString(),
+                                          style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          Recently_item_List[index].date.toString(),
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Divider(
+                                color: appcolor().mediumGreyColor,
+                              ),
+                              Container(
+                                height: Get.height * 0.2,
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 0),
+                                color: appcolor().lightgreyColor,
+                                child: Center(
+                                  child: Image(
+                                    image: AssetImage(Recently_item_List[index]
+                                        .imagePath
+                                        .toString()),
+                                    height: Get.height * 0.15,
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                color: appcolor().mediumGreyColor,
+                              ),
+                              SizedBox(
+                                height: Get.height * 0.009,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Text(
+                                    //   Featured_Businesses_Item_List[index]
+                                    //       .servicetype
+                                    //       .toString(),
+                                    //   style: TextStyle(
+                                    //       fontSize: 13,
+                                    //       fontWeight: FontWeight.bold,
+                                    //       color: appcolor().mediumGreyColor),
+                                    // ),
+                                    // SizedBox(
+                                    //   height: Get.height * 0.001,
+                                    // ),
+                                    Text(
+                                      data['name'].toString() != "null"
+                                          ? data['name'].toString()
+                                          : 'errand name',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: appcolor().mainColor),
+                                    ),
+                                    SizedBox(
+                                      height: Get.height * 0.001,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.location_on,
+                                          color: appcolor().mediumGreyColor,
+                                          size: 15,
+                                        ),
+                                        Text(
+                                          data['shop']['street'].toString(),
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: appcolor().mainColor),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }
+          }
+      );
+    }
+
     return WillPopScope(
       onWillPop: () async {
         Get.back();
@@ -467,7 +664,7 @@ class _VisitShopState extends State<VisitShop> {
                   ).paddingSymmetric(horizontal: 20),
                 ),
 
-                recently_posted_errands(),
+                Recently_posted_items_Widget(),
               ],
             ),
           )),

@@ -341,16 +341,17 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 height: Get.height * 0.3,
                 width: Get.width,
                 child: ClipRRect(
-                  child: Image.network(getImagePath(widget.service['featured_image'].toString()),
-                      fit: BoxFit.cover, errorBuilder: (BuildContext context,
-                          Object exception, StackTrace? stackTrace) {
-                        return Image.asset(
-                          'assets/images/errandia_logo.png',
-                          fit: BoxFit.fill,
-                          height: Get.height * 0.17,
-                          width: Get.width * 0.4,
-                        );
-                      }),
+                  child: FadeInImage.assetNetwork(
+                    placeholder: 'assets/images/errandia_logo.png',
+                    image: getImagePath(widget.service['featured_image']),
+                    fit: BoxFit.fill,
+                    imageErrorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/errandia_logo.png',
+                        fit: BoxFit.fill,
+                      );
+                    },
+                  ),
                 ),
               ),
 
@@ -387,13 +388,13 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                           fontSize: 18,
                         ),
                         controller: tabController,
-                        labelColor: appcolor().darkBlueColor,
+                        labelColor: appcolor().mainColor,
                         tabs: const [
                           Tab(
                             text: "Description",
                           ),
                           Tab(
-                            text: "Supplier Info",
+                            text: "Contact Info",
                           ),
                         ],
                       ),
@@ -414,17 +415,116 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('supplier image'),
+                              // business logo
+                              Container(
+                                height: Get.height * 0.1,
+                                width: Get.width * 0.2,
+                                color: Colors.white,
+                                child: Image.network(
+                                  getImagePath(widget.service['shop']['image']),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/errandia_logo.png',
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                ),
+                              ),
                               SizedBox(
                                 width: Get.width * 0.08,
                               ),
-                              const Column(
-                                children: [
-                                  Text('supplier info  1'),
-                                  Text('supplier info  1'),
-                                  Text('supplier info  1'),
-                                ],
-                              )
+
+                              widget.service['shop'] != null ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                       Text(
+                                        'Business Name',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.grey[700]
+                                        ),
+                                      ),
+                                      Text(
+                                        capitalizeAll(widget.service['shop']['name']),
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+
+                                      SizedBox(
+                                        height: Get.height * 0.01,
+                                      ),
+
+                                      widget.service['shop']['street'] != "" || widget.service['shop']['town'] != null || widget.service['shop']['region'] != null ? Text(
+                                        'Address',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.grey[700]
+                                        ),
+                                      ) : Container(),
+
+                                      widget.service['shop']['street'] != "" && widget.service['shop']['town'] != null && widget.service['shop']['region'] != null
+                                      ? SizedBox(
+                                        width: Get.width * 0.5,
+                                        child: Text(
+                                          widget.service['shop']['street']+", "+widget.service['shop']['town']['name']+ ", "+widget.service['shop']['region']['name'],
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ) : Container(),
+
+                                      widget.service['shop']['street'] != "" && widget.service['shop']['town'] == null && widget.service['shop']['region'] != null
+                                          ? SizedBox(
+                                        width: Get.width * 0.5,
+                                        child: Text(
+                                          widget.service['shop']['street']+ ", "+widget.service['shop']['region']['name'],
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ) : Container(),
+
+                                      widget.service['shop']['street'] == "" && widget.service['shop']['town'] != null && widget.service['shop']['region'] != null
+                                          ? SizedBox(
+                                        width: Get.width * 0.5,
+                                        child: Text(
+                                          widget.service['shop']['town']['name']+ ", "+widget.service['shop']['region']['name'],
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ) : Container(),
+
+                                      widget.service['shop']['street'] == "" && widget.service['shop']['town'] == null && widget.service['shop']['region'] != null
+                                          ? SizedBox(
+                                        width: Get.width * 0.5,
+                                        child: Text(
+                                          widget.service['shop']['region']['name'],
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ) : Container(),
+                                    ],
+                                  ): Container(),
                             ],
                           ),
                         ],
@@ -804,32 +904,32 @@ Widget product_review_widget(item) {
     ),
     Row(
       children: [
-        RatingBar.builder(
-          itemCount: 5,
-          direction: Axis.horizontal,
-          initialRating: 1,
-          itemSize: 22,
-          maxRating: 5,
-          allowHalfRating: true,
-          glow: true,
-          itemBuilder: (context, _) {
-            return const Icon(
-              Icons.star,
-              color: Colors.amber,
-            );
-          },
-          onRatingUpdate: (value) {
-            debugPrint(value.toString());
-          },
-        ),
+        // RatingBar.builder(
+        //   itemCount: 5,
+        //   direction: Axis.horizontal,
+        //   initialRating: 1,
+        //   itemSize: 22,
+        //   maxRating: 5,
+        //   allowHalfRating: true,
+        //   glow: true,
+        //   itemBuilder: (context, _) {
+        //     return const Icon(
+        //       Icons.star,
+        //       color: Colors.amber,
+        //     );
+        //   },
+        //   onRatingUpdate: (value) {
+        //     debugPrint(value.toString());
+        //   },
+        // ),
         SizedBox(
           width: Get.width * 0.01,
         ),
-        Text(
-          // '${item['reviews']} Supplier Reviews',
-          '{} Supplier Reviews',
-          style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
-        ),
+        // Text(
+        //   // '${item['reviews']} Supplier Reviews',
+        //   '{} Supplier Reviews',
+        //   style: TextStyle(color: appcolor().mediumGreyColor, fontSize: 12),
+        // ),
       ],
     ),
   ]).paddingOnly(left: 15, right: 15);
