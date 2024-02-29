@@ -31,13 +31,11 @@ class home_controller extends GetxController {
     try {
       isRPILoading.value = true;
 
-      var response = await api().getProduct('products', 1);
-      print("response recently posted: $response");
+      var data = await api().getErrands('errands', 1);
+      print("response recently posted: $data");
 
-      if (response != null) {
-        var data = jsonDecode(response.body);
-
-        recentlyPostedItemsData.addAll(data);
+      if (data != null) {
+        recentlyPostedItemsData.addAll(data['items']);
         isRPILoading.value = false;
         isRPIError.value = false;
       } else {

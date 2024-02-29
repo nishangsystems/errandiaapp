@@ -27,10 +27,10 @@ class _SeeAllErrandsState extends State<SeeAllErrands> {
 
   void _fetchRecentlyPostedItemsData() async {
     try {
-      var response = await api().getProduct('products', 1);
-      if (response.statusCode == 200) {
+      var data = await api().getErrands('errands', 1);
+      if (data != null ) {
         setState(() {
-          recentlyPostedItemsData = jsonDecode(response.body);
+          recentlyPostedItemsData = data['items'];
           _isRPILoading = false;
           isRPIError = false;
         });

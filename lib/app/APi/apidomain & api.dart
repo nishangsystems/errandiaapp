@@ -121,7 +121,7 @@ class api {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (kDebugMode) {
-        print("errands: $data");
+        // print("errands: $data");
       }
       return data['data'];
     } else {

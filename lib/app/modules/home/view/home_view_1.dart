@@ -327,8 +327,8 @@ class _home_view_1State extends State<home_view_1> {
                                     CircleAvatar(
                                       radius: 25,
                                       backgroundImage: AssetImage(
-                                        data['shop']['image'] != ''
-                                            ? data['shop']['image'].toString()
+                                        data['user']['photo'] != ''
+                                            ? data['user']['photo'].toString()
                                             : Recently_item_List[index]
                                             .avatarImage
                                             .toString(),
@@ -418,7 +418,7 @@ class _home_view_1State extends State<home_view_1> {
                                           size: 15,
                                         ),
                                         Text(
-                                          data['shop']['street'].toString(),
+                                          data['street'].toString(),
                                           style: TextStyle(
                                               fontSize: 12,
                                               color: appcolor().mainColor),
