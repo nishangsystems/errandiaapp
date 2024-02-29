@@ -994,7 +994,7 @@ Widget image_select_widget(BuildContext context, final item) {
       //   ),
       // ),
       SizedBox(
-        height: Get.height * 0.4,
+        height: Get.height * 0.3,
         width: Get.width,
         child: FlutterCarousel.builder(
           itemCount: item['images'].length + 1,
@@ -1011,20 +1011,19 @@ Widget image_select_widget(BuildContext context, final item) {
             return Container(
               margin: const EdgeInsets.all(0.0),
               width: Get.width,
-              height: Get.height * 0.43,
-              color: Colors.red,
+              height: Get.height * 0.3,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(0),
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (BuildContext context, Object exception,
-                      StackTrace? stackTrace) {
+                child: FadeInImage.assetNetwork(
+                  placeholder: 'assets/images/errandia_logo.png',
+                  image: imageUrl,
+                  fit: BoxFit.fill,
+                  imageErrorBuilder: (context, error, stackTrace) {
                     return Image.asset(
                       'assets/images/errandia_logo.png',
                       fit: BoxFit.fill,
                     );
-                  },
+                  }
                 ),
               ),
             );

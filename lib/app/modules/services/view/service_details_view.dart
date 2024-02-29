@@ -341,16 +341,17 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 height: Get.height * 0.3,
                 width: Get.width,
                 child: ClipRRect(
-                  child: Image.network(getImagePath(widget.service['featured_image'].toString()),
-                      fit: BoxFit.cover, errorBuilder: (BuildContext context,
-                          Object exception, StackTrace? stackTrace) {
-                        return Image.asset(
-                          'assets/images/errandia_logo.png',
-                          fit: BoxFit.fill,
-                          height: Get.height * 0.17,
-                          width: Get.width * 0.4,
-                        );
-                      }),
+                  child: FadeInImage.assetNetwork(
+                    placeholder: 'assets/images/errandia_logo.png',
+                    image: getImagePath(widget.service['featured_image']),
+                    fit: BoxFit.fill,
+                    imageErrorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/errandia_logo.png',
+                        fit: BoxFit.fill,
+                      );
+                    },
+                  ),
                 ),
               ),
 

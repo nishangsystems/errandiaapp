@@ -25,7 +25,6 @@ Future<void> main() async {
   Firebase.initializeApp();
   await GetStorage.init();
 
-
   runApp(const ErrandiaApp());
 }
 
@@ -34,6 +33,8 @@ class ErrandiaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    precacheImage(const AssetImage('assets/images/errandia_logo.png'), context);
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
