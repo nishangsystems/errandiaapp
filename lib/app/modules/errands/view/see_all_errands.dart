@@ -187,9 +187,6 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                                   radius: 25,
                                                   backgroundColor:
                                                       appcolor().mainColor,
-                                                  // backgroundImage: NetworkImage(
-                                                  //   data['shop']['image'].toString(),
-                                                  // ),
                                                   child: data['user']
                                                               ['photo'] ==
                                                           ""

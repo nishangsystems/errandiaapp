@@ -53,6 +53,22 @@ Future<void> launchCaller(String number) async {
   }
 }
 
+// launch whatsapp
+Future<void> launchWhatsapp(String number) async {
+  var url = Uri(scheme: 'https', host: 'wa.me', path: number);
+  if (!await launchUrl(url)) {
+    throw Exception('Could not launch $url');
+  }
+}
+
+// launch email url
+Future<void> launchEmail(String email) async {
+  var url = Uri(scheme: 'mailto', path: email);
+  if (!await launchUrl(url)) {
+    throw Exception('Could not launch $url');
+  }
+}
+
 // launch url
 Future<void> mlaunchUrl(String url) async {
   final Uri uri = Uri.parse(url);

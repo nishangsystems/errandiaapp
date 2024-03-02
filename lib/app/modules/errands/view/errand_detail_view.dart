@@ -1,5 +1,6 @@
 import 'package:errandia/app/modules/errands/controller/errandia_detail_view_controller.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,7 +23,7 @@ class errand_detail_view extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios,
             // size: 30,
           ),
@@ -32,8 +33,8 @@ class errand_detail_view extends StatelessWidget {
         ),
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text(
-          'Errands Detail',
+        title: const Text(
+          'Errand Details',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.normal,
@@ -50,7 +51,7 @@ class errand_detail_view extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
+                SizedBox(
                   width: Get.width * 0.3,
                   child: const Text(
                     'Title',
@@ -63,27 +64,31 @@ class errand_detail_view extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.035,
                 ),
-                Container(
+                SizedBox(
+                  width: Get.width * 0.55,
+                  height: Get.height * 0.08,
                   child: Text(
-                    '${data['name']}',
+                    capitalizeAll(data['title']),
                     style: TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                       color: appcolor().mainColor,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                SizedBox(
                   width: Get.width * 0.3,
-                  child: Text(
+                  child: const Text(
                     'Description',
                     style: TextStyle(
                       fontSize: 18,
@@ -134,27 +139,27 @@ class errand_detail_view extends StatelessWidget {
 
                 Expanded(
                   child: ReadMoreText(
-                    '${data['description']}',
+                    capitalize(data['description']),
                     trimLength: 200,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 17,
                     ),
                     textAlign: TextAlign.left,
                     trimMode: TrimMode.Length,
                     trimCollapsedText: 'read more',
-                    trimExpandedText: 'read less',
+                    trimExpandedText: '   read less',
                   ),
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Row(
               children: [
-                Container(
+                SizedBox(
                   width: Get.width * 0.3,
-                  child: Text(
+                  child: const Text(
                     'Categories',
                     style: TextStyle(
                       fontSize: 18,
@@ -165,10 +170,10 @@ class errand_detail_view extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.035,
                 ),
-                Expanded(
+                 Expanded(
                   child: ReadMoreText(
-                    'Electronics, Gadgets, Accessesories',
-                    style: TextStyle(
+                   data['categories'].toString(),
+                    style: const TextStyle(
                       fontStyle: FontStyle.italic,
                       fontSize: 17,
                       fontWeight: FontWeight.w500,
@@ -182,27 +187,50 @@ class errand_detail_view extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
-            Text(
+            const Text(
               'Posted By',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
               children: [
-                Container(
+                SizedBox(
                   width: Get.width * 0.3,
                   child: CircleAvatar(
                     radius: 35,
-                    backgroundImage: AssetImage(
-                      'assets/images/recently_posted_items/avatar1.png',
+                    backgroundColor:
+                    appcolor().mainColor,
+                    child: data['user']
+                    ['photo'] ==
+                        ""
+                        ? const Icon(Icons.person)
+                        : FadeInImage
+                        .assetNetwork(
+                      placeholder:
+                      'assets/images/errandia_logo.png',
+                      image: getImagePath(
+                          data['user']
+                          ['photo']
+                              .toString()),
+                      fit: BoxFit.fill,
+                      imageErrorBuilder:
+                          (context, error,
+                          stackTrace) {
+                        return Icon(
+                            Icons.person,
+                            color: appcolor()
+                            .lightgreyColor,
+                            size: 45,
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -210,43 +238,49 @@ class errand_detail_view extends StatelessWidget {
                   width: Get.width * 0.035,
                 ),
                 Expanded(
-                  child: Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          data['shop']['name'].toString(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                            color: appcolor().mainColor,
-                          ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data['user']['name'].toString(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: appcolor().mainColor,
                         ),
-                        Text(
-                          'Molyko, Buea, South West Region',
-                          style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 12,
-                            color: appcolor().mainColor,
-                          ),
+                      ),
+                      data['user']['street'] != "" ?
+                      Text(
+                        data['user']['street'],
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 12,
+                          color: appcolor().mainColor,
                         ),
-                      ],
-                    ),
+                      ): Text(
+                        "No location provided",
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: appcolor().mediumGreyColor,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ],
             ),
-            SizedBox(
-              height: 10,
+            const SizedBox(
+              height: 25,
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                SizedBox(
                   width: Get.width * 0.3,
-                  child: Text(
-                    'Categories',
+                  child: const Text(
+                    'Phone',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -256,90 +290,107 @@ class errand_detail_view extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.035,
                 ),
-                Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${data['user'] != null ? '+237 ' + data['user']['phone'] : data['shop']['phone']}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                        ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '+237 ${data['user']['phone']}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
                       ),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () {},
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: appcolor().skyblueColor,
-                                borderRadius: BorderRadius.circular(
-                                  8,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.call,
-                                    color: appcolor().mainColor,
-                                  ),
-                                  Text(
-                                    ' Call',
-                                  )
-                                ],
+                    ),
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            launchCaller(data['user']['phone']);
+                          },
+                          child: Container(
+                            width: data['user']['whatsapp'] != null &&
+                                data['user']['whatsapp'] != ""
+                                ? Get.width * 0.15
+                                : Get.width * 0.32,
+                            padding: const EdgeInsets.symmetric(
+                              // horizontal: 8,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: appcolor().skyblueColor,
+                              borderRadius: BorderRadius.circular(
+                                8,
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          InkWell(
-                            onTap: () {},
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: appcolor().skyblueColor,
-                                borderRadius: BorderRadius.circular(
-                                  8,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.call,
+                                  color: appcolor().mainColor,
+                                  size: 17,
                                 ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    FontAwesomeIcons.whatsapp,
-                                    color: appcolor().mainColor,
+                                const Text(
+                                  ' Call',
+                                  style: TextStyle(
+                                    fontSize: 15,
                                   ),
-                                  Text(
-                                    ' Whatsapp',
-                                  )
-                                ],
+                                )
+                              ],
+                            ).marginOnly(left: 0),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        data['user']['whatsapp'] != null && data['user']['whatsapp'] != "" ? InkWell(
+                          onTap: () {
+                            if (data['user']['whatsapp'] != null &&
+                                data['user']['whatsapp'] != "") {
+                              launchWhatsapp(
+                                  '+237 ${data['user']['whatsapp']}');
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: appcolor().skyblueColor,
+                              borderRadius: BorderRadius.circular(
+                                8,
                               ),
                             ),
-                          )
-                        ],
-                      ).paddingOnly(top: 5)
-                    ],
-                  ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  FontAwesomeIcons.whatsapp,
+                                  color: appcolor().mainColor,
+                                ),
+                                const Text(
+                                  ' Whatsapp',
+                                )
+                              ],
+                            ),
+                          ),
+                        ) : Container(),
+                      ],
+                    ).paddingOnly(top: 5)
+                  ],
                 )
               ],
             ),
-            SizedBox(
+
+            const SizedBox(
               height: 15,
             ),
-            Row(
+
+            data['user']['email'] != "" && data['user']['email'] != null ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                SizedBox(
                   width: Get.width * 0.3,
-                  child: Text(
+                  child: const Text(
                     'Email',
                     style: TextStyle(
                       fontSize: 18,
@@ -350,53 +401,54 @@ class errand_detail_view extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.035,
                 ),
-                Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${data['user'] != null ? data['user']['email'] : data['shop']['email']}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                        ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data['user']['email'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
                       ),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () {},
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: appcolor().skyblueColor,
-                                borderRadius: BorderRadius.circular(
-                                  8,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.email,
-                                    // color: appcolor().mainColor,
-                                  ),
-                                  Text(
-                                    '  Send Email',
-                                  )
-                                ],
+                    ),
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                             launchEmail(data['user']['email']);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: appcolor().skyblueColor,
+                              borderRadius: BorderRadius.circular(
+                                8,
                               ),
                             ),
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.email,
+                                  // color: appcolor().mainColor,
+                                ),
+                                Text(
+                                  '  Send Email',
+                                )
+                              ],
+                            ),
                           ),
-                        ],
-                      ).paddingOnly(top: 5)
-                    ],
-                  ),
+                        ),
+                      ],
+                    ).paddingOnly(top: 5)
+                  ],
                 )
               ],
-            ),
-            SizedBox(
+            ): Container(),
+
+            const SizedBox(
               height: 30,
             ),
 
@@ -404,21 +456,24 @@ class errand_detail_view extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Photos',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Container(
+                const SizedBox(
+                  height: 15,
+                ),
+                data['images'].length > 0 ? SizedBox(
                   height: 100,
                   child: ListView.builder(
-                    itemCount: 5,
+                    itemCount: data['images'].length,
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Container(
-                        margin: EdgeInsets.symmetric(
+                        margin: const EdgeInsets.symmetric(
                           horizontal: 5,
                         ),
                         height: 80,
@@ -427,17 +482,36 @@ class errand_detail_view extends StatelessWidget {
                           borderRadius: BorderRadius.circular(
                             10,
                           ),
-                          color: Color.fromARGB(255, 110, 193, 110),
+                          color: Colors.grey[300],
                         ),
                         child: Center(
-                          child: Text(
-                            index.toString(),
+                          child: FadeInImage.assetNetwork(
+                            placeholder: 'assets/images/errandia_logo.png',
+                            image: getImagePath(
+                                data['images'][index]['url'].toString()),
+                            fit: BoxFit.cover,
+                            imageErrorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                'assets/images/errandia_logo.png',
+                                fit: BoxFit.cover,
+                              );
+                            },
                           ),
                         ),
                       );
                     },
                   ),
+                ) :
+                 Center(
+                   child: Text(
+                    'No photos provided',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: appcolor().mediumGreyColor,
+                      fontStyle: FontStyle.italic,
+                    ),
                 ),
+                 ),
               ],
             ),
           ],
