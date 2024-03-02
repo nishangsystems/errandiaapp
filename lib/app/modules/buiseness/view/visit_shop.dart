@@ -42,7 +42,7 @@ class VisitShop extends StatefulWidget {
 
 class _VisitShopState extends State<VisitShop> {
   final business_controller controller = Get.put(business_controller());
-  final profile_controller profileController = Get.put(profile_controller());
+  late profile_controller profileController;
   final home_controller homeController = Get.put(home_controller());
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -51,7 +51,8 @@ class _VisitShopState extends State<VisitShop> {
   @override
   void initState() {
     super.initState();
-    profile_controller().getUser();
+    profileController = Get.put(profile_controller());
+    profileController.getUser();
     print("userData: ${profile_controller().userData}");
   }
 
@@ -141,6 +142,9 @@ class _VisitShopState extends State<VisitShop> {
                           if (mounted) {
                             // Check if the widget is still in the tree
                             if (response["status"] == 'success') {
+                              profileController.reloadMyProducts();
+                              profileController.reloadMyServices();
+
                               Navigator.of(dialogContext)
                                   .pop(); // Close the dialog
                               Navigator.of(context)
@@ -152,6 +156,7 @@ class _VisitShopState extends State<VisitShop> {
                                 description: response['data']['message'],
                                 type: PopupType.success,
                               );
+
                             } else {
                               Navigator.of(dialogContext)
                                   .pop(); // Close the dialog
@@ -400,9 +405,11 @@ class _VisitShopState extends State<VisitShop> {
 
     return WillPopScope(
       onWillPop: () async {
-        Get.back();
         profileController.reloadMyBusinesses();
+        profileController.reloadMyProducts();
+        profileController.reloadMyServices();
         homeController.reloadFeaturedBusinessesData();
+        Get.back();
         return true;
       },
       child: Scaffold(
@@ -437,16 +444,18 @@ class _VisitShopState extends State<VisitShop> {
                 SizedBox(
                     height: Get.height * 0.3,
                     width: Get.width * 1,
-                    child: Image.network(
-                      getImagePath(widget.businessData['image'].toString()),
+                    child: FadeInImage.assetNetwork(
+                      placeholder: 'assets/images/errandia_logo.png',
+                      image: getImagePath(widget.businessData['image'].toString()),
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
+                      imageErrorBuilder: (context, error, stackTrace) {
                         return Image.asset(
                           'assets/images/errandia_logo.png',
                           fit: BoxFit.cover,
                         );
                       },
-                    )),
+                    )
+                ),
 
                 Column(
                   children: [

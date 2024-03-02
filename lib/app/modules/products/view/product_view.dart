@@ -4,14 +4,18 @@ import 'package:errandia/app/APi/product.dart';
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
+import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
+import 'package:errandia/app/modules/products/controller/product_controller.dart';
 import 'package:errandia/app/modules/products/view/edit_product_view.dart';
 import 'package:errandia/app/modules/products/view/products_send_enquiry.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
 import 'package:errandia/app/modules/reviews/views/add_review.dart';
 import 'package:errandia/app/modules/reviews/views/review_view.dart';
+import 'package:errandia/app/modules/services/view/service_details_view.dart';
 import 'package:errandia/common/random_ui/ui_23.dart';
 import 'package:errandia/utils/helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -36,8 +40,23 @@ class _Product_viewState extends State<Product_view>
   late final TabController tabController =
       TabController(length: 2, vsync: this);
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  final profile_controller profileController = Get.find<profile_controller>();
+  late profile_controller profileController;
+  late ProductController productCtl;
   late PopupBox popup;
+
+  @override
+  void initState() {
+    super.initState();
+    productCtl = Get.put(ProductController());
+    profileController = Get.find<profile_controller>();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      productCtl.reload();
+      productCtl.loadOtherProducts(widget.item?['slug']);
+      productCtl.loadOtherServices(widget.item['slug']);
+    });
+
+  }
 
   void showPopupMenu(BuildContext context) {
     var userIsOwner =
@@ -188,6 +207,9 @@ class _Product_viewState extends State<Product_view>
       onWillPop: () async {
         Get.back();
         profileController.reloadMyProducts();
+        productCtl.reload();
+        productCtl.loadOtherServices(widget.item['slug']);
+        productCtl.loadOtherProducts(widget.item['slug']);
         return true;
       },
       child: Scaffold(
@@ -466,6 +488,10 @@ class _Product_viewState extends State<Product_view>
                                 ),
                               ),
 
+                              SizedBox(
+                                width: Get.width * 0.05,
+                              ),
+
                               widget.item['shop'] != null ? Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -490,7 +516,7 @@ class _Product_viewState extends State<Product_view>
                                     height: Get.height * 0.01,
                                   ),
 
-                                  widget.item['shop']['street'] != "" || widget.item['shop']['town'] != null || widget.item['shop']['region'] != null ? Text(
+                                  (widget.item['shop']['street'] != "" || widget.item['shop']['street'] != null)  || widget.item['shop']['town'] != null || widget.item['shop']['region'] != null ? Text(
                                     'Address',
                                     style: TextStyle(
                                         fontSize: 10,
@@ -499,7 +525,7 @@ class _Product_viewState extends State<Product_view>
                                     ),
                                   ) : Container(),
 
-                                  widget.item['shop']['street'] != "" && widget.item['shop']['town'] != null && widget.item['shop']['region'] != null
+                                  (widget.item['shop']['street'] != "" || widget.item['shop']['street'] != null)  && widget.item['shop']['town'] != null && widget.item['shop']['region'] != null
                                       ? SizedBox(
                                     width: Get.width * 0.5,
                                     child: Text(
@@ -513,11 +539,11 @@ class _Product_viewState extends State<Product_view>
                                     ),
                                   ) : Container(),
 
-                                  widget.item['shop']['street'] != "" && widget.item['shop']['town'] == null && widget.item['shop']['region'] != null
+                                  (widget.item['shop']['street'] != "" && widget.item['shop']['street'] != null) && widget.item['shop']['town'] == null && widget.item['shop']['region'] != null
                                       ? SizedBox(
                                     width: Get.width * 0.5,
                                     child: Text(
-                                      widget.item['shop']['street']+ ", "+widget.item['shop']['region']['name'],
+                                     widget.item['shop']['street']+", "+widget.item['shop']['region']['name'],
                                       style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w400,
@@ -527,7 +553,7 @@ class _Product_viewState extends State<Product_view>
                                     ),
                                   ) : Container(),
 
-                                  widget.item['shop']['street'] == "" && widget.item['shop']['town'] != null && widget.item['shop']['region'] != null
+                                  (widget.item['shop']['street'] == "" || widget.item['shop']['street'] == null)  && widget.item['shop']['town'] != null && widget.item['shop']['region'] != null
                                       ? SizedBox(
                                     width: Get.width * 0.5,
                                     child: Text(
@@ -541,7 +567,7 @@ class _Product_viewState extends State<Product_view>
                                     ),
                                   ) : Container(),
 
-                                  widget.item['shop']['street'] == "" && widget.item['shop']['town'] == null && widget.item['shop']['region'] != null
+                                  (widget.item['shop']['street'] == "" || widget.item['shop']['street'] == null) && widget.item['shop']['town'] == null && widget.item['shop']['region'] != null
                                       ? SizedBox(
                                     width: Get.width * 0.5,
                                     child: Text(
@@ -793,62 +819,49 @@ class _Product_viewState extends State<Product_view>
                 ),
               ),
               SizedBox(
-                height: Get.height * 0.36,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: ui_23_item_list.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                        margin:
-                            const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                        // height: Get.height * 0.15,
-                        color: Colors.white,
-                        width: Get.width * 0.38,
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: Get.height * 0.02,
+                height: Get.height * 0.32,
+                child: Obx(
+                    () {
+                      if (productCtl.isProductLoading.value == true) {
+                        return buildLoadingWidget();
+                      } else if (productCtl.productList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No products found',
+                            style: TextStyle(
+                              color: appcolor().mediumGreyColor,
+                              fontSize: 15,
                             ),
-                            SizedBox(
-                              height: Get.height * 0.15,
-                              child: Image.asset(
-                                  ui_23_item_list[index].imagePath.toString()),
-                            ),
-                            SizedBox(
-                              height: Get.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: appcolor().mediumGreyColor,
-                                  size: 13,
-                                ),
-                                Text(
-                                  ui_23_item_list[index].location.toString(),
-                                  style: TextStyle(
-                                      color: appcolor().mediumGreyColor,
-                                      fontSize: 12),
-                                )
-                              ],
-                            ).paddingOnly(left: 10, right: 10),
-                            Text(
-                              ui_23_item_list[index].item_desc,
-                              style: TextStyle(
-                                  fontSize: 12, color: appcolor().mainColor),
-                            ).paddingOnly(left: 12, right: 12),
-                            Text(
-                              ui_23_item_list[index].itemname,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: appcolor().mainColor,
-                                  fontSize: 14),
-                            ).paddingOnly(left: 10, right: 10),
-                          ],
-                        ));
-                  },
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: productCtl.productList.length,
+                          itemBuilder: (context, index) {
+                            var item = productCtl.productList[index];
+                            return GestureDetector(
+                                onTap: () {
+                                  if (kDebugMode) {
+                                    print("product item clicked: ${item['name']}");
+                                  }
+                                  // replace current view
+                                  Get.to(() => Product_view(
+                                    item: item,
+                                  ));
+                                },
+                                child: errandia_widget(
+                                  cost: item['unit_price'].toString(),
+                                  imagePath: item['featured_image'],
+                                  name: item['name'],
+                                  location: item['shop'] != null ? item['shop']['street'] : "",
+                                ));
+                          },
+                        );
+                      }
+
+
+                    }
                 ),
               ),
 
@@ -863,63 +876,49 @@ class _Product_viewState extends State<Product_view>
                 ),
               ),
               SizedBox(
-                height: Get.height * 0.35,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: Recently_item_List.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                        margin:
-                            const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                        // height: Get.height * 0.15,
-                        color: Colors.white,
-                        width: Get.width * 0.38,
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: Get.height * 0.02,
+                height: Get.height * 0.32,
+                child: Obx(
+                    () {
+                      if (productCtl.isServiceLoading.value == true) {
+                        return buildLoadingWidget();
+                      } else if (productCtl.serviceList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No services found',
+                            style: TextStyle(
+                              color: appcolor().mediumGreyColor,
+                              fontSize: 15,
                             ),
-                            SizedBox(
-                              height: Get.height * 0.15,
-                              child: Image.asset(
-                                  Recently_item_List[index].imagePath.toString()),
-                            ),
-                            SizedBox(
-                              height: Get.height * 0.01,
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: appcolor().mediumGreyColor,
-                                  size: 13,
-                                ),
-                                Text(
-                                  ui_23_item_list[index].location.toString(),
-                                  style: TextStyle(
-                                      color: appcolor().mediumGreyColor,
-                                      fontSize: 12),
-                                )
-                              ],
-                            ).paddingOnly(left: 10, right: 10),
-                            Text(
-                              ui_23_item_list[index].item_desc,
-                              style: TextStyle(
-                                  fontSize: 12, color: appcolor().mainColor),
-                              textAlign: TextAlign.center,
-                            ).paddingOnly(left: 12, right: 12),
-                            Text(
-                              ui_23_item_list[index].itemname,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: appcolor().mainColor,
-                                  fontSize: 14),
-                            ).paddingOnly(left: 10, right: 10),
-                          ],
-                        ));
-                  },
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: productCtl.serviceList.length,
+                          itemBuilder: (context, index) {
+                            var item = productCtl.serviceList[index];
+                            return GestureDetector(
+                              onTap: () async {
+                                await Future.delayed(Duration.zero);
+                                if (!mounted) return;
+                                if (kDebugMode) {
+                                  print("service item: ${item['name']}");
+                                }
+                                // WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  Get.to(() => ServiceDetailsView(service: item));
+                                // });
+                              },
+                              child: errandia_widget(
+                                cost: item['unit_price'].toString(),
+                                imagePath: item['featured_image'],
+                                name: item['name'],
+                                location: item['shop'] != null ? item['shop']['street'] : "",
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    }
                 ),
               ),
 

@@ -234,10 +234,11 @@ class _errandia_business_viewState extends State<errandia_business_view> {
             SizedBox(
               height: Get.height * 0.3,
               width: Get.width,
-              child: Image.network(
-                getImagePath(widget.businessData['image'].toString() ?? ""),
+              child: FadeInImage.assetNetwork(
+                placeholder: 'assets/images/errandia_logo.png',
+                image: getImagePath(widget.businessData['image'].toString()),
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
+                imageErrorBuilder: (context, error, stackTrace) {
                   return Image.asset(
                     'assets/images/errandia_logo.png',
                     fit: BoxFit.fill,

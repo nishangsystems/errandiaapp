@@ -172,6 +172,31 @@ class ProductAPI {
     }
   }
 
+  // get related products or services
+  static Future getRelatedProductsOrServices(String itemSlug, bool isService) async {
+    var response = await http.get(
+      Uri.parse('${apiDomain().domain}/items/$itemSlug/related?service=${isService ? 1 : 0}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (kDebugMode) {
+        print("related products response: $responseData");
+      }
+      return jsonEncode({'status': 'success', 'data': responseData});
+    } else {
+      if (kDebugMode) {
+        print("related products error: ${response.statusCode}");
+      }
+      final errorData = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'data': errorData});
+    }
+  }
+
   // delete item image
   static Future deleteItemImage(String itemSlug, String imageId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -36,7 +36,7 @@ String getImagePath(String imagePath) {
     return sanitizedPath;
   } else {
     String finalUrl = '${apiDomain().imageDomain}/$sanitizedPath';
-    print('image: $finalUrl');
+    // print('image: $finalUrl');
     return finalUrl;
   }
 }

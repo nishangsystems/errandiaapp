@@ -6,8 +6,11 @@ import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/errands/view/Product/serivces.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
+import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/products/controller/product_controller.dart';
+import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/products/view/products_send_enquiry.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
@@ -37,8 +40,23 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
   late final TabController tabController =
   TabController(length: 2, vsync: this);
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  final profile_controller profileController = Get.find<profile_controller>();
+  late profile_controller profileController;
   late PopupBox popup;
+  late ProductController productCtl;
+
+  @override
+  void initState() {
+    super.initState();
+    productCtl = Get.put(ProductController());
+    profileController = Get.find<profile_controller>();
+
+    // profileController.loadMyProducts();
+   WidgetsBinding.instance.addPostFrameCallback((_) {
+     productCtl.reload();
+     productCtl.loadOtherServices(widget.service['slug']);
+     productCtl.loadOtherProducts(widget.service['slug']);
+    });
+  }
 
   void showPopupMenu(BuildContext context) {
     var userIsOwner =
@@ -184,12 +202,15 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) {
-      print("service: ${widget.service['name']}");
+      print("service: ${widget.service['slug']}");
     }
     return WillPopScope(
       onWillPop: () async {
         Get.back();
         profileController.reloadMyServices();
+        productCtl.reload();
+        productCtl.loadOtherServices(widget.service['slug']);
+        productCtl.loadOtherProducts(widget.service['slug']);
         return true;
       },
       child: Scaffold(
@@ -459,7 +480,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                         height: Get.height * 0.01,
                                       ),
 
-                                      widget.service['shop']['street'] != "" || widget.service['shop']['town'] != null || widget.service['shop']['region'] != null ? Text(
+                                      (widget.service['shop']['street'] != "" || widget.service['shop']['street'] != null)  || widget.service['shop']['town'] != null || widget.service['shop']['region'] != null ? Text(
                                         'Address',
                                         style: TextStyle(
                                           fontSize: 10,
@@ -468,7 +489,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                         ),
                                       ) : Container(),
 
-                                      widget.service['shop']['street'] != "" && widget.service['shop']['town'] != null && widget.service['shop']['region'] != null
+                                      (widget.service['shop']['street'] != "" || widget.service['shop']['street'] != null)  && widget.service['shop']['town'] != null && widget.service['shop']['region'] != null
                                       ? SizedBox(
                                         width: Get.width * 0.5,
                                         child: Text(
@@ -482,7 +503,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                         ),
                                       ) : Container(),
 
-                                      widget.service['shop']['street'] != "" && widget.service['shop']['town'] == null && widget.service['shop']['region'] != null
+                                      (widget.service['shop']['street'] != "" && widget.service['shop']['street'] != null) && widget.service['shop']['town'] == null && widget.service['shop']['region'] != null
                                           ? SizedBox(
                                         width: Get.width * 0.5,
                                         child: Text(
@@ -496,7 +517,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                         ),
                                       ) : Container(),
 
-                                      widget.service['shop']['street'] == "" && widget.service['shop']['town'] != null && widget.service['shop']['region'] != null
+                                      (widget.service['shop']['street'] == "" || widget.service['shop']['street'] == null)  && widget.service['shop']['town'] != null && widget.service['shop']['region'] != null
                                           ? SizedBox(
                                         width: Get.width * 0.5,
                                         child: Text(
@@ -510,7 +531,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                         ),
                                       ) : Container(),
 
-                                      widget.service['shop']['street'] == "" && widget.service['shop']['town'] == null && widget.service['shop']['region'] != null
+                                      (widget.service['shop']['street'] == "" || widget.service['shop']['street'] == null) && widget.service['shop']['town'] == null && widget.service['shop']['region'] != null
                                           ? SizedBox(
                                         width: Get.width * 0.5,
                                         child: Text(
@@ -757,61 +778,52 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
 
               SizedBox(
                 height: Get.height * 0.32,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: ui_23_item_list.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                        margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                        // height: Get.height * 0.15,
-                        color: Colors.white,
-                        width: Get.width * 0.38,
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: Get.height * 0.15,
-                              child: Image.asset(
-                                  ui_23_item_list[index].imagePath.toString()),
+                child: Obx(
+                    () {
+                      if (productCtl.isProductLoading.value == true) {
+                        return buildLoadingWidget();
+                      } else if (productCtl.productList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No products found',
+                            style: TextStyle(
+                              color: appcolor().mediumGreyColor,
+                              fontSize: 15,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: appcolor().mediumGreyColor,
-                                ),
-                                Text(
-                                  ui_23_item_list[index].location.toString(),
-                                  style: TextStyle(
-                                      color: appcolor().mediumGreyColor,
-                                      fontSize: 12),
-                                )
-                              ],
-                            ),
-                            Text(
-                              ui_23_item_list[index].item_desc,
-                              style: TextStyle(
-                                  fontSize: 12, color: appcolor().mainColor),
-                              textAlign: TextAlign.center,
-                            ),
-                            Text(
-                              ui_23_item_list[index].itemname,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: appcolor().mainColor,
-                                  fontSize: 16),
-                            )
-                          ],
-                        ));
-                  },
-                ),
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: productCtl.productList.length,
+                          itemBuilder: (context, index) {
+                            var item = productCtl.productList[index];
+                            return GestureDetector(
+                                onTap: () {
+                                  if (kDebugMode) {
+                                    print("product item clicked: ${item['name']}");
+                                  }
+                                  Get.to(() => Product_view(item: item));
+                                },
+                                child: errandia_widget(
+                                  cost: item['unit_price'].toString(),
+                                  imagePath: item['featured_image'],
+                                  name: item['name'],
+                                  location: item['shop'] != null ? item['shop']['street'] : "",
+                                ));
+                          },
+                        );
+                      }
+                    }
+                )
+
               ),
 
               const Padding(
                 padding:
                 EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
                 child: Text(
-                  'Services Offered by this Supplier',
+                  'More Services Offered by this Supplier',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
@@ -820,53 +832,44 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
 
               SizedBox(
                 height: Get.height * 0.32,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: Recently_item_List.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                        margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                        // height: Get.height * 0.15,
-                        color: Colors.white,
-                        width: Get.width * 0.38,
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: Get.height * 0.15,
-                              child: Image.asset(
-                                  Recently_item_List[index].imagePath.toString()),
+                child: Obx(
+                        () {
+                      if (productCtl.isServiceLoading.value == true) {
+                        return buildLoadingWidget();
+                      } else if (productCtl.serviceList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No services found',
+                            style: TextStyle(
+                              color: appcolor().mediumGreyColor,
+                              fontSize: 15,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: appcolor().mediumGreyColor,
-                                ),
-                                Text(
-                                  ui_23_item_list[index].location.toString(),
-                                  style: TextStyle(
-                                      color: appcolor().mediumGreyColor,
-                                      fontSize: 12),
-                                )
-                              ],
-                            ),
-                            Text(
-                              ui_23_item_list[index].item_desc,
-                              style: TextStyle(
-                                  fontSize: 12, color: appcolor().mainColor),
-                              textAlign: TextAlign.center,
-                            ),
-                            Text(
-                              ui_23_item_list[index].itemname,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: appcolor().mainColor,
-                                  fontSize: 16),
-                            )
-                          ],
-                        ));
-                  },
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: productCtl.serviceList.length,
+                          itemBuilder: (context, index) {
+                            var item = productCtl.serviceList[index];
+                            return GestureDetector(
+                              onTap: () {
+                                if (kDebugMode) {
+                                  print("service item: ${item['name']}");
+                                }
+                                Get.to(() => ServiceDetailsView(service: item));
+                              },
+                              child: errandia_widget(
+                                cost: item['unit_price'].toString(),
+                                imagePath: item['featured_image'],
+                                name: item['name'],
+                                location: item['shop'] != null ? item['shop']['street'] : "",
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    }
                 ),
               ),
 
