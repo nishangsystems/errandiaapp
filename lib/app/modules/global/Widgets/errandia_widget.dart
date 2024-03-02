@@ -25,9 +25,10 @@ class errandia_widget extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
         height: Get.height * 0.4,
         color: Colors.white70,
-        // width: Get.width * 0.38,
+        width: Get.width * 0.4,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
               color: appcolor().lightgreyColor,
@@ -80,15 +81,18 @@ class errandia_widget extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-            Text(
-              capitalizeAll(name.toString() ?? ""),
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: appcolor().mainColor),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            SizedBox(
+              width: Get.width * 0.4,
+              child: Text(
+                capitalizeAll(name!),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: appcolor().mainColor),
+                textAlign: TextAlign.start,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             cost.toString() != "null" && cost.toString().isNotEmpty == true
                 ? // text with suffix XAF 2000

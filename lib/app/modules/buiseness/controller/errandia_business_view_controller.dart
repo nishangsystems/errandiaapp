@@ -9,10 +9,33 @@ class ErrandiaBusinessViewController extends GetxController {
   var itemList = List<dynamic>.empty(growable: true).obs;
   RxBool isError = false.obs;
 
+  RxBool isBranchesLoading = false.obs;
+  RxBool isBranchesError = false.obs;
+  var branchesList = List<dynamic>.empty(growable: true).obs;
+
   @override
   void onInit() {
     super.onInit();
     // fetchBusinessBranches();
+  }
+
+  void loadBusinesses(currentSlug) async {
+    print("fetching businesses");
+
+    isBranchesLoading.value = true;
+    var data = await BusinessAPI.businessBranches(currentSlug, 1);
+    print("response businesses: $data");
+
+    if (data != null && data.isNotEmpty) {
+      branchesList.addAll(data['items']);
+      isBranchesLoading.value = false;
+      isBranchesError.value = false;
+    } else {
+      // Handle error
+      printError(info: 'Failed to load businesses');
+      isBranchesLoading.value = false;
+      isBranchesError.value = true;
+    }
   }
 
   void loadBusinessBranches(shopSlug) async {
@@ -41,6 +64,12 @@ class ErrandiaBusinessViewController extends GetxController {
       isLoading.value = false;
       print("error loading businesses: $e");
     }
+  }
+
+  void reloadBusinesses() {
+    branchesList.clear();
+    isBranchesError.value = false;
+    isBranchesLoading.value = false;
   }
 
   @override

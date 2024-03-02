@@ -50,6 +50,7 @@ class errand_detail_view extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
                   width: Get.width * 0.3,
@@ -155,7 +156,7 @@ class errand_detail_view extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            Row(
+            data['categories'] != "" ? Row(
               children: [
                 SizedBox(
                   width: Get.width * 0.3,
@@ -186,7 +187,7 @@ class errand_detail_view extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
+            ) : Container(),
             const SizedBox(
               height: 40,
             ),

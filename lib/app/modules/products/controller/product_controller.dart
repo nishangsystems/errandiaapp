@@ -7,14 +7,60 @@ import 'package:get/get.dart';
 class ProductController extends GetxController {
   RxBool isProductLoading = false.obs;
   RxBool isServiceLoading = false.obs;
+  RxBool isAllProductLoading = false.obs;
+  RxBool isAllServiceLoading = false.obs;
 
   var productList = List<dynamic>.empty(growable: true).obs;
   var serviceList = List<dynamic>.empty(growable: true).obs;
+  var allProductList = List<dynamic>.empty(growable: true).obs;
+  var allServiceList = List<dynamic>.empty(growable: true).obs;
 
   @override
   void onInit() {
     super.onInit();
     // loadOtherProducts();
+  }
+
+  void loadAllProducts() async {
+    print("fetching all products");
+
+    isAllProductLoading.value = true;
+    var data = await ProductAPI.getAllProductsOrServices(false, 1);
+    print("response all products: $data");
+
+    var products = jsonDecode(data);
+
+    print("decoded all products: ${products['data']['data']}");
+
+    if (data != null) {
+      allProductList.addAll(products['data']['data'][0]['items']);
+      isAllProductLoading.value = false;
+    } else {
+      // Handle error
+      printError(info: 'Failed to load all products');
+      isAllProductLoading.value = false;
+    }
+  }
+
+  void loadAllServices() async {
+    print("fetching all services");
+
+    isAllServiceLoading.value = true;
+    var data = await ProductAPI.getAllProductsOrServices(true, 1);
+    print("response all services: $data");
+
+    var services = jsonDecode(data);
+
+    print("decoded all services: ${services['data']['data']}");
+
+    if (data != null) {
+      allServiceList.addAll(services['data']['data'][0]['items']);
+      isAllServiceLoading.value = false;
+    } else {
+      // Handle error
+      printError(info: 'Failed to load all services');
+      isAllServiceLoading.value = false;
+    }
   }
 
   void loadOtherProducts(String slug) async {
@@ -71,6 +117,14 @@ class ProductController extends GetxController {
     serviceList.clear();
     isProductLoading.value = false;
     isServiceLoading.value = false;
+  }
+
+  void reloadAll() {
+    allProductList.clear();
+    allServiceList.clear();
+    isAllProductLoading.value = false;
+    isAllServiceLoading.value = false;
+    loadAllProducts();
   }
 
 }

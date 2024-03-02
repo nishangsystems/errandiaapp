@@ -776,14 +776,17 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 ),
               ),
 
-              SizedBox(
-                height: Get.height * 0.32,
-                child: Obx(
-                    () {
-                      if (productCtl.isProductLoading.value == true) {
-                        return buildLoadingWidget();
-                      } else if (productCtl.productList.isEmpty) {
-                        return Center(
+              Obx(
+                      () {
+                    if (productCtl.isProductLoading.value == true) {
+                      return SizedBox(
+                        height: Get.height * 0.3,
+                        child: buildLoadingWidget(),
+                      );
+                    } else if (productCtl.productList.isEmpty) {
+                      return SizedBox(
+                        height: Get.height * 0.3,
+                        child: Center(
                           child: Text(
                             'No products found',
                             style: TextStyle(
@@ -791,9 +794,12 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                               fontSize: 15,
                             ),
                           ),
-                        );
-                      } else {
-                        return ListView.builder(
+                        ),
+                      );
+                    } else {
+                      return SizedBox(
+                        height: Get.height * 0.3,
+                        child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: productCtl.productList.length,
                           itemBuilder: (context, index) {
@@ -812,11 +818,10 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                   location: item['shop'] != null ? item['shop']['street'] : "",
                                 ));
                           },
-                        );
-                      }
+                        ),
+                      );
                     }
-                )
-
+                  }
               ),
 
               const Padding(
@@ -830,14 +835,17 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 ),
               ),
 
-              SizedBox(
-                height: Get.height * 0.32,
-                child: Obx(
-                        () {
-                      if (productCtl.isServiceLoading.value == true) {
-                        return buildLoadingWidget();
-                      } else if (productCtl.serviceList.isEmpty) {
-                        return Center(
+              Obx(
+                      () {
+                    if (productCtl.isServiceLoading.value == true) {
+                      return SizedBox(
+                        height: Get.height * 0.3,
+                        child: buildLoadingWidget(),
+                      );
+                    } else if (productCtl.serviceList.isEmpty) {
+                      return SizedBox(
+                        height: Get.height * 0.3,
+                        child: Center(
                           child: Text(
                             'No services found',
                             style: TextStyle(
@@ -845,9 +853,12 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                               fontSize: 15,
                             ),
                           ),
-                        );
-                      } else {
-                        return ListView.builder(
+                        ),
+                      );
+                    } else {
+                      return SizedBox(
+                        height: Get.height * 0.3,
+                        child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: productCtl.serviceList.length,
                           itemBuilder: (context, index) {
@@ -867,10 +878,10 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                               ),
                             );
                           },
-                        );
-                      }
+                        ),
+                      );
                     }
-                ),
+                  }
               ),
 
               SizedBox(
