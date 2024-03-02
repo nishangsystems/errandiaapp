@@ -14,6 +14,9 @@ String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
 // capitalize all words in a string
 String capitalizeAll(String s) {
+  // remove extra spaces in the string
+  s = s.trim().replaceAll(RegExp(r'\s+'), ' ');
+
   List<String> words = s.split(' ');
   for (int i = 0; i < words.length; i++) {
     words[i] = capitalize(words[i]);
@@ -33,10 +36,11 @@ String getLastName(String s) {
 String getImagePath(String imagePath) {
   String sanitizedPath = imagePath.trim().replaceAll(RegExp(r'^"|"$'), '');
   if (sanitizedPath.startsWith("http")) {
+    print('url image: $sanitizedPath');
     return sanitizedPath;
   } else {
     String finalUrl = '${apiDomain().imageDomain}/$sanitizedPath';
-    // print('image: $finalUrl');
+    print('final image: $finalUrl');
     return finalUrl;
   }
 }
@@ -84,4 +88,9 @@ Future<File> compressFile({required File? file}) async {
 String formatPrice(double price) {
   final format = NumberFormat.currency(locale: "fr_CM", symbol: "XAF", decimalDigits: 0);
   return format.format(price);
+}
+
+String formatDate(DateTime date) {
+  final format = DateFormat('dd-MM-yyyy');
+  return format.format(date);
 }

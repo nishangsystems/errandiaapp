@@ -31,7 +31,7 @@ class home_controller extends GetxController {
     try {
       isRPILoading.value = true;
 
-      var data = await api().getErrands('errands', 1);
+      var data = await api().getErrands(1);
       print("response recently posted: $data");
 
       if (data != null) {

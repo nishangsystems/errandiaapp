@@ -208,7 +208,7 @@ class ErrandViewWithoutBar extends StatelessWidget {
 
 Widget PostedErrands(BuildContext ctx) {
   return FutureBuilder(
-      future: api().getErrands('errands', 1),
+      future: api().getErrands(1),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Center(

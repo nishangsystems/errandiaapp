@@ -105,17 +105,11 @@ class api {
     }
   }
 
-  Future getErrands(String url, int value) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token;
-    if (value == 1) {
-      token = prefs.getString('token');
-    }
-    final response = await http.get(Uri.parse('${apiDomain().domain}/$url'),
+  Future getErrands(int page) async {
+    final response = await http.get(Uri.parse('${apiDomain().domain}/errands?page=$page'),
         headers: ({
           'Content-Type': 'application/json; charset=UTF-8',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $token'
         }));
 
     if (response.statusCode == 200) {
