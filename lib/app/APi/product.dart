@@ -32,6 +32,31 @@ class ProductAPI {
     }
   }
 
+  // get items by shop slug
+  static Future getItemsByShop(String shopSlug, bool isService, int page) async {
+    var response = await http.get(
+      Uri.parse('${apiDomain().domain}/shops/$shopSlug/items?service=${isService ? 1 : 0}&page=$page'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (kDebugMode) {
+        print("items by shop slug response: $responseData");
+      }
+      return jsonEncode({'status': 'success', 'data': responseData});
+    } else {
+      if (kDebugMode) {
+        print("items by shop slug error: ${response.statusCode}");
+      }
+      final errorData = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'data': errorData});
+    }
+  }
+
   static Future createProductOrService(Map<String, dynamic> value, context,
       String imagePath) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -9,16 +9,62 @@ class ProductController extends GetxController {
   RxBool isServiceLoading = false.obs;
   RxBool isAllProductLoading = false.obs;
   RxBool isAllServiceLoading = false.obs;
+  RxBool isShopProductsLoading = false.obs;
+  RxBool isShopServicesLoading = false.obs;
 
   var productList = List<dynamic>.empty(growable: true).obs;
   var serviceList = List<dynamic>.empty(growable: true).obs;
   var allProductList = List<dynamic>.empty(growable: true).obs;
   var allServiceList = List<dynamic>.empty(growable: true).obs;
+  var shopProductList = List<dynamic>.empty(growable: true).obs;
+  var shopServiceList = List<dynamic>.empty(growable: true).obs;
 
   @override
   void onInit() {
     super.onInit();
     // loadOtherProducts();
+  }
+
+  void loadShopProducts(String slug) async {
+    print("fetching shop products");
+
+    isShopProductsLoading.value = true;
+    var data = await ProductAPI.getItemsByShop(slug, false, 1);
+    print("response shop products: $data");
+
+    var products = jsonDecode(data);
+
+    print("decoded shop products: ${products['data']['data']}");
+
+    if (data != null) {
+      shopProductList.addAll(products['data']['data']['items']);
+      isShopProductsLoading.value = false;
+    } else {
+      // Handle error
+      printError(info: 'Failed to load shop products');
+      isShopProductsLoading.value = false;
+    }
+  }
+
+  void loadShopServices(String slug) async {
+    print("fetching shop services");
+
+    isShopServicesLoading.value = true;
+    var data = await ProductAPI.getItemsByShop(slug, true, 1);
+    print("response shop services: $data");
+
+    var services = jsonDecode(data);
+
+    print("decoded shop services: ${services['data']['data']}");
+
+    if (data != null) {
+      shopServiceList.addAll(services['data']['data']['items']);
+      isShopServicesLoading.value = false;
+    } else {
+      // Handle error
+      printError(info: 'Failed to load shop services');
+      isShopServicesLoading.value = false;
+    }
   }
 
   void loadAllProducts() async {

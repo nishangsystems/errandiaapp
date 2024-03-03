@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
@@ -11,28 +10,21 @@ import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/errands/view/search_errand_prod.dart';
-import 'package:errandia/app/modules/errands/view/see_all_erands.dart';
 import 'package:errandia/app/modules/errands/view/see_all_errands.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
-import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/products/controller/product_controller.dart';
-import 'package:errandia/app/modules/products/view/manage_products_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/view/service_details_view.dart';
 import 'package:errandia/utils/helper.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:share/share.dart';
 
 import '../../products/view/product_view.dart';
 import '../../recently_posted_item.dart/view/recently_posted_list.dart';
@@ -66,8 +58,8 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
     profileController.getUser();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      productController.loadAllProducts();
-      productController.loadAllServices();
+      productController.loadShopProducts(widget.businessData['slug']);
+      productController.loadShopServices(widget.businessData['slug']);
       errBController.loadBusinesses(widget.businessData['slug']);
     });
 
@@ -222,38 +214,11 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) {
-      print("businessData: ${widget.businessData['name']}");
+      print("businessData: ${widget.businessData['slug']}");
     }
 
     Widget _buildRPIErrorWidget(String message, VoidCallback onReload) {
       return !homeController.isRPILoading.value
-          ? Container(
-        height: Get.height * 0.3,
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(message),
-              ElevatedButton(
-                onPressed: onReload,
-                style: ElevatedButton.styleFrom(
-                  primary: appcolor().mainColor,
-                ),
-                child: Text(
-                  'Retry',
-                  style: TextStyle(color: appcolor().lightgreyColor),
-                ),
-              ),
-            ],
-          ),
-        ),
-      )
-          : buildLoadingWidget();
-    }
-
-    Widget _buildFBLErrorWidget(String message, VoidCallback onReload) {
-      return !homeController.isFBLLoading.value
           ? Container(
         height: Get.height * 0.3,
         color: Colors.white,
@@ -414,13 +379,13 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
     Widget Service_item_list() {
       return Obx(
               () {
-            if (productController.isAllServiceLoading.value) {
+            if (productController.isShopServicesLoading.value) {
               return Container(
                 height: Get.height * 0.3,
                 color: Colors.white,
                 child: buildLoadingWidget(),
               );
-            } else if (productController.allServiceList.isEmpty) {
+            } else if (productController.shopServiceList.isEmpty) {
               return Container(
                 height: Get.height * 0.3,
                 color: Colors.white,
@@ -440,12 +405,12 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                 height: Get.height * 0.3,
                 color: Colors.white,
                 child: ListView.builder(
-                  itemCount: productController.allServiceList.length,
+                  itemCount: productController.shopServiceList.length,
                   primary: false,
                   shrinkWrap: false,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
-                    final item = productController.allServiceList[index];
+                    final item = productController.shopServiceList[index];
                     return GestureDetector(
                       onTap: () {
                         if (kDebugMode) {
@@ -471,13 +436,13 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
     Widget product_item_list() {
       return Obx(
               () {
-            if (productController.isAllProductLoading.value) {
+            if (productController.isShopProductsLoading.value) {
               return Container(
                 height: Get.height * 0.3,
                 color: Colors.white,
                 child: buildLoadingWidget(),
               );
-            } else if (productController.allProductList.isEmpty) {
+            } else if (productController.shopProductList.isEmpty) {
               return Container(
                 height: Get.height * 0.3,
                 color: Colors.white,
@@ -497,12 +462,12 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                 height: Get.height * 0.3,
                 color: Colors.white,
                 child: ListView.builder(
-                  itemCount: productController.allProductList.length,
+                  itemCount: productController.shopProductList.length,
                   primary: false,
                   shrinkWrap: false,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
-                    final item = productController.allProductList[index];
+                    final item = productController.shopProductList[index];
 
                     return GestureDetector(
                         onTap: () {
