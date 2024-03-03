@@ -19,6 +19,12 @@ class ProductController extends GetxController {
   var shopProductList = List<dynamic>.empty(growable: true).obs;
   var shopServiceList = List<dynamic>.empty(growable: true).obs;
 
+  RxInt currentPage = 1.obs;
+  RxInt total = 0.obs;
+
+  RxInt serviceCurrentPage = 1.obs;
+  RxInt serviceTotal = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -70,20 +76,30 @@ class ProductController extends GetxController {
   void loadAllProducts() async {
     print("fetching all products");
 
+    if (isAllProductLoading.isTrue && (allProductList.isNotEmpty && allProductList.length >= total.value)) return;
+
     isAllProductLoading.value = true;
-    var data = await ProductAPI.getAllProductsOrServices(false, 1);
-    print("response all products: $data");
 
-    var products = jsonDecode(data);
+    try {
+      var data = await ProductAPI.getAllProductsOrServices(false, currentPage.value);
+      print("response all products: $data");
 
-    print("decoded all products: ${products['data']['data']}");
+      var products = jsonDecode(data);
 
-    if (data != null) {
-      allProductList.addAll(products['data']['data'][0]['items']);
-      isAllProductLoading.value = false;
-    } else {
-      // Handle error
-      printError(info: 'Failed to load all products');
+      print("decoded all products: ${products['data']['data']}");
+
+      if (data != null) {
+        currentPage.value++;
+        isAllProductLoading.value = false;
+        // parse total to an integer
+        total.value = products['data']['data'][0]['total'];
+        // print("total_: ${total.value}");
+        allProductList.addAll(products['data']['data'][0]['items']);
+        print("allProductList: $allProductList");
+      }
+    } catch (e) {
+      // Handle exception
+      printError(info: e.toString());
       isAllProductLoading.value = false;
     }
   }
@@ -91,20 +107,30 @@ class ProductController extends GetxController {
   void loadAllServices() async {
     print("fetching all services");
 
+    if (isAllServiceLoading.isTrue && (allServiceList.isNotEmpty && allServiceList.length >= serviceTotal.value)) return;
+
     isAllServiceLoading.value = true;
-    var data = await ProductAPI.getAllProductsOrServices(true, 1);
-    print("response all services: $data");
 
-    var services = jsonDecode(data);
+    try {
+      var data = await ProductAPI.getAllProductsOrServices(true, serviceCurrentPage.value);
+      print("response all services: $data");
 
-    print("decoded all services: ${services['data']['data']}");
+      var services = jsonDecode(data);
 
-    if (data != null) {
-      allServiceList.addAll(services['data']['data'][0]['items']);
-      isAllServiceLoading.value = false;
-    } else {
-      // Handle error
-      printError(info: 'Failed to load all services');
+      print("decoded all services: ${services['data']['data']}");
+
+      if (data != null) {
+        serviceCurrentPage.value++;
+        isAllServiceLoading.value = false;
+        // parse total to an integer
+        serviceTotal.value = services['data']['data'][0]['total'];
+        // print("total_: ${total.value}");
+        allServiceList.addAll(services['data']['data'][0]['items']);
+        print("allServiceList: $allServiceList");
+      }
+    } catch (e) {
+      // Handle exception
+      printError(info: e.toString());
       isAllServiceLoading.value = false;
     }
   }
@@ -166,11 +192,21 @@ class ProductController extends GetxController {
   }
 
   void reloadAll() {
+    currentPage.value = 1;
+    total.value = 0;
+    serviceTotal.value = 0;
+    serviceCurrentPage.value = 1;
     allProductList.clear();
     allServiceList.clear();
     isAllProductLoading.value = false;
     isAllServiceLoading.value = false;
-    loadAllProducts();
+  }
+
+  void reloadAllServices() {
+    serviceCurrentPage.value = 1;
+    serviceTotal.value = 0;
+    allServiceList.clear();
+    isAllServiceLoading.value = false;
   }
 
 }

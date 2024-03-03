@@ -197,6 +197,14 @@ class _Product_viewState extends State<Product_view>
     });
   }
 
+  String _formatAddress(Map<String, dynamic> shop) {
+    String street = shop['street'] ?? '';
+    String townName = shop['town'] != null ? shop['town']['name'] : '';
+    String regionName = shop['region'] != null ? shop['region']['name'] : '';
+
+    return [street, townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
+  }
+
   @override
   Widget build(BuildContext context) {
     //  print(widget.item.product_name);
@@ -531,25 +539,10 @@ class _Product_viewState extends State<Product_view>
                                                     color: Colors.grey[700]),
                                               )
                                             : Container(),
-                                        (widget.item['shop']['street'] != "" ||
-                                                    widget.item['shop']
-                                                            ['street'] !=
-                                                        null) &&
-                                                widget.item['shop']['town'] !=
-                                                    null &&
-                                                widget.item['shop']['region'] !=
-                                                    null
-                                            ? SizedBox(
+
+                                        SizedBox(
                                                 width: Get.width * 0.5,
-                                                child: Text(
-                                                  widget.item['shop']
-                                                          ['street'] +
-                                                      ", " +
-                                                      widget.item['shop']
-                                                          ['town']['name'] +
-                                                      ", " +
-                                                      widget.item['shop']
-                                                          ['region']['name'],
+                                                child: Text(_formatAddress(widget.item['shop']),
                                                   style: const TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.w400,
@@ -558,83 +551,7 @@ class _Product_viewState extends State<Product_view>
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                 ),
-                                              )
-                                            : Container(),
-                                        (widget.item['shop']['street'] != "" &&
-                                                    widget.item['shop']
-                                                            ['street'] !=
-                                                        null) &&
-                                                widget.item['shop']['town'] ==
-                                                    null &&
-                                                widget.item['shop']['region'] !=
-                                                    null
-                                            ? SizedBox(
-                                                width: Get.width * 0.5,
-                                                child: Text(
-                                                  widget.item['shop']
-                                                          ['street'] +
-                                                      ", " +
-                                                      widget.item['shop']
-                                                          ['region']['name'],
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              )
-                                            : Container(),
-                                        (widget.item['shop']['street'] == "" ||
-                                                    widget.item['shop']
-                                                            ['street'] ==
-                                                        null) &&
-                                                widget.item['shop']['town'] !=
-                                                    null &&
-                                                widget.item['shop']['region'] !=
-                                                    null
-                                            ? SizedBox(
-                                                width: Get.width * 0.5,
-                                                child: Text(
-                                                  widget.item['shop']['town']
-                                                          ['name'] +
-                                                      ", " +
-                                                      widget.item['shop']
-                                                          ['region']['name'],
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              )
-                                            : Container(),
-                                        (widget.item['shop']['street'] == "" ||
-                                                    widget.item['shop']
-                                                            ['street'] ==
-                                                        null) &&
-                                                widget.item['shop']['town'] ==
-                                                    null &&
-                                                widget.item['shop']['region'] !=
-                                                    null
-                                            ? SizedBox(
-                                                width: Get.width * 0.5,
-                                                child: Text(
-                                                  widget.item['shop']['region']
-                                                      ['name'],
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              )
-                                            : Container(),
+                                              ),
                                       ],
                                     )
                                   : Container(),

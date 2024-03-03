@@ -14,6 +14,7 @@ import 'package:errandia/app/modules/errands/view/see_all_errands.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
+import 'package:errandia/app/modules/global/Widgets/items_list_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
@@ -883,7 +884,7 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                       const Spacer(),
                       TextButton(
                         onPressed: () {
-                          Get.to(() => search_errand_prod());
+                          Get.to(() => const ItemListWidget(isService: false));
                         },
                         child: const Text('See All'),
                       ),
@@ -912,7 +913,7 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                       const Spacer(),
                       TextButton(
                         onPressed: () {
-                          // Get.to(() => manage_product_view());
+                          Get.to(() => const ItemListWidget(isService: true));
                         },
                         child: const Text('See All'),
                       ),

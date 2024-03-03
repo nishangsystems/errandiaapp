@@ -199,6 +199,14 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
     });
   }
 
+  String _formatAddress(Map<String, dynamic> shop) {
+    String street = shop['street'] ?? '';
+    String townName = shop['town'] != null ? shop['town']['name'] : '';
+    String regionName = shop['region'] != null ? shop['region']['name'] : '';
+
+    return [street, townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) {
@@ -489,11 +497,10 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                         ),
                                       ) : Container(),
 
-                                      (widget.service['shop']['street'] != "" || widget.service['shop']['street'] != null)  && widget.service['shop']['town'] != null && widget.service['shop']['region'] != null
-                                      ? SizedBox(
+                                    SizedBox(
                                         width: Get.width * 0.5,
                                         child: Text(
-                                          widget.service['shop']['street']+", "+widget.service['shop']['town']['name']+ ", "+widget.service['shop']['region']['name'],
+                                          _formatAddress(widget.service['shop']),
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w400,
@@ -501,49 +508,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                      ) : Container(),
-
-                                      (widget.service['shop']['street'] != "" && widget.service['shop']['street'] != null) && widget.service['shop']['town'] == null && widget.service['shop']['region'] != null
-                                          ? SizedBox(
-                                        width: Get.width * 0.5,
-                                        child: Text(
-                                          widget.service['shop']['street']+ ", "+widget.service['shop']['region']['name'],
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ) : Container(),
-
-                                      (widget.service['shop']['street'] == "" || widget.service['shop']['street'] == null)  && widget.service['shop']['town'] != null && widget.service['shop']['region'] != null
-                                          ? SizedBox(
-                                        width: Get.width * 0.5,
-                                        child: Text(
-                                          widget.service['shop']['town']['name']+ ", "+widget.service['shop']['region']['name'],
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ) : Container(),
-
-                                      (widget.service['shop']['street'] == "" || widget.service['shop']['street'] == null) && widget.service['shop']['town'] == null && widget.service['shop']['region'] != null
-                                          ? SizedBox(
-                                        width: Get.width * 0.5,
-                                        child: Text(
-                                          widget.service['shop']['region']['name'],
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ) : Container(),
+                                      ),
                                     ],
                                   ): Container(),
                             ],
