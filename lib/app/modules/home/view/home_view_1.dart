@@ -1,42 +1,30 @@
 import 'dart:convert';
-import 'package:errandia/app/APi/business.dart';
-import 'package:errandia/app/modules/buiseness/view/businesses_view.dart';
+
+import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
+import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/utils/helper.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../modal/Country.dart';
-import 'package:errandia/app/APi/apidomain%20&%20api.dart';
-import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
-import 'package:errandia/app/modules/global/constants/color.dart';
-import 'package:errandia/app/modules/categories/view/categories.dart';
-import 'package:errandia/app/modules/home/controller/home_controller.dart';
-import 'package:errandia/common/random_ui/ui_23.dart';
-import 'package:errandia/app/modules/errands/view/run_an_errand.dart';
-import 'package:errandia/app/modules/products/view/product_view.dart';
-import 'package:errandia/modal/Country.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../../../../modal/Region.dart';
 import '../../../../modal/Street.dart';
-import '../../../../modal/subcatgeory.dart';
 import '../../../../modal/Town.dart';
 import '../../../../modal/category.dart';
+import '../../../../modal/subcatgeory.dart';
 import '../../categories/CategoryData.dart';
-import '../../buiseness/featured_buiseness/view/featured_list_item.dart';
 import '../../errands/view/see_all_errands.dart';
-import '../../recently_posted_item.dart/view/recently_posted_list.dart';
-import 'package:http/http.dart' as http;
 
 class home_view_1 extends StatefulWidget {
   home_view_1({super.key});

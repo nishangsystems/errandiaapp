@@ -160,9 +160,9 @@ class business_controller extends GetxController {
 class manage_business_tabController extends GetxController
     with GetSingleTickerProviderStateMixin {
   List<Widget> myTabs = [
-    allBusiness(),
-    Published(),
-    Trashed(),
+    // allBusiness(),
+    // Published(),
+    // Trashed(),
   ];
 
   late TabController tabController;

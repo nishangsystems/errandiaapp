@@ -1,347 +1,418 @@
-import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'dart:convert';
+
 import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
+import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
+import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
+import 'package:errandia/app/modules/global/Widgets/business_item.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
-import 'package:errandia/app/modules/home/view/home_view_1.dart';
 import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/view/add_service_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+
 import '../../global/Widgets/blockButton.dart';
 import '../../global/Widgets/bottomsheet_item.dart';
 import '../../global/Widgets/customDrawer.dart';
 import '../../global/constants/color.dart';
-import '../../home/view/home_view.dart';
 
 enum BusinessAction { suspend, reinstate, delete }
 
-class manage_business_view extends StatelessWidget {
+class manage_business_view extends StatefulWidget {
   manage_business_view({super.key});
-  manage_business_tabController mController =
-      Get.put(manage_business_tabController());
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: InkWell(
-        onTap: () {
-          Get.off(add_business_view());
-        },
-        child: Container(
-          width: Get.width * 0.47,
-          padding: EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: appcolor().skyblueColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.add,
-                color: appcolor().mainColor,
-                size: 28,
-              ),
-              Spacer(),
-              Text(
-                'Add Business',
-                style: TextStyle(fontSize: 16, color: appcolor().mainColor),
-              ),
-            ],
-          ),
-        ),
-      ),
-      endDrawer: CustomEndDrawer(
-        onBusinessCreated: () {
-          home_controller().closeDrawer();
-          home_controller().featuredBusinessData.clear();
-          home_controller().fetchFeaturedBusinessesData();
-          business_controller().itemList.clear();
-          business_controller().loadBusinesses();
-          home_controller().recentlyPostedItemsData.clear();
-          home_controller().fetchRecentlyPostedItemsData();
-          profile_controller().itemList.clear();
-          profile_controller().loadMyBusinesses();
-        },
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 2,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            // size: 30,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: const Text(
-          'Manage Business',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
-        ),
-        iconTheme: IconThemeData(
-          color: appcolor().mediumGreyColor,
-          size: 30,
-        ),
-      ),
-      body:
-      Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              border: Border.symmetric(
-                horizontal: BorderSide(
-                  color: appcolor().greyColor,
-                ),
-              ),
-            ),
-            height: Get.height * 0.08,
-            child: TabBar(
-              dividerColor: appcolor().bluetextcolor,
-              isScrollable: true,
-              unselectedLabelColor: appcolor().mediumGreyColor,
-              unselectedLabelStyle: const TextStyle(
-                fontWeight: FontWeight.normal,
-                fontSize: 16,
-              ),
-              indicatorColor: appcolor().mainColor,
-              labelColor: appcolor().bluetextcolor,
-              labelStyle: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: appcolor().mainColor,
-                fontSize: 18,
-              ),
-              controller: mController.tabController,
-              tabs: [
-                Container(
-                  height:Get.height* 0.05,
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  child: const Text('All Businesses'),
-                ),
-                SizedBox(
-                  height:Get.height* 0.05,
-                  width: Get.width * 0.26,
-                  child: const Text('Published'),
-                ),
-                SizedBox(
-                    height:Get.height* 0.05,
-                    child: const Text('Trashed')),
-              ],
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: mController.tabController,
-              children: mController.myTabs,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<manage_business_view> createState() => _manage_business_viewState();
 }
 
-Widget allBusiness() {
- return FutureBuilder(
-    future: BusinessAPI.businesses(1),
-      builder: (context, snapshot){
-    if(snapshot.hasError){
-      return const Center(child: CircularProgressIndicator(),);
-    }else if(snapshot.hasData){
-      return ListView.builder(
-        itemCount: snapshot.data.length,
-        itemBuilder: (context, index) {
-          var data = snapshot.data[index];
-          if (kDebugMode) {
-            print("manage business : $data");
-          }
-          return Container(
-            margin: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 10,
+class _manage_business_viewState extends State<manage_business_view>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  final manage_business_tabController mController =
+      Get.put(manage_business_tabController());
+  late profile_controller profileController;
+  late ScrollController scrollController;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  late PopupBox popup;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    profileController = Get.put(profile_controller());
+    mController.tabController = TabController(length: 3, vsync: this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      profileController.loadMyBusinesses();
+    });
+
+    scrollController = ScrollController();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent) {
+        profileController.loadMyBusinesses();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      profileController.reloadMyBusinesses();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget allBusiness() {
+      return Expanded(child: Obx(() {
+        if (profileController.isLoading.isTrue) {
+          return buildLoadingWidget();
+        } else if (profileController.isError.isTrue) {
+          return buildErrorWidget(
+            message: 'An error occurred',
+            callback: () {
+              profileController.loadMyBusinesses();
+            },
+          );
+        } else if (profileController.itemList.isEmpty) {
+          return SizedBox(
+            height: Get.height * 0.5,
+            child: Center(
+              child: Text(
+                'No Business found',
+                style: TextStyle(
+                  color: appcolor().mainColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+        } else {
+          return ListView.builder(
+            itemCount: profileController.itemList.length,
+            itemBuilder: (context, index) {
+              var data = profileController.itemList[index];
+              if (kDebugMode) {
+                print("manage business : $data");
+              }
+              return BusinessItem(
+                name: data['name'],
+                address: data['address'],
+                image: data['image'],
+                onTap: () {
+                  Get.bottomSheet(
+                    // backgroundColor: Colors.white,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      color: Colors.white,
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Center(
+                            child: Icon(
+                              Icons.horizontal_rule,
+                              size: 25,
+                            ),
+                          ),
+                          // Text(index.toString()),
+                          bottomSheetWidgetitem(
+                            title: 'Edit Business',
+                            imagepath:
+                                'assets/images/sidebar_icon/icon-edit.png',
+                            callback: () async {
+                              print('tapped');
+                              Get.back();
+                              Get.to(() => EditBusinessView(
+                                    data: data,
+                                  ));
+                            },
+                          ),
+                          bottomSheetWidgetitem(
+                            title: 'Add New Product',
+                            imagepath:
+                                'assets/images/sidebar_icon/add_products.png',
+                            callback: () async {
+                              print('add new product');
+                              Get.back();
+                              Get.to(() => add_product_view());
+                            },
+                          ),
+                          bottomSheetWidgetitem(
+                            title: 'Add New Service',
+                            imagepath:
+                                'assets/images/sidebar_icon/services.png',
+                            callback: () async {
+                              print('add new service');
+                              Get.back();
+                              Get.to(() => add_service_view());
+                            },
+                          ),
+                          bottomSheetWidgetitem(
+                            title: 'Suspend Business',
+                            imagepath:
+                                'assets/images/sidebar_icon/icon-suspend.png',
+                            callback: () {
+                              Get.back();
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return businessDialog(BusinessAction.suspend);
+                                },
+                              );
+                            },
+                          ),
+                          bottomSheetWidgetitem(
+                            title: 'Update Location',
+                            imagepath:
+                                'assets/images/sidebar_icon/icon-location.png',
+                            callback: () {},
+                          ),
+                          bottomSheetWidgetitem(
+                            title: 'Move to trash',
+                            imagepath:
+                                'assets/images/sidebar_icon/icon-trash.png',
+                            callback: () {
+                              Get.back();
+
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext dialogContext) {
+                                  // Use dialogContext
+                                  var response;
+                                  return CustomAlertDialog(
+                                      title: "Delete Business",
+                                      message:
+                                          "Are you sure you want to delete this business?",
+                                      dialogType: MyDialogType.error,
+                                      onConfirm: () {
+                                        // delete product
+                                        print(
+                                            "delete business: ${data['slug']}");
+                                        BusinessAPI.deleteBusiness(data['slug'])
+                                            .then((response_) {
+                                          if (response_ != null) {
+                                            response = jsonDecode(response_);
+                                            print(
+                                                "delete business response: $response");
+
+                                            if (mounted) {
+                                              // Check if the widget is still in the tree
+                                              if (response["status"] ==
+                                                  'success') {
+                                                profileController
+                                                    .reloadMyProducts();
+                                                profileController
+                                                    .reloadMyServices();
+
+                                                Navigator.of(dialogContext)
+                                                    .pop(); // Close the dialog
+
+                                                // Show success popup
+                                                popup = PopupBox(
+                                                  title: 'Success',
+                                                  description: response['data']
+                                                      ['message'],
+                                                  type: PopupType.success,
+                                                );
+                                              } else {
+                                                Navigator.of(dialogContext)
+                                                    .pop(); // Close the dialog
+
+                                                // Show error popup
+                                                popup = PopupBox(
+                                                  title: 'Error',
+                                                  description: response['data']
+                                                      ['data'],
+                                                  type: PopupType.error,
+                                                );
+                                              }
+
+                                              popup.showPopup(
+                                                  context); // Show the popup
+                                            }
+                                          }
+                                        });
+                                      },
+                                      onCancel: () {
+                                        // cancel delete
+                                        print("cancel delete");
+                                        Navigator.of(dialogContext)
+                                            .pop(); // Close the dialog
+                                      });
+                                },
+                              ).then((_) {
+                                if (mounted) {
+                                  try {
+                                    popup.dismissPopup(navigatorKey
+                                        .currentContext!); // Dismiss the popup
+                                  } catch (e) {
+                                    print("error dismissing popup: $e");
+                                  }
+                                  profileController.reloadMyBusinesses();
+                                  Get.back();
+                                }
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    enableDrag: true,
+                  );
+                },
+              );
+            },
+          );
+        }
+      }));
+    }
+
+    mController.myTabs = <Widget>[
+      allBusiness(),
+      Published(),
+      Trashed(),
+    ];
+
+    return WillPopScope(
+      onWillPop: () async {
+        Get.back();
+        return true;
+      },
+      child: Scaffold(
+        floatingActionButton: InkWell(
+          onTap: () {
+            Get.to(() => add_business_view());
+          },
+          child: Container(
+            width: Get.width * 0.47,
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: appcolor().skyblueColor,
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
-                // image container
-                Container(
-                  margin: const EdgeInsets.only(
-                    right: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                      8,
-                    ),
-                  ),
-                  width: Get.width * 0.16,
-                  height: Get.height * 0.06,
-                  child: const Image(
-                    image: AssetImage(
-                      'assets/images/barber_logo.png',
-                    ),
-                    fit: BoxFit.fill,
-                  ),
+                Icon(
+                  Icons.add,
+                  color: appcolor().mainColor,
+                  size: 28,
                 ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${data['name']}',
-                        style: TextStyle(
-                          color: appcolor().mainColor,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        '${data['address']}',
-                        style: TextStyle(
-                          color: appcolor().mediumGreyColor,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                InkWell(
-                  onTap: () {
-                    if (kDebugMode) {
-                      print(index.toString());
-                    }
-                    Get.bottomSheet(
-                      // backgroundColor: Colors.white,
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-
-                        color: Colors.white,
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            const Center(
-                              child: Icon(
-                                Icons.horizontal_rule,
-                                size: 25,
-                              ),
-                            ),
-                            // Text(index.toString()),
-                            bottomSheetWidgetitem(
-                              title: 'Edit Business',
-                              imagepath:
-                              'assets/images/sidebar_icon/icon-edit.png',
-                              callback: () async {
-                                print('tapped');
-                                Get.back();
-                                Get.to(() => EditBusinessView(data: data,));
-                              },
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Add New Product',
-                              imagepath:
-                              'assets/images/sidebar_icon/add_products.png',
-                              callback: () async {
-                                print('add new product');
-                                Get.back();
-                                // show a popup with a dropdown to select the shop to add the product to
-
-                              },
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Add New Service',
-                              imagepath:
-                              'assets/images/sidebar_icon/services.png',
-                              callback: () async {
-                                print('add new service');
-                                Get.back();
-                                Get.to(() => add_service_view());
-                              },
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Suspend Business',
-                              imagepath:
-                              'assets/images/sidebar_icon/icon-suspend.png',
-                              callback: () {
-                                Get.back();
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return businessDialog(BusinessAction.suspend);
-                                  },
-                                );
-                              },
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Update Location',
-                              imagepath:
-                              'assets/images/sidebar_icon/icon-location.png',
-                              callback: () {},
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Move to trash',
-                              imagepath:
-                              'assets/images/sidebar_icon/icon-trash.png',
-                              callback: () {
-                                Get.back();
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return businessDialog(BusinessAction.delete);
-                                  },
-                                );
-                              //   var value = {
-                              //     "errand_id": data['id']
-                              //   };
-                              //   api().deleteUpdate('shops/delete', 1, value);
-                              //   Future.delayed(Duration(seconds: 2),(){
-                              //     Get.offAll(manage_business_view());
-                              //   });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      enableDrag: true,
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Text(
-                        'MANAGE',
-                        style: TextStyle(
-                            color: appcolor().bluetextcolor,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: appcolor().greyColor),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Icon(
-                          Icons.more_horiz,
-                          color: appcolor().greyColor,
-                        ),
-                      ),
-                    ],
-                  ),
+                Spacer(),
+                Text(
+                  'Add Business',
+                  style: TextStyle(fontSize: 16, color: appcolor().mainColor),
                 ),
               ],
             ),
-          );
-        },
-      );
-    }else{
-      return const Center(child: CircularProgressIndicator(),);
-    }
-  },
-  );
-
+          ),
+        ),
+        endDrawer: CustomEndDrawer(
+          onBusinessCreated: () {
+            home_controller().closeDrawer();
+            home_controller().featuredBusinessData.clear();
+            home_controller().fetchFeaturedBusinessesData();
+            business_controller().itemList.clear();
+            business_controller().loadBusinesses();
+            home_controller().recentlyPostedItemsData.clear();
+            home_controller().fetchRecentlyPostedItemsData();
+            profile_controller().itemList.clear();
+            profile_controller().loadMyBusinesses();
+          },
+        ),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 2,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              // size: 30,
+            ),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          title: const Text(
+            'Manage Business',
+            style:
+                TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
+          ),
+          iconTheme: IconThemeData(
+            color: appcolor().mediumGreyColor,
+            size: 30,
+          ),
+        ),
+        body: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                border: Border.symmetric(
+                  horizontal: BorderSide(
+                    color: appcolor().greyColor,
+                  ),
+                ),
+              ),
+              height: Get.height * 0.08,
+              child: TabBar(
+                dividerColor: appcolor().bluetextcolor,
+                isScrollable: true,
+                unselectedLabelColor: appcolor().mediumGreyColor,
+                unselectedLabelStyle: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 16,
+                ),
+                indicatorColor: appcolor().mainColor,
+                labelColor: appcolor().bluetextcolor,
+                labelStyle: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: appcolor().mainColor,
+                  fontSize: 18,
+                ),
+                controller: mController.tabController,
+                tabs: [
+                  Container(
+                    height: Get.height * 0.05,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    child: const Text('All Businesses'),
+                  ),
+                  SizedBox(
+                    height: Get.height * 0.05,
+                    width: Get.width * 0.26,
+                    child: const Text('Published'),
+                  ),
+                  SizedBox(
+                      height: Get.height * 0.05, child: const Text('Trashed')),
+                ],
+              ),
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: mController.tabController,
+                children: mController.myTabs,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 String getActionText(BusinessAction action) {
@@ -370,8 +441,7 @@ String getActionPrompt(BusinessAction action) {
 Color getActionButtonColor(BusinessAction action) {
   switch (action) {
     case BusinessAction.suspend:
-      return const Color.fromARGB(
-          255, 225, 146, 20);
+      return const Color.fromARGB(255, 225, 146, 20);
     case BusinessAction.reinstate:
       return appcolor().mainColor;
     case BusinessAction.delete:
@@ -393,10 +463,8 @@ Widget businessDialog(BusinessAction action) {
       // height: Get.height * 0.7,
       width: Get.width,
       child: Column(
-        mainAxisAlignment:
-        MainAxisAlignment.center,
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             getActionText(action),
@@ -425,8 +493,7 @@ Widget businessDialog(BusinessAction action) {
                   right: 10,
                 ),
                 decoration: BoxDecoration(
-                  borderRadius:
-                  BorderRadius.circular(
+                  borderRadius: BorderRadius.circular(
                     8,
                   ),
                 ),
@@ -440,25 +507,20 @@ Widget businessDialog(BusinessAction action) {
                 ),
               ),
               Column(
-                crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Rubiliams Hair Clinic',
                     style: TextStyle(
-                      color: appcolor()
-                          .mainColor,
-                      fontWeight:
-                      FontWeight.w500,
+                      color: appcolor().mainColor,
+                      fontWeight: FontWeight.w500,
                       fontSize: 16,
                     ),
                   ),
                   Text(
                     'Molyko, Buea',
                     style: TextStyle(
-                      color: appcolor()
-                          .mediumGreyColor,
+                      color: appcolor().mediumGreyColor,
                       fontSize: 13,
                     ),
                   ),
@@ -473,9 +535,8 @@ Widget businessDialog(BusinessAction action) {
             children: [
               blockButton(
                 title: Text(
-                 getActionText(action),
-                  style: const TextStyle(
-                      color: Colors.white),
+                  getActionText(action),
+                  style: const TextStyle(color: Colors.white),
                 ),
                 ontap: () {
                   Get.back();
@@ -488,9 +549,7 @@ Widget businessDialog(BusinessAction action) {
               blockButton(
                 title: Text(
                   'Cancel',
-                  style: TextStyle(
-                      color: appcolor()
-                          .mediumGreyColor),
+                  style: TextStyle(color: appcolor().mediumGreyColor),
                 ),
                 ontap: () {
                   Get.back();
@@ -848,7 +907,6 @@ Widget Trashed() {
                         // backgroundColor: Colors.white,
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 20),
-                          
                           color: Colors.white,
                           child: Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
@@ -889,10 +947,12 @@ Widget Trashed() {
                                     context: context,
                                     builder: (context) {
                                       return AlertDialog(
-                                        insetPadding: const EdgeInsets.symmetric(
+                                        insetPadding:
+                                            const EdgeInsets.symmetric(
                                           horizontal: 10,
                                         ),
-                                        contentPadding: const EdgeInsets.symmetric(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
                                           horizontal: 8,
                                           vertical: 20,
                                         ),
@@ -915,7 +975,8 @@ Widget Trashed() {
                                                 ),
                                               ),
                                               Container(
-                                                margin: const EdgeInsets.symmetric(
+                                                margin:
+                                                    const EdgeInsets.symmetric(
                                                   vertical: 15,
                                                 ),
                                                 child: const Text(
@@ -929,7 +990,8 @@ Widget Trashed() {
                                               Row(
                                                 children: [
                                                   Container(
-                                                    margin: const EdgeInsets.only(
+                                                    margin:
+                                                        const EdgeInsets.only(
                                                       right: 10,
                                                     ),
                                                     decoration: BoxDecoration(
@@ -987,7 +1049,6 @@ Widget Trashed() {
                                                     ),
                                                     ontap: () {
                                                       Get.back();
-
                                                     },
                                                     color: appcolor().redColor,
                                                   ),
@@ -1005,7 +1066,8 @@ Widget Trashed() {
                                                     ontap: () {
                                                       Get.back();
                                                     },
-                                                    color: const Color(0xfffafafa),
+                                                    color:
+                                                        const Color(0xfffafafa),
                                                   ),
                                                 ],
                                               )
