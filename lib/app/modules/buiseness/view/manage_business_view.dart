@@ -85,7 +85,7 @@ class _manage_business_viewState extends State<manage_business_view>
           return buildErrorWidget(
             message: 'An error occurred',
             callback: () {
-              profileController.loadMyBusinesses();
+              profileController.reloadMyBusinesses();
             },
           );
         } else if (profileController.itemList.isEmpty) {
@@ -95,15 +95,17 @@ class _manage_business_viewState extends State<manage_business_view>
               child: Text(
                 'No Business found',
                 style: TextStyle(
-                  color: appcolor().mainColor,
+                  color: appcolor().mediumGreyColor,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
           );
         } else {
           return ListView.builder(
+            key: const PageStorageKey('allMyBusinesses'),
+            controller: scrollController,
             itemCount: profileController.itemList.length,
             itemBuilder: (context, index) {
               var data = profileController.itemList[index];

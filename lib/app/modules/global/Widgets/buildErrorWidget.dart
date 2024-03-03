@@ -20,11 +20,12 @@ class buildErrorWidget extends StatelessWidget {
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error,
+             Icon(
+              Icons.error_outline,
               size: 50,
-              color: Colors.red,
+              color: appcolor().mediumGreyColor,
             ),
             const SizedBox(
               height: 10,
@@ -32,10 +33,14 @@ class buildErrorWidget extends StatelessWidget {
             Text(
              message ?? 'An error occurred, please try again later',
               style: TextStyle(
-                color: appcolor().greyColor,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                color: appcolor().mediumGreyColor,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(
+              height: 10,
             ),
             ElevatedButton(
               onPressed: callback ?? () {},
