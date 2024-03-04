@@ -78,7 +78,7 @@ class _manage_business_viewState extends State<manage_business_view>
   @override
   Widget build(BuildContext context) {
     Widget allBusiness() {
-      return Expanded(child: Obx(() {
+      return Obx(() {
         if (profileController.isLoading.isTrue) {
           return buildLoadingWidget();
         } else if (profileController.isError.isTrue) {
@@ -135,19 +135,19 @@ class _manage_business_viewState extends State<manage_business_view>
                           bottomSheetWidgetitem(
                             title: 'Edit Business',
                             imagepath:
-                                'assets/images/sidebar_icon/icon-edit.png',
+                            'assets/images/sidebar_icon/icon-edit.png',
                             callback: () async {
                               print('tapped');
                               Get.back();
                               Get.to(() => EditBusinessView(
-                                    data: data,
-                                  ));
+                                data: data,
+                              ));
                             },
                           ),
                           bottomSheetWidgetitem(
                             title: 'Add New Product',
                             imagepath:
-                                'assets/images/sidebar_icon/add_products.png',
+                            'assets/images/sidebar_icon/add_products.png',
                             callback: () async {
                               print('add new product');
                               Get.back();
@@ -157,7 +157,7 @@ class _manage_business_viewState extends State<manage_business_view>
                           bottomSheetWidgetitem(
                             title: 'Add New Service',
                             imagepath:
-                                'assets/images/sidebar_icon/services.png',
+                            'assets/images/sidebar_icon/services.png',
                             callback: () async {
                               print('add new service');
                               Get.back();
@@ -167,7 +167,7 @@ class _manage_business_viewState extends State<manage_business_view>
                           bottomSheetWidgetitem(
                             title: 'Suspend Business',
                             imagepath:
-                                'assets/images/sidebar_icon/icon-suspend.png',
+                            'assets/images/sidebar_icon/icon-suspend.png',
                             callback: () {
                               Get.back();
                               showDialog(
@@ -181,13 +181,13 @@ class _manage_business_viewState extends State<manage_business_view>
                           bottomSheetWidgetitem(
                             title: 'Update Location',
                             imagepath:
-                                'assets/images/sidebar_icon/icon-location.png',
+                            'assets/images/sidebar_icon/icon-location.png',
                             callback: () {},
                           ),
                           bottomSheetWidgetitem(
                             title: 'Move to trash',
                             imagepath:
-                                'assets/images/sidebar_icon/icon-trash.png',
+                            'assets/images/sidebar_icon/icon-trash.png',
                             callback: () {
                               Get.back();
 
@@ -199,7 +199,7 @@ class _manage_business_viewState extends State<manage_business_view>
                                   return CustomAlertDialog(
                                       title: "Delete Business",
                                       message:
-                                          "Are you sure you want to delete this business?",
+                                      "Are you sure you want to delete this business?",
                                       dialogType: MyDialogType.error,
                                       onConfirm: () {
                                         // delete product
@@ -228,7 +228,7 @@ class _manage_business_viewState extends State<manage_business_view>
                                                 popup = PopupBox(
                                                   title: 'Success',
                                                   description: response['data']
-                                                      ['message'],
+                                                  ['message'],
                                                   type: PopupType.success,
                                                 );
                                               } else {
@@ -239,7 +239,7 @@ class _manage_business_viewState extends State<manage_business_view>
                                                 popup = PopupBox(
                                                   title: 'Error',
                                                   description: response['data']
-                                                      ['data'],
+                                                  ['data'],
                                                   type: PopupType.error,
                                                 );
                                               }
@@ -282,7 +282,7 @@ class _manage_business_viewState extends State<manage_business_view>
             },
           );
         }
-      }));
+      });
     }
 
     mController.myTabs = <Widget>[

@@ -74,120 +74,80 @@ class _manage_product_viewState extends State<manage_product_view> with WidgetsB
   @override
   Widget build(BuildContext context) {
     Widget allProducts(BuildContext ctx) {
-      return Expanded(
-        child: Obx(
-            () {
-              if (profileController.isProductLoading.value) {
-                return buildLoadingWidget();
-              } else if (profileController.isProductError.value) {
-                return buildErrorWidget(
-                  message: 'An error occurred, please try again later',
-                  callback: () {
-                    profileController.reloadMyProducts();
-                  },
-                );
-              } else if (profileController.productItemList.isEmpty) {
-                return SizedBox(
-                  height: Get.height * 0.5,
-                  child: Center(
-                    child: Text(
-                      'No Products found',
-                      style: TextStyle(
-                        color: appcolor().mediumGreyColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
+      return Obx(
+              () {
+            if (profileController.isProductLoading.value) {
+              return buildLoadingWidget();
+            } else if (profileController.isProductError.value) {
+              return buildErrorWidget(
+                message: 'An error occurred, please try again later',
+                callback: () {
+                  profileController.reloadMyProducts();
+                },
+              );
+            } else if (profileController.productItemList.isEmpty) {
+              return SizedBox(
+                height: Get.height * 0.5,
+                child: Center(
+                  child: Text(
+                    'No Products found',
+                    style: TextStyle(
+                      color: appcolor().mediumGreyColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                );
-              } else {
-                return Column(
-                  children: [
-                    filter_sort_container(
-                          () {
-                        Get.to(filter_product_view());
-                      },
-                          () {
-                        Get.bottomSheet(
-                          Container(
-                            color: const Color.fromRGBO(255, 255, 255, 1),
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.start,
-                              children: [
-                                Text(
-                                  'Sort List',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 22,
-                                    color: appcolor().mainColor,
+                ),
+              );
+            } else {
+              return Column(
+                children: [
+                  filter_sort_container(
+                        () {
+                      Get.to(filter_product_view());
+                    },
+                        () {
+                      Get.bottomSheet(
+                        Container(
+                          color: const Color.fromRGBO(255, 255, 255, 1),
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.start,
+                            children: [
+                              Text(
+                                'Sort List',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 22,
+                                  color: appcolor().mainColor,
+                                ),
+                              ),
+                              // z-a
+                              Row(
+                                children: [
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(fontSize: 16),
+                                      children: [
+                                        TextSpan(
+                                          text: 'Product Name : ',
+                                          style: TextStyle(
+                                            color: appcolor().mainColor,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Desc Z-A',
+                                          style: TextStyle(
+                                            color: appcolor().mediumGreyColor,
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                // z-a
-                                Row(
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: TextStyle(fontSize: 16),
-                                        children: [
-                                          TextSpan(
-                                            text: 'Product Name : ',
-                                            style: TextStyle(
-                                              color: appcolor().mainColor,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: 'Desc Z-A',
-                                            style: TextStyle(
-                                              color: appcolor().mediumGreyColor,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    Spacer(),
-                                    Obx(
-                                          () =>
-                                          Radio(
-                                            value: 'sort descending',
-                                            groupValue: manageProductController
-                                                .allProducts_sort_group_value
-                                                .value,
-                                            onChanged: (val) {
-                                              manageProductController
-                                                  .allProducts_sort_group_value
-                                                  .value = val.toString();
-                                            },
-                                          ),
-                                    )
-                                  ],
-                                ),
-
-                                // a-z
-                                Row(
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: TextStyle(fontSize: 16),
-                                        children: [
-                                          TextSpan(
-                                            text: 'Product Name : ',
-                                            style: TextStyle(
-                                              color: appcolor().mainColor,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: 'Asc A-Z',
-                                            style: TextStyle(
-                                              color: appcolor().mediumGreyColor,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    Spacer(),
-                                    Obx(() =>
+                                  Spacer(),
+                                  Obx(
+                                        () =>
                                         Radio(
-                                          value: 'sort ascending',
+                                          value: 'sort descending',
                                           groupValue: manageProductController
                                               .allProducts_sort_group_value
                                               .value,
@@ -196,31 +156,101 @@ class _manage_product_viewState extends State<manage_product_view> with WidgetsB
                                                 .allProducts_sort_group_value
                                                 .value = val.toString();
                                           },
-                                        ))
-                                  ],
-                                ),
+                                        ),
+                                  )
+                                ],
+                              ),
 
-                                // distance nearest to me
-                                Row(
-                                  children: [
-                                    RichText(
-                                        text: TextSpan(
-                                            style: TextStyle(fontSize: 16),
-                                            children: [
-                                              TextSpan(
-                                                text: 'Date',
-                                                style: TextStyle(
-                                                  color: appcolor().mainColor,
-                                                ),
+                              // a-z
+                              Row(
+                                children: [
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(fontSize: 16),
+                                      children: [
+                                        TextSpan(
+                                          text: 'Product Name : ',
+                                          style: TextStyle(
+                                            color: appcolor().mainColor,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Asc A-Z',
+                                          style: TextStyle(
+                                            color: appcolor().mediumGreyColor,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Obx(() =>
+                                      Radio(
+                                        value: 'sort ascending',
+                                        groupValue: manageProductController
+                                            .allProducts_sort_group_value
+                                            .value,
+                                        onChanged: (val) {
+                                          manageProductController
+                                              .allProducts_sort_group_value
+                                              .value = val.toString();
+                                        },
+                                      ))
+                                ],
+                              ),
+
+                              // distance nearest to me
+                              Row(
+                                children: [
+                                  RichText(
+                                      text: TextSpan(
+                                          style: TextStyle(fontSize: 16),
+                                          children: [
+                                            TextSpan(
+                                              text: 'Date',
+                                              style: TextStyle(
+                                                color: appcolor().mainColor,
                                               ),
-                                              TextSpan(
-                                                text: 'Last Modified',
-                                              ),
-                                            ])),
-                                    Spacer(),
-                                    Obx(() =>
+                                            ),
+                                            TextSpan(
+                                              text: 'Last Modified',
+                                            ),
+                                          ])),
+                                  Spacer(),
+                                  Obx(() =>
+                                      Radio(
+                                        value: 'Date Last modified ',
+                                        groupValue: manageProductController
+                                            .allProducts_sort_group_value
+                                            .value,
+                                        onChanged: (val) {
+                                          manageProductController
+                                              .allProducts_sort_group_value
+                                              .value = val.toString();
+                                        },
+                                      ))
+                                ],
+                              ),
+
+                              //recentaly added
+                              Row(
+                                children: [
+                                  Text(
+                                    'Price',
+                                    style: TextStyle(
+                                        color: appcolor().mainColor,
+                                        fontSize: 16),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_upward,
+                                    size: 25,
+                                    color: appcolor().mediumGreyColor,
+                                  ),
+                                  Spacer(),
+                                  Obx(
+                                        () =>
                                         Radio(
-                                          value: 'Date Last modified ',
+                                          value: 'Price',
                                           groupValue: manageProductController
                                               .allProducts_sort_group_value
                                               .value,
@@ -228,206 +258,174 @@ class _manage_product_viewState extends State<manage_product_view> with WidgetsB
                                             manageProductController
                                                 .allProducts_sort_group_value
                                                 .value = val.toString();
+                                            print(val.toString());
                                           },
-                                        ))
-                                  ],
-                                ),
-
-                                //recentaly added
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Price',
-                                      style: TextStyle(
-                                          color: appcolor().mainColor,
-                                          fontSize: 16),
-                                    ),
-                                    Icon(
-                                      Icons.arrow_upward,
-                                      size: 25,
-                                      color: appcolor().mediumGreyColor,
-                                    ),
-                                    Spacer(),
-                                    Obx(
-                                          () =>
-                                          Radio(
-                                            value: 'Price',
-                                            groupValue: manageProductController
-                                                .allProducts_sort_group_value
-                                                .value,
-                                            onChanged: (val) {
-                                              manageProductController
-                                                  .allProducts_sort_group_value
-                                                  .value = val.toString();
-                                              print(val.toString());
-                                            },
-                                          ),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ).paddingSymmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
+                                        ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ).paddingSymmetric(
+                            horizontal: 20,
+                            vertical: 10,
                           ),
+                        ),
+                      );
+                    },
+                        () {
+                      Scaffold.of(ctx).openEndDrawer();
+                    },
+                  ),
+                  SizedBox(
+                    height: Get.height * 0.01,
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      key: const PageStorageKey('allMyProducts'),
+                      controller: scrollController,
+                      itemCount: profileController.productItemList.length,
+                      itemBuilder: (context, index) {
+                        var data = profileController.productItemList[index];
+                        return RowItemWidget(
+                          name: data['name'],
+                          price: data['unit_price'].toString(),
+                          image: data['featured_image'],
+                          index: index,
+                          onTap: () {
+                            Get.bottomSheet(
+                              // backgroundColor: Colors.white,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20),
+                                color: Colors.white,
+                                child: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment
+                                      .center,
+                                  children: [
+                                    const Center(
+                                      child: Icon(
+                                        Icons.horizontal_rule,
+                                        size: 25,
+                                      ),
+                                    ),
+                                    // Text(index.toString()),
+                                    managebottomSheetWidgetitem(
+                                      title: 'Edit Product',
+                                      icondata: Icons.edit,
+                                      callback: () async {
+                                        print('tapped');
+                                        Get.back();
+                                        Get.to(() =>
+                                            EditProductView(
+                                              data: data,));
+                                      },
+                                    ),
+                                    // managebottomSheetWidgetitem(
+                                    //   title: 'Edit Photo',
+                                    //   icondata: FontAwesomeIcons
+                                    //       .fileImage,
+                                    //   callback: () {
+                                    //     Get.back();
+                                    //   },
+                                    // ),
+                                    // managebottomSheetWidgetitem(
+                                    //   title: 'UnPublish Product',
+                                    //   icondata: FontAwesomeIcons
+                                    //       .minusCircle,
+                                    //   callback: () {},
+                                    // ),
+                                    managebottomSheetWidgetitem(
+                                      title: 'Move to trash',
+                                      icondata: Icons.delete,
+                                      callback: () {
+                                        Get.back();
+
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext dialogContext) {
+                                            // Use dialogContext
+                                            var response;
+                                            return CustomAlertDialog(
+                                                title: "Delete Product",
+                                                message: "Are you sure you want to delete this product?",
+                                                dialogType: MyDialogType.error,
+                                                onConfirm: () {
+                                                  // delete product
+                                                  print("delete product: ${data['slug']}");
+                                                  ProductAPI.deleteProductOrService(data['slug'])
+                                                      .then((response_) {
+                                                    if (response_ != null) {
+                                                      response = jsonDecode(response_);
+                                                      print("delete product response: $response");
+
+                                                      if (mounted) {
+                                                        // Check if the widget is still in the tree
+                                                        if (response["status"] == 'success') {
+                                                          Navigator.of(dialogContext)
+                                                              .pop(); // Close the dialog
+
+                                                          // Show success popup
+                                                          popup = PopupBox(
+                                                            title: 'Success',
+                                                            description: response['data']['message'],
+                                                            type: PopupType.success,
+                                                          );
+                                                        } else {
+                                                          Navigator.of(dialogContext)
+                                                              .pop(); // Close the dialog
+
+                                                          // Show error popup
+                                                          popup = PopupBox(
+                                                            title: 'Error',
+                                                            description: response['data']['data'],
+                                                            type: PopupType.error,
+                                                          );
+                                                        }
+
+                                                        popup.showPopup(context); // Show the popup
+                                                      }
+                                                    }
+                                                  });
+                                                },
+                                                onCancel: () {
+                                                  // cancel delete
+                                                  print("cancel delete");
+                                                  Navigator.of(dialogContext).pop(); // Close the dialog
+                                                });
+                                          },
+                                        ).then((_) {
+                                          if (mounted) {
+                                            try {
+                                              popup.dismissPopup(
+                                                  navigatorKey.currentContext!); // Dismiss the popup
+                                            } catch (e) {
+                                              print("error dismissing popup: $e");
+                                            }
+                                            profileController.reloadMyProducts();
+                                            Get.back();
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              enableDrag: true,
+                            );
+                          },
                         );
                       },
-                          () {
-                        Scaffold.of(ctx).openEndDrawer();
-                      },
                     ),
-                    SizedBox(
-                      height: Get.height * 0.01,
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        key: const PageStorageKey('allMyProducts'),
-                        controller: scrollController,
-                        itemCount: profileController.productItemList.length,
-                        itemBuilder: (context, index) {
-                          var data = profileController.productItemList[index];
-                          return RowItemWidget(
-                            name: data['name'],
-                            price: data['unit_price'].toString(),
-                            image: data['featured_image'],
-                            index: index,
-                            onTap: () {
-                              Get.bottomSheet(
-                                // backgroundColor: Colors.white,
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  color: Colors.white,
-                                  child: Wrap(
-                                    crossAxisAlignment: WrapCrossAlignment
-                                        .center,
-                                    children: [
-                                      const Center(
-                                        child: Icon(
-                                          Icons.horizontal_rule,
-                                          size: 25,
-                                        ),
-                                      ),
-                                      // Text(index.toString()),
-                                      managebottomSheetWidgetitem(
-                                        title: 'Edit Product',
-                                        icondata: Icons.edit,
-                                        callback: () async {
-                                          print('tapped');
-                                          Get.back();
-                                          Get.to(() =>
-                                              EditProductView(
-                                                data: data,));
-                                        },
-                                      ),
-                                      // managebottomSheetWidgetitem(
-                                      //   title: 'Edit Photo',
-                                      //   icondata: FontAwesomeIcons
-                                      //       .fileImage,
-                                      //   callback: () {
-                                      //     Get.back();
-                                      //   },
-                                      // ),
-                                      // managebottomSheetWidgetitem(
-                                      //   title: 'UnPublish Product',
-                                      //   icondata: FontAwesomeIcons
-                                      //       .minusCircle,
-                                      //   callback: () {},
-                                      // ),
-                                      managebottomSheetWidgetitem(
-                                        title: 'Move to trash',
-                                        icondata: Icons.delete,
-                                        callback: () {
-                                          Get.back();
-
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext dialogContext) {
-                                              // Use dialogContext
-                                              var response;
-                                              return CustomAlertDialog(
-                                                  title: "Delete Product",
-                                                  message: "Are you sure you want to delete this product?",
-                                                  dialogType: MyDialogType.error,
-                                                  onConfirm: () {
-                                                    // delete product
-                                                    print("delete product: ${data['slug']}");
-                                                    ProductAPI.deleteProductOrService(data['slug'])
-                                                        .then((response_) {
-                                                      if (response_ != null) {
-                                                        response = jsonDecode(response_);
-                                                        print("delete product response: $response");
-
-                                                        if (mounted) {
-                                                          // Check if the widget is still in the tree
-                                                          if (response["status"] == 'success') {
-                                                            Navigator.of(dialogContext)
-                                                                .pop(); // Close the dialog
-
-                                                            // Show success popup
-                                                            popup = PopupBox(
-                                                              title: 'Success',
-                                                              description: response['data']['message'],
-                                                              type: PopupType.success,
-                                                            );
-                                                          } else {
-                                                            Navigator.of(dialogContext)
-                                                                .pop(); // Close the dialog
-
-                                                            // Show error popup
-                                                            popup = PopupBox(
-                                                              title: 'Error',
-                                                              description: response['data']['data'],
-                                                              type: PopupType.error,
-                                                            );
-                                                          }
-
-                                                          popup.showPopup(context); // Show the popup
-                                                        }
-                                                      }
-                                                    });
-                                                  },
-                                                  onCancel: () {
-                                                    // cancel delete
-                                                    print("cancel delete");
-                                                    Navigator.of(dialogContext).pop(); // Close the dialog
-                                                  });
-                                            },
-                                          ).then((_) {
-                                            if (mounted) {
-                                              try {
-                                                popup.dismissPopup(
-                                                    navigatorKey.currentContext!); // Dismiss the popup
-                                              } catch (e) {
-                                                print("error dismissing popup: $e");
-                                              }
-                                              profileController.reloadMyProducts();
-                                              Get.back();
-                                            }
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                enableDrag: true,
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    )
-                  ],
-                ).paddingOnly(
-                  left: 10,
-                  right: 10,
-                  top: 10,
-                );
-              }
+                  )
+                ],
+              ).paddingOnly(
+                left: 10,
+                right: 10,
+                top: 10,
+              );
             }
-        )
+          }
       );
     }
 
