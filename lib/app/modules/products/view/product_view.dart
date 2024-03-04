@@ -1000,17 +1000,19 @@ Widget image_select_widget(BuildContext context, final item) {
             return Container(
               margin: const EdgeInsets.all(0.0),
               width: Get.width,
-              height: Get.height * 0.3,
+              // height: Get.height * 0.3,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(0),
                 child: FadeInImage.assetNetwork(
                     placeholder: 'assets/images/errandia_logo.png',
                     image: imageUrl,
-                    fit: BoxFit.fill,
+                    fit: BoxFit.contain,
+                    width: double.infinity,
                     imageErrorBuilder: (context, error, stackTrace) {
                       return Image.asset(
                         'assets/images/errandia_logo.png',
-                        fit: BoxFit.fill,
+                        fit: BoxFit.contain,
+                        width: double.infinity,
                       );
                     }),
               ),

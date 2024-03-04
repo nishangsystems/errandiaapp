@@ -22,19 +22,25 @@ class ErrandiaBusinessViewController extends GetxController {
   void loadBusinesses(currentSlug) async {
     print("fetching businesses");
 
-    isBranchesLoading.value = true;
-    var data = await BusinessAPI.businessBranches(currentSlug, 1);
-    print("response businesses: $data");
+    try {
+      isBranchesLoading.value = true;
+      var data = await BusinessAPI.businessBranches(currentSlug, 1);
+      print("response businesses: $data");
 
-    if (data != null && data.isNotEmpty) {
-      branchesList.addAll(data['items']);
-      isBranchesLoading.value = false;
-      isBranchesError.value = false;
-    } else {
-      // Handle error
-      printError(info: 'Failed to load businesses');
-      isBranchesLoading.value = false;
-      isBranchesError.value = true;
+      if (data != null && data.isNotEmpty) {
+        branchesList.addAll(data['items']);
+        isBranchesLoading.value = false;
+        isBranchesError.value = false;
+      } else {
+        // Handle error
+        printError(info: 'Failed to load businesses');
+        isBranchesLoading.value = false;
+        isBranchesError.value = false;
+      }
+    } catch (e) {
+      isError.value = true;
+      isLoading.value = false;
+      print("error loading businesses: $e");
     }
   }
 

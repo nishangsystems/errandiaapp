@@ -60,15 +60,18 @@ class errandia_widget extends StatelessWidget {
                         size: 13,
                         color: appcolor().mediumGreyColor,
                       ),
-                      Text(
-                        location.toString(),
-                        style: TextStyle(
-                          color: appcolor().mediumGreyColor,
-                          fontSize: 12,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
+                      SizedBox(
+                        width: Get.width * 0.3,
+                        child: Text(
+                          location.toString(),
+                          style: TextStyle(
+                            color: appcolor().mediumGreyColor,
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      ),
                     ],
                   )
                 : Text(

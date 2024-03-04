@@ -543,15 +543,18 @@ class _home_view_1State extends State<home_view_1> {
                         SizedBox(
                           height: Get.height * 0.009,
                         ),
-                        Text(
-                          data['category']['name'].toString(),
-                          style: TextStyle(
-                              fontSize: 11,
-                              // fontWeight: FontWeight.bold,
-                              color: appcolor().mediumGreyColor),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ).paddingOnly(left: 3),
+                        SizedBox(
+                          width: Get.width * 0.4,
+                          child: Text(
+                            data['category']['name'].toString(),
+                            style: TextStyle(
+                                fontSize: 11,
+                                // fontWeight: FontWeight.bold,
+                                color: appcolor().mediumGreyColor),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ).paddingOnly(left: 3)
+                        ),
                         SizedBox(
                           height: Get.height * 0.001,
                         ),
@@ -579,10 +582,18 @@ class _home_view_1State extends State<home_view_1> {
                                   const SizedBox(
                                     width: 1,
                                   ),
-                                  Text(
-                                    data['street'].toString(),
-                                    style: const TextStyle(fontSize: 12),
-                                  )
+                                  SizedBox(
+                                    width: Get.width * 0.35,
+                                    child: Text(
+                                      data['street'].toString(),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: appcolor().mediumGreyColor,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                 ],
                               )
                             : Text(
