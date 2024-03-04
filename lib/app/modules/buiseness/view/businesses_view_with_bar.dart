@@ -402,14 +402,17 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                         height: Get.height * 0.02,
                                       ),
                                       business['category'] != null
-                                          ? Text(
-                                        business['category']['name'] ?? "",
-                                        style: TextStyle(
-                                            fontSize: 11,
-                                            color: appcolor().mediumGreyColor),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                          ) : Text(
+                                          ? SizedBox(
+                                        width: Get.width * 0.35,
+                                        child: Text(
+                                          business['category']['name'] ?? "",
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              color: appcolor().mediumGreyColor),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )
+                                      ) : Text(
                                         "No category provided",
                                         style: TextStyle(
                                           fontSize: 11,
@@ -445,16 +448,18 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                             size: 13,
                                             color: appcolor().mediumGreyColor,
                                           ),
-                                          Text(
-                                            business['street'].toString(),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: appcolor().mediumGreyColor,
+                                          SizedBox(
+                                            width: Get.width * 0.35,
+                                            child: Text(
+                                              business['street'].toString(),
+                                              style: TextStyle(
+                                                color: appcolor().mediumGreyColor,
+                                                fontSize: 12,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          )
+                                          ),
                                         ],
                                       )
                                           : Text(

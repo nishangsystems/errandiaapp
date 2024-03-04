@@ -61,7 +61,7 @@ class _errandia_business_viewState extends State<errandia_business_view> {
     print("bz data: ${widget.businessData}");
     print("current slug: ${widget.businessData['image']}");
 
-    Widget _buildBusinessBranchesErrorWidget(String message, VoidCallback onReload) {
+    Widget _buildBusinessBranchesErrorWidget(String message, [VoidCallback? onReload]) {
       return !errandiaBusinessViewController.isLoading.value ? Container(
         height: Get.height * 0.9,
         color: Colors.white,
@@ -70,7 +70,8 @@ class _errandia_business_viewState extends State<errandia_business_view> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(message),
-              ElevatedButton(
+              onReload != null
+                  ? ElevatedButton(
                 onPressed: onReload,
                 style: ElevatedButton.styleFrom(
                   primary: appcolor().mainColor,
@@ -80,7 +81,8 @@ class _errandia_business_viewState extends State<errandia_business_view> {
                       color: appcolor().lightgreyColor
                   ),
                 ),
-              ),
+              )
+                  : const SizedBox(),
             ],
           ),
         ),
@@ -103,13 +105,19 @@ class _errandia_business_viewState extends State<errandia_business_view> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              capitalizeAll(widget.businessData['name']),
-              style: TextStyle(
-                color: appcolor().mediumGreyColor,
-                fontSize: 20,
+            SizedBox(
+              width: Get.width * 0.58,
+              child: Text(
+                capitalizeAll(widget.businessData['name'] ?? ""),
+                style: TextStyle(
+                  color: appcolor().mediumGreyColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
+            )
           ],
         ),
         actions: [
@@ -237,11 +245,13 @@ class _errandia_business_viewState extends State<errandia_business_view> {
               child: FadeInImage.assetNetwork(
                 placeholder: 'assets/images/errandia_logo.png',
                 image: getImagePath(widget.businessData['image'].toString()),
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
+                width: double.infinity,
                 imageErrorBuilder: (context, error, stackTrace) {
                   return Image.asset(
                     'assets/images/errandia_logo.png',
-                    fit: BoxFit.fill,
+                    fit: BoxFit.contain,
+                    width: double.infinity,
                   );
                 },
               )
@@ -543,10 +553,7 @@ class _errandia_business_viewState extends State<errandia_business_view> {
                           );
                         } else if (errandiaBusinessViewController.itemList.isEmpty) {
                           return _buildBusinessBranchesErrorWidget(
-                            "No business branches found",
-                            () {
-                              errandiaBusinessViewController.loadBusinessBranches(widget.businessData['slug']);
-                            },
+                            "No business branches found"
                           );
                         } else {
                           return ListView.builder(

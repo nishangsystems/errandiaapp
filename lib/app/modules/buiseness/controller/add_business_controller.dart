@@ -22,6 +22,7 @@ class add_business_controller extends GetxController{
   TextEditingController phone_controller= TextEditingController();
   TextEditingController email_controller= TextEditingController();
   TextEditingController description_controller = TextEditingController();
+  TextEditingController whatsapp_controller = TextEditingController();
 
   RxBool emailValid = false.obs;
 

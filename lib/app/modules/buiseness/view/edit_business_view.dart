@@ -12,6 +12,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/countries.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../../modal/Region.dart';
 import '../../../../modal/Town.dart';
@@ -39,8 +41,11 @@ class EditBusinessViewState extends State<EditBusinessView> {
   bool isLoading = false;
   List<String> selectedFilters = [];
   List<int> selectedFilters_ = [];
+  var filteredCountries = ["CM"];
+  List<Country> filter = [];
   var town;
   var category;
+  var phoneNumber;
 
   String? businessTitle;
 
@@ -49,6 +54,15 @@ class EditBusinessViewState extends State<EditBusinessView> {
   void initState() {
     super.initState();
     add_controller.loadCategories();
+
+    countries.forEach((element) {
+      filteredCountries.forEach((filteredC) {
+        if (element.code == filteredC) {
+          filter.add(element);
+        }
+      });
+    });
+
     businessTitle = capitalizeAll(widget.data['name']) ?? "Edit Business";
     add_controller.company_name_controller.text = widget.data['name'] ?? '';
     add_controller.Business_information_controller.text =
@@ -58,9 +72,10 @@ class EditBusinessViewState extends State<EditBusinessView> {
     add_controller.facebook_controller.text = widget.data['facebook'] ?? '';
     add_controller.instagram_controller.text = widget.data['instagram'] ?? '';
     add_controller.twitter_controller.text = widget.data['twitter'] ?? '';
-    add_controller.phone_controller.text = widget.data['phone'] ?? '';
-    add_controller.email_controller.text = widget.data['email'] ?? '';
+    add_controller.phone_controller.text = widget.data['phone'].toString().contains("237") ? widget.data['phone'].toString().substring(3) : widget.data['phone'].toString();
+    add_controller.email_controller.text  = widget.data['email'] ?? '';
     add_controller.description_controller.text = widget.data['description'] ?? '';
+    add_controller.whatsapp_controller.text = widget.data['whatsapp'] ?? '';
 
     imageController.image_path.value = widget.data['image'] ?? '' ;
     print("image path:  ${widget.data['image']}");
@@ -94,6 +109,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
     // var categories =
     //     add_controller.Business_category_controller.text.toString();
     var email = add_controller.email_controller.text.toString();
+    var whatsapp = add_controller.whatsapp_controller.text.toString();
 
     if (name == '') {
       alertDialogBox(context, "Error", 'Please enter company name');
@@ -101,7 +117,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
       alertDialogBox(context, "Error", 'Please select category');
     } else if (description == '') {
       alertDialogBox(context, "Error", 'Please enter description');
-    } else if (phone == '') {
+    } else if (phone == '' || phone.length < 13) {
       alertDialogBox(context, "Error", 'Please enter phone number');
     } else if (email == '') {
       alertDialogBox(context, "Error", 'Please enter an email address');
@@ -126,7 +142,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
         "description": description,
         "slogan": businessInfo,
         "phone": phone,
-        "whatsapp": "whatsapp",
+        "whatsapp": whatsapp ?? "",
         "category_id": category.toString(),
         // "image_path": imageController.image_path.toString(),
         "street": address ?? "",
@@ -751,23 +767,91 @@ class EditBusinessViewState extends State<EditBusinessView> {
                     indent: 0,
                   ),
 
+                  // phone number
+                  Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: const Color(0xffe0e6ec),
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      children: [
+                        // intl phone field
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 0, left: 10),
+                          child: SizedBox(
+                            width: Get.width * 0.86,
+                            child: IntlPhoneField(
+                              controller: add_controller.phone_controller,
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.only(top: 12),
+                                border: InputBorder.none,
+                                counter: SizedBox(),
+                                hintText: 'Phone Number *',
+                                hintStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                              ),
+                              keyboardType: TextInputType.number,
+                              initialCountryCode: 'CM',
+                              countries: filter,
+                              showDropdownIcon: false,
+                              dropdownTextStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                              ),
+                              validator: (value) {
+                                if (value == null) {
+                                  print(value);
+                                }
+                                return null;
+                              },
+                              onChanged: (phone) {
+                                // add_controller.phone_controller.text = phone.completeNumber;
+                                print("phone: ${phone.completeNumber}");
+                                setState(() {
+                                  phoneNumber = phone.completeNumber;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
                   Container(
                     padding:
                     const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                     child: TextFormField(
-                      controller: add_controller.phone_controller,
+                      controller: add_controller.whatsapp_controller,
                       keyboardType: TextInputType.phone,
                       maxLength: 9,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
-                          Icons.phone,
+                          FontAwesomeIcons.whatsapp,
                           color: Colors.black,
                         ),
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Phone Number *',
+                        hintText: 'Whatsapp Number (optional)',
                         counterText: '',
                         suffixIcon: Icon(
                           color: Colors.black,
@@ -776,6 +860,14 @@ class EditBusinessViewState extends State<EditBusinessView> {
                       ),
                     ),
                   ),
+
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
                   // email
                   Container(
                     padding:

@@ -741,15 +741,17 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
               children: [
                 SizedBox(
                     height: Get.height * 0.3,
-                    width: Get.width * 1,
+                    width: Get.width,
                     child: FadeInImage.assetNetwork(
                       placeholder: 'assets/images/errandia_logo.png',
                       image: getImagePath(widget.businessData['image'].toString()),
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
                       imageErrorBuilder: (context, error, stackTrace) {
                         return Image.asset(
                           'assets/images/errandia_logo.png',
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
+                          width: double.infinity,
                         );
                       },
                     )

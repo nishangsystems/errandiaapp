@@ -15,6 +15,8 @@ import 'package:errandia/modal/subcatgeory.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/countries.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../modal/Region.dart';
 import '../../../../modal/Street.dart';
@@ -41,13 +43,18 @@ class _add_business_viewState extends State<add_business_view> {
   final profile_controller profileController = Get.put(profile_controller());
 
   var country;
+
   // var value = null;
   var regionCode;
   bool isLoading = false;
   List<String> selectedFilters = [];
   List<int> selectedFilters_ = [];
+  var filteredCountries = ["CM"];
+  List<Country> filter = [];
   var town;
   var category;
+  var phoneNumber;
+
   // var regionValue;
   // var townValue;
 
@@ -55,29 +62,35 @@ class _add_business_viewState extends State<add_business_view> {
   void initState() {
     super.initState();
     add_controller.loadCategories();
+
+    countries.forEach((element) {
+      filteredCountries.forEach((filteredC) {
+        if (element.code == filteredC) {
+          filter.add(element);
+        }
+      });
+    });
+
   }
 
   void createBusiness(BuildContext context) {
-    var name =
-    add_controller.company_name_controller.text.toString();
-    var description = add_controller
-        .description_controller.text
-        .toString();
+    var name = add_controller.company_name_controller.text.toString();
+    var description = add_controller.description_controller.text.toString();
     var websiteAddress =
-    add_controller.website_address_controller.text.toString();
+        add_controller.website_address_controller.text.toString();
     var address = add_controller.address_controller.text.toString();
     // var facebook =
     //     add_controller.facebook_controller.text.toString();
     // var instagram =
     //     add_controller.instagram_controller.text.toString();
     // var twitter = add_controller.twitter_controller.text.toString();
-    var businessInfo = add_controller
-        .Business_information_controller.text
-        .toString();
+    var businessInfo =
+        add_controller.Business_information_controller.text.toString();
     var phone = add_controller.phone_controller.text.toString();
     // var categories =
     //     add_controller.Business_category_controller.text.toString();
     var email = add_controller.email_controller.text.toString();
+    var whatsapp = add_controller.whatsapp_controller.text.toString();
 
     if (name == '') {
       alertDialogBox(context, "Error", 'Please enter company name');
@@ -85,7 +98,7 @@ class _add_business_viewState extends State<add_business_view> {
       alertDialogBox(context, "Error", 'Please select category');
     } else if (description == '') {
       alertDialogBox(context, "Error", 'Please enter description');
-    } else if (phone == '') {
+    } else if (phoneNumber == '' || phoneNumber == null) {
       alertDialogBox(context, "Error", 'Please enter phone number');
     } else if (email == '') {
       alertDialogBox(context, "Error", 'Please enter an email address');
@@ -111,8 +124,8 @@ class _add_business_viewState extends State<add_business_view> {
         "name": name,
         "description": description,
         "slogan": businessInfo,
-        "phone": phone,
-        "whatsapp": "whatsapp",
+        "phone": phoneNumber.toString(),
+        "whatsapp": whatsapp ?? "",
         "category_id": category.toString(),
         // "image_path": imageController.image_path.toString(),
         "street": address ?? "",
@@ -134,98 +147,96 @@ class _add_business_viewState extends State<add_business_view> {
       PopupBox popup;
       var response;
 
+      print("phone number: $phoneNumber");
+
       // check if logo image is empty
       if (imageController.image_path.toString() == '') {
-        BusinessAPI.createBusiness(value, context)
-            .then((response_) => {
-          response = jsonDecode(response_),
-          print("added business: $response"),
-          if (response['status'] == 'success')
-            {
-              popup = PopupBox(
-                title: 'Success',
-                description: response['data']['message'],
-                type: PopupType.success,
-              ),
-              // reset all form fields
-              add_controller.resetFields(),
-              setState(() {
-                regionCode = null;
-                town = null;
-                category = null;
-                selectedFilters_.clear();
+        BusinessAPI.createBusiness(value, context).then((response_) => {
+              response = jsonDecode(response_),
+              print("added business: $response"),
+              if (response['status'] == 'success')
+                {
+                  popup = PopupBox(
+                    title: 'Success',
+                    description: response['data']['message'],
+                    type: PopupType.success,
+                  ),
+                  // reset all form fields
+                  add_controller.resetFields(),
+                  setState(() {
+                    regionCode = null;
+                    town = null;
+                    category = null;
+                    selectedFilters_.clear();
+                  }),
+                  imageController.reset(),
+                  // home_controller()
+                  //     .featuredBusinessData
+                  //     .clear(),
+                  // home_controller()
+                  //     .fetchFeaturedBusinessesData(),
+                  profileController.reloadMyBusinesses(),
+                }
+              else
+                {
+                  popup = PopupBox(
+                    title: 'Error',
+                    description: response['data']['data']['error'],
+                    type: PopupType.error,
+                  )
+                },
+              Future.delayed(const Duration(seconds: 2), () {
+                setState(() {
+                  isLoading = false;
+                });
               }),
-              imageController.reset(),
-              // home_controller()
-              //     .featuredBusinessData
-              //     .clear(),
-              // home_controller()
-              //     .fetchFeaturedBusinessesData(),
-              profileController.reloadMyBusinesses(),
-            }
-          else
-            {
-              popup = PopupBox(
-                title: 'Error',
-                description: response['data']['data']
-                ['error'],
-                type: PopupType.error,
-              )
-            },
-          Future.delayed(const Duration(seconds: 2), () {
-            setState(() {
-              isLoading = false;
+              popup.showPopup(context),
             });
-          }),
-          popup.showPopup(context),
-        });
       } else {
-        print(
-            "image path: ${imageController.image_path.toString()}");
-        BusinessAPI.createBusinessWithImageLogo(value, context,
-            imageController.image_path.toString())
+        print("image path: ${imageController.image_path.toString()}");
+        BusinessAPI.createBusinessWithImageLogo(
+                value, context, imageController.image_path.toString())
             .then((response_) => {
-          response = jsonDecode(response_),
-          print("added business: $response"),
-          if (response['status'] == 'success')
-            {
-              popup = PopupBox(
-                title: 'Success',
-                description: response['data']['message'],
-                type: PopupType.success,
-              ),
-              add_controller.resetFields(),
-              setState(() {
-                regionCode = null;
-                town = null;
-                category = null;
-                selectedFilters_.clear();
-              }),
-              imageController.reset(),
-              // home_controller()
+                  response = jsonDecode(response_),
+                  print("added business: $response"),
+                  if (response['status'] == 'success')
+                    {
+                      popup = PopupBox(
+                        title: 'Success',
+                        description: response['data']['message'],
+                        type: PopupType.success,
+                      ),
+                      add_controller.resetFields(),
+                      setState(() {
+                        regionCode = null;
+                        town = null;
+                        category = null;
+                        selectedFilters_.clear();
+                      }),
+                      imageController.reset(),
+                      // home_controller()
 
-              //     .featuredBusinessData
-              //     .clear(),
-              // home_controller()
-              //     .fetchFeaturedBusinessesData(),
-              profileController.reloadMyBusinesses(),
-            }
-          else
-            {
-              popup = PopupBox(
-                title: 'Error',
-                description: response['data']['data']
-                ['error'],
-                type: PopupType.error,
-              )
-            },
-          Future.delayed(const Duration(seconds: 3), () {
-            setState(() {
-              isLoading = false;
-            });
-          }),
-          popup.showPopup(context),
-        });
+                      //     .featuredBusinessData
+                      //     .clear(),
+                      // home_controller()
+                      //     .fetchFeaturedBusinessesData(),
+                      profileController.reloadMyBusinesses(),
+                    }
+                  else
+                    {
+                      popup = PopupBox(
+                        title: 'Error',
+                        description: response['data']['data']['error'],
+                        type: PopupType.error,
+                      )
+                    },
+                  Future.delayed(const Duration(seconds: 3), () {
+                    setState(() {
+                      isLoading = false;
+                    });
+                  }),
+                  popup.showPopup(context),
+                });
       }
     }
   }
@@ -389,7 +400,7 @@ class _add_business_viewState extends State<add_business_view> {
                         border: InputBorder.none,
                         prefixIcon: Icon(
                           color: Colors.black,
-                            Icons.info_outlined,
+                          Icons.info_outlined,
                         ),
                         hintStyle: TextStyle(
                           color: Colors.black,
@@ -416,7 +427,8 @@ class _add_business_viewState extends State<add_business_view> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
                     child: TextFormField(
-                      controller: add_controller.Business_information_controller,
+                      controller:
+                          add_controller.Business_information_controller,
                       minLines: 1,
                       maxLines: 2,
                       decoration: const InputDecoration(
@@ -459,7 +471,8 @@ class _add_business_viewState extends State<add_business_view> {
                                       insetPadding: const EdgeInsets.symmetric(
                                         horizontal: 20,
                                       ),
-                                      contentPadding: const EdgeInsets.symmetric(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
                                         horizontal: 8,
                                         vertical: 20,
                                       ),
@@ -489,12 +502,13 @@ class _add_business_viewState extends State<add_business_view> {
                                                 blockButton(
                                                   title: Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment.center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
                                                       Icon(
                                                         FontAwesomeIcons.image,
-                                                        color:
-                                                            appcolor().mainColor,
+                                                        color: appcolor()
+                                                            .mainColor,
                                                         size: 22,
                                                       ),
                                                       Text(
@@ -518,12 +532,13 @@ class _add_business_viewState extends State<add_business_view> {
                                                 blockButton(
                                                   title: Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment.center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
                                                       Icon(
                                                         FontAwesomeIcons.camera,
-                                                        color:
-                                                            appcolor().mainColor,
+                                                        color: appcolor()
+                                                            .mainColor,
                                                         size: 22,
                                                       ),
                                                       Text(
@@ -537,31 +552,39 @@ class _add_business_viewState extends State<add_business_view> {
                                                   ),
                                                   ontap: () async {
                                                     Get.back();
-                                                    var path = await imageController
-                                                        .getimagefromCamera();
+                                                    var path =
+                                                        await imageController
+                                                            .getimagefromCamera();
 
                                                     print("image path: $path");
 
                                                     if (path != null) {
                                                       File? file = File(path);
 
-                                                      print("original file size: ${file.lengthSync()}");
+                                                      print(
+                                                          "original file size: ${file.lengthSync()}");
 
                                                       try {
-                                                        file = (await compressFile(file: file));
-                                                      print("Compressed file size: ${file.lengthSync()}");
+                                                        file =
+                                                            (await compressFile(
+                                                                file: file));
+                                                        print(
+                                                            "Compressed file size: ${file.lengthSync()}");
                                                       } catch (e) {
-                                                      print("Error compressing file: $e");
+                                                        print(
+                                                            "Error compressing file: $e");
                                                       }
-                                                      imageController.image_path.value = file!.path;
+                                                      imageController.image_path
+                                                          .value = file!.path;
 
                                                       imageController.update();
 
-                                                      print("compressed file path: ${file.path}");
-
+                                                      print(
+                                                          "compressed file path: ${file.path}");
                                                     }
                                                   },
-                                                  color: const Color(0xfffafafa),
+                                                  color:
+                                                      const Color(0xfffafafa),
                                                 ),
                                               ],
                                             )
@@ -623,22 +646,23 @@ class _add_business_viewState extends State<add_business_view> {
                                   ),
                                   Stack(
                                     children: [
-                                      Obx(
-                                          () {
-                                            return imageController.image_path.isEmpty
-                                                ? Container()
-                                                : Image(
-                                              image: FileImage(
-                                                File(
-                                                  imageController.image_path.toString(),
+                                      Obx(() {
+                                        return imageController
+                                                .image_path.isEmpty
+                                            ? Container()
+                                            : Image(
+                                                image: FileImage(
+                                                  File(
+                                                    imageController.image_path
+                                                        .toString(),
+                                                  ),
                                                 ),
-                                              ),
-                                              height: Get.height * 0.32,
-                                              width: Get.width * 0.9,
-                                              fit: BoxFit.fill,
-                                            ).paddingSymmetric(horizontal: 50);
-                                          }
-                                      ),
+                                                height: Get.height * 0.32,
+                                                width: Get.width * 0.9,
+                                                fit: BoxFit.fill,
+                                              ).paddingSymmetric(
+                                                horizontal: 50);
+                                      }),
                                       SizedBox(
                                         height: Get.height * 0.32,
                                         child: Row(
@@ -729,24 +753,118 @@ class _add_business_viewState extends State<add_business_view> {
                     height: 1,
                     indent: 0,
                   ),
+
                   // phone number
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: const Color(0xffe0e6ec),
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      children: [
+                        // intl phone field
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 0, left: 10),
+                          child: SizedBox(
+                            width: Get.width * 0.86,
+                            child: IntlPhoneField(
+                              controller: add_controller.phone_controller,
+                              decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.only(top: 12),
+                                  border: InputBorder.none,
+                                counter: SizedBox(),
+                                hintText: 'Phone Number *',
+                                hintStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                              ),
+                              keyboardType: TextInputType.number,
+                              initialCountryCode: 'CM',
+                              countries: filter,
+                              showDropdownIcon: false,
+                              dropdownTextStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                              ),
+                              validator: (value) {
+                                if (value == null) {
+                                  print(value);
+                                }
+                                return null;
+                              },
+                              onChanged: (phone) {
+                                // add_controller.phone_controller.text = phone.completeNumber;
+                                print("phone: ${phone.completeNumber}");
+                                setState(() {
+                                  phoneNumber = phone.completeNumber;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Container(
+                  //   padding:
+                  //       const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                  //   child: TextFormField(
+                  //     controller: add_controller.phone_controller,
+                  //     keyboardType: TextInputType.phone,
+                  //     maxLength: 9,
+                  //     decoration: const InputDecoration(
+                  //       border: InputBorder.none,
+                  //       prefixIcon: Icon(
+                  //         Icons.phone,
+                  //         color: Colors.black,
+                  //       ),
+                  //       hintStyle: TextStyle(
+                  //         color: Colors.black,
+                  //       ),
+                  //       hintText: 'Phone Number *',
+                  //       counterText: '',
+                  //       suffixIcon: Icon(
+                  //         color: Colors.black,
+                  //         Icons.edit,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // whatsapp number
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                     child: TextFormField(
-                      controller: add_controller.phone_controller,
+                      controller: add_controller.whatsapp_controller,
                       keyboardType: TextInputType.phone,
                       maxLength: 9,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
-                          Icons.phone,
+                          FontAwesomeIcons.whatsapp,
                           color: Colors.black,
                         ),
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Phone Number *',
+                        hintText: 'Whatsapp Number (optional)',
                         counterText: '',
                         suffixIcon: Icon(
                           color: Colors.black,
@@ -755,6 +873,7 @@ class _add_business_viewState extends State<add_business_view> {
                       ),
                     ),
                   ),
+
                   Divider(
                     color: appcolor().greyColor,
                     thickness: 1,
@@ -924,12 +1043,14 @@ class _add_business_viewState extends State<add_business_view> {
                     leading: Container(
                       padding: const EdgeInsets.only(left: 15, right: 0),
                       child: Icon(FontAwesomeIcons.city,
-                          color: regionCode == null ? Colors.grey : Colors.black),
+                          color:
+                              regionCode == null ? Colors.grey : Colors.black),
                     ),
                     trailing: Container(
                       padding: const EdgeInsets.only(left: 0, right: 15),
                       child: Icon(Icons.arrow_forward_ios_outlined,
-                          color: regionCode == null ? Colors.grey : Colors.black),
+                          color:
+                              regionCode == null ? Colors.grey : Colors.black),
                     ),
                     contentPadding: EdgeInsets.zero,
                     title: Obx(() {
