@@ -42,7 +42,7 @@ class home_controller extends GetxController {
         // Handle error
         printError(info: 'Failed to load recently posted items');
         isRPILoading.value = false;
-        isRPIError.value = true;
+        isRPIError.value = false;
       }
     } catch (e) {
       // Handle exception
@@ -68,10 +68,11 @@ class home_controller extends GetxController {
         // Handle error
         printError(info: 'Failed to load featured businesses');
         isFBLLoading.value = false;
-        isFBLError.value = true;
+        isFBLError.value = false;
       }
     } catch (e) {
       // Handle exception
+      print('error FBL: $e');
       printError(info: e.toString());
       isFBLLoading.value = false;
       isFBLError.value = true;

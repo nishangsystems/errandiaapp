@@ -7,9 +7,10 @@ import 'package:get/get.dart';
 class buildErrorWidget extends StatelessWidget {
   final VoidCallback? callback;
   final String? message;
+  final String? actionText;
 
   const buildErrorWidget(
-      {Key? key, this.callback, this.message}
+      {Key? key, this.callback, this.message, this.actionText}
       ) : super(key: key);
 
   @override
@@ -48,7 +49,7 @@ class buildErrorWidget extends StatelessWidget {
                 primary: appcolor().mainColor,
               ),
               child: Text(
-                'Retry',
+                actionText ?? 'Retry',
                 style: TextStyle(color: appcolor().lightgreyColor),
               ),
             ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/view/profile_view.dart';
@@ -139,10 +140,11 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                       } else if (errandController.isErrandLoading.value) {
                         return buildLoadingWidget();
                       } else if (errandController.errandList.isEmpty) {
-                        return _buildRPIErrorWidget(
-                            'No recently posted items found', () {
-                          errandController.reloadErrands();
-                        });
+                        return buildErrorWidget(
+                            message: 'No recent errands found',
+                            actionText: 'Reload',
+                            callback: errandController.reloadErrands
+                        );
                       } else {
                         return ListView.builder(
                           key: const PageStorageKey('recentlyPostedItemsList'),

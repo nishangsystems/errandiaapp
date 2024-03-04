@@ -3,6 +3,7 @@ import 'package:errandia/app/modules/buiseness/controller/business_controller.da
 import 'package:errandia/app/modules/buiseness/view/business_item.dart';
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
+import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
@@ -330,6 +331,12 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                 return buildLoadingWidget();
               } else if (busi_controller.isFBLError.value) {
                 return _buildFBLErrorWidget('Failed to load businesses', _reloadFeaturedBusinessesData);
+              } else if (busi_controller.itemList.isEmpty) {
+                return buildErrorWidget(
+                  message: 'No businesses found',
+                  actionText: 'Reload',
+                  callback: _reloadFeaturedBusinessesData,
+                );
               } else {
                 return RefreshIndicator(
                     child: Obx(

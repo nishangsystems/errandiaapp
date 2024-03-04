@@ -275,16 +275,16 @@ class _home_view_1State extends State<home_view_1> {
               homeController.reloadRecentlyPostedItems);
         } else if (homeController.isRPILoading.value) {
           return Container(
-            height: Get.height * 0.45,
+            height: Get.height * 0.33,
             color: Colors.white,
             child: buildLoadingWidget(),
           );
         } else if (homeController.recentlyPostedItemsData.isEmpty) {
           return Container(
-            height: Get.height * 0.45,
+            height: Get.height * 0.33,
             color: Colors.white,
             child: const Center(
-              child: Text('No recently posted items'),
+              child: Text('No recently posted errands found.'),
             ),
           );
         } else {
@@ -493,7 +493,7 @@ class _home_view_1State extends State<home_view_1> {
             height: Get.height * 0.33,
             color: Colors.white,
             child: const Center(
-              child: Text('No featured businesses'),
+              child: Text('No featured businesses found.'),
             ),
           );
         } else {
