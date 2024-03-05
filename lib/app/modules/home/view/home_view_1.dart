@@ -527,18 +527,34 @@ class _home_view_1State extends State<home_view_1> {
                         SizedBox(
                           height: Get.height * 0.005,
                         ),
+                        // Image(
+                        //   image: NetworkImage(data['image'] != ''
+                        //       ? getImagePath(data['image'].toString())
+                        //       : 'https://errandia.com/assets/images/logo-default.png'),
+                        //   fit: BoxFit.fill,
+                        //   height: Get.height * 0.15,
+                        //   // width: Get.width * 0.3,
+                        // )
                         Container(
                           height: Get.height * 0.15,
                           width: Get.width,
                           color: appcolor().lightgreyColor,
-                          child: Image(
-                            image: NetworkImage(data['image'] != ''
-                                ? getImagePath(data['image'].toString())
-                                : 'https://errandia.com/assets/images/logo-default.png'),
-                            fit: BoxFit.fill,
-                            height: Get.height * 0.15,
-                            // width: Get.width * 0.3,
+                          child: FadeInImage.assetNetwork(
+                            placeholder: 'assets/images/errandia_logo.png',
+                            image: getImagePath(
+                                data['image'].toString()),
+                            fit: BoxFit.contain,
+                            width: double.infinity,
+                            imageErrorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                'assets/images/errandia_logo.png',
+                                // Your fallback image
+                                fit: BoxFit.contain,
+                                width: double.infinity,
+                              );
+                            },
                           ),
+
                         ).paddingOnly(left: 3, right: 3, top: 10, bottom: 5),
                         SizedBox(
                           height: Get.height * 0.009,

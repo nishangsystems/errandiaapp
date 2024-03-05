@@ -11,7 +11,8 @@ import 'package:http_parser/http_parser.dart';
 
 class apiDomain {
   final domain = 'https://errandia.com/api';
-  final imageDomain = 'https://errandia.com';
+  final imageDomain =
+      'https://cznbemgsca.cloudimg.io/https://errandia.com';
 }
 
 class api {
@@ -90,12 +91,12 @@ class api {
     var token = prefs.getString('token');
 
     final response =
-    await http.get(Uri.parse('${apiDomain().domain}/categories'),
-        headers: ({
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token'
-        }));
+        await http.get(Uri.parse('${apiDomain().domain}/categories'),
+            headers: ({
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token'
+            }));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (kDebugMode) {
@@ -106,11 +107,12 @@ class api {
   }
 
   Future getErrands(int page) async {
-    final response = await http.get(Uri.parse('${apiDomain().domain}/errands?page=$page'),
-        headers: ({
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json',
-        }));
+    final response =
+        await http.get(Uri.parse('${apiDomain().domain}/errands?page=$page'),
+            headers: ({
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Accept': 'application/json',
+            }));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -124,7 +126,10 @@ class api {
     }
   }
 
-  Future getProduct(String url, int value,) async {
+  Future getProduct(
+    String url,
+    int value,
+  ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token;
     if (value == 1) {
@@ -207,8 +212,7 @@ class api {
   Future updateProfile(Object value, context, navigator) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
-    final response = await http.patch(
-        Uri.parse('${apiDomain().domain}/user'),
+    final response = await http.patch(Uri.parse('${apiDomain().domain}/user'),
         body: jsonEncode(value),
         headers: ({
           'Content-Type': 'application/json; charset=UTF-8',
@@ -255,10 +259,7 @@ class api {
 
     // Add image file to the request
     request.files.add(
-      await http.MultipartFile.fromPath(
-          'image',
-          image.path
-      ),
+      await http.MultipartFile.fromPath('image', image.path),
     );
 
     // Add headers
@@ -303,12 +304,12 @@ class api {
     var token = prefs.getString('token');
 
     final response =
-    await http.get(Uri.parse('${apiDomain().domain}/categories'),
-        headers: ({
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token'
-        }));
+        await http.get(Uri.parse('${apiDomain().domain}/categories'),
+            headers: ({
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token'
+            }));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (kDebugMode) {
@@ -342,5 +343,4 @@ class api {
       return da;
     }
   }
-
 }

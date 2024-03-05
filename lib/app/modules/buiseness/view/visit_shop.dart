@@ -271,7 +271,7 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
           print("related businesses: ${errBController.branchesList}");
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 14),
-            height: Get.height * 0.3,
+            height: Get.height * 0.31,
             color: Colors.white,
             child: ListView.builder(
               primary: false,
@@ -302,27 +302,36 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                           height: Get.height * 0.15,
                           width: Get.width,
                           color: appcolor().lightgreyColor,
-                          child: Image(
-                            image: NetworkImage(data['image'] != ''
-                                ? getImagePath(data['image'].toString())
-                                : 'https://errandia.com/assets/images/logo-default.png'),
-                            fit: BoxFit.fill,
-                            height: Get.height * 0.15,
-                            // width: Get.width * 0.3,
+                          child: FadeInImage.assetNetwork(
+                            placeholder: 'assets/images/errandia_logo.png',
+                            image: getImagePath(data['image'].toString()),
+                            fit: BoxFit.contain,
+                            width: double.infinity,
+                            imageErrorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                'assets/images/errandia_logo.png',
+                                // Your fallback image
+                                fit: BoxFit.contain,
+                                width: double.infinity,
+                              );
+                            },
                           ),
                         ).paddingOnly(left: 3, right: 3, top: 10, bottom: 5),
                         SizedBox(
                           height: Get.height * 0.009,
                         ),
-                        Text(
-                          data['category']['name'].toString(),
-                          style: TextStyle(
-                              fontSize: 11,
-                              // fontWeight: FontWeight.bold,
-                              color: appcolor().mediumGreyColor),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ).paddingOnly(left: 3),
+                        SizedBox(
+                          width: Get.width * 0.35,
+                          child: Text(
+                            data['category']['name'].toString(),
+                            style: TextStyle(
+                                fontSize: 11,
+                                // fontWeight: FontWeight.bold,
+                                color: appcolor().mediumGreyColor),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ).paddingOnly(left: 3)
+                        ),
                         SizedBox(
                           height: Get.height * 0.001,
                         ),
@@ -350,10 +359,19 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                             const SizedBox(
                               width: 1,
                             ),
-                            Text(
-                              data['street'].toString(),
-                              style: const TextStyle(fontSize: 12),
-                            )
+                           SizedBox(
+                              width: Get.width * 0.35,
+                              child: Text(
+                                data['street'].toString(),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: appcolor().mediumGreyColor,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         )
                             : Text(
