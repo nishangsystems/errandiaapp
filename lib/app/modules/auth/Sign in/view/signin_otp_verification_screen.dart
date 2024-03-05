@@ -18,7 +18,7 @@ import '../../Register/register_ui.dart';
 class signin_otp_verification_screen extends StatefulWidget {
   final Map<String, dynamic> otpData;
 
-  signin_otp_verification_screen({super.key, required this.otpData});
+  const signin_otp_verification_screen({super.key, required this.otpData});
 
   @override
   _signin_otp_verification_screenState createState() =>

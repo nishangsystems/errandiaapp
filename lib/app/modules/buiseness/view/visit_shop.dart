@@ -5,6 +5,7 @@ import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/controller/errandia_business_view_controller.dart';
 import 'package:errandia/app/modules/buiseness/featured_buiseness/view/featured_list_item.dart';
+import 'package:errandia/app/modules/buiseness/verify_business_otp.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
 import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
@@ -739,18 +740,20 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
               ),
               color: appcolor().mediumGreyColor,
             ),
-            IconButton(
-              onPressed: () {
-                // Share.share('text', subject: 'hello share');
-                showPopupMenu(context);
-              },
-              // vertical 3 dots
-              icon: const Icon(
-                Icons.more_vert,
-                size: 30,
+
+            if (profileController.userData.value['id'] == widget.businessData['user']['id'])
+              IconButton(
+                onPressed: () {
+                  // Share.share('text', subject: 'hello share');
+                  showPopupMenu(context);
+                },
+                // vertical 3 dots
+                icon: const Icon(
+                  Icons.more_vert,
+                  size: 30,
+                ),
+                color: appcolor().mediumGreyColor,
               ),
-              color: appcolor().mediumGreyColor,
-            ),
           ]),
           body: SingleChildScrollView(
             child: Column(
@@ -783,6 +786,67 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                     ),
                   ],
                 ).paddingOnly(top: 20, left: 15, right: 15),
+
+                // a section for business verification: verified or not
+                // check if current user is owner of the shop
+                if (profileController.userData.value['id'] == widget.businessData['user']['id'])
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, right: 8),
+                        child: Text(
+                          "You're business is unverified!",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: appcolor().redColor,
+                          ),
+                        ),
+                      ),
+                      widget.businessData['verified'] == true
+                          ? const Icon(
+                        Icons.verified,
+                        color: Colors.green,
+                        size: 17,
+                      )
+                          : const Icon(
+                          Icons.info_outline,
+                          color: Colors.red,
+                          size: 17
+                      ),
+                      const Spacer(),
+                      // verify now link
+                      InkWell(
+                        onTap: () {
+                          // verify business
+                          Get.to(() => VerifyBusinessOtp(businessData: widget.businessData));
+                        },
+                        child: Container(
+                          height: Get.height * 0.03,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: appcolor().mainColor,
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Verify Now',
+                              style: TextStyle(
+                                  fontSize: 11, color: Colors.white,
+                                  fontWeight: FontWeight.w500
+                              ),
+                            ),
+                          ),
+                        ),
+                      ).marginOnly(right: 15),
+                    ],
+                  ),
+
+                if (profileController.userData.value['id'] == widget.businessData['user']['id'])
+                  SizedBox(
+                    height: Get.height * 0.02,
+                  ),
 
                 // Padding(
                 //   padding: const EdgeInsets.only(left: 15, right: 15),

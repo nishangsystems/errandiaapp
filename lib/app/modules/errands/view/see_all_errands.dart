@@ -222,13 +222,19 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
-                                                    Text(
-                                                      capitalizeAll(
-                                                          data['user']['name']),
-                                                      style: const TextStyle(
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                    SizedBox(
+                                                      width: Get.width * 0.4,
+                                                      child: Text(
+                                                        capitalizeAll(
+                                                            data['user']['name']),
+                                                        style: const TextStyle(
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                            FontWeight.bold),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      )
                                                     ),
                                                     Text(
                                                       DateFormat('dd-MM-yyyy')
@@ -302,13 +308,18 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                               // SizedBox(
                                               //   height: Get.height * 0.001,
                                               // ),
-                                              Text(
-                                                capitalizeAll(data['title'].toString()),
-                                                style: TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color:
-                                                        appcolor().mainColor),
+                                              SizedBox(
+                                                width: Get.width * 0.5,
+                                                child: Text(
+                                                  capitalizeAll(data['title'].toString()),
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.bold,
+                                                      color:
+                                                      appcolor().mainColor),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                )
                                               ),
                                               SizedBox(
                                                 height: Get.height * 0.003,
