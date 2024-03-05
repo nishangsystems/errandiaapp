@@ -72,7 +72,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
     add_controller.facebook_controller.text = widget.data['facebook'] ?? '';
     add_controller.instagram_controller.text = widget.data['instagram'] ?? '';
     add_controller.twitter_controller.text = widget.data['twitter'] ?? '';
-    add_controller.phone_controller.text = widget.data['phone'].toString().contains("237") ? widget.data['phone'].toString().substring(3) : widget.data['phone'].toString();
+    add_controller.phone_controller.text = widget.data['phone'].toString().contains("237") ? widget.data['phone'].toString().substring(4).trim() : widget.data['phone'].toString();
     add_controller.email_controller.text  = widget.data['email'] ?? '';
     add_controller.description_controller.text = widget.data['description'] ?? '';
     add_controller.whatsapp_controller.text = widget.data['whatsapp'] ?? '';

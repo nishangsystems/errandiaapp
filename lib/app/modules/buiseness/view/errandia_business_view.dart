@@ -168,7 +168,7 @@ class _errandia_business_viewState extends State<errandia_business_view> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              SizedBox(
+              (widget.businessData['whatsapp'] != "" && widget.businessData['whatsapp'] != "whatsapp") ? SizedBox(
                 width: Get.width * 0.45,
                 height: 50,
                 child: blockButton(
@@ -193,11 +193,12 @@ class _errandia_business_viewState extends State<errandia_business_view> {
                   ),
                   ontap: () async
                   {
-
+                    print("whatsapp: ${widget.businessData['whatsapp']}");
+                      launchWhatsapp(widget.businessData['whatsapp']);
                   },
                   color: appcolor().mainColor,
                 ),
-              ),
+              ) : Container(),
               SizedBox(
                 width: Get.width * 0.45,
                 height: 50,

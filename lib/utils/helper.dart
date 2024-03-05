@@ -55,7 +55,7 @@ Future<void> launchCaller(String number) async {
 
 // launch whatsapp
 Future<void> launchWhatsapp(String number) async {
-  var url = Uri(scheme: 'https', host: 'wa.me', path: number);
+  var url =  Uri.parse("https://wa.me/$number");
   if (!await launchUrl(url)) {
     throw Exception('Could not launch $url');
   }

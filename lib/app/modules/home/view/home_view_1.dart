@@ -428,13 +428,18 @@ class _home_view_1State extends State<home_view_1> {
                                 // SizedBox(
                                 //   height: Get.height * 0.001,
                                 // ),
-                                Text(
-                                  capitalizeAll(data['title'].toString()),
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color:
-                                      appcolor().mainColor),
+                                SizedBox(
+                                  width: Get.width * 0.42,
+                                  child: Text(
+                                    capitalizeAll(data['title'].toString()),
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                        appcolor().mainColor),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                                 SizedBox(
                                   height: Get.height * 0.001,
@@ -449,13 +454,19 @@ class _home_view_1State extends State<home_view_1> {
                                       color: appcolor()
                                           .mediumGreyColor,
                                     ),
-                                    Text(
-                                      data['street']
-                                          .toString(),
-                                      style: TextStyle(
-                                        color: appcolor()
-                                            .mediumGreyColor,
-                                        fontSize: 12,
+                                    SizedBox(
+                                      width: Get.width * 0.35,
+                                      child: Text(
+                                        data['street']
+                                            .toString(),
+                                        style: TextStyle(
+                                          color: appcolor()
+                                              .mediumGreyColor,
+                                          fontSize: 12,
+                                        ),
+                                        maxLines: 1,
+                                        overflow:
+                                        TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
