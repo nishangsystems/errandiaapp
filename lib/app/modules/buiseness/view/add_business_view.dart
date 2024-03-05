@@ -1,31 +1,26 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:errandia/app/APi/business.dart';
+import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
-import 'package:errandia/app/modules/home/controller/home_controller.dart';
+import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/modal/category.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
-import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
-import 'package:errandia/app/modules/global/constants/color.dart';
-import 'package:errandia/modal/subcatgeory.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../modal/Region.dart';
-import '../../../../modal/Street.dart';
 import '../../../../modal/Town.dart';
-import '../../../APi/apidomain & api.dart';
 import '../../../AlertDialogBox/alertBoxContent.dart';
 import '../../global/Widgets/blockButton.dart';
 import '../controller/add_business_controller.dart';
-import 'manage_business_view.dart';
 
 class add_business_view extends StatefulWidget {
   add_business_view({super.key});
@@ -54,6 +49,7 @@ class _add_business_viewState extends State<add_business_view> {
   var town;
   var category;
   var phoneNumber;
+  bool focusInEmailField = false;
 
   // var regionValue;
   // var townValue;
@@ -100,9 +96,7 @@ class _add_business_viewState extends State<add_business_view> {
       alertDialogBox(context, "Error", 'Please enter description');
     } else if (phoneNumber == '' || phoneNumber == null) {
       alertDialogBox(context, "Error", 'Please enter phone number');
-    } else if (email == '') {
-      alertDialogBox(context, "Error", 'Please enter an email address');
-    } else if (add_controller.emailValid.value == false) {
+    } else if (email != '' && add_controller.emailValid.value == false) {
       alertDialogBox(context, "Error", 'Please enter a valid email address');
     } else if (regionCode == null) {
       alertDialogBox(context, "Error", 'Please select region');
@@ -888,7 +882,16 @@ class _add_business_viewState extends State<add_business_view> {
                     child: TextFormField(
                       controller: add_controller.email_controller,
                       keyboardType: TextInputType.emailAddress,
+                      onTapOutside: (val) {
+                        setState(() {
+                          focusInEmailField = false;
+                        });
+                      },
                       onChanged: (val) {
+                        setState(() {
+                          focusInEmailField = true;
+                        });
+
                         // if it's a valid email address
                         if (val.contains('@') && val.contains('.')) {
                           add_controller.emailValid.value = true;
@@ -905,7 +908,7 @@ class _add_business_viewState extends State<add_business_view> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Email Address *',
+                        hintText: 'Email Address (optional)',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
@@ -915,7 +918,7 @@ class _add_business_viewState extends State<add_business_view> {
                   ),
 
                   // show invalid email error
-                  Obx(
+                  focusInEmailField ? Obx(
                     () => add_controller.emailValid.value
                         ? Container()
                         : Container(
@@ -929,7 +932,7 @@ class _add_business_viewState extends State<add_business_view> {
                               ),
                             ),
                           ),
-                  ),
+                  ): Container(),
 
                   // shop head
                   // Container(

@@ -46,6 +46,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
   var town;
   var category;
   var phoneNumber;
+  bool focusInEmailField = false;
 
   String? businessTitle;
 
@@ -117,10 +118,8 @@ class EditBusinessViewState extends State<EditBusinessView> {
       alertDialogBox(context, "Error", 'Please select category');
     } else if (description == '') {
       alertDialogBox(context, "Error", 'Please enter description');
-    } else if (phone == '' || phone.length < 13) {
+    } else if (phoneNumber == '' || phoneNumber == null) {
       alertDialogBox(context, "Error", 'Please enter phone number');
-    } else if (email == '') {
-      alertDialogBox(context, "Error", 'Please enter an email address');
     } else if (regionCode == null) {
       alertDialogBox(context, "Error", 'Please select region');
     } else {
@@ -141,7 +140,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
         "name": name,
         "description": description,
         "slogan": businessInfo,
-        "phone": phone,
+        "phone": phoneNumber.toString(),
         "whatsapp": whatsapp ?? "",
         "category_id": category.toString(),
         // "image_path": imageController.image_path.toString(),
@@ -875,6 +874,23 @@ class EditBusinessViewState extends State<EditBusinessView> {
                     child: TextFormField(
                       controller: add_controller.email_controller,
                       keyboardType: TextInputType.emailAddress,
+                      onTapOutside: (val) {
+                        setState(() {
+                          focusInEmailField = false;
+                        });
+                      },
+                      onChanged: (val) {
+                        setState(() {
+                          focusInEmailField = true;
+                        });
+
+                        // if it's a valid email address
+                        if (val.contains('@') && val.contains('.')) {
+                          add_controller.emailValid.value = true;
+                        } else {
+                          add_controller.emailValid.value = false;
+                        }
+                      },
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
@@ -884,7 +900,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Email Address *',
+                        hintText: 'Email Address (optional)',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
@@ -892,6 +908,22 @@ class EditBusinessViewState extends State<EditBusinessView> {
                       ),
                     ),
                   ),
+                  // show invalid email error
+                  focusInEmailField ? Obx(
+                        () => add_controller.emailValid.value
+                        ? Container()
+                        : Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 5),
+                      child: const Text(
+                        'Invalid email address',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ): Container(),
                   Divider(
                     color: appcolor().greyColor,
                     thickness: 1,
