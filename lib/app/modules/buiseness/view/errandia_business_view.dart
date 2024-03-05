@@ -587,20 +587,19 @@ class _errandia_business_viewState extends State<errandia_business_view> {
                                             decoration: BoxDecoration(
                                               border: Border.all(),
                                             ),
-                                            child: Image.network(
-                                              getImagePath(data['image'].toString()),
-                                              height: Get.height * 0.17,
-                                              width: Get.width * 0.2,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) {
+                                            child: FadeInImage.assetNetwork(
+                                              placeholder: 'assets/images/errandia_logo.png',
+                                              image: getImagePath(data['image'].toString()),
+                                              fit: BoxFit.contain,
+                                              width: 60,
+                                              imageErrorBuilder: (context, error, stackTrace) {
                                                 return Image.asset(
                                                   'assets/images/errandia_logo.png',
-                                                  fit: BoxFit.cover,
-                                                  height: Get.height * 0.17,
-                                                  width: Get.width * 0.2,
+                                                  fit: BoxFit.contain,
+                                                  width: 60,
                                                 );
                                               },
-                                            )
+                                            ),
                                           ),
                                           Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -630,9 +629,11 @@ class _errandia_business_viewState extends State<errandia_business_view> {
                                               ),
                                             ],
                                           ).paddingOnly(left: 10),
-                                          Spacer(),
+                                          const Spacer(),
                                           IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              Get.to(() => VisitShop(businessData: data));
+                                            },
                                             icon: Icon(
                                               Icons.arrow_forward_ios_outlined,
                                               color: appcolor().bluetextcolor,

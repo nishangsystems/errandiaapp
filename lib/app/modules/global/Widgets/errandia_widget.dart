@@ -31,19 +31,18 @@ class errandia_widget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
+              height: Get.height * 0.15,
               color: appcolor().lightgreyColor,
               child: FadeInImage.assetNetwork(
                 placeholder: 'assets/images/errandia_logo.png', // Local asset image
                 image: getImagePath(imagePath.toString()),
-                fit: BoxFit.cover,
-                height: Get.height * 0.17,
-                width: Get.width * 0.4,
+                fit: BoxFit.contain,
+                width: double.infinity,
                 imageErrorBuilder: (context, error, stackTrace) {
                   return Image.asset(
                     'assets/images/errandia_logo.png', // Your fallback image
-                    fit: BoxFit.cover,
-                    height: Get.height * 0.17,
-                    width: Get.width * 0.4,
+                    fit: BoxFit.contain,
+                    width: double.infinity,
                   );
                 },
               ),

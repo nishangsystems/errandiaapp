@@ -202,7 +202,10 @@ class _Product_viewState extends State<Product_view>
     String townName = shop['town'] != null ? shop['town']['name'] : '';
     String regionName = shop['region'] != null ? shop['region']['name'] : '';
 
-    return [street, townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
+    return [street, townName, regionName]
+        .where((s) => s.isNotEmpty)
+        .join(", ")
+        .trim();
   }
 
   @override
@@ -539,19 +542,18 @@ class _Product_viewState extends State<Product_view>
                                                     color: Colors.grey[700]),
                                               )
                                             : Container(),
-
                                         SizedBox(
-                                                width: Get.width * 0.5,
-                                                child: Text(_formatAddress(widget.item['shop']),
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
+                                          width: Get.width * 0.5,
+                                          child: Text(
+                                            _formatAddress(widget.item['shop']),
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
                                       ],
                                     )
                                   : Container(),
@@ -1051,16 +1053,19 @@ Widget image_select_widget(BuildContext context, final item) {
                     width: Get.width * 0.18,
                     // child: Center(child: Image.network(image['url'].toString())),
                     child: Center(
-                        child: Image.network(
-                            getImagePath(image['url'].toString()),
-                            fit: BoxFit.fill, errorBuilder:
-                                (BuildContext context, Object exception,
-                                    StackTrace? stackTrace) {
-                      return Image.asset(
-                        'assets/images/errandia_logo.png',
-                        fit: BoxFit.fill,
-                      );
-                    })),
+                        child: FadeInImage.assetNetwork(
+                            placeholder: 'assets/images/errandia_logo.png',
+                            image: getImagePath(image['url'].toString()),
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            imageErrorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                'assets/images/errandia_logo.png',
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              );
+                            })
+                    ),
                   );
                 },
               ),

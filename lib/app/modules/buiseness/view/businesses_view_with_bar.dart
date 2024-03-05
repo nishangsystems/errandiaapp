@@ -382,22 +382,22 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                     // mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
+                                        height: Get.height * 0.15,
                                         color: appcolor().lightgreyColor,
-                                        child: Image.network(
-                                          getImagePath(business['image'].toString()),
-                                          height: Get.height * 0.17,
-                                          width: Get.width * 0.4,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image.asset(
-                                              'assets/images/errandia_logo.png',
-                                              height: Get.height * 0.17,
-                                              width: Get.width * 0.4,
-                                              fit: BoxFit.cover,
+                                        child: FadeInImage.assetNetwork(
+                                          placeholder: 'assets/images/errandia_logo.png',
+                                          image: getImagePath(business['image'].toString()),
+                                          fit: BoxFit.contain,
+                                          width: double.infinity,
+                                          imageErrorBuilder:  (context, error, stackTrace) {
+                                            return Image.asset('assets/images/errandia_logo.png',
+                                              fit: BoxFit.contain,
+                                              width: double.infinity,
                                             );
                                           },
                                         ),
                                       ),
+
                                       SizedBox(
                                         height: Get.height * 0.02,
                                       ),
