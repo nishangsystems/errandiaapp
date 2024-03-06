@@ -7,11 +7,12 @@ class PopupBox extends StatelessWidget {
   final String title;
   final String description;
   final PopupType type;
+  final VoidCallback? callback;
 
    PopupBox({
     required this.title,
     required this.description,
-    required this.type,
+    required this.type, this.callback,
   });
 
   IconData _getIcon() {
@@ -55,7 +56,7 @@ class PopupBox extends StatelessWidget {
       ),
       dismissOnTouchOutside: true,
       desc: description,
-      btnOkOnPress: () {},
+      btnOkOnPress: callback ?? () {},
 
       headerAnimationLoop: false,
     ).show();

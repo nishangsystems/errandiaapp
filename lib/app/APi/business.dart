@@ -312,6 +312,71 @@ class BusinessAPI {
     }
   }
 
+  // send business otp
+  static Future sendBusinessOtp(String shopSlug) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    final response = await http.post(Uri.parse('${apiDomain().domain}/user/shops/$shopSlug/send_otp'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (kDebugMode) {
+      print("send business otp response: ${response.body}");
+    }
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      var data_ = data;
+      if (kDebugMode) {
+        print("data: $data_");
+      }
+      var item = data_;
+      print("send business otp response: $item");
+      // prefs.setString("business", jsonEncode(user));
+      // customSnackBar(Text('${data['message']}'));
+      return jsonEncode({'status': 'success', 'data': item});
+    } else {
+      var da = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'data': da});
+      // await alertDialogBox(context, 'Alert', '${da['data']['error']}');
+    }
+  }
+
+  // validate business otp
+  static Future validateBusinessOtp(String shopSlug, Object value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    final response = await http.post(Uri.parse('${apiDomain().domain}/user/shops/$shopSlug/validate_otp'),
+        body: jsonEncode(value),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (kDebugMode) {
+      print("validate business otp response: ${response.body}");
+    }
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      var data_ = data;
+      if (kDebugMode) {
+        print("data: $data_");
+      }
+      var item = data_;
+      print("validate business otp response: $item");
+      // prefs.setString("business", jsonEncode(user));
+      // customSnackBar(Text('${data['message']}'));
+      return jsonEncode({'status': 'success', 'data': item});
+    } else {
+      var da = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'data': da});
+      // await alertDialogBox(context, 'Alert', '${da['data']['error']}');
+    }
+  }
+
   // delete business
   static Future deleteBusiness(String shopSlug) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

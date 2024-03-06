@@ -27,6 +27,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../products/view/product_view.dart';
 import '../../recently_posted_item.dart/view/recently_posted_list.dart';
@@ -49,6 +50,8 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
   late ErrandiaBusinessViewController errBController;
 
   late PopupBox popup;
+
+  bool sendingOTPLoading = false;
 
   @override
   void initState() {
@@ -168,7 +171,6 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                                 description: response['data']['message'],
                                 type: PopupType.success,
                               );
-
                             } else {
                               Navigator.of(dialogContext)
                                   .pop(); // Close the dialog
@@ -213,6 +215,51 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
     });
   }
 
+  void sendOTP(BuildContext context) async {
+    try {
+      setState(() {
+        sendingOTPLoading = true;
+      });
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      await BusinessAPI.sendBusinessOtp(widget.businessData['slug'])
+          .then((response) {
+        print("send otp response: $response");
+
+        var data = jsonDecode(response);
+
+        if (response != null) {
+          print("send otp response: $data");
+          if (data['status'] == 'success') {
+            prefs.setString('shopUuid', data['data']['data']['uuid']);
+            Get.to(() => VerifyBusinessOtp(
+                  businessData: widget.businessData,
+                ))?.then((value) {
+              if (value != null) {
+                setState(() {
+                  widget.businessData = value;
+                });
+              }
+            });
+          } else {
+            // show error popup
+            popup = PopupBox(
+              title: 'Error',
+              description: data['data']['data']['error'].contains("does not exist") ? "Business does not exist" : data['data']['data']['error'],
+              type: PopupType.error,
+            );
+            popup.showPopup(context);
+          }
+        }
+      });
+    } finally {
+      setState(() {
+        sendingOTPLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) {
@@ -222,33 +269,33 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
     Widget _buildRPIErrorWidget(String message, VoidCallback onReload) {
       return !homeController.isRPILoading.value
           ? Container(
-        height: Get.height * 0.3,
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(message),
-              ElevatedButton(
-                onPressed: onReload,
-                style: ElevatedButton.styleFrom(
-                  primary: appcolor().mainColor,
-                ),
-                child: Text(
-                  'Retry',
-                  style: TextStyle(color: appcolor().lightgreyColor),
+              height: Get.height * 0.3,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      )
+            )
           : buildLoadingWidget();
     }
 
     Widget Related_Businesses_List() {
       return Obx(() {
-         if (errBController.isBranchesLoading.value) {
+        if (errBController.isBranchesLoading.value) {
           print("loading related businesses");
           return Container(
             height: Get.height * 0.3,
@@ -260,7 +307,8 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
             height: Get.height * 0.3,
             color: Colors.white,
             child: Center(
-              child: Text('No related businesses found',
+              child: Text(
+                'No related businesses found',
                 style: TextStyle(
                   color: appcolor().mediumGreyColor,
                   fontSize: 15,
@@ -290,7 +338,7 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                   },
                   child: Container(
                     margin:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     width: Get.width * 0.4,
                     color: Colors.white,
                     child: Column(
@@ -322,17 +370,16 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                           height: Get.height * 0.009,
                         ),
                         SizedBox(
-                          width: Get.width * 0.35,
-                          child: Text(
-                            data['category']['name'].toString(),
-                            style: TextStyle(
-                                fontSize: 11,
-                                // fontWeight: FontWeight.bold,
-                                color: appcolor().mediumGreyColor),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ).paddingOnly(left: 3)
-                        ),
+                            width: Get.width * 0.35,
+                            child: Text(
+                              data['category']['name'].toString(),
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  // fontWeight: FontWeight.bold,
+                                  color: appcolor().mediumGreyColor),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ).paddingOnly(left: 3)),
                         SizedBox(
                           height: Get.height * 0.001,
                         ),
@@ -351,19 +398,32 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                         ),
                         (data['street'] != '' && data['street'] != null)
                             ? Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              color: appcolor().mediumGreyColor,
-                              size: 15,
-                            ),
-                            const SizedBox(
-                              width: 1,
-                            ),
-                           SizedBox(
-                              width: Get.width * 0.35,
-                              child: Text(
-                                data['street'].toString(),
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    color: appcolor().mediumGreyColor,
+                                    size: 15,
+                                  ),
+                                  const SizedBox(
+                                    width: 1,
+                                  ),
+                                  SizedBox(
+                                    width: Get.width * 0.35,
+                                    child: Text(
+                                      data['street'].toString(),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: appcolor().mediumGreyColor,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                "No location provided",
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: appcolor().mediumGreyColor,
@@ -372,19 +432,6 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
-                        )
-                            : Text(
-                          "No location provided",
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: appcolor().mediumGreyColor,
-                            fontStyle: FontStyle.italic,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
                       ],
                     ),
                   ),
@@ -397,119 +444,115 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
     }
 
     Widget Service_item_list() {
-      return Obx(
-              () {
-            if (productController.isShopServicesLoading.value) {
-              return Container(
-                height: Get.height * 0.3,
-                color: Colors.white,
-                child: buildLoadingWidget(),
-              );
-            } else if (productController.shopServiceList.isEmpty) {
-              return Container(
-                height: Get.height * 0.3,
-                color: Colors.white,
-                child: Center(
-                  child: Text(
-                    'No services found',
-                    style: TextStyle(
-                      color: appcolor().mediumGreyColor,
-                      fontSize: 15,
-                    ),
-                  ),
+      return Obx(() {
+        if (productController.isShopServicesLoading.value) {
+          return Container(
+            height: Get.height * 0.3,
+            color: Colors.white,
+            child: buildLoadingWidget(),
+          );
+        } else if (productController.shopServiceList.isEmpty) {
+          return Container(
+            height: Get.height * 0.3,
+            color: Colors.white,
+            child: Center(
+              child: Text(
+                'No services found',
+                style: TextStyle(
+                  color: appcolor().mediumGreyColor,
+                  fontSize: 15,
                 ),
-              );
-            } else {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                height: Get.height * 0.3,
-                color: Colors.white,
-                child: ListView.builder(
-                  itemCount: productController.shopServiceList.length,
-                  primary: false,
-                  shrinkWrap: false,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    final item = productController.shopServiceList[index];
-                    return GestureDetector(
-                      onTap: () {
-                        if (kDebugMode) {
-                          print("service item: ${item['name']}");
-                        }
-                        Get.to(() => ServiceDetailsView(service: item));
-                      },
-                      child:  errandia_widget(
-                        cost: item['unit_price'].toString(),
-                        imagePath: item['featured_image'],
-                        name: item['name'],
-                        location: item['shop'] != null ? item['shop']['street'] : "",
-                      ),
-                    );
+              ),
+            ),
+          );
+        } else {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            height: Get.height * 0.3,
+            color: Colors.white,
+            child: ListView.builder(
+              itemCount: productController.shopServiceList.length,
+              primary: false,
+              shrinkWrap: false,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                final item = productController.shopServiceList[index];
+                return GestureDetector(
+                  onTap: () {
+                    if (kDebugMode) {
+                      print("service item: ${item['name']}");
+                    }
+                    Get.to(() => ServiceDetailsView(service: item));
                   },
-                ),
-              );
-            }
-          }
-      );
+                  child: errandia_widget(
+                    cost: item['unit_price'].toString(),
+                    imagePath: item['featured_image'],
+                    name: item['name'],
+                    location:
+                        item['shop'] != null ? item['shop']['street'] : "",
+                  ),
+                );
+              },
+            ),
+          );
+        }
+      });
     }
 
     Widget product_item_list() {
-      return Obx(
-              () {
-            if (productController.isShopProductsLoading.value) {
-              return Container(
-                height: Get.height * 0.3,
-                color: Colors.white,
-                child: buildLoadingWidget(),
-              );
-            } else if (productController.shopProductList.isEmpty) {
-              return Container(
-                height: Get.height * 0.3,
-                color: Colors.white,
-                child: Center(
-                  child: Text(
-                    'No products found',
-                    style: TextStyle(
-                      color: appcolor().mediumGreyColor,
-                      fontSize: 15,
-                    ),
-                  ),
+      return Obx(() {
+        if (productController.isShopProductsLoading.value) {
+          return Container(
+            height: Get.height * 0.3,
+            color: Colors.white,
+            child: buildLoadingWidget(),
+          );
+        } else if (productController.shopProductList.isEmpty) {
+          return Container(
+            height: Get.height * 0.3,
+            color: Colors.white,
+            child: Center(
+              child: Text(
+                'No products found',
+                style: TextStyle(
+                  color: appcolor().mediumGreyColor,
+                  fontSize: 15,
                 ),
-              );
-            } else {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                height: Get.height * 0.3,
-                color: Colors.white,
-                child: ListView.builder(
-                  itemCount: productController.shopProductList.length,
-                  primary: false,
-                  shrinkWrap: false,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    final item = productController.shopProductList[index];
+              ),
+            ),
+          );
+        } else {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            height: Get.height * 0.3,
+            color: Colors.white,
+            child: ListView.builder(
+              itemCount: productController.shopProductList.length,
+              primary: false,
+              shrinkWrap: false,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                final item = productController.shopProductList[index];
 
-                    return GestureDetector(
-                        onTap: () {
-                          if (kDebugMode) {
-                            print("product item clicked: ${item['name']}");
-                          }
-                          Get.to(() => Product_view(item: item));
-                        },
-                        child: errandia_widget(
-                          cost: item['unit_price'].toString(),
-                          imagePath: item['featured_image'],
-                          name: item['name'],
-                          location: item['shop'] != null
-                              ? item['shop']['street']
-                              : "",
-                        ));
-                  },
-                ),
-              );
-            }
-          }
-      );
+                return GestureDetector(
+                    onTap: () {
+                      if (kDebugMode) {
+                        print("product item clicked: ${item['name']}");
+                      }
+                      Get.to(() => Product_view(item: item));
+                    },
+                    child: errandia_widget(
+                      cost: item['unit_price'].toString(),
+                      imagePath: item['featured_image'],
+                      name: item['name'],
+                      location:
+                          item['shop'] != null ? item['shop']['street'] : "",
+                    ));
+              },
+            ),
+          );
+        }
+      });
     }
 
     Widget Recently_posted_items_Widget() {
@@ -551,8 +594,8 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                     // Get.to(Product_view(item: data,name: data['name'].toString(),));
                     // Get.back();
                     Get.to(() => errand_detail_view(
-                      data: data,
-                    ));
+                          data: data,
+                        ));
                   },
                   child: Card(
                     child: Container(
@@ -571,20 +614,20 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                                   child: data['user']['photo'] == ""
                                       ? const Icon(Icons.person)
                                       : FadeInImage.assetNetwork(
-                                    placeholder:
-                                    'assets/images/errandia_logo.png',
-                                    image: getImagePath(
-                                        data['user']['photo'].toString()),
-                                    fit: BoxFit.cover,
-                                    imageErrorBuilder:
-                                        (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/errandia_logo.png',
-                                        // Your fallback image
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  ),
+                                          placeholder:
+                                              'assets/images/errandia_logo.png',
+                                          image: getImagePath(
+                                              data['user']['photo'].toString()),
+                                          fit: BoxFit.cover,
+                                          imageErrorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Image.asset(
+                                              'assets/images/errandia_logo.png',
+                                              // Your fallback image
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
                                 ),
                                 SizedBox(
                                   width: Get.width * 0.02,
@@ -594,20 +637,16 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      capitalizeAll(
-                                          data['user']['name']),
+                                      capitalizeAll(data['user']['name']),
                                       style: const TextStyle(
                                           fontSize: 13,
-                                          fontWeight:
-                                          FontWeight.bold),
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      DateFormat('dd-MM-yyyy')
-                                          .format(DateTime.parse(
-                                          data['created_at']
-                                              .toString())),
-                                      style: const TextStyle(
-                                          fontSize: 12),
+                                      DateFormat('dd-MM-yyyy').format(
+                                          DateTime.parse(
+                                              data['created_at'].toString())),
+                                      style: const TextStyle(fontSize: 12),
                                     ),
                                   ],
                                 ),
@@ -623,28 +662,27 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                                 horizontal: 8, vertical: 0),
                             color: appcolor().lightgreyColor,
                             child: Center(
-                              child:  data['images'].length > 0
+                              child: data['images'].length > 0
                                   ? FadeInImage.assetNetwork(
-                                placeholder:
-                                'assets/images/errandia_logo.png',
-                                image: getImagePath(
-                                    data['images'][0]['url']
-                                        .toString()),
-                                fit: BoxFit.cover,
-                                imageErrorBuilder: (context,
-                                    error, stackTrace) {
-                                  return Image.asset(
-                                    'assets/images/errandia_logo.png',
-                                    // Your fallback image
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              )
+                                      placeholder:
+                                          'assets/images/errandia_logo.png',
+                                      image: getImagePath(
+                                          data['images'][0]['url'].toString()),
+                                      fit: BoxFit.cover,
+                                      imageErrorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/errandia_logo.png',
+                                          // Your fallback image
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    )
                                   : Image.asset(
-                                'assets/images/errandia_logo.png',
-                                // Your fallback image
-                                fit: BoxFit.cover,
-                              ),
+                                      'assets/images/errandia_logo.png',
+                                      // Your fallback image
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                           ),
                           Divider(
@@ -677,33 +715,28 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color:
-                                      appcolor().mainColor),
+                                      color: appcolor().mainColor),
                                 ),
                                 SizedBox(
                                   height: Get.height * 0.001,
                                 ),
-                                data['street'] != "" &&
-                                    data['street'] != null
+                                data['street'] != "" && data['street'] != null
                                     ? Row(
-                                  children: [
-                                    Icon(
-                                      Icons.location_on,
-                                      size: 13,
-                                      color: appcolor()
-                                          .mediumGreyColor,
-                                    ),
-                                    Text(
-                                      data['street']
-                                          .toString(),
-                                      style: TextStyle(
-                                        color: appcolor()
-                                            .mediumGreyColor,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                )
+                                        children: [
+                                          Icon(
+                                            Icons.location_on,
+                                            size: 13,
+                                            color: appcolor().mediumGreyColor,
+                                          ),
+                                          Text(
+                                            data['street'].toString(),
+                                            style: TextStyle(
+                                              color: appcolor().mediumGreyColor,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      )
                                     : Container(),
                               ],
                             ),
@@ -729,336 +762,363 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
         Get.back();
         return true;
       },
-      child: Scaffold(
-          appBar:
-              titledAppBar(capitalizeAll(widget.businessData['name'] ?? ''), [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.notifications,
-                size: 30,
-              ),
-              color: appcolor().mediumGreyColor,
-            ),
-
-            if (profileController.userData.value['id'] == widget.businessData['user']['id'])
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar:
+                titledAppBar(capitalizeAll(widget.businessData['name'] ?? ''), [
               IconButton(
-                onPressed: () {
-                  // Share.share('text', subject: 'hello share');
-                  showPopupMenu(context);
-                },
-                // vertical 3 dots
+                onPressed: () {},
                 icon: const Icon(
-                  Icons.more_vert,
+                  Icons.notifications,
                   size: 30,
                 ),
                 color: appcolor().mediumGreyColor,
               ),
-          ]),
-          body: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                    height: Get.height * 0.3,
-                    width: Get.width,
-                    child: FadeInImage.assetNetwork(
-                      placeholder: 'assets/images/errandia_logo.png',
-                      image: getImagePath(widget.businessData['image'].toString()),
-                      fit: BoxFit.contain,
-                      width: double.infinity,
-                      imageErrorBuilder: (context, error, stackTrace) {
-                        return Image.asset(
-                          'assets/images/errandia_logo.png',
-                          fit: BoxFit.contain,
-                          width: double.infinity,
-                        );
-                      },
-                    )
+              if (profileController.userData.value['id'] ==
+                  widget.businessData['user']['id'])
+                IconButton(
+                  onPressed: () {
+                    // Share.share('text', subject: 'hello share');
+                    showPopupMenu(context);
+                  },
+                  // vertical 3 dots
+                  icon: const Icon(
+                    Icons.more_vert,
+                    size: 30,
+                  ),
+                  color: appcolor().mediumGreyColor,
                 ),
+            ]),
+            body: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                      height: Get.height * 0.3,
+                      width: Get.width,
+                      child: FadeInImage.assetNetwork(
+                        placeholder: 'assets/images/errandia_logo.png',
+                        image:
+                            getImagePath(widget.businessData['image'].toString()),
+                        fit: BoxFit.contain,
+                        width: double.infinity,
+                        imageErrorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/errandia_logo.png',
+                            fit: BoxFit.contain,
+                            width: double.infinity,
+                          );
+                        },
+                      )),
 
-                Column(
-                  children: [
-                    product_review_widget(widget.businessData),
+                  Column(
+                    children: [
+                      product_review_widget(widget.businessData),
+                      SizedBox(
+                        height: Get.height * 0.02,
+                      ),
+                    ],
+                  ).paddingOnly(top: 20, left: 15, right: 15),
+
+                  // a section for business verification: verified or not
+                  // check if current user is owner of the shop
+                  if (profileController.userData.value['id'] ==
+                      widget.businessData['user']['id'])
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        widget.businessData['phone_verified'] == 0
+                            ? Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, right: 8),
+                                child: Text(
+                                  "You're business is unverified!",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: appcolor().redColor,
+                                  ),
+                                ),
+                              )
+                            : Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, right: 8),
+                                child: Text(
+                                  "You're business is verified!",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: appcolor().greenColor,
+                                  ),
+                                ),
+                              ),
+                        widget.businessData['phone_verified'] == 1
+                            ? const Icon(
+                                Icons.verified,
+                                color: Colors.green,
+                                size: 17,
+                              )
+                            : const Icon(Icons.info_outline,
+                                color: Colors.red, size: 17),
+                        const Spacer(),
+                        // verify now link
+                        widget.businessData['phone_verified'] == 0
+                            ? InkWell(
+                                onTap: () async {
+                                  // verify business
+                                  sendOTP(context);
+                                },
+                                child: Container(
+                                  height: Get.height * 0.03,
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: appcolor().mainColor,
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      'Verify Now',
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ),
+                              ).marginOnly(right: 15)
+                            : Container(),
+                      ],
+                    ),
+
+                  if (profileController.userData.value['id'] ==
+                      widget.businessData['user']['id'])
                     SizedBox(
                       height: Get.height * 0.02,
                     ),
-                  ],
-                ).paddingOnly(top: 20, left: 15, right: 15),
 
-                // a section for business verification: verified or not
-                // check if current user is owner of the shop
-                if (profileController.userData.value['id'] == widget.businessData['user']['id'])
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, right: 8),
-                        child: Text(
-                          "You're business is unverified!",
+                  // Padding(
+                  //   padding: const EdgeInsets.only(left: 15, right: 15),
+                  //   child: InkWell(
+                  //     onTap: () {
+                  //       // errandia_view_bottomsheet();
+                  //     },
+                  //     child: Container(
+                  //       height: Get.height * 0.08,
+                  //       decoration: BoxDecoration(
+                  //         borderRadius: BorderRadius.circular(10),
+                  //         color: const Color(0xffe6edf7),
+                  //       ),
+                  //       child: Center(
+                  //         child: Text(
+                  //           'Unfollow Shop',
+                  //           style: TextStyle(
+                  //               fontSize: 16, color: appcolor().bluetextcolor),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+
+                  // SizedBox(
+                  //   height: Get.height * 0.025,
+                  // ),
+                  //
+                  // // follow us on social media
+                  // Row(
+                  //   children: [
+                  //     const Padding(
+                  //       padding: EdgeInsets.only(left: 15, right: 15),
+                  //       child: Text(
+                  //         'Follow us on social media',
+                  //         style: TextStyle(
+                  //           fontSize: 16,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     // fb
+                  //     InkWell(
+                  //       onTap: () async {
+                  //         controller.myLaunchUrl('www.bmdu.net');
+                  //       },
+                  //       child: Container(
+                  //         decoration: BoxDecoration(
+                  //           borderRadius: BorderRadius.circular(
+                  //             8,
+                  //           ),
+                  //         ),
+                  //         padding: const EdgeInsets.only(
+                  //           left: 5,
+                  //         ),
+                  //         child: Icon(
+                  //           FontAwesomeIcons.squareFacebook,
+                  //           color: appcolor().bluetextcolor,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //
+                  //     // insta
+                  //     InkWell(
+                  //       onTap: () async {
+                  //         controller.myLaunchUrl('www.google.com');
+                  //       },
+                  //       child: Container(
+                  //         decoration: BoxDecoration(
+                  //           borderRadius: BorderRadius.circular(
+                  //             8,
+                  //           ),
+                  //         ),
+                  //         padding: const EdgeInsets.symmetric(
+                  //           horizontal: 5,
+                  //         ),
+                  //         child: const Icon(
+                  //           FontAwesomeIcons.instagram,
+                  //           color: Colors.pink,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //
+                  //     // twitter
+                  //     InkWell(
+                  //       onTap: () async {
+                  //         controller.myLaunchUrl('www.instagram.com');
+                  //       },
+                  //       child: Container(
+                  //         decoration: BoxDecoration(
+                  //           borderRadius: BorderRadius.circular(
+                  //             8,
+                  //           ),
+                  //         ),
+                  //         child: Icon(
+                  //           FontAwesomeIcons.squareTwitter,
+                  //           color: appcolor().bluetextcolor,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  //
+                  // SizedBox(
+                  //   height: Get.height * 0.03,
+                  // ),
+
+                  Container(
+                    color: Colors.white,
+                    child: Row(
+                      children: [
+                        Text(
+                          'Products',
                           style: TextStyle(
-                            fontSize: 13,
-                            color: appcolor().redColor,
-                          ),
-                        ),
-                      ),
-                      widget.businessData['verified'] == true
-                          ? const Icon(
-                        Icons.verified,
-                        color: Colors.green,
-                        size: 17,
-                      )
-                          : const Icon(
-                          Icons.info_outline,
-                          color: Colors.red,
-                          size: 17
-                      ),
-                      const Spacer(),
-                      // verify now link
-                      InkWell(
-                        onTap: () {
-                          // verify business
-                          Get.to(() => VerifyBusinessOtp(businessData: widget.businessData));
-                        },
-                        child: Container(
-                          height: Get.height * 0.03,
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
                             color: appcolor().mainColor,
                           ),
-                          child: const Center(
-                            child: Text(
-                              'Verify Now',
-                              style: TextStyle(
-                                  fontSize: 11, color: Colors.white,
-                                  fontWeight: FontWeight.w500
-                              ),
-                            ),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () {
+                            Get.to(() => const ItemListWidget(isService: false));
+                          },
+                          child: const Text('See All'),
+                        ),
+                      ],
+                    ).paddingSymmetric(horizontal: 20),
+                  ),
+
+                  product_item_list(),
+
+                  SizedBox(
+                    height: Get.height * 0.03,
+                  ),
+
+                  Container(
+                    color: Colors.white,
+                    child: Row(
+                      children: [
+                        Text(
+                          'Services',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                            color: appcolor().mainColor,
                           ),
                         ),
-                      ).marginOnly(right: 15),
-                    ],
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () {
+                            Get.to(() => const ItemListWidget(isService: true));
+                          },
+                          child: const Text('See All'),
+                        ),
+                      ],
+                    ).paddingSymmetric(horizontal: 20),
                   ),
 
-                if (profileController.userData.value['id'] == widget.businessData['user']['id'])
-                  SizedBox(
-                    height: Get.height * 0.02,
+                  Service_item_list(),
+
+                  Container(
+                    color: Colors.white,
+                    child: Row(
+                      children: [
+                        Text(
+                          'Related Businesses',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                            color: appcolor().mainColor,
+                          ),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () {
+                            Get.to(() => BusinessesViewWithBar());
+                          },
+                          child: const Text('See All'),
+                        ),
+                      ],
+                    ).paddingSymmetric(horizontal: 20),
                   ),
 
-                // Padding(
-                //   padding: const EdgeInsets.only(left: 15, right: 15),
-                //   child: InkWell(
-                //     onTap: () {
-                //       // errandia_view_bottomsheet();
-                //     },
-                //     child: Container(
-                //       height: Get.height * 0.08,
-                //       decoration: BoxDecoration(
-                //         borderRadius: BorderRadius.circular(10),
-                //         color: const Color(0xffe6edf7),
-                //       ),
-                //       child: Center(
-                //         child: Text(
-                //           'Unfollow Shop',
-                //           style: TextStyle(
-                //               fontSize: 16, color: appcolor().bluetextcolor),
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                  Related_Businesses_List(),
 
-                // SizedBox(
-                //   height: Get.height * 0.025,
-                // ),
-                //
-                // // follow us on social media
-                // Row(
-                //   children: [
-                //     const Padding(
-                //       padding: EdgeInsets.only(left: 15, right: 15),
-                //       child: Text(
-                //         'Follow us on social media',
-                //         style: TextStyle(
-                //           fontSize: 16,
-                //         ),
-                //       ),
-                //     ),
-                //     // fb
-                //     InkWell(
-                //       onTap: () async {
-                //         controller.myLaunchUrl('www.bmdu.net');
-                //       },
-                //       child: Container(
-                //         decoration: BoxDecoration(
-                //           borderRadius: BorderRadius.circular(
-                //             8,
-                //           ),
-                //         ),
-                //         padding: const EdgeInsets.only(
-                //           left: 5,
-                //         ),
-                //         child: Icon(
-                //           FontAwesomeIcons.squareFacebook,
-                //           color: appcolor().bluetextcolor,
-                //         ),
-                //       ),
-                //     ),
-                //
-                //     // insta
-                //     InkWell(
-                //       onTap: () async {
-                //         controller.myLaunchUrl('www.google.com');
-                //       },
-                //       child: Container(
-                //         decoration: BoxDecoration(
-                //           borderRadius: BorderRadius.circular(
-                //             8,
-                //           ),
-                //         ),
-                //         padding: const EdgeInsets.symmetric(
-                //           horizontal: 5,
-                //         ),
-                //         child: const Icon(
-                //           FontAwesomeIcons.instagram,
-                //           color: Colors.pink,
-                //         ),
-                //       ),
-                //     ),
-                //
-                //     // twitter
-                //     InkWell(
-                //       onTap: () async {
-                //         controller.myLaunchUrl('www.instagram.com');
-                //       },
-                //       child: Container(
-                //         decoration: BoxDecoration(
-                //           borderRadius: BorderRadius.circular(
-                //             8,
-                //           ),
-                //         ),
-                //         child: Icon(
-                //           FontAwesomeIcons.squareTwitter,
-                //           color: appcolor().bluetextcolor,
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                //
-                // SizedBox(
-                //   height: Get.height * 0.03,
-                // ),
-
-                Container(
-                  color: Colors.white,
-                  child: Row(
-                    children: [
-                      Text(
-                        'Products',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                          color: appcolor().mainColor,
+                  Container(
+                    color: Colors.white,
+                    child: Row(
+                      children: [
+                        Text(
+                          'Recently Posted Errands',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                            color: appcolor().mainColor,
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          Get.to(() => const ItemListWidget(isService: false));
-                        },
-                        child: const Text('See All'),
-                      ),
-                    ],
-                  ).paddingSymmetric(horizontal: 20),
-                ),
-
-                product_item_list(),
-
-                SizedBox(
-                  height: Get.height * 0.03,
-                ),
-
-                Container(
-                  color: Colors.white,
-                  child: Row(
-                    children: [
-                      Text(
-                        'Services',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                          color: appcolor().mainColor,
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () {
+                            Get.to(() => const SeeAllErrands());
+                          },
+                          child: const Text('See All'),
                         ),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          Get.to(() => const ItemListWidget(isService: true));
-                        },
-                        child: const Text('See All'),
-                      ),
-                    ],
-                  ).paddingSymmetric(horizontal: 20),
-                ),
+                      ],
+                    ).paddingSymmetric(horizontal: 20),
+                  ),
 
-                Service_item_list(),
+                  Recently_posted_items_Widget(),
+                ],
+              ),
+            )),
 
-                Container(
-                  color: Colors.white,
-                  child: Row(
-                    children: [
-                      Text(
-                        'Related Businesses',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                          color: appcolor().mainColor,
-                        ),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          Get.to(() => BusinessesViewWithBar());
-                        },
-                        child: const Text('See All'),
-                      ),
-                    ],
-                  ).paddingSymmetric(horizontal: 20),
-                ),
-
-                Related_Businesses_List(),
-
-                Container(
-                  color: Colors.white,
-                  child: Row(
-                    children: [
-                      Text(
-                        'Recently Posted Errands',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                          color: appcolor().mainColor,
-                        ),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          Get.to(() => const SeeAllErrands());
-                        },
-                        child: const Text('See All'),
-                      ),
-                    ],
-                  ).paddingSymmetric(horizontal: 20),
-                ),
-
-                Recently_posted_items_Widget(),
-              ],
+        if (sendingOTPLoading)
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(
+              child: CircularProgressIndicator(),
             ),
-          )),
+          ),
+        ]
+      ),
     );
   }
 }
@@ -1067,112 +1127,108 @@ Widget product_review_widget(Map<String, dynamic> data) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              capitalizeAll(data['name'].toString() ?? ''),
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(
+          capitalizeAll(data['name'].toString() ?? ''),
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        data['street'] != null
+            ? Text(
+                data['street'],
+                style: const TextStyle(),
+              )
+            : const Text(
+                'No street provided',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
-            ),
-            data['street'] != null
-                ? Text(
-              data['street'],
-              style: const TextStyle(),
-            )
-                : const Text(
-              'No street provided',
-              style: TextStyle(
-                color: Colors.grey,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            // Row(
-            //   children: [
-            //     Icon(
-            //       Icons.person,
-            //       size: 18,
-            //       color: appcolor().mediumGreyColor,
-            //     ),
-            //     Text(
-            //       '  Member Since 2010',
-            //       style: TextStyle(
-            //         fontSize: 13,
-            //         color: appcolor().mediumGreyColor,
-            //       ),
-            //     ),
-            //     const Spacer(),
-            //     RatingBar.builder(
-            //       initialRating: 3.5,
-            //       allowHalfRating: true,
-            //       ignoreGestures: true,
-            //       itemSize: 18,
-            //       itemBuilder: (context, index) {
-            //         return const Icon(
-            //           Icons.star_rate_rounded,
-            //           color: Colors.amber,
-            //         );
-            //       },
-            //       onRatingUpdate: (val) {},
-            //     ),
-            //     Text(
-            //       '10 Reviews',
-            //       style: TextStyle(
-            //         fontSize: 11,
-            //         color: appcolor().mediumGreyColor,
-            //         fontWeight: FontWeight.bold,
-            //       ),
-            //     ),
-            //   ],
-            // ),
-          ]),
+        const SizedBox(
+          height: 5,
+        ),
+        // Row(
+        //   children: [
+        //     Icon(
+        //       Icons.person,
+        //       size: 18,
+        //       color: appcolor().mediumGreyColor,
+        //     ),
+        //     Text(
+        //       '  Member Since 2010',
+        //       style: TextStyle(
+        //         fontSize: 13,
+        //         color: appcolor().mediumGreyColor,
+        //       ),
+        //     ),
+        //     const Spacer(),
+        //     RatingBar.builder(
+        //       initialRating: 3.5,
+        //       allowHalfRating: true,
+        //       ignoreGestures: true,
+        //       itemSize: 18,
+        //       itemBuilder: (context, index) {
+        //         return const Icon(
+        //           Icons.star_rate_rounded,
+        //           color: Colors.amber,
+        //         );
+        //       },
+        //       onRatingUpdate: (val) {},
+        //     ),
+        //     Text(
+        //       '10 Reviews',
+        //       style: TextStyle(
+        //         fontSize: 11,
+        //         color: appcolor().mediumGreyColor,
+        //         fontWeight: FontWeight.bold,
+        //       ),
+        //     ),
+        //   ],
+        // ),
+      ]),
 
       // region and town
       Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-         data['region'] != null || data['region'].toString() != 'null'
+          data['region'] != null || data['region'].toString() != 'null'
               ? Text(
-            data['region']['name'],
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[800],
-            ),
-          )
+                  data['region']['name'],
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[800],
+                  ),
+                )
               : const Text(
-            'No region provided',
-            style: TextStyle(
-              color: Colors.grey,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
+                  'No region provided',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           data['town'] != null || data['town'].toString() != 'null'
               ? Text(
-            data['town']['name'],
-            style: const TextStyle(
-              fontSize: 13,
-              color: Colors.grey,
-            ),
-          )
+                  data['town']['name'],
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey,
+                  ),
+                )
               : const Text(
-            'No town provided',
-            style: TextStyle(
-              color: Colors.grey,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
+                  'No town provided',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
         ],
       ),
     ],
   );
 }
-
-
 
 // widget businesses list
 Widget businesses_item_list() {

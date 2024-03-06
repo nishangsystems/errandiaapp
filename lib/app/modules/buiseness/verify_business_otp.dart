@@ -1,5 +1,9 @@
 
+import 'dart:convert';
+
+import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/helpers.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VerifyBusinessOtp extends StatefulWidget {
   final Map<String, dynamic> businessData;
@@ -20,7 +25,16 @@ class _VerifyBusinessOtpState extends State<VerifyBusinessOtp> {
   TextEditingController? otpController = TextEditingController();
   RxInt x = 0.obs;
   bool isLoading = false;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+  late PopupBox popupBox;
+
+
+  Future<String?> getShopUuid() async {
+    final SharedPreferences prefs = await _prefs;
+    final String? uuid = prefs.getString('shopUuid');
+    return uuid;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -183,37 +197,60 @@ class _VerifyBusinessOtpState extends State<VerifyBusinessOtp> {
                             if (kDebugMode) {
                               print("otp code: ${otpController?.text}");
                             }
-                            // var value = {
-                            //   "code": otpController?.text,
-                            //   "uuid": await getUuid(),
-                            // };
+                            var value = {
+                              "code": otpController?.text,
+                              "uuid": await getShopUuid(),
+                            };
 
                             if (kDebugMode) {
-                              // print("value: $value");
+                              print("value: $value");
                             }
 
                             // Home_view home = Home_view();
                             setState(() {
                               isLoading = true;
                             });
-                            await Future.delayed(
-                                const Duration(seconds: 3));
 
-                            // try {
-                            //   print("isLoading: $isLoading");
-                            //   await api().validatePhoneOtp(
-                            //       value,
-                            //       context ?? scaffoldKey.currentContext!,
-                            //       registration_successful_view(
-                            //           userAction: const {
-                            //             "name": "login",
-                            //           }
-                            //       ));
-                            // } finally {
-                            //   setState(() {
-                            //     isLoading = false;
-                            //   });
-                            // }
+                            try {
+                              print("isLoading: $isLoading");
+
+                              await BusinessAPI.validateBusinessOtp(widget.businessData['slug'], value).then((response) async {
+                                print("validate shop otp response: $response");
+
+                                var data = jsonDecode(response);
+
+                                if (data != null) {
+                                  if (data['status'] == "success") {
+                                    print("validate shop otp data: ${data['data']['data']}");
+
+                                    popupBox = PopupBox(
+                                      title: "Success",
+                                      description: "Your business has been verified successfully",
+                                      type: PopupType.success,
+                                      callback: () {
+                                        // Get.back();
+                                        Get.back(result: data['data']['data']['item']);
+                                      },
+                                    );
+
+                                    popupBox.showPopup(context);
+
+                                  } else {
+                                    print("validate shop otp error: $data");
+                                    Get.snackbar("Error", data['data']['data']['error'].contains('Invalid OTP') ? 'Invalid Verification code or code has expired!' : data['data']['data']['error'],
+                                      colorText: Colors.white,
+                                      duration: const Duration(seconds: 10),
+                                      backgroundColor: Colors.red,
+                                    );
+                                  }
+                                }
+                              });
+
+                            } finally {
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xff113d6b),
