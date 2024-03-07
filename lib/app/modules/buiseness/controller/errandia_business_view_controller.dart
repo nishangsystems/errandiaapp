@@ -13,9 +13,12 @@ class ErrandiaBusinessViewController extends GetxController {
   RxBool isBranchesError = false.obs;
   var branchesList = List<dynamic>.empty(growable: true).obs;
 
+  Map<String, dynamic> businessData = {};
+
   @override
   void onInit() {
     super.onInit();
+    // businessData = Get.arguments as Map<String, dynamic>;
     // fetchBusinessBranches();
   }
 

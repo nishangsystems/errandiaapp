@@ -14,6 +14,7 @@ import 'package:errandia/app/modules/setting/view/review_view.dart';
 import 'package:errandia/app/modules/setting/view/setting_view.dart';
 import 'package:errandia/app/modules/splashScreen/splash_screen.dart';
 import 'package:errandia/languages/language.dart';
+import 'package:errandia/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,6 +47,7 @@ class ErrandiaApp extends StatelessWidget {
       locale: Locale('en', 'US'),
       fallbackLocale: Locale('fr', 'CA'),
       debugShowCheckedModeBanner: false,
+      getPages: Routes.routes,
       theme: ThemeData(
         fontFamily: 'Poppins',
         textTheme: TextTheme(),
