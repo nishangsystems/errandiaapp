@@ -52,8 +52,10 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
   @override
   void initState() {
     super.initState();
+    // widget.businessData = Get.arguments as Map<String, dynamic>;
     WidgetsBinding.instance.addObserver(this);
     errandiaBusinessViewController = Get.put(ErrandiaBusinessViewController());
+    // widget.businessData = Get.arguments as Map<String, dynamic>;
 
     setState(() {
       businessSlug = widget.businessData['slug'];
@@ -800,23 +802,9 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                                  var data = errandiaBusinessViewController.itemList[index];
                                 return InkWell(
                                   onTap: () {
-                                    errandiaBusinessViewController.reloadBusinesses();
-                                    errandiaBusinessViewController.loadBusinesses(data['slug']);
-                                    Get.to(() {
-                                      return errandia_business_view(
-                                        key: UniqueKey(),
-                                        businessData: data,
-                                      );
-                                    },
+                                    Get.offNamed('/business_view', arguments: data,
                                       preventDuplicates: false,
-                                      transition: Transition.cupertino,
                                     );
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) => errandia_business_view(businessData: data),
-                                    //   ),
-                                    // );
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric( horizontal: 10),
