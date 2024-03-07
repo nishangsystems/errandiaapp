@@ -215,51 +215,6 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
     });
   }
 
-  void sendOTP(BuildContext context) async {
-    try {
-      setState(() {
-        sendingOTPLoading = true;
-      });
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      await BusinessAPI.sendBusinessOtp(widget.businessData['slug'])
-          .then((response) {
-        print("send otp response: $response");
-
-        var data = jsonDecode(response);
-
-        if (response != null) {
-          print("send otp response: $data");
-          if (data['status'] == 'success') {
-            prefs.setString('shopUuid', data['data']['data']['uuid']);
-            Get.to(() => VerifyBusinessOtp(
-                  businessData: widget.businessData,
-                ))?.then((value) {
-              if (value != null) {
-                setState(() {
-                  widget.businessData = value;
-                });
-              }
-            });
-          } else {
-            // show error popup
-            popup = PopupBox(
-              title: 'Error',
-              description: data['data']['data']['error'].contains("does not exist") ? "Business does not exist" : data['data']['data']['error'],
-              type: PopupType.error,
-            );
-            popup.showPopup(context);
-          }
-        }
-      });
-    } finally {
-      setState(() {
-        sendingOTPLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) {
@@ -795,216 +750,9 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                      height: Get.height * 0.3,
-                      width: Get.width,
-                      child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/images/errandia_logo.png',
-                        image:
-                            getImagePath(widget.businessData['image'].toString()),
-                        fit: BoxFit.contain,
-                        width: double.infinity,
-                        imageErrorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'assets/images/errandia_logo.png',
-                            fit: BoxFit.contain,
-                            width: double.infinity,
-                          );
-                        },
-                      )),
-
-                  Column(
-                    children: [
-                      product_review_widget(widget.businessData),
-                      SizedBox(
-                        height: Get.height * 0.02,
-                      ),
-                    ],
-                  ).paddingOnly(top: 20, left: 15, right: 15),
-
-                  // a section for business verification: verified or not
-                  // check if current user is owner of the shop
-                  if (profileController.userData.value['id'] ==
-                      widget.businessData['user']['id'])
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        widget.businessData['phone_verified'] == 0
-                            ? Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 15, right: 8),
-                                child: Text(
-                                  "You're business is unverified!",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: appcolor().redColor,
-                                  ),
-                                ),
-                              )
-                            : Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 15, right: 8),
-                                child: Text(
-                                  "You're business is verified!",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: appcolor().greenColor,
-                                  ),
-                                ),
-                              ),
-                        widget.businessData['phone_verified'] == 1
-                            ? const Icon(
-                                Icons.verified,
-                                color: Colors.green,
-                                size: 17,
-                              )
-                            : const Icon(Icons.info_outline,
-                                color: Colors.red, size: 17),
-                        const Spacer(),
-                        // verify now link
-                        widget.businessData['phone_verified'] == 0
-                            ? InkWell(
-                                onTap: () async {
-                                  // verify business
-                                  sendOTP(context);
-                                },
-                                child: Container(
-                                  height: Get.height * 0.03,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: appcolor().mainColor,
-                                  ),
-                                  child: const Center(
-                                    child: Text(
-                                      'Verify Now',
-                                      style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                  ),
-                                ),
-                              ).marginOnly(right: 15)
-                            : Container(),
-                      ],
-                    ),
-
-                  if (profileController.userData.value['id'] ==
-                      widget.businessData['user']['id'])
-                    SizedBox(
-                      height: Get.height * 0.02,
-                    ),
-
-                  // Padding(
-                  //   padding: const EdgeInsets.only(left: 15, right: 15),
-                  //   child: InkWell(
-                  //     onTap: () {
-                  //       // errandia_view_bottomsheet();
-                  //     },
-                  //     child: Container(
-                  //       height: Get.height * 0.08,
-                  //       decoration: BoxDecoration(
-                  //         borderRadius: BorderRadius.circular(10),
-                  //         color: const Color(0xffe6edf7),
-                  //       ),
-                  //       child: Center(
-                  //         child: Text(
-                  //           'Unfollow Shop',
-                  //           style: TextStyle(
-                  //               fontSize: 16, color: appcolor().bluetextcolor),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-
-                  // SizedBox(
-                  //   height: Get.height * 0.025,
-                  // ),
-                  //
-                  // // follow us on social media
-                  // Row(
-                  //   children: [
-                  //     const Padding(
-                  //       padding: EdgeInsets.only(left: 15, right: 15),
-                  //       child: Text(
-                  //         'Follow us on social media',
-                  //         style: TextStyle(
-                  //           fontSize: 16,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     // fb
-                  //     InkWell(
-                  //       onTap: () async {
-                  //         controller.myLaunchUrl('www.bmdu.net');
-                  //       },
-                  //       child: Container(
-                  //         decoration: BoxDecoration(
-                  //           borderRadius: BorderRadius.circular(
-                  //             8,
-                  //           ),
-                  //         ),
-                  //         padding: const EdgeInsets.only(
-                  //           left: 5,
-                  //         ),
-                  //         child: Icon(
-                  //           FontAwesomeIcons.squareFacebook,
-                  //           color: appcolor().bluetextcolor,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //
-                  //     // insta
-                  //     InkWell(
-                  //       onTap: () async {
-                  //         controller.myLaunchUrl('www.google.com');
-                  //       },
-                  //       child: Container(
-                  //         decoration: BoxDecoration(
-                  //           borderRadius: BorderRadius.circular(
-                  //             8,
-                  //           ),
-                  //         ),
-                  //         padding: const EdgeInsets.symmetric(
-                  //           horizontal: 5,
-                  //         ),
-                  //         child: const Icon(
-                  //           FontAwesomeIcons.instagram,
-                  //           color: Colors.pink,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //
-                  //     // twitter
-                  //     InkWell(
-                  //       onTap: () async {
-                  //         controller.myLaunchUrl('www.instagram.com');
-                  //       },
-                  //       child: Container(
-                  //         decoration: BoxDecoration(
-                  //           borderRadius: BorderRadius.circular(
-                  //             8,
-                  //           ),
-                  //         ),
-                  //         child: Icon(
-                  //           FontAwesomeIcons.squareTwitter,
-                  //           color: appcolor().bluetextcolor,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  //
-                  // SizedBox(
-                  //   height: Get.height * 0.03,
-                  // ),
 
                   Container(
-                    color: Colors.white,
+                    // color: Colors.white,
                     child: Row(
                       children: [
                         Text(
@@ -1057,30 +805,30 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
 
                   Service_item_list(),
 
-                  Container(
-                    color: Colors.white,
-                    child: Row(
-                      children: [
-                        Text(
-                          'Related Businesses',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 18,
-                            color: appcolor().mainColor,
-                          ),
-                        ),
-                        const Spacer(),
-                        TextButton(
-                          onPressed: () {
-                            Get.to(() => BusinessesViewWithBar());
-                          },
-                          child: const Text('See All'),
-                        ),
-                      ],
-                    ).paddingSymmetric(horizontal: 20),
-                  ),
-
-                  Related_Businesses_List(),
+                  // Container(
+                  //   color: Colors.white,
+                  //   child: Row(
+                  //     children: [
+                  //       Text(
+                  //         'Related Businesses',
+                  //         style: TextStyle(
+                  //           fontWeight: FontWeight.w700,
+                  //           fontSize: 18,
+                  //           color: appcolor().mainColor,
+                  //         ),
+                  //       ),
+                  //       const Spacer(),
+                  //       TextButton(
+                  //         onPressed: () {
+                  //           Get.to(() => BusinessesViewWithBar());
+                  //         },
+                  //         child: const Text('See All'),
+                  //       ),
+                  //     ],
+                  //   ).paddingSymmetric(horizontal: 20),
+                  // ),
+                  //
+                  // Related_Businesses_List(),
 
                   Container(
                     color: Colors.white,

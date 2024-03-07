@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
+import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
 import 'package:errandia/app/modules/categories/CategoryData.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
@@ -274,7 +275,7 @@ class _Profile_viewState extends State<Profile_view>
                         print("business item clicked: ${businessData['name']}");
                       }
                       Get.to(
-                          () => VisitShop(businessData: businessData));
+                          () => errandia_business_view(businessData: businessData));
                     },
                     child: errandia_widget(
                       imagePath: businessData['image'],

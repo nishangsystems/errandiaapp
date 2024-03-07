@@ -525,7 +525,7 @@ class _home_view_1State extends State<home_view_1> {
                 print("sub data: ${data['street']}");
                 return InkWell(
                   onTap: () {
-                    Get.to(() => errandia_business_view(businessData: data));
+                    Get.to(() => errandia_business_view(key: UniqueKey(), businessData: data));
                   },
                   child: Container(
                     margin:
