@@ -752,7 +752,6 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                 children: [
 
                   Container(
-                    // color: Colors.white,
                     child: Row(
                       children: [
                         Text(
@@ -781,7 +780,6 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                   ),
 
                   Container(
-                    color: Colors.white,
                     child: Row(
                       children: [
                         Text(
@@ -831,7 +829,6 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                   // Related_Businesses_List(),
 
                   Container(
-                    color: Colors.white,
                     child: Row(
                       children: [
                         Text(

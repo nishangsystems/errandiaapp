@@ -169,15 +169,12 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                                   .pop(true); // Navigate back with result
 
                               // Show success popup
-                              popup = PopupBox(
-                                title: 'Success',
-                                description: response['data']['message'],
-                                type: PopupType.success,
-                                callback: () {
-                                  print("issue");
-                                  Get.back();
-                                  // popup.dismissPopup(context);
-                                },
+                              Get.snackbar(
+                                'Success',
+                                response['data']['message'],
+                                backgroundColor: Colors.green,
+                                colorText: Colors.white,
+                                duration: const Duration(seconds: 5),
                               );
                             } else {
                               Navigator.of(dialogContext)
@@ -185,18 +182,15 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                               Navigator.pop(context); // Close the dialog
 
                               // Show error popup
-                              popup = PopupBox(
-                                title: 'Error',
-                                description: response['data']['data'],
-                                type: PopupType.error,
-                                callback: () {
-                                  // Get.back();
-                                  popup.dismissPopup(context);
-                                },
+                              Get.snackbar(
+                                'Error',
+                                response['data']['message'],
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                                duration: const Duration(seconds: 10),
                               );
                             }
 
-                            popup.showPopup(context); // Show the popup
                           }
                         }
                       });
