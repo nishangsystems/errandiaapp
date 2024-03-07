@@ -6,6 +6,7 @@ import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/modal/category.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
@@ -35,6 +36,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
   Get.put(add_business_controller());
   final imagePickercontroller imageController =
   Get.put(imagePickercontroller());
+  final profile_controller profileController = Get.put(profile_controller());
 
   var country;
   var regionCode;
@@ -82,11 +84,13 @@ class EditBusinessViewState extends State<EditBusinessView> {
     print("image path:  ${widget.data['image']}");
 
     setState(() {
+      phoneNumber = widget.data['phone'];
       category = widget.data['category']['id'] as int;
       regionCode = widget.data['region'] != null ? widget.data['region']['id'] as int : null;
       town = widget.data['town'] != null ? widget.data['town']['id'] as int : null;
     });
 
+    print("phone NUmber: $phoneNumber");
   }
 
   void updateBusiness(BuildContext context) {
@@ -193,7 +197,8 @@ class EditBusinessViewState extends State<EditBusinessView> {
                 updatedData = response['data']['data']['item'];
                 businessTitle = updatedData['name'];
               }),
-              print('updated: ${response['data']['data']['item']}'),
+              print('updated: $updatedData'),
+              profileController.reloadMyBusinesses(),
             }
           else
             {
@@ -204,11 +209,9 @@ class EditBusinessViewState extends State<EditBusinessView> {
                 type: PopupType.error,
               )
             },
-          Future.delayed(const Duration(seconds: 3), () {
             setState(() {
               isLoading = false;
-            });
-          }),
+            }),
           popup.showPopup(context),
         });
       } else {
@@ -230,7 +233,8 @@ class EditBusinessViewState extends State<EditBusinessView> {
                 updatedData = response['data']['data']['item'];
                 businessTitle = updatedData['name'];
               }),
-              print('updated: ${response['data']['data']['item']}'),
+              print('updated: $updatedData'),
+              profileController.reloadMyBusinesses(),
             }
           else
             {
@@ -241,11 +245,9 @@ class EditBusinessViewState extends State<EditBusinessView> {
                 type: PopupType.error,
               )
             },
-          Future.delayed(const Duration(seconds: 3), () {
             setState(() {
               isLoading = false;
-            });
-          }),
+            }),
           popup.showPopup(context),
         });
       }
@@ -265,7 +267,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
           elevation: 0,
           backgroundColor: Colors.white,
           titleSpacing: 8,
-          title: Text(businessTitle!),
+          title: Text(capitalizeAll(businessTitle!)),
           titleTextStyle: TextStyle(
               fontWeight: FontWeight.w500,
               color: appcolor().mediumGreyColor,
