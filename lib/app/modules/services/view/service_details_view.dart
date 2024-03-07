@@ -367,7 +367,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
             children: [
               // service image
               SizedBox(
-                // height: Get.height * 0.3,
+                height: Get.height * 0.3,
                 width: Get.width,
                 child: ClipRRect(
                   child: FadeInImage.assetNetwork(
