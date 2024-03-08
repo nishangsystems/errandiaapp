@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ItemListWidget extends StatefulWidget {
-  final data;
+  final dynamic data;
   final bool isService;
   
   const ItemListWidget({super.key, this.data, required this.isService});
@@ -32,9 +32,9 @@ class _ItemListWidgetState extends State<ItemListWidget> with WidgetsBindingObse
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.isService) {
-        productController.loadAllServices();
+        productController.loadAllShopServices(widget.data['slug']);
       } else {
-        productController.loadAllProducts();
+        productController.loadAllShopProducts(widget.data['slug']);
       }
     });
     
@@ -43,9 +43,9 @@ class _ItemListWidgetState extends State<ItemListWidget> with WidgetsBindingObse
       if (scrollController.position.pixels >=
           scrollController.position.maxScrollExtent) {
         if (widget.isService) {
-          productController.loadAllServices();
+          productController.loadAllShopServices(widget.data['slug']);
         } else {
-          productController.loadAllProducts();
+          productController.loadAllShopProducts(widget.data['slug']);
         }
       }
     });
@@ -63,9 +63,11 @@ class _ItemListWidgetState extends State<ItemListWidget> with WidgetsBindingObse
       // productController.reloadAll();
 
       if (widget.isService) {
-        productController.loadAllServices();
+        productController.reloadAllShopServices();
+        productController.loadAllShopServices(widget.data['slug']);
       } else {
-        productController.loadAllProducts();
+        productController.reloadAllShopProducts();
+        productController.loadAllShopProducts(widget.data['slug']);
       }
     }
   }
@@ -86,14 +88,14 @@ class _ItemListWidgetState extends State<ItemListWidget> with WidgetsBindingObse
              productController.reloadAll();
 
               if (widget.isService) {
-                productController.loadAllServices();
+                productController.loadAllShopServices(widget.data['slug']);
               } else {
-                productController.loadAllProducts();
+                productController.loadAllShopProducts(widget.data['slug']);
               }
             },
             child: Obx(() {
-              if (productController.isAllProductLoading.isTrue ||
-                  productController.isAllServiceLoading.isTrue) {
+              if (productController.isAllShopProductsLoading.isTrue ||
+                  productController.isAllShopServicesLoading.isTrue) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
@@ -103,8 +105,8 @@ class _ItemListWidgetState extends State<ItemListWidget> with WidgetsBindingObse
                 key: const PageStorageKey('item_list'),
                 controller: scrollController,
                 itemCount: widget.isService
-                    ? productController.allServiceList.length
-                    : productController.allProductList.length,
+                    ? productController.allShopServiceList.length
+                    : productController.allShopProductList.length,
                 gridDelegate:
                 const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -114,8 +116,8 @@ class _ItemListWidgetState extends State<ItemListWidget> with WidgetsBindingObse
                 ),
                 itemBuilder: (context, index) {
                   var item = widget.isService
-                      ? productController.allServiceList[index]
-                      : productController.allProductList[index];
+                      ? productController.allShopServiceList[index]
+                      : productController.allShopProductList[index];
 
                   return GestureDetector(
                     onTap: () {

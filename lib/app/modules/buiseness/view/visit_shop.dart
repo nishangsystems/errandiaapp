@@ -765,7 +765,8 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                         const Spacer(),
                         TextButton(
                           onPressed: () {
-                            Get.to(() => const ItemListWidget(isService: false));
+                            var data = widget.businessData;
+                            Get.to(() => ItemListWidget(data: data, isService: false));
                           },
                           child: const Text('See All'),
                         ),
@@ -793,7 +794,8 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                         const Spacer(),
                         TextButton(
                           onPressed: () {
-                            Get.to(() => const ItemListWidget(isService: true));
+                            var data = widget.businessData;
+                            Get.to(() => ItemListWidget(data: data, isService: true));
                           },
                           child: const Text('See All'),
                         ),

@@ -11,6 +11,8 @@ class ProductController extends GetxController {
   RxBool isAllServiceLoading = false.obs;
   RxBool isShopProductsLoading = false.obs;
   RxBool isShopServicesLoading = false.obs;
+  RxBool isAllShopProductsLoading = false.obs;
+  RxBool isAllShopServicesLoading = false.obs;
 
   var productList = List<dynamic>.empty(growable: true).obs;
   var serviceList = List<dynamic>.empty(growable: true).obs;
@@ -18,9 +20,17 @@ class ProductController extends GetxController {
   var allServiceList = List<dynamic>.empty(growable: true).obs;
   var shopProductList = List<dynamic>.empty(growable: true).obs;
   var shopServiceList = List<dynamic>.empty(growable: true).obs;
+  var allShopProductList = List<dynamic>.empty(growable: true).obs;
+  var allShopServiceList = List<dynamic>.empty(growable: true).obs;
 
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
+
+  RxInt allShopProductsCurrentPage = 1.obs;
+  RxInt allShopProductsTotal = 0.obs;
+
+  RxInt allShopServicesCurrentPage = 1.obs;
+  RxInt allShopServicesTotal = 0.obs;
 
   RxInt serviceCurrentPage = 1.obs;
   RxInt serviceTotal = 0.obs;
@@ -70,6 +80,68 @@ class ProductController extends GetxController {
       // Handle error
       printError(info: 'Failed to load shop services');
       isShopServicesLoading.value = false;
+    }
+  }
+
+  void loadAllShopProducts(String slug) async {
+    print("fetching all shop products");
+
+    if (isAllShopProductsLoading.isTrue && (allShopProductList.isNotEmpty && allShopProductList.length >= allShopProductsTotal.value)) return;
+
+    isAllShopProductsLoading.value = true;
+
+    try {
+      var data = await ProductAPI.getItemsByShop(slug, false, allShopProductsCurrentPage.value);
+      print("response all shop products: $data");
+
+      var products = jsonDecode(data);
+
+      print("decoded all shop products: ${products['data']['data']}");
+
+      if (data != null) {
+        allShopProductsCurrentPage.value++;
+        isAllShopProductsLoading.value = false;
+        // parse total to an integer
+        allShopProductsTotal.value = products['data']['data']['total'];
+        // print("total_: ${total.value}");
+        allShopProductList.addAll(products['data']['data']['items']);
+        print("allShopProductList: $allShopProductList");
+      }
+    } catch (e) {
+      // Handle exception
+      printError(info: e.toString());
+      isAllShopProductsLoading.value = false;
+    }
+  }
+
+  void loadAllShopServices(String slug) async {
+    print("fetching all shop services");
+
+    if (isAllShopServicesLoading.isTrue && (allShopServiceList.isNotEmpty && allShopServiceList.length >= allShopServicesTotal.value)) return;
+
+    isAllShopServicesLoading.value = true;
+
+    try {
+      var data = await ProductAPI.getItemsByShop(slug, true, allShopServicesCurrentPage.value);
+      print("response all shop services: $data");
+
+      var services = jsonDecode(data);
+
+      print("decoded all shop services: ${services['data']['data']}");
+
+      if (data != null) {
+        allShopServicesCurrentPage.value++;
+        isAllShopServicesLoading.value = false;
+        // parse total to an integer
+        allShopServicesTotal.value = services['data']['data']['total'];
+        // print("total_: ${total.value}");
+        allShopServiceList.addAll(services['data']['data']['items']);
+        print("allShopServiceList: $allShopServiceList");
+      }
+    } catch (e) {
+      // Handle exception
+      printError(info: e.toString());
+      isAllShopServicesLoading.value = false;
     }
   }
 
@@ -207,6 +279,20 @@ class ProductController extends GetxController {
     serviceTotal.value = 0;
     allServiceList.clear();
     isAllServiceLoading.value = false;
+  }
+
+  void reloadAllShopProducts() {
+    allShopProductsCurrentPage.value = 1;
+    allShopProductsTotal.value = 0;
+    allShopProductList.clear();
+    isAllShopProductsLoading.value = false;
+  }
+
+  void reloadAllShopServices() {
+    allShopServicesCurrentPage.value = 1;
+    allShopServicesTotal.value = 0;
+    allShopServiceList.clear();
+    isAllShopServicesLoading.value = false;
   }
 
 }
