@@ -295,12 +295,16 @@ class _Product_viewState extends State<Product_view>
                                 Icon(
                                   Icons.call,
                                   color: appcolor().mainColor,
+                                  size: 20
+                                ),
+                                const SizedBox(
+                                  width: 5,
                                 ),
                                 Text(
                                   // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
-                                  'Call ${widget.item['shop']['phone']}',
+                                  'Call',
                                   style: TextStyle(
-                                    fontSize: 9,
+                                    fontSize: 16,
                                     color: appcolor().mainColor,
                                   ),
                                 ),
@@ -568,225 +572,225 @@ class _Product_viewState extends State<Product_view>
               SizedBox(
                 height: Get.height * 0.015,
               ),
-              Container(
-                height: Get.height * 0.08,
-                decoration: BoxDecoration(
-                  border: Border.symmetric(
-                    horizontal: BorderSide(
-                      color: appcolor().greyColor,
-                    ),
-                  ),
-                  color: Colors.white,
-                ),
-                padding: const EdgeInsets.only(
-                    left: 20, right: 15, top: 5, bottom: 5),
-                child: InkWell(
-                  onTap: () {
-                    Get.to(product_send_enquiry());
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        FontAwesomeIcons.message,
-                        color: appcolor().blueColor,
-                      ),
-                      Text(
-                        '   Send Enquiry',
-                        style: TextStyle(color: appcolor().blueColor),
-                      ),
-                      Spacer(),
-                      Icon(
-                        Icons.arrow_forward_ios_outlined,
-                        color: appcolor().mainColor,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
+              // Container(
+              //   height: Get.height * 0.08,
+              //   decoration: BoxDecoration(
+              //     border: Border.symmetric(
+              //       horizontal: BorderSide(
+              //         color: appcolor().greyColor,
+              //       ),
+              //     ),
+              //     color: Colors.white,
+              //   ),
+              //   padding: const EdgeInsets.only(
+              //       left: 20, right: 15, top: 5, bottom: 5),
+              //   child: InkWell(
+              //     onTap: () {
+              //       Get.to(product_send_enquiry());
+              //     },
+              //     child: Row(
+              //       children: [
+              //         Icon(
+              //           FontAwesomeIcons.message,
+              //           color: appcolor().blueColor,
+              //         ),
+              //         Text(
+              //           '   Send Enquiry',
+              //           style: TextStyle(color: appcolor().blueColor),
+              //         ),
+              //         Spacer(),
+              //         Icon(
+              //           Icons.arrow_forward_ios_outlined,
+              //           color: appcolor().mainColor,
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              //
               SizedBox(
                 height: Get.height * 0.015,
               ),
               // suplier review
-              Container(
-                height: Get.height * 0.08,
-                decoration: BoxDecoration(
-                  border: Border.symmetric(
-                    horizontal: BorderSide(
-                      color: appcolor().greyColor,
-                    ),
-                  ),
-                  color: Colors.white,
-                ),
-                padding: const EdgeInsets.only(
-                    left: 20, right: 15, top: 5, bottom: 5),
-                child: Row(
-                  children: [
-                    const Text(
-                      'Supplier Review',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    Spacer(),
-                    TextButton(
-                      onPressed: () {
-                        Get.to(Review_view());
-                      },
-                      child: Text(
-                        'See All',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Container(
-                // height: Get.height * 0.3,
-                width: Get.width,
-                decoration: BoxDecoration(
-                  border: Border.symmetric(
-                    horizontal: BorderSide(
-                      color: appcolor().greyColor,
-                    ),
-                  ),
-                  color: Colors.white,
-                ),
-                padding:
-                    EdgeInsets.only(left: 20, right: 15, top: 15, bottom: 5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          child: Row(
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.only(right: 8),
-                                height: Get.height * 0.05,
-                                width: Get.width * 0.1,
-                                color: Colors.white,
-                                // child: Image.asset(widget.item['featured_image']),
-                                child: Image.network(
-                                  getImagePath(
-                                      widget.item['featured_image'].toString()),
-                                  fit: BoxFit.fill,
-                                  errorBuilder: (BuildContext context,
-                                      Object exception,
-                                      StackTrace? stackTrace) {
-                                    return Image.asset(
-                                      'assets/images/errandia_logo.png',
-                                      fit: BoxFit.cover,
-                                      height: Get.height * 0.17,
-                                      width: Get.width * 0.4,
-                                    );
-                                  },
-                                ),
-                              ),
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Name of supplier',
-                                  ),
-                                  Text('location'),
-                                ],
-                              ),
-                              // Spacer(),
-                              SizedBox(
-                                width: Get.width * 0.13,
-                              ),
-                              RatingBar.builder(
-                                itemCount: 5,
-                                direction: Axis.horizontal,
-                                initialRating: 1,
-                                itemSize: 22,
-                                maxRating: 5,
-                                allowHalfRating: true,
-                                glow: true,
-                                itemBuilder: (context, _) {
-                                  return Icon(
-                                    Icons.star,
-                                    color: Colors.amber,
-                                  );
-                                },
-                                onRatingUpdate: (value) {
-                                  debugPrint(value.toString());
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      height: Get.height * 0.15,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: Recently_item_List.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin:
-                                EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                            height: Get.height * 0.2,
-                            color: Colors.white,
-                            width: Get.width * 0.2,
-                            child: Center(
-                                child: Image.asset(Recently_item_List[index]
-                                    .imagePath
-                                    .toString())),
-                          );
-                        },
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(bottom: 10),
-                      child: Text(
-                        'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Container(
+              //   height: Get.height * 0.08,
+              //   decoration: BoxDecoration(
+              //     border: Border.symmetric(
+              //       horizontal: BorderSide(
+              //         color: appcolor().greyColor,
+              //       ),
+              //     ),
+              //     color: Colors.white,
+              //   ),
+              //   padding: const EdgeInsets.only(
+              //       left: 20, right: 15, top: 5, bottom: 5),
+              //   child: Row(
+              //     children: [
+              //       const Text(
+              //         'Supplier Review',
+              //         style: TextStyle(fontSize: 15),
+              //       ),
+              //       Spacer(),
+              //       TextButton(
+              //         onPressed: () {
+              //           Get.to(Review_view());
+              //         },
+              //         child: Text(
+              //           'See All',
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              //
+              // Container(
+              //   // height: Get.height * 0.3,
+              //   width: Get.width,
+              //   decoration: BoxDecoration(
+              //     border: Border.symmetric(
+              //       horizontal: BorderSide(
+              //         color: appcolor().greyColor,
+              //       ),
+              //     ),
+              //     color: Colors.white,
+              //   ),
+              //   padding:
+              //       EdgeInsets.only(left: 20, right: 15, top: 15, bottom: 5),
+              //   child: Column(
+              //     mainAxisAlignment: MainAxisAlignment.start,
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Row(
+              //         children: [
+              //           Container(
+              //             child: Row(
+              //               children: [
+              //                 Container(
+              //                   margin: const EdgeInsets.only(right: 8),
+              //                   height: Get.height * 0.05,
+              //                   width: Get.width * 0.1,
+              //                   color: Colors.white,
+              //                   // child: Image.asset(widget.item['featured_image']),
+              //                   child: Image.network(
+              //                     getImagePath(
+              //                         widget.item['featured_image'].toString()),
+              //                     fit: BoxFit.fill,
+              //                     errorBuilder: (BuildContext context,
+              //                         Object exception,
+              //                         StackTrace? stackTrace) {
+              //                       return Image.asset(
+              //                         'assets/images/errandia_logo.png',
+              //                         fit: BoxFit.cover,
+              //                         height: Get.height * 0.17,
+              //                         width: Get.width * 0.4,
+              //                       );
+              //                     },
+              //                   ),
+              //                 ),
+              //                 const Column(
+              //                   crossAxisAlignment: CrossAxisAlignment.start,
+              //                   children: [
+              //                     Text(
+              //                       'Name of supplier',
+              //                     ),
+              //                     Text('location'),
+              //                   ],
+              //                 ),
+              //                 // Spacer(),
+              //                 SizedBox(
+              //                   width: Get.width * 0.13,
+              //                 ),
+              //                 RatingBar.builder(
+              //                   itemCount: 5,
+              //                   direction: Axis.horizontal,
+              //                   initialRating: 1,
+              //                   itemSize: 22,
+              //                   maxRating: 5,
+              //                   allowHalfRating: true,
+              //                   glow: true,
+              //                   itemBuilder: (context, _) {
+              //                     return Icon(
+              //                       Icons.star,
+              //                       color: Colors.amber,
+              //                     );
+              //                   },
+              //                   onRatingUpdate: (value) {
+              //                     debugPrint(value.toString());
+              //                   },
+              //                 ),
+              //               ],
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //       Container(
+              //         height: Get.height * 0.15,
+              //         child: ListView.builder(
+              //           scrollDirection: Axis.horizontal,
+              //           itemCount: Recently_item_List.length,
+              //           itemBuilder: (context, index) {
+              //             return Container(
+              //               margin:
+              //                   EdgeInsets.only(right: 10, top: 10, bottom: 10),
+              //               height: Get.height * 0.2,
+              //               color: Colors.white,
+              //               width: Get.width * 0.2,
+              //               child: Center(
+              //                   child: Image.asset(Recently_item_List[index]
+              //                       .imagePath
+              //                       .toString())),
+              //             );
+              //           },
+              //         ),
+              //       ),
+              //       Container(
+              //         padding: EdgeInsets.only(bottom: 10),
+              //         child: Text(
+              //           'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.',
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
 
               // add your Reviews
 
-              InkWell(
-                onTap: () {
-                  var item_ = {
-                    'name': widget.item.name,
-                    'price': widget.item.price,
-                    'image': widget.item.imagePath,
-                    'location': 'location',
-                    'address': 'Molyko, Buea',
-                    'featured_image': 'https://picsum.photos/250?image=9'
-                  };
-                  print("item: ${widget.item}");
-                  Get.to(add_review_view(
-                    review: item_,
-                  ));
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(
-                      left: 20, right: 15, top: 10, bottom: 10),
-                  height: Get.height * 0.05,
-                  width: Get.width * 0.4,
-                  decoration: BoxDecoration(
-                      color: appcolor().mainColor,
-                      borderRadius: BorderRadius.circular(5)),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: const Center(
-                    child: Text(
-                      'Add Your Review',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 12),
-                    ),
-                  ),
-                ),
-              ),
+              // InkWell(
+              //   onTap: () {
+              //     var item_ = {
+              //       'name': widget.item.name,
+              //       'price': widget.item.price,
+              //       'image': widget.item.imagePath,
+              //       'location': 'location',
+              //       'address': 'Molyko, Buea',
+              //       'featured_image': 'https://picsum.photos/250?image=9'
+              //     };
+              //     print("item: ${widget.item}");
+              //     Get.to(add_review_view(
+              //       review: item_,
+              //     ));
+              //   },
+              //   child: Container(
+              //     margin: const EdgeInsets.only(
+              //         left: 20, right: 15, top: 10, bottom: 10),
+              //     height: Get.height * 0.05,
+              //     width: Get.width * 0.4,
+              //     decoration: BoxDecoration(
+              //         color: appcolor().mainColor,
+              //         borderRadius: BorderRadius.circular(5)),
+              //     padding:
+              //         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              //     child: const Center(
+              //       child: Text(
+              //         'Add Your Review',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold,
+              //             color: Colors.white,
+              //             fontSize: 12),
+              //       ),
+              //     ),
+              //   ),
+              // ),
 
               const Padding(
                 padding:
@@ -831,9 +835,12 @@ class _Product_viewState extends State<Product_view>
                                 print("product item clicked: ${item['name']}");
                               }
                               // replace current view
-                              Get.to(() => Product_view(
-                                    item: item,
-                                  ));
+                              Get.offNamed('/product_view', arguments: item,
+                                preventDuplicates: false,
+                              );
+                              // Get.to(() => Product_view(
+                              //       item: item,
+                              //     ));
                             },
                             child: errandia_widget(
                               cost: item['unit_price'].toString(),

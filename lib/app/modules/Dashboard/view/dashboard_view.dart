@@ -86,18 +86,18 @@ class dashboard_view extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: Get.height * 0.40,
+                height: Get.height * 0.23,
                 child: GridView.count(
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisSpacing: 1,
                   mainAxisSpacing: 5,
                   childAspectRatio: 1 / 1.3,
-                  crossAxisCount: 3,
+                  crossAxisCount: 2,
                   children: [
                     dashboard_widget(
                       Imagepath: 'assets/images/sidebar_icon/icon-company.png',
                       title: 'Manage Businesses',
-                      belowtext: '0 Businesses',
+                      belowText: '0 Businesses',
                       callback: () {
                         // Get.offAll(Home_view());
                         Get.to(() => manage_business_view());
@@ -107,47 +107,30 @@ class dashboard_view extends StatelessWidget {
                       Imagepath:
                           'assets/images/sidebar_icon/icon-manage-products.png',
                       title: 'Manage Products',
-                      belowtext: '0 Products',
+                      belowText: '0 Products',
                       callback: () {
                         // Get.back();
                         Get.to(() => manage_product_view());
                       },
                     ),
-                    dashboard_widget(
-                      Imagepath: 'assets/images/sidebar_icon/services.png',
-                      title: 'Manage Services',
-                      belowtext: '0 Services',
-                      callback: () {
-                        // Get.back();
-                        Get.to(() => manage_service_view());
-                      },
-                    ),
-                    dashboard_widget(
-                      Imagepath:
-                          'assets/images/sidebar_icon/icon-profile-errands.png',
-                      title: 'Errands',
-                      belowtext: '0 Errands',
-                      callback: () {
-                        Get.to(() => errand_view());
-                      },
-                    ),
-                    dashboard_widget(
-                      Imagepath: 'assets/images/sidebar_icon/icon-reviews.png',
-                      title: 'Reviews',
-                      belowtext: '0 Reviews',
-                      callback: () {
-                        Get.to(()=>manage_review_view());
-                      },
-                    ),
-                    dashboard_widget(
-                      Imagepath:
-                          'assets/images/sidebar_icon/icon-profile-subscribers.png',
-                      title: 'Subscribers',
-                      belowtext: '0 Subscribers',
-                      callback: () {
-                        Get.to(() => subscriber_view());
-                      },
-                    ),
+
+                    // dashboard_widget(
+                    //   Imagepath: 'assets/images/sidebar_icon/icon-reviews.png',
+                    //   title: 'Reviews',
+                    //   belowtext: '0 Reviews',
+                    //   callback: () {
+                    //     Get.to(()=>manage_review_view());
+                    //   },
+                    // ),
+                    // dashboard_widget(
+                    //   Imagepath:
+                    //       'assets/images/sidebar_icon/icon-profile-subscribers.png',
+                    //   title: 'Subscribers',
+                    //   belowtext: '0 Subscribers',
+                    //   callback: () {
+                    //     Get.to(() => subscriber_view());
+                    //   },
+                    // ),
                     // dashboard_widget(
                     //   Imagepath:
                     //       'assets/images/sidebar_icon/icon-profile-following.png',
@@ -160,95 +143,101 @@ class dashboard_view extends StatelessWidget {
                   ],
                 ),
               ),
+              // const Divider(),
+              // SizedBox(
+              //   height: Get.height * 0.2,
+              //   child: GridView.count(
+              //     physics: const NeverScrollableScrollPhysics(),
+              //     crossAxisSpacing: 1,
+              //     childAspectRatio: 1 / 1.3,
+              //     crossAxisCount: 3,
+              //     children: [
+              //       dashboard_widget(
+              //           Imagepath:
+              //               'assets/images/sidebar_icon/icon-business-branches.png',
+              //           title: 'Business Branches',
+              //           belowtext: '0 Branches',
+              //           callback: () {}),
+              //       dashboard_widget(
+              //           Imagepath: 'assets/images/sidebar_icon/icon-manager.png',
+              //           title: 'Branch Managers',
+              //           belowtext: '0 Managers',
+              //           callback: () {}),
+              //     ],
+              //   ),
+              // ),
               const Divider(),
               SizedBox(
-                height: Get.height * 0.2,
+                height: Get.height * 0.23,
                 child: GridView.count(
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisSpacing: 1,
                   childAspectRatio: 1 / 1.3,
-                  crossAxisCount: 3,
+                  crossAxisCount: 2,
                   children: [
                     dashboard_widget(
-                        Imagepath:
-                            'assets/images/sidebar_icon/icon-business-branches.png',
-                        title: 'Business Branches',
-                        belowtext: '0 Branches',
-                        callback: () {}),
+                      Imagepath: 'assets/images/sidebar_icon/services.png',
+                      title: 'Manage Services',
+                      belowText: '0 Services',
+                      callback: () {
+                        // Get.back();
+                        Get.to(() => manage_service_view());
+                      },
+                    ),
                     dashboard_widget(
-                        Imagepath: 'assets/images/sidebar_icon/icon-manager.png',
-                        title: 'Branch Managers',
-                        belowtext: '0 Managers',
-                        callback: () {}),
+                      Imagepath:
+                      'assets/images/sidebar_icon/icon-profile-errands.png',
+                      title: 'Errands',
+                      belowText: '0 Errands',
+                      callback: () {
+                        Get.to(() => errand_view());
+                      },
+                    ),
+
+                    // dashboard_widget(
+                    //     Imagepath:
+                    //         'assets/images/sidebar_icon/icon-dashboard-smsplan.png',
+                    //     title: 'SMS Plan',
+                    //     belowtext: 'No Plan',
+                    //     callback: () {
+                    //       Get.to(sms_plan_view());
+                    //     }),
                   ],
                 ),
               ),
+
               const Divider(),
               SizedBox(
-                height: Get.height * 0.2,
+                height: Get.height * 0.23,
                 child: GridView.count(
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisSpacing: 1,
                   childAspectRatio: 1 / 1.3,
-                  crossAxisCount: 3,
+                  crossAxisCount: 2,
                   children: [
                     dashboard_widget(
                         Imagepath:
-                            'assets/images/sidebar_icon/icon-dashboard-subscription-plan.png',
+                        'assets/images/sidebar_icon/icon-dashboard-subscription-plan.png',
                         title: 'Subscription',
-                        belowtext: 'Ongoing',
+                        belowText: 'Ongoing',
                         callback: () {
                           Get.to(()=> subscription_view());
                         }),
                     dashboard_widget(
                         Imagepath:
-                            'assets/images/sidebar_icon/icon-dashboard-smsplan.png',
-                        title: 'SMS Plan',
-                        belowtext: 'No Plan',
-                        callback: () {
-                          Get.to(sms_plan_view());
-                        }),
-                    dashboard_widget(
-                        Imagepath:
-                            'assets/images/sidebar_icon/icon-dashboard-my-profile.png',
-                        title: 'My Profile',
-                        belowtext: '0 complete',
-                        callback: () {}),
+                        'assets/images/delete_account.png',
+                        title: 'Delete Account',
+                        belowText: '0 complete',
+                        callback: () {}
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         ).paddingSymmetric(horizontal: 10),
-        // body: CustomScrollView(
-        //   slivers: <Widget>[
-        //     SliverGrid.count(
-        //       crossAxisCount: 3,
-        //       children: [
-        //         Container(
-        //           height: 100,
-        //           width: 100,
-        //           color: Colors.red,
-        //         ),
-        //       ],
-        //     ),
-        //     SliverPadding(
-        //       padding: EdgeInsets.symmetric(
-        //         vertical: 10,
-        //       ),
-        //     ),
-        //     SliverGrid.count(
-        //       crossAxisCount: 3,
-        //       children: [
-        //         Container(
-        //           height: 100,
-        //           width: 100,
-        //           color: Colors.red,
-        //         ),
-        //       ],
-        //     ),
-        //   ],
-        // ),
+
+
       ),
     );
   }
@@ -257,7 +246,7 @@ class dashboard_view extends StatelessWidget {
 Widget dashboard_widget({
   required String Imagepath,
   required String title,
-  required String belowtext,
+  required String belowText,
   required Callback callback,
 }) {
   return InkWell(
@@ -268,14 +257,14 @@ Widget dashboard_widget({
           borderRadius: BorderRadius.circular(5),
           color: Colors.white,
         ),
-        margin: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
 
         // height: 100,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Container(
+            SizedBox(
               height: 45,
               child: Image(
                 image: AssetImage(
@@ -296,17 +285,17 @@ Widget dashboard_widget({
                       fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
-                Text(
-                  belowtext,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                // Text(
+                //   belowText,
+                //   style: const TextStyle(
+                //     fontSize: 11,
+                //     color: Colors.grey,
+                //     fontWeight: FontWeight.w400,
+                //   ),
+                //   textAlign: TextAlign.center,
+                // ),
               ],
-            ),
+            ).paddingOnly(bottom: 30),
           ],
         ),
       ),

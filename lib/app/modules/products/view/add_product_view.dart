@@ -102,11 +102,11 @@ class _add_product_viewState extends State<add_product_view> {
               selectedShop = null;
             });
             imageController.reset();
-            profile_controller().reloadMyProducts();
+            profileController.reloadMyProducts();
           } else {
             popup = PopupBox(
               title: "Error",
-              description: response['data']['message'],
+              description: response['data']['data']['error'],
              type: PopupType.error,
             );
             setState(() {
@@ -166,6 +166,7 @@ class _add_product_viewState extends State<add_product_view> {
           leading: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () {
+              profileController.reloadMyProducts();
               Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios),

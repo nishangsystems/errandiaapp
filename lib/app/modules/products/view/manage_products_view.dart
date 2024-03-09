@@ -9,6 +9,7 @@ import 'package:errandia/app/modules/global/Widgets/row_item_widget.dart';
 import 'package:errandia/app/modules/products/controller/manage_products_controller.dart';
 import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/products/view/edit_product_view.dart';
+import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
@@ -286,134 +287,143 @@ class _manage_product_viewState extends State<manage_product_view> with WidgetsB
                       itemCount: profileController.productItemList.length,
                       itemBuilder: (context, index) {
                         var data = profileController.productItemList[index];
-                        return RowItemWidget(
-                          name: data['name'],
-                          price: data['unit_price'].toString(),
-                          image: data['featured_image'],
-                          index: index,
+                        return GestureDetector(
                           onTap: () {
-                            Get.bottomSheet(
-                              // backgroundColor: Colors.white,
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20),
-                                color: Colors.white,
-                                child: Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment
-                                      .center,
-                                  children: [
-                                    const Center(
-                                      child: Icon(
-                                        Icons.horizontal_rule,
-                                        size: 25,
-                                      ),
-                                    ),
-                                    // Text(index.toString()),
-                                    managebottomSheetWidgetitem(
-                                      title: 'Edit Product',
-                                      icondata: Icons.edit,
-                                      callback: () async {
-                                        print('tapped');
-                                        Get.back();
-                                        Get.to(() =>
-                                            EditProductView(
-                                              data: data,));
-                                      },
-                                    ),
-                                    // managebottomSheetWidgetitem(
-                                    //   title: 'Edit Photo',
-                                    //   icondata: FontAwesomeIcons
-                                    //       .fileImage,
-                                    //   callback: () {
-                                    //     Get.back();
-                                    //   },
-                                    // ),
-                                    // managebottomSheetWidgetitem(
-                                    //   title: 'UnPublish Product',
-                                    //   icondata: FontAwesomeIcons
-                                    //       .minusCircle,
-                                    //   callback: () {},
-                                    // ),
-                                    managebottomSheetWidgetitem(
-                                      title: 'Move to trash',
-                                      icondata: Icons.delete,
-                                      callback: () {
-                                        Get.back();
-
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext dialogContext) {
-                                            // Use dialogContext
-                                            var response;
-                                            return CustomAlertDialog(
-                                                title: "Delete Product",
-                                                message: "Are you sure you want to delete this product?",
-                                                dialogType: MyDialogType.error,
-                                                onConfirm: () {
-                                                  // delete product
-                                                  print("delete product: ${data['slug']}");
-                                                  ProductAPI.deleteProductOrService(data['slug'])
-                                                      .then((response_) {
-                                                    if (response_ != null) {
-                                                      response = jsonDecode(response_);
-                                                      print("delete product response: $response");
-
-                                                      if (mounted) {
-                                                        // Check if the widget is still in the tree
-                                                        if (response["status"] == 'success') {
-                                                          Navigator.of(dialogContext)
-                                                              .pop(); // Close the dialog
-
-                                                          // Show success popup
-                                                          popup = PopupBox(
-                                                            title: 'Success',
-                                                            description: response['data']['message'],
-                                                            type: PopupType.success,
-                                                          );
-                                                        } else {
-                                                          Navigator.of(dialogContext)
-                                                              .pop(); // Close the dialog
-
-                                                          // Show error popup
-                                                          popup = PopupBox(
-                                                            title: 'Error',
-                                                            description: response['data']['data'],
-                                                            type: PopupType.error,
-                                                          );
-                                                        }
-
-                                                        popup.showPopup(context); // Show the popup
-                                                      }
-                                                    }
-                                                  });
-                                                },
-                                                onCancel: () {
-                                                  // cancel delete
-                                                  print("cancel delete");
-                                                  Navigator.of(dialogContext).pop(); // Close the dialog
-                                                });
-                                          },
-                                        ).then((_) {
-                                          if (mounted) {
-                                            try {
-                                              popup.dismissPopup(
-                                                  navigatorKey.currentContext!); // Dismiss the popup
-                                            } catch (e) {
-                                              print("error dismissing popup: $e");
-                                            }
-                                            profileController.reloadMyProducts();
-                                            Get.back();
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              enableDrag: true,
+                            Get.to(() => Product_view(item: data ),
+                              transition: Transition.fadeIn,
+                              duration: const Duration(milliseconds: 500),
                             );
                           },
+
+                          child: RowItemWidget(
+                            name: data['name'],
+                            price: data['unit_price'].toString(),
+                            image: data['featured_image'],
+                            index: index,
+                            onTap: () {
+                              Get.bottomSheet(
+                                // backgroundColor: Colors.white,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  color: Colors.white,
+                                  child: Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment
+                                        .center,
+                                    children: [
+                                      const Center(
+                                        child: Icon(
+                                          Icons.horizontal_rule,
+                                          size: 25,
+                                        ),
+                                      ),
+                                      // Text(index.toString()),
+                                      managebottomSheetWidgetitem(
+                                        title: 'Edit Product',
+                                        icondata: Icons.edit,
+                                        callback: () async {
+                                          print('tapped');
+                                          Get.back();
+                                          Get.to(() =>
+                                              EditProductView(
+                                                data: data,));
+                                        },
+                                      ),
+                                      // managebottomSheetWidgetitem(
+                                      //   title: 'Edit Photo',
+                                      //   icondata: FontAwesomeIcons
+                                      //       .fileImage,
+                                      //   callback: () {
+                                      //     Get.back();
+                                      //   },
+                                      // ),
+                                      // managebottomSheetWidgetitem(
+                                      //   title: 'UnPublish Product',
+                                      //   icondata: FontAwesomeIcons
+                                      //       .minusCircle,
+                                      //   callback: () {},
+                                      // ),
+                                      managebottomSheetWidgetitem(
+                                        title: 'Move to trash',
+                                        icondata: Icons.delete,
+                                        callback: () {
+                                          Get.back();
+
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext dialogContext) {
+                                              // Use dialogContext
+                                              var response;
+                                              return CustomAlertDialog(
+                                                  title: "Delete Product",
+                                                  message: "Are you sure you want to delete this product?",
+                                                  dialogType: MyDialogType.error,
+                                                  onConfirm: () {
+                                                    // delete product
+                                                    print("delete product: ${data['slug']}");
+                                                    ProductAPI.deleteProductOrService(data['slug'])
+                                                        .then((response_) {
+                                                      if (response_ != null) {
+                                                        response = jsonDecode(response_);
+                                                        print("delete product response: $response");
+
+                                                        if (mounted) {
+                                                          // Check if the widget is still in the tree
+                                                          if (response["status"] == 'success') {
+                                                            Navigator.of(dialogContext)
+                                                                .pop(); // Close the dialog
+
+                                                            // Show success popup
+                                                            popup = PopupBox(
+                                                              title: 'Success',
+                                                              description: response['data']['message'],
+                                                              type: PopupType.success,
+                                                            );
+                                                          } else {
+                                                            Navigator.of(dialogContext)
+                                                                .pop(); // Close the dialog
+
+                                                            // Show error popup
+                                                            popup = PopupBox(
+                                                              title: 'Error',
+                                                              description: response['data']['data'],
+                                                              type: PopupType.error,
+                                                            );
+                                                          }
+
+                                                          popup.showPopup(context); // Show the popup
+                                                        }
+                                                      }
+                                                    });
+                                                  },
+                                                  onCancel: () {
+                                                    // cancel delete
+                                                    print("cancel delete");
+                                                    Navigator.of(dialogContext).pop(); // Close the dialog
+                                                  });
+                                            },
+                                          ).then((_) {
+                                            if (mounted) {
+                                              try {
+                                                popup.dismissPopup(
+                                                    navigatorKey.currentContext!); // Dismiss the popup
+                                              } catch (e) {
+                                                print("error dismissing popup: $e");
+                                              }
+                                              profileController.reloadMyProducts();
+                                              Get.back();
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                enableDrag: true,
+                              );
+                            },
+                          ),
                         );
                       },
                     ),

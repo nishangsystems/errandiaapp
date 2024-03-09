@@ -4,13 +4,10 @@ import 'dart:io';
 import 'package:errandia/app/APi/product.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
-import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
-import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
-import 'package:errandia/app/modules/services/controller/edit_service_controller.dart';
 import 'package:errandia/modal/Shop.dart';
 import 'package:errandia/modal/category.dart';
 import 'package:errandia/utils/helper.dart';
@@ -18,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
-import '../../buiseness/controller/add_business_controller.dart';
 import '../../global/Widgets/blockButton.dart';
 
 class EditServiceView extends StatefulWidget {
@@ -47,6 +43,8 @@ class EditServiceViewState extends State<EditServiceView> {
 
   Map<String, dynamic> updatedData = {};
 
+  late Map<String, dynamic> _localServiceData;
+
   @override
   void initState() {
     super.initState();
@@ -55,32 +53,33 @@ class EditServiceViewState extends State<EditServiceView> {
     imageController2 = Get.put(imagePickercontroller());
     profileController = Get.put(profile_controller());
     _scrollController = ScrollController();
+    _localServiceData = widget.data!;
 
     setState(() {
       isLoadingData = true;
-      productName = capitalizeAll(widget.data!['name']) ?? 'Edit Service';
+      productName = capitalizeAll(_localServiceData['name']) ?? 'Edit Service';
     });
 
     product_controller.loadCategories();
     product_controller.loadShops().then((_) {
-      product_controller.product_name_controller.text = widget.data!['name'] ?? '';
-      product_controller.shop_Id_controller.text = widget.data!['shop']['id'].toString();
-      product_controller.unit_price_controller.text = widget.data!['unit_price'].toString();
-      product_controller.product_desc_controller.text = widget.data!['description'] ?? '';
-      product_controller.product_tags_controller.text = widget.data!['tags'] ?? '';
-      product_controller.category_controller.text = widget.data!['category']['name'];
-      product_controller.quantity_controller.text = widget.data!['quantity'].toString();
+      product_controller.product_name_controller.text = _localServiceData['name'] ?? '';
+      product_controller.shop_Id_controller.text = _localServiceData['shop']['id'].toString();
+      product_controller.unit_price_controller.text = _localServiceData['unit_price'].toString();
+      product_controller.product_desc_controller.text = _localServiceData['description'] ?? '';
+      product_controller.product_tags_controller.text = _localServiceData['tags'] ?? '';
+      product_controller.category_controller.text = _localServiceData['category']['name'];
+      product_controller.quantity_controller.text = _localServiceData['quantity'].toString();
 
-      imageController.image_path.value = widget.data!['featured_image'] ?? '';
+      imageController.image_path.value = _localServiceData['featured_image'] ?? '';
 
       Shop? shop = product_controller.shopList.firstWhereOrNull(
-              (s) => s.id == widget.data!['shop']['id'] as int
+              (s) => s.id == _localServiceData['shop']['id'] as int
       );
 
-      print("shop to edit: ${widget.data!['shop']['id']}");
+      print("shop to edit: ${_localServiceData['shop']['id']}");
       setState(() {
         selectedShop = shop;
-        category = widget.data!['category']['id'] as int;
+        category = _localServiceData['category']['id'] as int;
         isLoadingData = false;
       });
     });
@@ -130,7 +129,7 @@ class EditServiceViewState extends State<EditServiceView> {
         print("product data: $value");
 
         if (imageController.image_path.toString() == '') {
-          ProductAPI.updateProductOrService(value, context, widget.data?['slug']).then((response_) {
+          ProductAPI.updateProductOrService(value, context, _localServiceData?['slug']).then((response_) {
             response = jsonDecode(response_);
             print("product response: $response");
             if (response['status'] == "success") {
@@ -139,16 +138,18 @@ class EditServiceViewState extends State<EditServiceView> {
                 description: response['data']['message'],
                 type: PopupType.success,
               );
+              var data = response['data']['data']['item'];
+              print("updated data: $data");
               setState(() {
-                updatedData = response['data']['data']['item'];
+                updatedData.addAll(data);
                 productName = capitalizeAll(updatedData['name']);
                 isLoading = false;
               });
-              profileController.reloadMyProducts();
+              profileController.reloadMyServices();
             } else {
               popup = PopupBox(
                 title: "Error",
-                description: response['data']['message'],
+                description: response['data']['data']['error'],
                 type: PopupType.error,
               );
               setState(() {
@@ -158,7 +159,7 @@ class EditServiceViewState extends State<EditServiceView> {
             popup.showPopup(context);
           });
         } else {
-          ProductAPI.updateProductOrServiceWithImage(value, context, imageController.image_path.toString(), widget.data?['slug']).then((response_) {
+          ProductAPI.updateProductOrServiceWithImage(value, context, imageController.image_path.toString(), _localServiceData?['slug']).then((response_) {
             response = jsonDecode(response_);
             print("product response img: $response");
             if (response['status'] == "success") {
@@ -167,17 +168,18 @@ class EditServiceViewState extends State<EditServiceView> {
                 description: response['data']['message'],
                 type: PopupType.success,
               );
-              print("updated data: ${response['data']['data']['item']}");
+              var data = response['data']['data']['item'];
+              print("updated data: $data");
               setState(() {
-                updatedData = response['data']['data']['item'];
+                updatedData.addAll(data);
                 productName = capitalizeAll(updatedData['name']);
                 isLoading = false;
               });
-              profileController.reloadMyProducts();
+              profileController.reloadMyServices();
             } else {
               popup = PopupBox(
                 title: "Error",
-                description: response['data']['message'],
+                description: response['data']['data']['error'],
                 type: PopupType.error,
               );
               setState(() {
@@ -207,7 +209,7 @@ class EditServiceViewState extends State<EditServiceView> {
 
   @override
   Widget build(BuildContext context) {
-    print('Edit Service: ${widget.data}');
+    print('Edit Service: $_localServiceData');
 
     return WillPopScope(
       onWillPop: () async {
@@ -228,7 +230,7 @@ class EditServiceViewState extends State<EditServiceView> {
           leading: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () {
-              Get.back();
+              Get.back(result: updatedData.isNotEmpty ? updatedData : null);
             },
             icon: const Icon(Icons.arrow_back_ios),
             color: appcolor().mediumGreyColor,

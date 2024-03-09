@@ -276,7 +276,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
           leading: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () {
-              Get.back();
+              Get.back(result: updatedData.isNotEmpty ? updatedData : null);
             },
             icon: const Icon(Icons.arrow_back_ios),
             color: appcolor().mediumGreyColor,

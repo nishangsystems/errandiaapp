@@ -15,7 +15,7 @@ class manage_product_tabController extends GetxController
   @override
   void onInit() {
     // TODO: implement onInit
-    tabController = TabController(length:4, vsync: this);
+    tabController = TabController(length:3, vsync: this);
     super.onInit();
   }
 

@@ -68,7 +68,7 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
       errBController.loadBusinesses(widget.businessData['slug']);
     });
 
-    print("userData: ${profile_controller().userData}");
+    print("userData: ${profileController.userData}");
   }
 
   void showPopupMenu(BuildContext context) {

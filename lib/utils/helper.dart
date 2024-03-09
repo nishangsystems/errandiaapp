@@ -35,13 +35,17 @@ String getLastName(String s) {
 
 String getImagePath(String imagePath) {
   String sanitizedPath = imagePath.trim().replaceAll(RegExp(r'^"|"$'), '');
-  if (sanitizedPath.startsWith("http")) {
-    print('url image: $sanitizedPath');
-    return sanitizedPath;
-  } else {
-    String finalUrl = '${apiDomain().imageDomain}/$sanitizedPath';
-    print('final image: $finalUrl');
-    return finalUrl;
+  try {
+    if (sanitizedPath.startsWith("http")) {
+      print('url image: $sanitizedPath');
+      return sanitizedPath;
+    } else {
+      String finalUrl = '${apiDomain().imageDomain}/$sanitizedPath';
+      print('final image: $finalUrl');
+      return finalUrl;
+    }
+  } catch (e) {
+    return '';
   }
 }
 

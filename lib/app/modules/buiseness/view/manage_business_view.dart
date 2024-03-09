@@ -4,6 +4,7 @@ import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
+import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 import 'package:errandia/app/modules/global/Widgets/business_item.dart';
@@ -38,15 +39,25 @@ class _manage_business_viewState extends State<manage_business_view>
       Get.put(manage_business_tabController());
   late profile_controller profileController;
   late ScrollController scrollController;
+  late home_controller homeController;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   late PopupBox popup;
+
+  String _formatAddress(Map<String, dynamic> shop) {
+    String street = shop['street'] ?? '';
+    String townName = shop['town'] != null ? shop['town']['name'] : '';
+    String regionName = shop['region'] != null ? shop['region']['name'] : '';
+
+    return [street, townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     profileController = Get.put(profile_controller());
+    homeController = Get.put(home_controller());
     mController.tabController = TabController(length: 3, vsync: this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -112,172 +123,181 @@ class _manage_business_viewState extends State<manage_business_view>
               if (kDebugMode) {
                 print("manage business : $data");
               }
-              return BusinessItem(
-                name: data['name'],
-                address: data['address'],
-                image: data['image'],
+              return GestureDetector(
                 onTap: () {
-                  Get.bottomSheet(
-                    // backgroundColor: Colors.white,
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      color: Colors.white,
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Center(
-                            child: Icon(
-                              Icons.horizontal_rule,
-                              size: 25,
-                            ),
-                          ),
-                          // Text(index.toString()),
-                          bottomSheetWidgetitem(
-                            title: 'Edit Business',
-                            imagepath:
-                            'assets/images/sidebar_icon/icon-edit.png',
-                            callback: () async {
-                              print('tapped');
-                              Get.back();
-                              Get.to(() => EditBusinessView(
-                                data: data,
-                              ));
-                            },
-                          ),
-                          bottomSheetWidgetitem(
-                            title: 'Add New Product',
-                            imagepath:
-                            'assets/images/sidebar_icon/add_products.png',
-                            callback: () async {
-                              print('add new product');
-                              Get.back();
-                              Get.to(() => add_product_view());
-                            },
-                          ),
-                          bottomSheetWidgetitem(
-                            title: 'Add New Service',
-                            imagepath:
-                            'assets/images/sidebar_icon/services.png',
-                            callback: () async {
-                              print('add new service');
-                              Get.back();
-                              Get.to(() => add_service_view());
-                            },
-                          ),
-                          bottomSheetWidgetitem(
-                            title: 'Suspend Business',
-                            imagepath:
-                            'assets/images/sidebar_icon/icon-suspend.png',
-                            callback: () {
-                              Get.back();
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return businessDialog(BusinessAction.suspend);
-                                },
-                              );
-                            },
-                          ),
-                          bottomSheetWidgetitem(
-                            title: 'Update Location',
-                            imagepath:
-                            'assets/images/sidebar_icon/icon-location.png',
-                            callback: () {},
-                          ),
-                          bottomSheetWidgetitem(
-                            title: 'Move to trash',
-                            imagepath:
-                            'assets/images/sidebar_icon/icon-trash.png',
-                            callback: () {
-                              Get.back();
-
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext dialogContext) {
-                                  // Use dialogContext
-                                  var response;
-                                  return CustomAlertDialog(
-                                      title: "Delete Business",
-                                      message:
-                                      "Are you sure you want to delete this business?",
-                                      dialogType: MyDialogType.error,
-                                      onConfirm: () {
-                                        // delete product
-                                        print(
-                                            "delete business: ${data['slug']}");
-                                        BusinessAPI.deleteBusiness(data['slug'])
-                                            .then((response_) {
-                                          if (response_ != null) {
-                                            response = jsonDecode(response_);
-                                            print(
-                                                "delete business response: $response");
-
-                                            if (mounted) {
-                                              // Check if the widget is still in the tree
-                                              if (response["status"] ==
-                                                  'success') {
-                                                profileController
-                                                    .reloadMyProducts();
-                                                profileController
-                                                    .reloadMyServices();
-
-                                                Navigator.of(dialogContext)
-                                                    .pop(); // Close the dialog
-
-                                                // Show success popup
-                                                popup = PopupBox(
-                                                  title: 'Success',
-                                                  description: response['data']
-                                                  ['message'],
-                                                  type: PopupType.success,
-                                                );
-                                              } else {
-                                                Navigator.of(dialogContext)
-                                                    .pop(); // Close the dialog
-
-                                                // Show error popup
-                                                popup = PopupBox(
-                                                  title: 'Error',
-                                                  description: response['data']
-                                                  ['data'],
-                                                  type: PopupType.error,
-                                                );
-                                              }
-
-                                              popup.showPopup(
-                                                  context); // Show the popup
-                                            }
-                                          }
-                                        });
-                                      },
-                                      onCancel: () {
-                                        // cancel delete
-                                        print("cancel delete");
-                                        Navigator.of(dialogContext)
-                                            .pop(); // Close the dialog
-                                      });
-                                },
-                              ).then((_) {
-                                if (mounted) {
-                                  try {
-                                    popup.dismissPopup(navigatorKey
-                                        .currentContext!); // Dismiss the popup
-                                  } catch (e) {
-                                    print("error dismissing popup: $e");
-                                  }
-                                  profileController.reloadMyBusinesses();
-                                  Get.back();
-                                }
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    enableDrag: true,
+                  Get.to(() => errandia_business_view(businessData: data),
+                    transition: Transition.rightToLeft,
+                    duration: const Duration(milliseconds: 500),
                   );
                 },
+                child: BusinessItem(
+                  name: data['name'],
+                  address: _formatAddress(data),
+                  image: data['image'],
+                  onTap: () {
+                    Get.bottomSheet(
+                      // backgroundColor: Colors.white,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        color: Colors.white,
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            const Center(
+                              child: Icon(
+                                Icons.horizontal_rule,
+                                size: 25,
+                              ),
+                            ),
+                            // Text(index.toString()),
+                            bottomSheetWidgetitem(
+                              title: 'Edit Business',
+                              imagepath:
+                              'assets/images/sidebar_icon/icon-edit.png',
+                              callback: () async {
+                                print('tapped');
+                                Get.back();
+                                Get.to(() => EditBusinessView(
+                                  data: data,
+                                ));
+                              },
+                            ),
+                            bottomSheetWidgetitem(
+                              title: 'Add New Product',
+                              imagepath:
+                              'assets/images/sidebar_icon/add_products.png',
+                              callback: () async {
+                                print('add new product');
+                                Get.back();
+                                Get.to(() => add_product_view());
+                              },
+                            ),
+                            bottomSheetWidgetitem(
+                              title: 'Add New Service',
+                              imagepath:
+                              'assets/images/sidebar_icon/services.png',
+                              callback: () async {
+                                print('add new service');
+                                Get.back();
+                                Get.to(() => add_service_view());
+                              },
+                            ),
+                            bottomSheetWidgetitem(
+                              title: 'Suspend Business',
+                              imagepath:
+                              'assets/images/sidebar_icon/icon-suspend.png',
+                              callback: () {
+                                Get.back();
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return businessDialog(BusinessAction.suspend);
+                                  },
+                                );
+                              },
+                            ),
+                            bottomSheetWidgetitem(
+                              title: 'Update Location',
+                              imagepath:
+                              'assets/images/sidebar_icon/icon-location.png',
+                              callback: () {},
+                            ),
+                            bottomSheetWidgetitem(
+                              title: 'Move to trash',
+                              imagepath:
+                              'assets/images/sidebar_icon/icon-trash.png',
+                              callback: () {
+                                Get.back();
+
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext dialogContext) {
+                                    // Use dialogContext
+                                    var response;
+                                    return CustomAlertDialog(
+                                        title: "Delete Business",
+                                        message:
+                                        "Are you sure you want to delete this business?",
+                                        dialogType: MyDialogType.error,
+                                        onConfirm: () {
+                                          // delete product
+                                          print(
+                                              "delete business: ${data['slug']}");
+                                          BusinessAPI.deleteBusiness(data['slug'])
+                                              .then((response_) {
+                                            if (response_ != null) {
+                                              response = jsonDecode(response_);
+                                              print(
+                                                  "delete business response: $response");
+
+                                              if (mounted) {
+                                                // Check if the widget is still in the tree
+                                                if (response["status"] ==
+                                                    'success') {
+                                                  profileController
+                                                      .reloadMyProducts();
+                                                  profileController
+                                                      .reloadMyServices();
+                                                  profileController.reloadMyBusinesses();
+
+                                                  Navigator.of(dialogContext)
+                                                      .pop(); // Close the dialog
+
+                                                  // Show success popup
+                                                  popup = PopupBox(
+                                                    title: 'Success',
+                                                    description: response['data']
+                                                    ['message'],
+                                                    type: PopupType.success,
+                                                  );
+                                                } else {
+                                                  Navigator.of(dialogContext)
+                                                      .pop(); // Close the dialog
+
+                                                  // Show error popup
+                                                  popup = PopupBox(
+                                                    title: 'Error',
+                                                    description: response['data']
+                                                    ['data'],
+                                                    type: PopupType.error,
+                                                  );
+                                                }
+
+                                                popup.showPopup(
+                                                    context); // Show the popup
+                                              }
+                                            }
+                                          });
+                                        },
+                                        onCancel: () {
+                                          // cancel delete
+                                          print("cancel delete");
+                                          Navigator.of(dialogContext)
+                                              .pop(); // Close the dialog
+                                        });
+                                  },
+                                ).then((_) {
+                                  if (mounted) {
+                                    try {
+                                      popup.dismissPopup(navigatorKey
+                                          .currentContext!); // Dismiss the popup
+                                    } catch (e) {
+                                      print("error dismissing popup: $e");
+                                    }
+                                    profileController.reloadMyBusinesses();
+                                    Get.back();
+                                  }
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      enableDrag: true,
+                    );
+                  },
+                ),
               );
             },
           );
@@ -293,6 +313,7 @@ class _manage_business_viewState extends State<manage_business_view>
 
     return WillPopScope(
       onWillPop: () async {
+        profileController.reloadMyBusinesses();
         Get.back();
         return true;
       },
@@ -326,15 +347,15 @@ class _manage_business_viewState extends State<manage_business_view>
         ),
         endDrawer: CustomEndDrawer(
           onBusinessCreated: () {
-            home_controller().closeDrawer();
-            home_controller().featuredBusinessData.clear();
-            home_controller().fetchFeaturedBusinessesData();
+            homeController.closeDrawer();
+            homeController.featuredBusinessData.clear();
+            homeController.fetchFeaturedBusinessesData();
             business_controller().itemList.clear();
             business_controller().loadBusinesses();
-            home_controller().recentlyPostedItemsData.clear();
-            home_controller().fetchRecentlyPostedItemsData();
-            profile_controller().itemList.clear();
-            profile_controller().loadMyBusinesses();
+            homeController.recentlyPostedItemsData.clear();
+            homeController.fetchRecentlyPostedItemsData();
+            profileController.itemList.clear();
+            profileController.loadMyBusinesses();
           },
         ),
         appBar: AppBar(
