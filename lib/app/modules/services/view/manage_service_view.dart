@@ -10,6 +10,7 @@ import 'package:errandia/app/modules/profile/controller/profile_controller.dart'
 import 'package:errandia/app/modules/services/controller/manage_service_controller.dart';
 import 'package:errandia/app/modules/services/view/add_service_view.dart';
 import 'package:errandia/app/modules/services/view/edit_service_view.dart';
+import 'package:errandia/app/modules/services/view/service_details_view.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -276,128 +277,137 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                       itemCount: profileController.serviceItemList.length,
                       itemBuilder: (context, index) {
                         var data = profileController.serviceItemList[index];
-                        return RowItemWidget(
-                          name: data['name'],
-                          price: data['unit_price'].toString(),
-                          image: data['featured_image'],
-                          index: index,
+                        return GestureDetector(
                           onTap: () {
-                            Get.bottomSheet(
-                              // backgroundColor: Colors.white,
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                color: Colors.white,
-                                child: Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-                                    const Center(
-                                      child: Icon(
-                                        Icons.horizontal_rule,
-                                        size: 25,
-                                      ),
-                                    ),
-                                    // Text(index.toString()),
-                                    managebottomSheetWidgetitem(
-                                      title: 'Edit Service',
-                                      icondata: Icons.edit,
-                                      callback: () async {
-                                        print('tapped');
-                                        Get.back();
-                                        Get.to(() => EditServiceView(data: data));
-                                      },
-                                    ),
-                                    // managebottomSheetWidgetitem(
-                                    //   title: 'Edit Photo',
-                                    //   icondata: FontAwesomeIcons.fileImage,
-                                    //   callback: () {
-                                    //     Get.back();
-                                    //   },
-                                    // ),
-                                    // managebottomSheetWidgetitem(
-                                    //   title: 'UnPublish Product',
-                                    //   icondata: FontAwesomeIcons.minusCircle,
-                                    //   callback: () {},
-                                    // ),
-                                    managebottomSheetWidgetitem(
-                                      title: 'Move to trash',
-                                      icondata: Icons.delete,
-                                      callback: () {
-                                        Get.back();
-
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext dialogContext) {
-                                            // Use dialogContext
-                                            var response;
-                                            return CustomAlertDialog(
-                                                title: "Delete Service",
-                                                message: "Are you sure you want to delete this service?",
-                                                dialogType: MyDialogType.error,
-                                                onConfirm: () {
-                                                  // delete product
-                                                  print("delete product: ${data['slug']}");
-                                                  ProductAPI.deleteProductOrService(data['slug'])
-                                                      .then((response_) {
-                                                    if (response_ != null) {
-                                                      response = jsonDecode(response_);
-                                                      print("delete service response: $response");
-
-                                                      if (mounted) {
-                                                        // Check if the widget is still in the tree
-                                                        if (response["status"] == 'success') {
-                                                          Navigator.of(dialogContext)
-                                                              .pop(); // Close the dialog
-
-                                                          // Show success popup
-                                                          popup = PopupBox(
-                                                            title: 'Success',
-                                                            description: response['data']['message'],
-                                                            type: PopupType.success,
-                                                          );
-                                                        } else {
-                                                          Navigator.of(dialogContext)
-                                                              .pop(); // Close the dialog
-
-                                                          // Show error popup
-                                                          popup = PopupBox(
-                                                            title: 'Error',
-                                                            description: response['data']['data'],
-                                                            type: PopupType.error,
-                                                          );
-                                                        }
-
-                                                        popup.showPopup(context); // Show the popup
-                                                      }
-                                                    }
-                                                  });
-                                                },
-                                                onCancel: () {
-                                                  // cancel delete
-                                                  print("cancel delete");
-                                                  Navigator.of(dialogContext).pop(); // Close the dialog
-                                                });
-                                          },
-                                        ).then((_) {
-                                          if (mounted) {
-                                            try {
-                                              popup.dismissPopup(
-                                                  navigatorKey.currentContext!); // Dismiss the popup
-                                            } catch (e) {
-                                              print("error dismissing popup: $e");
-                                            }
-                                            profileController.reloadMyServices();
-                                            Get.back();
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              enableDrag: true,
+                            Get.to(() => ServiceDetailsView(service: data),
+                              transition: Transition.fadeIn,
+                              duration: const Duration(milliseconds: 500),
                             );
                           },
+
+                          child: RowItemWidget(
+                            name: data['name'],
+                            price: data['unit_price'].toString(),
+                            image: data['featured_image'],
+                            index: index,
+                            onTap: () {
+                              Get.bottomSheet(
+                                // backgroundColor: Colors.white,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  color: Colors.white,
+                                  child: Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+                                      const Center(
+                                        child: Icon(
+                                          Icons.horizontal_rule,
+                                          size: 25,
+                                        ),
+                                      ),
+                                      // Text(index.toString()),
+                                      managebottomSheetWidgetitem(
+                                        title: 'Edit Service',
+                                        icondata: Icons.edit,
+                                        callback: () async {
+                                          print('tapped');
+                                          Get.back();
+                                          Get.to(() => EditServiceView(data: data));
+                                        },
+                                      ),
+                                      // managebottomSheetWidgetitem(
+                                      //   title: 'Edit Photo',
+                                      //   icondata: FontAwesomeIcons.fileImage,
+                                      //   callback: () {
+                                      //     Get.back();
+                                      //   },
+                                      // ),
+                                      // managebottomSheetWidgetitem(
+                                      //   title: 'UnPublish Product',
+                                      //   icondata: FontAwesomeIcons.minusCircle,
+                                      //   callback: () {},
+                                      // ),
+                                      managebottomSheetWidgetitem(
+                                        title: 'Move to trash',
+                                        icondata: Icons.delete,
+                                        callback: () {
+                                          Get.back();
+
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext dialogContext) {
+                                              // Use dialogContext
+                                              var response;
+                                              return CustomAlertDialog(
+                                                  title: "Delete Service",
+                                                  message: "Are you sure you want to delete this service?",
+                                                  dialogType: MyDialogType.error,
+                                                  onConfirm: () {
+                                                    // delete product
+                                                    print("delete product: ${data['slug']}");
+                                                    ProductAPI.deleteProductOrService(data['slug'])
+                                                        .then((response_) {
+                                                      if (response_ != null) {
+                                                        response = jsonDecode(response_);
+                                                        print("delete service response: $response");
+
+                                                        if (mounted) {
+                                                          // Check if the widget is still in the tree
+                                                          if (response["status"] == 'success') {
+                                                            Navigator.of(dialogContext)
+                                                                .pop(); // Close the dialog
+
+                                                            // Show success popup
+                                                            popup = PopupBox(
+                                                              title: 'Success',
+                                                              description: response['data']['message'],
+                                                              type: PopupType.success,
+                                                            );
+                                                          } else {
+                                                            Navigator.of(dialogContext)
+                                                                .pop(); // Close the dialog
+
+                                                            // Show error popup
+                                                            popup = PopupBox(
+                                                              title: 'Error',
+                                                              description: response['data']['data'],
+                                                              type: PopupType.error,
+                                                            );
+                                                          }
+
+                                                          popup.showPopup(context); // Show the popup
+                                                        }
+                                                      }
+                                                    });
+                                                  },
+                                                  onCancel: () {
+                                                    // cancel delete
+                                                    print("cancel delete");
+                                                    Navigator.of(dialogContext).pop(); // Close the dialog
+                                                  });
+                                            },
+                                          ).then((_) {
+                                            if (mounted) {
+                                              try {
+                                                popup.dismissPopup(
+                                                    navigatorKey.currentContext!); // Dismiss the popup
+                                              } catch (e) {
+                                                print("error dismissing popup: $e");
+                                              }
+                                              profileController.reloadMyServices();
+                                              Get.back();
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                enableDrag: true,
+                              );
+                            },
+                          )
                         );
                       },
                     ),

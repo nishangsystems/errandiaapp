@@ -109,7 +109,7 @@ class _add_service_viewState extends State<add_service_view> {
               selectedShop = null;
             });
             imageController.reset();
-            profileController.reloadMyProducts();
+            profileController.reloadMyServices();
           } else {
             popup = PopupBox(
               title: "Error",
@@ -167,6 +167,7 @@ class _add_service_viewState extends State<add_service_view> {
           leading: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () {
+              profileController.reloadMyServices();
               Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios),

@@ -30,10 +30,12 @@ class CustomEndDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final profile_controller profileController = Get.put(profile_controller());
+
     return WillPopScope(
       onWillPop: () async {
         homeController.closeDrawer();
-        profile_controller().reloadMyBusinesses();
+        profileController.reloadMyBusinesses();
         return false;
       },
       child: Drawer(
@@ -67,7 +69,7 @@ class CustomEndDrawer extends StatelessWidget {
                       homeController.closeDrawer();
                       Get.to(() => add_business_view())?.then((_) {
                         onBusinessCreated();
-                        profile_controller().reloadMyBusinesses();
+                        profileController.reloadMyBusinesses();
                       });
                     },
                   )
@@ -133,35 +135,35 @@ class CustomEndDrawer extends StatelessWidget {
                       Get.to(() => errand_view());
                     },
                   ): Container()),
+            // Obx(() => homeController.loggedIn.value
+            //     ? drawerItemWidget(
+            //         text: 'Following',
+            //         imagePath:
+            //             'assets/images/sidebar_icon/icon-profile-following.png',
+            //         callback: () {
+            //           Get.back();
+            //           Get.to(() => const following_view());
+            //         },
+            //       )
+            //     : Container()),
+            // Obx(() => homeController.loggedIn.value
+            //     ? drawerItemWidget(
+            //         text: 'Reviews',
+            //         imagePath:
+            //             'assets/images/sidebar_icon/icon-profile-reviews.png',
+            //         callback: () {
+            //           Get.back();
+            //           Get.to(() => manage_review_view());
+            //         })
+            //     : Container()),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
-                    text: 'Following',
-                    imagePath:
-                        'assets/images/sidebar_icon/icon-profile-following.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(() => const following_view());
-                    },
-                  )
-                : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Reviews',
-                    imagePath:
-                        'assets/images/sidebar_icon/icon-profile-reviews.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(() => manage_review_view());
-                    })
-                : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? drawerItemWidget(
-                    text: 'Subscriptions',
+                    text: 'Subscription',
                     imagePath:
                         'assets/images/sidebar_icon/icon-profile-subscribers.png',
                     callback: () {
-                      Get.back();
-                      Get.to(() => subscriber_view());
+                      // Get.back();
+                      // Get.to(() => subscriber_view());
                     },
                   )
                 : Container()),

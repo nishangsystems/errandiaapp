@@ -461,11 +461,13 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                           Icon(
                             Icons.call,
                             color: appcolor().mainColor,
+                            size: 20
                           ),
+                          const SizedBox(width: 5,),
                           Text(
-                            'Call ${_localBusinessData['phone']}',
+                            'Call',
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 16,
                               color: appcolor().mainColor,
                             ),
                           ),

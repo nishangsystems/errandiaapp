@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:errandia/app/APi/search.dart';
 import 'package:errandia/modal/Region.dart';
 import 'package:errandia/modal/Town.dart';
 import 'package:errandia/modal/category.dart';
@@ -21,13 +22,269 @@ class run_an_errand extends StatefulWidget {
 
 class _run_an_errandState extends State<run_an_errand> {
   home_controller homeController = Get.put(home_controller());
-  TextEditingController lookingyou = TextEditingController();
+  TextEditingController searchTerm = TextEditingController();
   var country;
   var regionCode;
   var town;
 
+  bool isSearchLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  // void makeTheSearch(BuildContext context) async {
+  //   var searchT = searchTerm.text;
+  //
+  //   if (searchT.isEmpty) {
+  //     return;
+  //   }
+  //
+  //   setState(() {
+  //     isSearchLoading = true;
+  //   });
+  //
+  //   try {
+  //     SearchAPI.searchItem(searchT, 1).then((value) {
+  //       var response = jsonDecode(value);
+  //
+  //       if (response['status'] == 'success') {
+  //         var data = response['data'];
+  //         print("Search Data: $data");
+  //         Get.to(search_errand_prod(searchTerm: ,));
+  //       } else {
+  //         print('Error: ${response['data']}');
+  //       }
+  //     });
+  //   } finally {
+  //     setState(() {
+  //       isSearchLoading = false;
+  //     });
+  //   }
+
+  // }
+
   @override
   Widget build(BuildContext context) {
+
+    Widget run_as_errand_widget(BuildContext context) {
+      var value = null;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Center(
+            child: Text(
+              'Search a Product or Service',
+              style: TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const Text(
+            'Stay at home & Let Errandia do the search',
+            style: TextStyle(color: Colors.white, fontSize: 13),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(
+            height: Get.height * 0.02,
+          ),
+
+          // what are you looking container
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            height: Get.height * 0.07,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Center(
+              child: TextFormField(
+                controller: searchTerm,
+                style: const TextStyle(),
+                decoration: const InputDecoration(
+                  hintText: 'what are you looking for....',
+                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          // Container(
+          //   margin: const EdgeInsets.symmetric(vertical: 10),
+          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+          //   height: Get.height * 0.07,
+          //   decoration: BoxDecoration(
+          //     color: Colors.white,
+          //     borderRadius: BorderRadius.circular(5),
+          //   ),
+          // child: Center(
+          //   child: DropdownButtonFormField(
+          //     iconSize: 0.0,
+          //     decoration: InputDecoration.collapsed(
+          //       hintText: 'Category',
+          //     ),
+          //     value: value,
+          //     onChanged: (value) {
+          //       setState(() {
+          //         country = value as int;
+          //       });
+          //       print(value);
+          //     },
+          //     items:categor.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 14),),value: e.id,)).toList(),
+          //
+          //   ),
+          // )
+          // ),
+
+          // Row(
+          //   children: [
+          //     Container(
+          //         margin: EdgeInsets.symmetric(vertical: 10),
+          //         padding: EdgeInsets.symmetric(horizontal: 10),
+          //         height: Get.height * 0.07,
+          //         width: Get.width * 0.42,
+          //         decoration: BoxDecoration(
+          //           color: Colors.white,
+          //           borderRadius: BorderRadius.circular(5),
+          //         ),
+          //         child: Center(
+          //           child: DropdownButtonFormField(
+          //             iconSize: 0.0,
+          //             decoration: InputDecoration.collapsed(
+          //               hintText: 'Region',
+          //             ),
+          //             value: value,
+          //             onChanged: (value) {
+          //               setState(() {
+          //                 regionCode = value as int;
+          //               });
+          //             },
+          //             items: Regions.Items.map((e) => DropdownMenuItem(
+          //                   child: Text(
+          //                     e.name.toString(),
+          //                     style: TextStyle(fontSize: 14),
+          //                   ),
+          //                   value: e.id,
+          //                 )).toList(),
+          //           ),
+          //         )),
+          //     Spacer(),
+          //     Container(
+          //         margin: EdgeInsets.symmetric(vertical: 10),
+          //         padding: EdgeInsets.symmetric(horizontal: 2),
+          //         height: Get.height * 0.07,
+          //         width: Get.width * 0.42,
+          //         decoration: BoxDecoration(
+          //           color: Colors.white,
+          //           borderRadius: BorderRadius.circular(5),
+          //         ),
+          //         child: Center(
+          //           child: DropdownButtonFormField(
+          //             iconSize: 0.0,
+          //             decoration: InputDecoration.collapsed(
+          //               hintText: 'Town',
+          //             ),
+          //             value: value,
+          //             onChanged: (value) {
+          //               town = value as int;
+          //             },
+          //             items: Towns.Items.map((e) => DropdownMenuItem(
+          //                   child: Text(
+          //                     e.name.toString(),
+          //                     style: TextStyle(fontSize: 14),
+          //                   ),
+          //                   value: e.id,
+          //                 )).toList(),
+          //           ),
+          //         )),
+          //   ],
+          // ),
+
+          GestureDetector(
+            onTap: () {
+              if (searchTerm.text.isEmpty) {
+                return;
+              }
+              Get.to(() => search_errand_prod(searchTerm: searchTerm.text),
+              transition: Transition.rightToLeftWithFade,
+              duration: const Duration(milliseconds: 500)
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              height: Get.height * 0.07,
+              decoration: BoxDecoration(
+                color: appcolor().mainColor,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: const Center(
+                child: Text(
+                  'Search',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20),
+                ),
+              ),
+            ),
+          ),
+
+          // Container(
+          //   margin: EdgeInsets.symmetric(vertical: 10),
+          //   padding: EdgeInsets.symmetric(horizontal: 0),
+          //   height: Get.height * 0.07,
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.start,
+          //     children: [
+          //       Text(
+          //         'Top Searches',
+          //         style: TextStyle(color: Colors.white, fontSize: 15),
+          //       ),
+          //       Expanded(
+          //         child: Container(
+          //           margin: EdgeInsets.all(5),
+          //           padding: EdgeInsets.symmetric(horizontal: 10),
+          //           child: ListView.builder(
+          //             scrollDirection: Axis.horizontal,
+          //             itemBuilder: (context, index) {
+          //               return InkWell(
+          //                 onTap: () {},
+          //                 hoverColor: Colors.blue,
+          //                 highlightColor: Colors.blue,
+          //                 child: Container(
+          //                   margin: EdgeInsets.all(5),
+          //                   width: Get.width * 0.2,
+          //                   decoration: BoxDecoration(
+          //                     color: Colors.white,
+          //                     borderRadius: BorderRadius.circular(5),
+          //                   ),
+          //                   child: Center(
+          //                     child: Text(
+          //                       'Hello',
+          //                     ),
+          //                   ),
+          //                 ),
+          //               );
+          //             },
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+        ],
+      ).paddingOnly(
+        left: 20,
+        right: 20,
+        top: 40,
+        bottom: 10,
+      );
+    }
+
     return Scaffold(
       // appBar: AppBar(
       //   elevation: 0,
@@ -165,7 +422,7 @@ class _run_an_errandState extends State<run_an_errand> {
           child: Column(
             children: [
               SizedBox(
-                height: Get.height * 0.4,
+                height: Get.height * 0.43,
                 width: Get.width,
                 child: Stack(
                   children: [
@@ -176,7 +433,7 @@ class _run_an_errandState extends State<run_an_errand> {
                       fit: BoxFit.fill,
                       width: Get.width,
                     ),
-                    run_as_errand_widget(),
+                    run_as_errand_widget(context),
                   ],
                 ),
               ),
@@ -328,217 +585,6 @@ class _run_an_errandState extends State<run_an_errand> {
           );
         },
       ),
-    );
-  }
-
-  Widget run_as_errand_widget() {
-    var value = null;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Center(
-          child: Text(
-            'Run an Errand',
-            style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        Text(
-          'Stay at home & Let Errandia do the search',
-          style: TextStyle(color: Colors.white, fontSize: 13),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(
-          height: Get.height * 0.02,
-        ),
-
-        // what are you looking container
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 5),
-          height: Get.height * 0.07,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Center(
-            child: TextFormField(
-              controller: lookingyou,
-              style: const TextStyle(),
-              decoration: const InputDecoration(
-                hintText: 'what are you looking for....',
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
-                border: InputBorder.none,
-              ),
-            ),
-          ),
-        ),
-        // Container(
-        //   margin: const EdgeInsets.symmetric(vertical: 10),
-        //   padding: const EdgeInsets.symmetric(horizontal: 20),
-        //   height: Get.height * 0.07,
-        //   decoration: BoxDecoration(
-        //     color: Colors.white,
-        //     borderRadius: BorderRadius.circular(5),
-        //   ),
-        // child: Center(
-        //   child: DropdownButtonFormField(
-        //     iconSize: 0.0,
-        //     decoration: InputDecoration.collapsed(
-        //       hintText: 'Category',
-        //     ),
-        //     value: value,
-        //     onChanged: (value) {
-        //       setState(() {
-        //         country = value as int;
-        //       });
-        //       print(value);
-        //     },
-        //     items:categor.Items.map((e)=>DropdownMenuItem(child: Text(e.name.toString(),style: TextStyle(fontSize: 14),),value: e.id,)).toList(),
-        //
-        //   ),
-        // )
-        // ),
-
-        // Row(
-        //   children: [
-        //     Container(
-        //         margin: EdgeInsets.symmetric(vertical: 10),
-        //         padding: EdgeInsets.symmetric(horizontal: 10),
-        //         height: Get.height * 0.07,
-        //         width: Get.width * 0.42,
-        //         decoration: BoxDecoration(
-        //           color: Colors.white,
-        //           borderRadius: BorderRadius.circular(5),
-        //         ),
-        //         child: Center(
-        //           child: DropdownButtonFormField(
-        //             iconSize: 0.0,
-        //             decoration: InputDecoration.collapsed(
-        //               hintText: 'Region',
-        //             ),
-        //             value: value,
-        //             onChanged: (value) {
-        //               setState(() {
-        //                 regionCode = value as int;
-        //               });
-        //             },
-        //             items: Regions.Items.map((e) => DropdownMenuItem(
-        //                   child: Text(
-        //                     e.name.toString(),
-        //                     style: TextStyle(fontSize: 14),
-        //                   ),
-        //                   value: e.id,
-        //                 )).toList(),
-        //           ),
-        //         )),
-        //     Spacer(),
-        //     Container(
-        //         margin: EdgeInsets.symmetric(vertical: 10),
-        //         padding: EdgeInsets.symmetric(horizontal: 2),
-        //         height: Get.height * 0.07,
-        //         width: Get.width * 0.42,
-        //         decoration: BoxDecoration(
-        //           color: Colors.white,
-        //           borderRadius: BorderRadius.circular(5),
-        //         ),
-        //         child: Center(
-        //           child: DropdownButtonFormField(
-        //             iconSize: 0.0,
-        //             decoration: InputDecoration.collapsed(
-        //               hintText: 'Town',
-        //             ),
-        //             value: value,
-        //             onChanged: (value) {
-        //               town = value as int;
-        //             },
-        //             items: Towns.Items.map((e) => DropdownMenuItem(
-        //                   child: Text(
-        //                     e.name.toString(),
-        //                     style: TextStyle(fontSize: 14),
-        //                   ),
-        //                   value: e.id,
-        //                 )).toList(),
-        //           ),
-        //         )),
-        //   ],
-        // ),
-
-        GestureDetector(
-          onTap: () {
-            Get.to(search_errand_prod());
-          },
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            height: Get.height * 0.07,
-            decoration: BoxDecoration(
-              color: appcolor().mainColor,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: const Center(
-              child: Text(
-                'Search',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),
-              ),
-            ),
-          ),
-        ),
-
-        // Container(
-        //   margin: EdgeInsets.symmetric(vertical: 10),
-        //   padding: EdgeInsets.symmetric(horizontal: 0),
-        //   height: Get.height * 0.07,
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.start,
-        //     children: [
-        //       Text(
-        //         'Top Searches',
-        //         style: TextStyle(color: Colors.white, fontSize: 15),
-        //       ),
-        //       Expanded(
-        //         child: Container(
-        //           margin: EdgeInsets.all(5),
-        //           padding: EdgeInsets.symmetric(horizontal: 10),
-        //           child: ListView.builder(
-        //             scrollDirection: Axis.horizontal,
-        //             itemBuilder: (context, index) {
-        //               return InkWell(
-        //                 onTap: () {},
-        //                 hoverColor: Colors.blue,
-        //                 highlightColor: Colors.blue,
-        //                 child: Container(
-        //                   margin: EdgeInsets.all(5),
-        //                   width: Get.width * 0.2,
-        //                   decoration: BoxDecoration(
-        //                     color: Colors.white,
-        //                     borderRadius: BorderRadius.circular(5),
-        //                   ),
-        //                   child: Center(
-        //                     child: Text(
-        //                       'Hello',
-        //                     ),
-        //                   ),
-        //                 ),
-        //               );
-        //             },
-        //           ),
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
-      ],
-    ).paddingOnly(
-      left: 20,
-      right: 20,
-      top: 40,
-      bottom: 10,
     );
   }
 }

@@ -121,8 +121,8 @@ class _Profile_viewState extends State<Profile_view>
 
   @override
   Widget build(BuildContext context) {
-    String prod_list_size = profile_controller().product_list.isNotEmpty
-        ? profile_controller().product_list.length.toString()
+    String prod_list_size = profileController.product_list.isNotEmpty
+        ? profileController.product_list.length.toString()
         : "";
 
     if (kDebugMode) {
@@ -297,7 +297,7 @@ class _Profile_viewState extends State<Profile_view>
           } else if (profileController.isProductError.value) {
             return _buildMyProductsErrorWidget(
                 'An error occurred while loading your products', () {
-              profile_controller().reloadMyBusinesses();
+              profileController.reloadMyBusinesses();
             });
           } else if (profileController.productItemList.isEmpty) {
             return Column(
@@ -313,7 +313,7 @@ class _Profile_viewState extends State<Profile_view>
                 ElevatedButton(
                   onPressed: () {
                     Get.to(() => add_product_view())?.then((_) {
-                      profile_controller().loadMyProducts();
+                      profileController.loadMyProducts();
                     });
 
                   },
