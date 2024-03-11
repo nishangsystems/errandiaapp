@@ -257,7 +257,7 @@ class _Product_viewState extends State<Product_view>
                         width: 10,
                       )
                     : Container(),
-                SizedBox(
+                widget.item['shop']['whatsapp'] != "" && widget.item['shop']['whatsapp'] != "whatsapp" ? SizedBox(
                   width: Get.width * 0.4,
                   height: 50,
                   child: blockButton(
@@ -277,10 +277,17 @@ class _Product_viewState extends State<Product_view>
                         ],
                       ),
                     ),
-                    ontap: () async {},
+                    ontap: () async {
+                      print("whatsapp number: ${widget.item['shop']['whatsapp']}");
+                      launchWhatsapp(widget.item['shop']['whatsapp']);
+                    },
                     color: appcolor().mainColor,
                   ),
-                ),
+                ): Container(),
+
+                if (widget.item['shop']['whatsapp'] != "" || widget.item['shop']['whatsapp'] != "whatsapp")
+                  const Spacer(),
+
                 widget.item['shop'] != null ||
                         widget.item['shop'].toString() != 'null'
                     ? SizedBox(

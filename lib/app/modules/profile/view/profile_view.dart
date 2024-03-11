@@ -477,7 +477,7 @@ class _Profile_viewState extends State<Profile_view>
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child: userData['photo'] != null
-                            ? Image.network(userData['photo'], fit: BoxFit.fill,
+                            ? Image.network(userData['photo'], fit: BoxFit.contain,
                                 errorBuilder: (BuildContext context,
                                     Object exception, StackTrace? stackTrace) {
                                 return Center(

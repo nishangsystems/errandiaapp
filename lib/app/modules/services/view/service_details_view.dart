@@ -259,7 +259,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                     width: 10,
                   )
                       : Container(),
-                  SizedBox(
+                  _localService['shop']['whatsapp'] != "" && _localService['shop']['whatsapp'] != "whatsapp" ? SizedBox(
                     width: Get.width * 0.4,
                     height: 50,
                     child: blockButton(
@@ -279,10 +279,17 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                           ],
                         ),
                       ),
-                      ontap: () async {},
+                      ontap: () async {
+                        print("whatsapp: ${_localService['shop']['whatsapp']}");
+                        launchWhatsapp(_localService['shop']['whatsapp']);
+                      },
                       color: appcolor().mainColor,
                     ),
-                  ),
+                  ) : Container(),
+
+                  if (_localService['shop']['whatsapp'] !="" || _localService['shop']['whatsapp']!="whatsapp")
+                    const Spacer(),
+
                   _localService['shop'] != null ||
                       _localService['shop'].toString() != 'null'
                       ? SizedBox(
