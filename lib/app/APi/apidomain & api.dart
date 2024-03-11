@@ -304,7 +304,7 @@ class api {
     var token = prefs.getString('token');
 
     final response =
-        await http.get(Uri.parse('${apiDomain().domain}/categories'),
+        await http.get(Uri.parse('${apiDomain().domain}/sub_categories'),
             headers: ({
               'Content-Type': 'application/json; charset=UTF-8',
               'Accept': 'application/json',
