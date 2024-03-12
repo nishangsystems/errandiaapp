@@ -31,11 +31,11 @@ class errandia_widget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              height: Get.height * 0.15,
+              // height: Get.height * 0.15,
               color: appcolor().lightgreyColor,
               child: FadeInImage.assetNetwork(
                 placeholder: 'assets/images/errandia_logo.png', // Local asset image
-                image: getImagePath(imagePath.toString()),
+                image: getImagePathWithSize(imagePath.toString(), width: 200, height: 180),
                 fit: BoxFit.contain,
                 width: double.infinity,
                 imageErrorBuilder: (context, error, stackTrace) {
@@ -43,6 +43,7 @@ class errandia_widget extends StatelessWidget {
                     'assets/images/errandia_logo.png', // Your fallback image
                     fit: BoxFit.contain,
                     width: double.infinity,
+                    height: Get.height * 0.17,
                   );
                 },
               ),

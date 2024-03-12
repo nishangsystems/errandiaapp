@@ -136,6 +136,9 @@ class business_controller extends GetxController {
   void reloadBusinesses() {
     itemList.clear();
     currentPage.value = 1;
+    isFBLError.value = false;
+    total.value = 0;
+    isLoading.value = false;
     loadBusinesses();
   }
 

@@ -6,6 +6,8 @@ import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dar
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/errands/controller/search_errand_prod_controller.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
+import 'package:errandia/app/modules/global/Widgets/search_item_widget.dart';
 import 'package:errandia/app/modules/products/controller/manage_products_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
@@ -40,7 +42,8 @@ class search_errand_prodState extends State<search_errand_prod>
   manage_product_controller manageProductController =
   Get.put(manage_product_controller());
   late SearchErrandProdController searchProdController;
-
+  late ScrollController _scrollController;
+  late ScrollController _scrollController2;
 
   final GlobalKey scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -52,6 +55,8 @@ class search_errand_prodState extends State<search_errand_prod>
     WidgetsBinding.instance.addObserver(this);
     _localSearchTerm = widget.searchTerm;
     searchProdController = Get.put(SearchErrandProdController());
+    _scrollController = ScrollController();
+    _scrollController2 = ScrollController();
 
     print("search term: $_localSearchTerm");
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -60,10 +65,566 @@ class search_errand_prodState extends State<search_errand_prod>
 
       print("product List: ${searchProdController.productsList}");
     });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        // manageProductController.loadAllProducts(_localSearchTerm);
+        searchProdController.searchItem(_localSearchTerm);
+      }
+    });
+
+    _scrollController2.addListener(() {
+      if (_scrollController2.position.pixels ==
+          _scrollController2.position.maxScrollExtent) {
+        // manageProductController.loadAllProducts(_localSearchTerm);
+        searchProdController.searchItem(_localSearchTerm);
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+  
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("App State: $state");
+    if (state == AppLifecycleState.resumed) {
+      // manageProductController.loadAllProducts(_localSearchTerm);
+      // searchProdController.searchItem(_localSearchTerm);
+      searchProdController.reloadAll();
+    }
+  }
+
+  String _formatAddress(Map<String, dynamic> shop) {
+    String street = shop['street'] ?? '';
+    // String townName = shop['town'] != null ? shop['town']['name'] : '';
+    String regionName = shop['region'] != null ? shop['region']['name'].split(' -')[0] : '';
+
+    return capitalizeAll([street, regionName]
+        .where((s) => s.isNotEmpty)
+        .join(", ")
+        .trim());
   }
 
   @override
   Widget build(BuildContext context) {
+
+    Widget all(BuildContext ctx) {
+      return SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: Get.height * 0.01,
+            ),
+            Container(
+              child: Row(
+                children: [
+                  Obx(
+                     () {
+                       if (searchProdController.isLoading.isTrue) {
+                         return Text(
+                           'Loading...',
+                           style: TextStyle(
+                             fontWeight: FontWeight.w500,
+                             fontSize: 20,
+                             color: appcolor().mainColor,
+                           ),
+                         );
+                       } else if (searchProdController.isSearchError.isTrue) {
+                         return Text(
+                           'No Products found',
+                           style: TextStyle(
+                             fontWeight: FontWeight.w500,
+                             fontSize: 20,
+                             color: appcolor().mainColor,
+                           ),
+                         );
+                       } else if (searchProdController.productsList.isEmpty) {
+                         return Text(
+                           'No Products found',
+                           style: TextStyle(
+                             fontWeight: FontWeight.w500,
+                             fontSize: 20,
+                             color: appcolor().mainColor,
+                           ),
+                         );
+                       } else {
+                         return Text(
+                           '${searchProdController.productsList.length > 6 ? 6 : searchProdController.productsList.length} Suggested Product${searchProdController.productsList.length > 1 ? 's' : ''}',
+                           style: TextStyle(
+                             fontWeight: FontWeight.w700,
+                             fontSize: 20,
+                             color: appcolor().mainColor,
+                           ),
+                         );
+                       }
+                     }
+                 ),
+                  const Spacer(),
+                  Obx(
+                      () {
+                        if (searchProdController.isLoading.isTrue) {
+                          return Container();
+                        } else if (searchProdController.isSearchError.isTrue) {
+                          return TextButton(
+                            onPressed: () {
+                              searchProdController.reloadProducts();
+                            },
+                            child: const Text('Retry'),
+                          );
+                        } else if (searchProdController.productsList.isEmpty) {
+                          return Container();
+                        } else {
+                          return TextButton(
+                            onPressed: () {
+                              // screen for the list of all products
+                              pcontroller.tabController.animateTo(1);
+                            },
+                            child: const Text('See All'),
+                          );
+                        }
+                      }
+                  ),
+                ],
+              ).paddingSymmetric(horizontal: 20),
+            ),
+            Obx(
+                () {
+                  if (searchProdController.isLoading.isTrue) {
+                    return SizedBox(
+                      height: Get.height * 0.4,
+                      child: buildLoadingWidget(),
+                    );
+                  } else if (searchProdController.isSearchError.isTrue) {
+                    return Container(
+                      padding: const EdgeInsets.all(30),
+                      height: Get.height * 0.4,
+                      child: buildErrorWidget(
+                        message: 'There was an error loading products, please try again later',
+                        callback: () {
+                          searchProdController.reloadAll();
+                        },
+                      ),
+                    );
+                  } else if (searchProdController.productsList.isEmpty) {
+                    return SizedBox(
+                      height: Get.height * 0.3,
+                      child: Center(
+                        child: Text(
+                          'No products found',
+                          style: TextStyle(
+                            color: appcolor().mediumGreyColor,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      margin: const EdgeInsets.all(10),
+                      height: Get.height * 0.55,
+                      child: ListView.builder(
+                          itemCount: searchProdController.productsList.length > 6
+                              ? 6
+                              : searchProdController.productsList.length,
+                          primary: false,
+                          shrinkWrap: false,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            var item = searchProdController.productsList[index];
+                            print("item: $item");
+                            return InkWell(
+                              onTap: () {
+                                Get.to(() => Product_view(
+                                  item: item,
+                                ));
+                              },
+                              child: SearchItemWidget(
+                                item: item, key: UniqueKey(),
+                              ),
+                            );
+                          }),
+                    );
+                  }
+                }
+            ),
+            Container(
+              child: Row(
+                children: [
+                  Obx(
+                        () {
+                          if (searchProdController.isLoading.isTrue) {
+                            return Text(
+                              'Loading...',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: appcolor().mainColor,
+                              ),
+                            );
+                          } else if (searchProdController.isSearchError.isTrue) {
+                            return Text(
+                              'No Services found',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: appcolor().mainColor,
+                              ),
+                            );
+                          } else if (searchProdController.productsList.isEmpty) {
+                            return Text(
+                              'No Services found',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: appcolor().mainColor,
+                              ),
+                            );
+                          } else {
+                            return Text(
+                              '${searchProdController.servicesList.length > 6 ? 6 : searchProdController.servicesList.length} Suggested Service${searchProdController.servicesList.length > 1 ? 's' : ''}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20,
+                                color: appcolor().mainColor,
+                              ),
+                            );
+                          }
+                        }
+                  ),
+                  const Spacer(),
+                  Obx(
+                      () {
+                        if (searchProdController.isLoading.isTrue) {
+                          return Container();
+                        } else if (searchProdController.isSearchError.isTrue) {
+                          return TextButton(
+                            onPressed: () {
+                              searchProdController.reloadServices();
+                            },
+                            child: const Text('Retry'),
+                          );
+                        } else if (searchProdController.servicesList.isEmpty) {
+                          return Container();
+                        } else {
+                          return TextButton(
+                            onPressed: () {
+                              // screen for the list of all services
+                              pcontroller.tabController.animateTo(2);
+                            },
+                            child: const Text('See All'),
+                          );
+                        }
+                      }
+                  )
+                ],
+              ).paddingSymmetric(horizontal: 20),
+            ),
+            Obx(
+                () {
+                  if (searchProdController.isLoading.isTrue) {
+                    return SizedBox(
+                      height: Get.height * 0.4,
+                      child: buildLoadingWidget(),
+                    );
+                  } else if (searchProdController.isSearchError.isTrue) {
+                    return Container(
+                      padding: const EdgeInsets.all(30),
+                      height: Get.height * 0.4,
+                      child: buildErrorWidget(
+                        message: 'There was an error loading services, please try again later',
+                        callback: () {
+                          searchProdController.reloadAll();
+                        },
+                      ),
+                    );
+                  } else if (searchProdController.servicesList.isEmpty) {
+                    return SizedBox(
+                      height: Get.height * 0.3,
+                      child: Center(
+                        child: Text(
+                          'No services found',
+                          style: TextStyle(
+                            color: appcolor().mediumGreyColor,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      margin: const EdgeInsets.all(10),
+                      height: Get.height * 0.55,
+                      child: ListView.builder(
+                          itemCount: searchProdController.servicesList.length > 6
+                              ? 6
+                              : searchProdController.servicesList.length,
+                          primary: false,
+                          shrinkWrap: false,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            final item = searchProdController.servicesList[index];
+
+                            return InkWell(
+                              onTap: () {
+                                if (kDebugMode) {
+                                  print("service item: $item");
+                                }
+                                Get.to(() => ServiceDetailsView(service: item));
+                              },
+                              child: SearchItemWidget(
+                                item: item, key: UniqueKey(),
+                              ),
+                            );
+                          }),
+                    );
+                  }
+                }
+            ),
+          ],
+        ).paddingOnly(
+          left: 2,
+          right: 2,
+          top: 10,
+        ),
+      );
+    }
+
+    Widget Products(BuildContext ctx) {
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Obx(
+                      () {
+                    if (searchProdController.isLoading.isTrue) {
+                      return Text(
+                        'Loading...',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          color: appcolor().mainColor,
+                        ),
+                      );
+                    } else if (searchProdController.isSearchError.isTrue) {
+                      return Container();
+                    } else if (searchProdController.productsList.isEmpty) {
+                      return Container();
+                    } else {
+                      return Text(
+                        '${searchProdController.productsList.length} Suggested Product${searchProdController.productsList.length > 1 ? 's' : ''}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                          color: appcolor().mainColor,
+                        ),
+                      );
+                    }
+                  }
+              ),
+            ),
+
+            Obx(
+                () {
+                  if (searchProdController.isLoading.isTrue) {
+                    return SizedBox(
+                      height: Get.height * 0.4,
+                      child: buildLoadingWidget(),
+                    );
+                  } else if (searchProdController.isSearchError.isTrue) {
+                    return Container(
+                      padding: const EdgeInsets.all(30),
+                      height: Get.height * 0.4,
+                      child: buildErrorWidget(
+                        message: 'There was an error loading products, please try again later',
+                        callback: () {
+                          searchProdController.reloadProducts();
+                        },
+                      ),
+                    );
+                  } else if (searchProdController.productsList.isEmpty) {
+                    return SizedBox(
+                      height: Get.height * 0.3,
+                      child: Center(
+                        child: Text(
+                          'No products found',
+                          style: TextStyle(
+                            color: appcolor().mediumGreyColor,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    return GridView.builder(
+                      key: UniqueKey(),
+                      controller: _scrollController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 1 / 1.88,
+                        crossAxisSpacing: 1 / 2.66,
+                        mainAxisSpacing: 1 / 1.88,
+                      ),
+                      itemCount: searchProdController.productsList.length,
+                      primary: false,
+                        scrollDirection: Axis.vertical,
+
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        var item = searchProdController.productsList[index];
+                        print("item: $item");
+                        return InkWell(
+                          onTap: () {
+                            Get.to(() => Product_view(
+                              item: item,
+                            ));
+                          },
+                          child: SearchItemWidget(
+                            item: item, key: UniqueKey(), showShop: false,
+                          ),
+                        );
+                      });
+                  }
+                }
+            ),
+
+            SizedBox(
+              height: Get.height * 0.02,
+            ),
+          ],
+        ).paddingOnly(
+          left: 2,
+          right: 2,
+          top: 10,
+        ),
+      );
+    }
+
+    Widget Services(BuildContext ctx) {
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // SizedBox(
+            //   height: Get.height * 0.01,
+            // ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Obx(
+                  () {
+                    if (searchProdController.isLoading.isTrue) {
+                      return Text(
+                        'Loading...',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          color: appcolor().mainColor,
+                        ),
+                      );
+                    } else if (searchProdController.isSearchError.isTrue) {
+                      return Container();
+                    } else if (searchProdController.servicesList.isEmpty) {
+                      return Container();
+                    } else {
+                      return Text(
+                        '${searchProdController.servicesList.length} Suggested Service${searchProdController.servicesList.length > 1 ? 's' : ''}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                          color: appcolor().mainColor,
+                        ),
+                      );
+                    }
+                  }
+              )
+            ),
+
+            Obx(
+                () {
+                  if (searchProdController.isLoading.isTrue) {
+                    return SizedBox(
+                      height: Get.height * 0.4,
+                      child: buildLoadingWidget(),
+                    );
+                  } else if (searchProdController.isSearchError.isTrue) {
+                    return Container(
+                      padding: const EdgeInsets.all(30),
+                      height: Get.height * 0.4,
+                      child: buildErrorWidget(
+                        message: 'There was an error loading services, please try again later',
+                        callback: () {
+                          searchProdController.reloadServices();
+                        },
+                      ),
+                    );
+                  } else if (searchProdController.servicesList.isEmpty) {
+                    return SizedBox(
+                      height: Get.height * 0.3,
+                      child: Center(
+                        child: Text(
+                          'No services found',
+                          style: TextStyle(
+                            color: appcolor().mediumGreyColor,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    return GridView.builder(
+                      key: UniqueKey(),
+                      controller: _scrollController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 1 / 1.88,
+                        crossAxisSpacing: 1 / 2.66,
+                        mainAxisSpacing: 1 / 1.88,
+                      ),
+                      itemCount: searchProdController.servicesList.length,
+                      primary: false,
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final item = searchProdController.servicesList[index];
+
+                        return InkWell(
+                          onTap: () {
+                            if (kDebugMode) {
+                              print("service item: $item");
+                            }
+                            Get.to(() => ServiceDetailsView(service: item));
+                          },
+                          child: SearchItemWidget(
+                            item: item, key: UniqueKey(), showShop: false,
+                          ),
+                        );
+                      });
+                  }
+                }
+            ),
+
+            SizedBox(
+              height: Get.height * 0.02,
+            ),
+          ],
+        ).paddingOnly(
+          left: 2,
+          right: 2,
+          top: 10,
+        ),
+      );
+    }
+
     return Stack(
       children: [
         Scaffold(
@@ -116,10 +677,13 @@ class search_errand_prodState extends State<search_errand_prod>
                 },
               ),
               automaticallyImplyLeading: false,
-              title: const Text(
-                'Hair Products',
+              title: Text(
+                capitalizeAll(_localSearchTerm),
                 style:
-                TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
+                const TextStyle(
+                    color: Colors.black, 
+                    fontWeight: FontWeight.normal
+                ),
               ),
               iconTheme: IconThemeData(
                 color: appcolor().mediumGreyColor,
@@ -127,8 +691,6 @@ class search_errand_prodState extends State<search_errand_prod>
               ),
               // filter icon buttons
               actions: [
-                ///
-
                 IconButton(
                   icon: const Icon(
                     FontAwesomeIcons.filter,
@@ -378,9 +940,9 @@ class search_errand_prodState extends State<search_errand_prod>
                       child: TabBarView(
                           controller: pcontroller.tabController,
                           children: [
-                            allProducts(ctx),
-                            Published(ctx),
-                            Drafts(ctx),
+                            all(ctx),
+                            Products(ctx),
+                            Services(ctx),
                           ]),
                     ),
                   ],
@@ -394,918 +956,10 @@ class search_errand_prodState extends State<search_errand_prod>
   }
 }
 
-Widget allProducts(BuildContext ctx) {
-  return SingleChildScrollView(
-    child: Column(
-      children: [
-        SizedBox(
-          height: Get.height * 0.01,
-        ),
-        Container(
-          child: Row(
-            children: [
-              Text(
-                '6 Suggested Products',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 20,
-                  color: appcolor().mainColor,
-                ),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () {
-                  // screen for the list of all products
-                  // Get.to(() => SeeAllErands());
-                },
-                child: const Text('See All'),
-              ),
-            ],
-          ).paddingSymmetric(horizontal: 20),
-        ),
-        Container(
-          margin: const EdgeInsets.all(10),
-          height: Get.height * 0.45,
-          child: ListView.builder(
-              itemCount: ui_23_item_list.length - 3,
-              primary: false,
-              shrinkWrap: false,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    Get.to(() => Product_view(
-                          item: Recently_item_List[0],
-                        ));
-                  },
-                  child: Container(
-                    color: Colors.transparent,
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    child: Column(
-                      children: [
-                        Card(
-                          shadowColor: Colors.transparent,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 6),
-                            height: Get.height * 0.365,
-                            // color: Colors.blue,
-                            width: Get.width * 0.4,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: Get.height * 0.02,
-                                ),
-                                Center(
-                                  child: Image(
-                                    image: AssetImage(
-                                      ui_23_item_list[index].imagePath,
-                                    ),
-                                    height: Get.height * 0.12,
-                                  ),
-                                ),
-
-                                SizedBox(
-                                  height: Get.height * 0.01,
-                                ),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Icon(
-                                      Icons.location_on,
-                                      color: appcolor().mediumGreyColor,
-                                      size: 15,
-                                    ),
-                                    Text(
-                                      ui_23_item_list[index]
-                                          .location
-                                          .toString(),
-                                      style: TextStyle(
-                                          color: appcolor().mediumGreyColor,
-                                          fontSize: 12),
-                                    )
-                                  ],
-                                ).paddingOnly(
-                                  left: 3,
-                                  right: 3,
-                                ),
-
-                                Text(
-                                  ui_23_item_list[index].itemname,
-                                  style: TextStyle(
-                                      color: appcolor().mainColor,
-                                      fontSize: 14),
-                                ).paddingOnly(
-                                  left: 5,
-                                  right: 5,
-                                ),
-
-                                Row(
-                                  children: [
-                                    Text(
-                                      ui_23_item_list[index].itemPrice,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    )
-                                  ],
-                                ).paddingOnly(
-                                  left: 4,
-                                  right: 4,
-                                ),
-
-                                SizedBox(
-                                  height: Get.height * 0.01,
-                                ),
-                                // contact shop button
-                                SizedBox(
-                                  width: Get.width * 0.4,
-                                  // height: 50,
-                                  child: blockButton(
-                                    title: const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.call,
-                                            color: Colors.white,
-                                            size: 15,
-                                          ),
-                                          SizedBox(
-                                            width: 7,
-                                          ),
-                                          Text(
-                                            // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
-                                            'Contact Shop',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    ontap: () {},
-                                    color: appcolor().mainColor,
-                                  ),
-                                ).paddingOnly(
-                                  left: 4,
-                                  right: 4,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        //  business name and icon
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              business_controller()
-                                  .businessList[index]
-                                  .imagepath,
-                              height: 10,
-                            ),
-                            const SizedBox(
-                              width: 7,
-                            ),
-                            Text(
-                              business_controller().businessList[index].name,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: appcolor().mainColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-        ),
-        Container(
-          child: Row(
-            children: [
-              Text(
-                '5 Suggested Services',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 20,
-                  color: appcolor().mainColor,
-                ),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () {
-                  // screen for the list of all services
-                  // Get.to(() => SeeAllErands());
-                },
-                child: const Text('See All'),
-              ),
-            ],
-          ).paddingSymmetric(horizontal: 20),
-        ),
-        Container(
-          margin: const EdgeInsets.all(10),
-          height: Get.height * 0.45,
-          child: ListView.builder(
-              itemCount: profile_controller().service_list.length,
-              primary: false,
-              shrinkWrap: false,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                final item = profile_controller().service_list[index];
-
-                return InkWell(
-                  onTap: () {
-                    if (kDebugMode) {
-                      print("service item: ${item.name}");
-                    }
-                    Get.to(() => ServiceDetailsView(service: item));
-                  },
-                  child: Container(
-                    color: Colors.transparent,
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    child: Column(
-                      children: [
-                        Card(
-                          shadowColor: Colors.transparent,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 6),
-                            height: Get.height * 0.365,
-                            // color: Colors.blue,
-                            width: Get.width * 0.4,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Center(
-                                  child: Image(
-                                    image: AssetImage(
-                                      profile_controller()
-                                          .service_list[index]
-                                          .imagePath
-                                          .toString(),
-                                    ),
-                                    height: Get.height * 0.12,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: Get.height * 0.01,
-                                ),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Icon(
-                                      Icons.location_on,
-                                      color: appcolor().mediumGreyColor,
-                                      size: 15,
-                                    ),
-                                    Text(
-                                      ui_23_item_list[index]
-                                          .location
-                                          .toString(),
-                                      style: TextStyle(
-                                          color: appcolor().mediumGreyColor,
-                                          fontSize: 12),
-                                    )
-                                  ],
-                                ).paddingOnly(
-                                  left: 3,
-                                  right: 3,
-                                ),
-
-                                Text(
-                                  ui_23_item_list[index].itemname,
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: appcolor().mainColor),
-                                ).paddingOnly(
-                                  left: 5,
-                                  right: 5,
-                                ),
-
-                                Row(
-                                  children: [
-                                    Text(
-                                      ui_23_item_list[index].itemPrice,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    )
-                                  ],
-                                ).paddingOnly(
-                                  left: 4,
-                                  right: 4,
-                                ),
-
-                                SizedBox(
-                                  height: Get.height * 0.01,
-                                ),
-                                // contact shop button
-                                SizedBox(
-                                  width: Get.width * 0.4,
-                                  // height: 50,
-                                  child: blockButton(
-                                    title: const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.call,
-                                            color: Colors.white,
-                                            size: 15,
-                                          ),
-                                          SizedBox(
-                                            width: 7,
-                                          ),
-                                          Text(
-                                            // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
-                                            'Contact Shop',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    ontap: () {},
-                                    color: appcolor().mainColor,
-                                  ),
-                                ).paddingOnly(
-                                  left: 4,
-                                  right: 4,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        //  business name and icon
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              business_controller()
-                                  .businessList[index]
-                                  .imagepath,
-                              height: 10,
-                            ),
-                            const SizedBox(
-                              width: 7,
-                            ),
-                            Text(
-                              business_controller().businessList[index].name,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: appcolor().mainColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-        ),
-        // Container(
-        //   child: Row(
-        //     children: [
-        //       Text(
-        //         '4 Suggested Businesses',
-        //         style: TextStyle(
-        //           fontWeight: FontWeight.w700,
-        //           fontSize: 20,
-        //           color: appcolor().mainColor,
-        //         ),
-        //       ),
-        //       const Spacer(),
-        //       TextButton(
-        //         onPressed: () {
-        //           Get.to(() => BusinessesViewWithBar());
-        //         },
-        //         child: const Text('See All'),
-        //       ),
-        //     ],
-        //   ).paddingSymmetric(horizontal: 20),
-        // ),
-        // FutureBuilder(
-        //     future: BusinessAPI.businesses(1),
-        //     builder: (context, snapshot) {
-        //       if (snapshot.hasError) {
-        //         return Container(
-        //           height: Get.height * 0.17,
-        //           color: Colors.white,
-        //           child: const Center(
-        //             child: Text('Featured Businesses not found'),
-        //           ),
-        //         );
-        //       } else if (snapshot.hasData) {
-        //         return Container(
-        //           padding: const EdgeInsets.symmetric(horizontal: 10),
-        //           height: Get.height * 0.4,
-        //           child: ListView.builder(
-        //             primary: false,
-        //             shrinkWrap: false,
-        //             scrollDirection: Axis.horizontal,
-        //             itemCount: 4,
-        //             itemBuilder: (context, index) {
-        //               var data = snapshot.data[index];
-        //               return InkWell(
-        //                 onTap: () {
-        //                   Get.to(errandia_business_view(
-        //                     businessData: data,));
-        //                 },
-        //                 child: Card(
-        //                   shadowColor: Colors.transparent,
-        //                   child: Container(
-        //                     margin: const EdgeInsets.symmetric(horizontal: 6),
-        //                     width: Get.width * 0.4,
-        //                     height: Get.height * 0.43,
-        //                     child: Column(
-        //                       crossAxisAlignment: CrossAxisAlignment.start,
-        //                       children: [
-        //                         Padding(
-        //                           padding: const EdgeInsets.all(8.0),
-        //                           child: Center(
-        //                               child: Image.network(
-        //                             getImagePath(data.imagepath.toString()
-        //                               ),
-        //                             fit: BoxFit.fill,
-        //                             height: Get.height * 0.15,
-        //                           )),
-        //                         ),
-        //                         SizedBox(
-        //                           height: Get.height * 0.009,
-        //                         ),
-        //                         Text(
-        //                           Featured_Businesses_Item_List[index]
-        //                               .servicetype
-        //                               .toString(),
-        //                           style: TextStyle(
-        //                               fontSize: 11,
-        //                               // fontWeight: FontWeight.bold,
-        //                               color: appcolor().mediumGreyColor),
-        //                         ).paddingOnly(
-        //                           left: 5,
-        //                           right: 5,
-        //                         ),
-        //
-        //                         SizedBox(
-        //                           height: Get.height * 0.001,
-        //                         ),
-        //
-        //                         Text(
-        //                           data.name.toString(),
-        //                           style: TextStyle(
-        //                               fontSize: 15,
-        //                               fontWeight: FontWeight.bold,
-        //                               color: appcolor().mainColor),
-        //                         ).paddingOnly(
-        //                           left: 5,
-        //                           right: 5,
-        //                         ),
-        //
-        //                         SizedBox(
-        //                           height: Get.height * 0.002,
-        //                         ),
-        //
-        //                         Row(
-        //                           mainAxisAlignment: MainAxisAlignment.start,
-        //                           children: [
-        //                             Icon(
-        //                               Icons.location_on,
-        //                               color: appcolor().mediumGreyColor,
-        //                               size: 15,
-        //                             ),
-        //                             Text(
-        //                               ui_23_item_list[index]
-        //                                   .location
-        //                                   .toString(),
-        //                               style: TextStyle(
-        //                                   color: appcolor().mediumGreyColor,
-        //                                   fontSize: 13),
-        //                             )
-        //                           ],
-        //                         ).paddingOnly(
-        //                           left: 3,
-        //                           right: 3,
-        //                         ),
-        //
-        //                         SizedBox(
-        //                           height: Get.height * 0.02,
-        //                         ),
-        //
-        //                         // contact shop button
-        //                         SizedBox(
-        //                           width: Get.width * 0.43,
-        //                           // height: 50,
-        //                           child: blockButton(
-        //                             title: const Padding(
-        //                               padding: EdgeInsets.all(4.0),
-        //                               child: Row(
-        //                                 mainAxisAlignment:
-        //                                     MainAxisAlignment.center,
-        //                                 children: [
-        //                                   Icon(
-        //                                     Icons.call,
-        //                                     color: Colors.white,
-        //                                     size: 15,
-        //                                   ),
-        //                                   SizedBox(
-        //                                     width: 7,
-        //                                   ),
-        //                                   Text(
-        //                                     // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
-        //                                     'Contact Shop',
-        //                                     style: TextStyle(
-        //                                       fontSize: 11,
-        //                                       color: Colors.white,
-        //                                       fontWeight: FontWeight.w600,
-        //                                     ),
-        //                                   ),
-        //                                 ],
-        //                               ),
-        //                             ),
-        //                             ontap: () {},
-        //                             color: appcolor().mainColor,
-        //                           ),
-        //                         ).paddingOnly(
-        //                           left: 4,
-        //                           right: 4,
-        //                         ),
-        //                       ],
-        //                     ),
-        //                   ),
-        //                 ),
-        //               );
-        //             },
-        //           ),
-        //         );
-        //       } else {
-        //         return Container(
-        //           height: Get.height * 0.17,
-        //           color: Colors.white,
-        //           child: const Center(
-        //             child: CircularProgressIndicator(),
-        //           ),
-        //         );
-        //       }
-        //     }),
-        // SizedBox(
-        //   height: Get.height * 0.02,
-        // ),
-      ],
-    ).paddingOnly(
-      left: 2,
-      right: 2,
-      top: 10,
-    ),
-  );
-}
-
-Widget Published(BuildContext ctx) {
-  return SingleChildScrollView(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // SizedBox(
-        //   height: Get.height * 0.01,
-        // ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Text(
-            '6 Suggested Products',
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 20,
-              color: appcolor().mainColor,
-            ),
-          ),
-        ),
-        GridView.count(
-          childAspectRatio: (1 / 1.55),
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          children: List.generate(ui_23_item_list.length - 4, (index) {
-            var item = profile_controller().product_list[index];
-            print("item: $item");
-            return InkWell(
-              onTap: () {
-                Get.to(Product_view(
-                  item: Recently_item_List[0],
-                ));
-              },
-              child: Card(
-                shadowColor: Colors.transparent,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6),
-                  height: Get.height * 0.43,
-                  // color: Colors.blue,
-                  width: Get.width * 0.4,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Image(
-                          image: AssetImage(
-                            item.imagePath.toString(),
-                          ),
-                          height: Get.height * 0.12,
-                        ),
-                      ),
-                      SizedBox(
-                        height: Get.height * 0.01,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.location_on,
-                            color: appcolor().mediumGreyColor,
-                            size: 15,
-                          ),
-                          Text(
-                            ui_23_item_list[index].location.toString(),
-                            style: TextStyle(
-                                color: appcolor().mediumGreyColor,
-                                fontSize: 12),
-                          )
-                        ],
-                      ).paddingOnly(
-                        left: 7,
-                        right: 7,
-                      ),
-
-                      Text(
-                        ui_23_item_list[index].itemname,
-                        style: TextStyle(
-                            color: appcolor().mainColor, fontSize: 14),
-                      ).paddingOnly(
-                        left: 10,
-                        right: 10,
-                      ),
-
-                      Row(
-                        children: [
-                          Text(
-                            ui_23_item_list[index].itemPrice,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        ],
-                      ).paddingOnly(
-                        left: 7,
-                        right: 7,
-                      ),
-
-                      SizedBox(
-                        height: Get.height * 0.02,
-                      ),
-
-                      // contact shop button
-                      SizedBox(
-                        width: Get.width * 0.4,
-                        // height: 50,
-                        child: blockButton(
-                          title: const Padding(
-                            padding: EdgeInsets.all(4.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.call,
-                                  color: Colors.white,
-                                  size: 15,
-                                ),
-                                SizedBox(
-                                  width: 7,
-                                ),
-                                Text(
-                                  // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
-                                  'Contact Shop',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ontap: () {},
-                          color: appcolor().mainColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
-        ),
-
-        SizedBox(
-          height: Get.height * 0.02,
-        ),
-      ],
-    ).paddingOnly(
-      left: 2,
-      right: 2,
-      top: 10,
-    ),
-  );
-}
-
-Widget Drafts(BuildContext ctx) {
-  return SingleChildScrollView(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // SizedBox(
-        //   height: Get.height * 0.01,
-        // ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Text(
-            '5 Suggested Services',
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 20,
-              color: appcolor().mainColor,
-            ),
-          ),
-        ),
-        GridView.count(
-          childAspectRatio: (1 / 1.55),
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          children:
-              List.generate(profile_controller().service_list.length, (index) {
-            var item = profile_controller().service_list[index];
-            print("item: $item");
-            return InkWell(
-              onTap: () {
-                Get.to(Product_view(
-                  item: Recently_item_List[0],
-                ));
-              },
-              child: Card(
-                shadowColor: Colors.transparent,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6),
-                  height: Get.height * 0.43,
-                  // color: Colors.blue,
-                  width: Get.width * 0.4,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Image(
-                          image: AssetImage(
-                            item.imagePath.toString(),
-                          ),
-                          height: Get.height * 0.12,
-                        ),
-                      ),
-                      SizedBox(
-                        height: Get.height * 0.01,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.location_on,
-                            color: appcolor().mediumGreyColor,
-                            size: 15,
-                          ),
-                          Text(
-                            ui_23_item_list[index].location.toString(),
-                            style: TextStyle(
-                                color: appcolor().mediumGreyColor,
-                                fontSize: 12),
-                          )
-                        ],
-                      ).paddingOnly(
-                        left: 7,
-                        right: 7,
-                      ),
-
-                      SizedBox(
-                        height: Get.height * 0.003,
-                      ),
-
-                      Row(
-                        children: [
-                          Text(
-                            item.name.toString(),
-                            style: TextStyle(
-                                color: appcolor().mainColor, fontSize: 14),
-                          ).paddingOnly(
-                            left: 10,
-                            right: 10,
-                          )
-                        ],
-                      ),
-
-                      Row(
-                        children: [
-                          Text(
-                            ui_23_item_list[index].itemPrice,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        ],
-                      ).paddingOnly(
-                        left: 7,
-                        right: 7,
-                      ),
-
-                      SizedBox(
-                        height: Get.height * 0.02,
-                      ),
-
-                      // contact shop button
-                      SizedBox(
-                        width: Get.width * 0.4,
-                        // height: 50,
-                        child: blockButton(
-                          title: const Padding(
-                            padding: EdgeInsets.all(4.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.call,
-                                  color: Colors.white,
-                                  size: 15,
-                                ),
-                                SizedBox(
-                                  width: 7,
-                                ),
-                                Text(
-                                  // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
-                                  'Contact Shop',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ontap: () {},
-                          color: appcolor().mainColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
-        ),
-
-        SizedBox(
-          height: Get.height * 0.02,
-        ),
-      ],
-    ).paddingOnly(
-      left: 2,
-      right: 2,
-      top: 10,
-    ),
-  );
-}
-
 Widget filter_sort_container(
-  Callback filter_button,
-  Callback sort_button,
-  Callback search_button,
+  Callback filterButton,
+  Callback sortButton,
+  Callback searchButton,
 ) {
   return Container(
     // width: Get.width*0.4,
@@ -1313,7 +967,7 @@ Widget filter_sort_container(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         InkWell(
-          onTap: filter_button,
+          onTap: filterButton,
           child: Container(
             width: Get.width * 0.35,
             decoration: BoxDecoration(
@@ -1341,7 +995,7 @@ Widget filter_sort_container(
           ),
         ),
         InkWell(
-          onTap: sort_button,
+          onTap: sortButton,
           child: Container(
             width: Get.width * 0.35,
             decoration: BoxDecoration(
@@ -1369,7 +1023,7 @@ Widget filter_sort_container(
           ),
         ),
         InkWell(
-          onTap: search_button,
+          onTap: searchButton,
           child: Container(
             // width: Get.width*0.4,
 
