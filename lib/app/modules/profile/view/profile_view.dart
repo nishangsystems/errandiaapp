@@ -467,7 +467,7 @@ class _Profile_viewState extends State<Profile_view>
                   Align(
                     alignment: AlignmentDirectional.center,
                     child: Container(
-                      height: Get.height * 0.13,
+                      // height: Get.height * 0.13,
                       width: Get.width * 0.27,
                       // color: Colors.redAccent,
                       decoration: BoxDecoration(

@@ -49,6 +49,26 @@ String getImagePath(String imagePath) {
   }
 }
 
+// get image path with cloudimg width and height
+String getImagePathWithSize(String imagePath, {int? width, int? height}) {
+  String sanitizedPath = imagePath.trim().replaceAll(RegExp(r'^"|"$'), '');
+  try {
+    if (sanitizedPath.startsWith("http")) {
+      print('url image: $sanitizedPath');
+      return sanitizedPath;
+    } else {
+      String finalUrl = '${apiDomain().imageDomain}/$sanitizedPath';
+      if (width != null && height != null) {
+        finalUrl = '$finalUrl?w=$width&h=$height';
+      }
+      print('final image: $finalUrl');
+      return finalUrl;
+    }
+  } catch (e) {
+    return '';
+  }
+}
+
 // launch caller
 Future<void> launchCaller(String number) async {
   var url = Uri(scheme: 'tel', path: number);

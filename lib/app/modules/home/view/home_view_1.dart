@@ -548,13 +548,13 @@ class _home_view_1State extends State<home_view_1> {
                         //   // width: Get.width * 0.3,
                         // )
                         Container(
-                          height: Get.height * 0.15,
+                          // height: Get.height * 0.15,
                           width: Get.width,
                           color: appcolor().lightgreyColor,
                           child: FadeInImage.assetNetwork(
                             placeholder: 'assets/images/errandia_logo.png',
-                            image: getImagePath(
-                                data['image'].toString()),
+                            image: getImagePathWithSize(
+                                data['image'].toString(), width: 200, height: 180),
                             fit: BoxFit.contain,
                             width: double.infinity,
                             imageErrorBuilder: (context, error, stackTrace) {
@@ -563,6 +563,7 @@ class _home_view_1State extends State<home_view_1> {
                                 // Your fallback image
                                 fit: BoxFit.contain,
                                 width: double.infinity,
+                                height: Get.height * 0.16,
                               );
                             },
                           ),

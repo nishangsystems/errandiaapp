@@ -1,14 +1,10 @@
-import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
-import 'package:errandia/app/modules/buiseness/view/business_item.dart';
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/utils/helper.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 import '../../global/constants/color.dart';
@@ -27,8 +23,7 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
 
   // Reload function for featured businesses
   void _reloadFeaturedBusinessesData() {
-    busi_controller.itemList.clear();
-    busi_controller.loadBusinesses();
+    busi_controller.reloadBusinesses();
   }
 
 
@@ -386,7 +381,7 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                         color: appcolor().lightgreyColor,
                                         child: FadeInImage.assetNetwork(
                                           placeholder: 'assets/images/errandia_logo.png',
-                                          image: getImagePath(business['image'].toString()),
+                                          image: getImagePathWithSize(business['image'].toString(), height: 200),
                                           fit: BoxFit.contain,
                                           width: double.infinity,
                                           imageErrorBuilder:  (context, error, stackTrace) {
