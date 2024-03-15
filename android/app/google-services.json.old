@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "380460889899",
-    "project_id": "errandia-subscriptions",
-    "storage_bucket": "errandia-subscriptions.appspot.com"
+    "project_number": "795521533722",
+    "project_id": "errandia-phone-otp",
+    "storage_bucket": "errandia-phone-otp.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:380460889899:android:f2cea790596b2f8834f76e",
+        "mobilesdk_app_id": "1:795521533722:android:5a82203ca1956311e1cea3",
         "android_client_info": {
           "package_name": "com.nishangsystems.errandia"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA-6Tix0rR3Ly88kGjHjP0XOfSxhIbRKfE"
+          "current_key": "AIzaSyC6Of-1b1Woiid9pwZohN50XuHGkimHHJg"
         }
       ],
       "services": {
