@@ -26,6 +26,8 @@ import '../../global/Widgets/blockButton.dart';
 import '../../global/constants/color.dart';
 import '../../products/view/product_view.dart';
 
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
 class search_errand_prod extends StatefulWidget {
   final String searchTerm;
 
@@ -45,7 +47,6 @@ class search_errand_prodState extends State<search_errand_prod>
   late ScrollController _scrollController;
   late ScrollController _scrollController2;
 
-  final GlobalKey scaffoldKey = GlobalKey<ScaffoldState>();
 
   late String _localSearchTerm;
 
@@ -62,8 +63,8 @@ class search_errand_prodState extends State<search_errand_prod>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // manageProductController.loadAllProducts(_localSearchTerm);
       searchProdController.searchItem(_localSearchTerm);
-
       print("product List: ${searchProdController.productsList}");
+      searchProdController.drawerSearchCtl.text = _localSearchTerm;
     });
 
     _scrollController.addListener(() {
@@ -226,7 +227,7 @@ class search_errand_prodState extends State<search_errand_prod>
                   } else {
                     return Container(
                       margin: const EdgeInsets.all(10),
-                      height: Get.height * 0.55,
+                      height: Get.height * 0.45,
                       child: ListView.builder(
                           itemCount: searchProdController.productsList.length > 6
                               ? 6
@@ -358,7 +359,7 @@ class search_errand_prodState extends State<search_errand_prod>
                   } else {
                     return Container(
                       margin: const EdgeInsets.all(10),
-                      height: Get.height * 0.55,
+                      height: Get.height * 0.45,
                       child: ListView.builder(
                           itemCount: searchProdController.servicesList.length > 6
                               ? 6
@@ -469,7 +470,7 @@ class search_errand_prodState extends State<search_errand_prod>
                       gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 1 / 1.88,
+                        childAspectRatio: 1 / 1.64,
                         crossAxisSpacing: 1 / 2.66,
                         mainAxisSpacing: 1 / 1.88,
                       ),
@@ -586,7 +587,7 @@ class search_errand_prodState extends State<search_errand_prod>
                       gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 1 / 1.88,
+                        childAspectRatio: 1 / 1.64,
                         crossAxisSpacing: 1 / 2.66,
                         mainAxisSpacing: 1 / 1.88,
                       ),
@@ -625,334 +626,347 @@ class search_errand_prodState extends State<search_errand_prod>
       );
     }
 
-    return Stack(
-      children: [
-        Scaffold(
-            endDrawer: Drawer(
-              width: Get.width * 0.7,
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    blockButton(
-                      title: TextFormField(
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
+      return Stack(
+        children: [
+          Scaffold(
+            key: scaffoldKey,
+              endDrawer: Drawer(
+                width: Get.width * 0.7,
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      blockButton(
+                        title: TextFormField(
+                          controller: searchProdController.drawerSearchCtl,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            hintText: 'Search Product',
                           ),
-                          hintText: 'Search Product',
                         ),
+                        ontap: () {},
+                        color: Colors.white,
+                      ).paddingOnly(
+                        bottom: 20,
                       ),
-                      ontap: () {},
-                      color: Colors.white,
-                    ).paddingOnly(
-                      bottom: 20,
-                    ),
-                    blockButton(
-                      title: const Text(
-                        'Search',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
+                      blockButton(
+                        title: const Text(
+                          'Search',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                          ),
                         ),
-                      ),
-                      ontap: () {},
-                      color: appcolor().mainColor,
-                    )
-                  ],
-                ).paddingSymmetric(horizontal: 10, vertical: 50),
-              ),
-            ),
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              elevation: 2,
-              leading: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  // size: 30,
-                ),
-                onPressed: () {
-                  Get.back();
-                },
-              ),
-              automaticallyImplyLeading: false,
-              title: Text(
-                capitalizeAll(_localSearchTerm),
-                style:
-                const TextStyle(
-                    color: Colors.black, 
-                    fontWeight: FontWeight.normal
+                        ontap: () {
+                          setState(() {
+                            _localSearchTerm = searchProdController.drawerSearchCtl.text;
+                          });
+                          searchProdController.itemList.clear();
+                          searchProdController.productsList.clear();
+                          searchProdController.servicesList.clear();
+                          searchProdController.currentPage.value = 1;
+                          searchProdController.total.value = 0;
+                          searchProdController.searchItem(_localSearchTerm);
+                          Get.back();
+                        },
+                        color: appcolor().mainColor,
+                      )
+                    ],
+                  ).paddingSymmetric(horizontal: 10, vertical: 50),
                 ),
               ),
-              iconTheme: IconThemeData(
-                color: appcolor().mediumGreyColor,
-                size: 30,
-              ),
-              // filter icon buttons
-              actions: [
-                IconButton(
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+                elevation: 2,
+                leading: IconButton(
                   icon: const Icon(
-                    FontAwesomeIcons.filter,
-                    size: 20,
-                    color: Colors.blueGrey,
+                    Icons.arrow_back_ios,
+                    // size: 30,
                   ),
                   onPressed: () {
-                    Get.to(filter_product_view());
+                    Get.back();
                   },
                 ),
-
-                IconButton(
-                  icon: const Icon(
-                    FontAwesomeIcons.arrowDownWideShort,
-                    size: 20,
-                    color: Colors.blueGrey,
+                automaticallyImplyLeading: false,
+                title: Text(
+                  capitalizeAll(_localSearchTerm),
+                  style:
+                  const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.normal
                   ),
-                  onPressed: () {
-                    Get.bottomSheet(
-                      Container(
-                        color: const Color.fromRGBO(255, 255, 255, 1),
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.start,
-                          children: [
-                            Text(
-                              'Sort List',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 22,
-                                color: appcolor().mainColor,
+                ),
+                iconTheme: IconThemeData(
+                  color: appcolor().mediumGreyColor,
+                  size: 30,
+                ),
+                // filter icon buttons
+                actions: [
+                  IconButton(
+                    icon: const Icon(
+                      FontAwesomeIcons.filter,
+                      size: 20,
+                      color: Colors.blueGrey,
+                    ),
+                    onPressed: () {
+                      Get.to(filter_product_view());
+                    },
+                  ),
+
+                  IconButton(
+                    icon: const Icon(
+                      FontAwesomeIcons.arrowDownWideShort,
+                      size: 20,
+                      color: Colors.blueGrey,
+                    ),
+                    onPressed: () {
+                      Get.bottomSheet(
+                        Container(
+                          color: const Color.fromRGBO(255, 255, 255, 1),
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.start,
+                            children: [
+                              Text(
+                                'Sort List',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 22,
+                                  color: appcolor().mainColor,
+                                ),
                               ),
-                            ),
-                            // z-a
-                            Row(
-                              children: [
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(fontSize: 16),
-                                    children: [
-                                      TextSpan(
-                                        text: 'Product Name : ',
-                                        style: TextStyle(
-                                          color: appcolor().mainColor,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'Desc Z-A',
-                                        style: TextStyle(
-                                          color: appcolor().mediumGreyColor,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Spacer(),
-                                Obx(
-                                      () => Radio(
-                                    value: 'sort descending',
-                                    groupValue: manageProductController
-                                        .allProducts_sort_group_value.value,
-                                    onChanged: (val) {
-                                      manageProductController
-                                          .allProducts_sort_group_value
-                                          .value = val.toString();
-                                    },
-                                  ),
-                                )
-                              ],
-                            ),
-
-                            // a-z
-                            Row(
-                              children: [
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(fontSize: 16),
-                                    children: [
-                                      TextSpan(
-                                        text: 'Product Name : ',
-                                        style: TextStyle(
-                                          color: appcolor().mainColor,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'Asc A-Z',
-                                        style: TextStyle(
-                                          color: appcolor().mediumGreyColor,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Spacer(),
-                                Obx(() => Radio(
-                                  value: 'sort ascending',
-                                  groupValue: manageProductController
-                                      .allProducts_sort_group_value.value,
-                                  onChanged: (val) {
-                                    manageProductController
-                                        .allProducts_sort_group_value
-                                        .value = val.toString();
-                                  },
-                                ))
-                              ],
-                            ),
-
-                            // distance nearest to me
-                            Row(
-                              children: [
-                                RichText(
+                              // z-a
+                              Row(
+                                children: [
+                                  RichText(
                                     text: TextSpan(
-                                        style: TextStyle(fontSize: 16),
-                                        children: [
-                                          TextSpan(
-                                            text: 'Date',
-                                            style: TextStyle(
-                                              color: appcolor().mainColor,
-                                            ),
+                                      style: TextStyle(fontSize: 16),
+                                      children: [
+                                        TextSpan(
+                                          text: 'Product Name : ',
+                                          style: TextStyle(
+                                            color: appcolor().mainColor,
                                           ),
-                                          TextSpan(
-                                            text: 'Last Modified',
+                                        ),
+                                        TextSpan(
+                                          text: 'Desc Z-A',
+                                          style: TextStyle(
+                                            color: appcolor().mediumGreyColor,
                                           ),
-                                        ])),
-                                Spacer(),
-                                Obx(() => Radio(
-                                  value: 'Date Last modified ',
-                                  groupValue: manageProductController
-                                      .allProducts_sort_group_value.value,
-                                  onChanged: (val) {
-                                    manageProductController
-                                        .allProducts_sort_group_value
-                                        .value = val.toString();
-                                  },
-                                ))
-                              ],
-                            ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Obx(
+                                        () => Radio(
+                                      value: 'sort descending',
+                                      groupValue: manageProductController
+                                          .allProducts_sort_group_value.value,
+                                      onChanged: (val) {
+                                        manageProductController
+                                            .allProducts_sort_group_value
+                                            .value = val.toString();
+                                      },
+                                    ),
+                                  )
+                                ],
+                              ),
 
-                            //recentaly added
-                            Row(
-                              children: [
-                                Text(
-                                  'Price',
-                                  style: TextStyle(
-                                      color: appcolor().mainColor, fontSize: 16),
-                                ),
-                                Icon(
-                                  Icons.arrow_upward,
-                                  size: 25,
-                                  color: appcolor().mediumGreyColor,
-                                ),
-                                Spacer(),
-                                Obx(
-                                      () => Radio(
-                                    value: 'Price',
+                              // a-z
+                              Row(
+                                children: [
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(fontSize: 16),
+                                      children: [
+                                        TextSpan(
+                                          text: 'Product Name : ',
+                                          style: TextStyle(
+                                            color: appcolor().mainColor,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Asc A-Z',
+                                          style: TextStyle(
+                                            color: appcolor().mediumGreyColor,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Obx(() => Radio(
+                                    value: 'sort ascending',
                                     groupValue: manageProductController
                                         .allProducts_sort_group_value.value,
                                     onChanged: (val) {
                                       manageProductController
                                           .allProducts_sort_group_value
                                           .value = val.toString();
-                                      print(val.toString());
                                     },
+                                  ))
+                                ],
+                              ),
+
+                              // distance nearest to me
+                              Row(
+                                children: [
+                                  RichText(
+                                      text: TextSpan(
+                                          style: TextStyle(fontSize: 16),
+                                          children: [
+                                            TextSpan(
+                                              text: 'Date',
+                                              style: TextStyle(
+                                                color: appcolor().mainColor,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: 'Last Modified',
+                                            ),
+                                          ])),
+                                  Spacer(),
+                                  Obx(() => Radio(
+                                    value: 'Date Last modified ',
+                                    groupValue: manageProductController
+                                        .allProducts_sort_group_value.value,
+                                    onChanged: (val) {
+                                      manageProductController
+                                          .allProducts_sort_group_value
+                                          .value = val.toString();
+                                    },
+                                  ))
+                                ],
+                              ),
+
+                              //recentaly added
+                              Row(
+                                children: [
+                                  Text(
+                                    'Price',
+                                    style: TextStyle(
+                                        color: appcolor().mainColor, fontSize: 16),
                                   ),
-                                )
-                              ],
-                            ),
-                          ],
-                        ).paddingSymmetric(
-                          horizontal: 20,
-                          vertical: 10,
+                                  Icon(
+                                    Icons.arrow_upward,
+                                    size: 25,
+                                    color: appcolor().mediumGreyColor,
+                                  ),
+                                  Spacer(),
+                                  Obx(
+                                        () => Radio(
+                                      value: 'Price',
+                                      groupValue: manageProductController
+                                          .allProducts_sort_group_value.value,
+                                      onChanged: (val) {
+                                        manageProductController
+                                            .allProducts_sort_group_value
+                                            .value = val.toString();
+                                        print(val.toString());
+                                      },
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ).paddingSymmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  ),
 
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    Scaffold.of(scaffoldKey.currentContext!).openEndDrawer();
-                  },
-                ),
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {
+                      scaffoldKey.currentState!.openEndDrawer();
+                    },
+                  ),
 
-                ///
-              ],
-            ),
-            body: SafeArea(
-              child: Builder(
-                builder: (ctx) => Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.symmetric(
-                          horizontal: BorderSide(
-                            color: appcolor().greyColor,
-                          ),
-                        ),
-                      ),
-                      height: Get.height * 0.08,
-                      child: TabBar(
-                        dividerColor: appcolor().bluetextcolor,
-                        isScrollable: true,
-                        unselectedLabelColor: appcolor().mediumGreyColor,
-                        unselectedLabelStyle: const TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 16,
-                        ),
-                        indicatorColor: appcolor().mainColor,
-                        labelColor: appcolor().bluetextcolor,
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: appcolor().mainColor,
-                          fontSize: 18,
-                        ),
-                        controller: pcontroller.tabController,
-                        tabs: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 10),
-                            child: const Text('All'),
-                          ),
-                          SizedBox(
-                            width: Get.width * 0.26,
-                            child: const Text('Products'),
-                          ),
-                          const Text('Services'),
-                        ],
-                      ),
-                    ),
-                    // a text saying Errandia Suggest the following businesses that might have your product
-                    // Container(
-                    //   margin: EdgeInsets.only(
-                    //     top: Get.height * 0.01,
-                    //     left: Get.width * 0.03,
-                    //   ),
-                    //   child: Expanded(
-                    //     child: Text(
-                    //       'Errandia Suggest the following businesses that might have your product',
-                    //       textAlign: TextAlign.center,
-                    //       style: TextStyle(
-                    //         color: appcolor().mediumGreyColor,
-                    //         fontSize: 12,
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-                    Expanded(
-                      child: TabBarView(
-                          controller: pcontroller.tabController,
-                          children: [
-                            all(ctx),
-                            Products(ctx),
-                            Services(ctx),
-                          ]),
-                    ),
-                  ],
-                ),
+                  ///
+                ],
               ),
-            )),
+              body: SafeArea(
+                child: Builder(
+                  builder: (ctx) => Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.symmetric(
+                            horizontal: BorderSide(
+                              color: appcolor().greyColor,
+                            ),
+                          ),
+                        ),
+                        height: Get.height * 0.08,
+                        child: TabBar(
+                          dividerColor: appcolor().bluetextcolor,
+                          isScrollable: true,
+                          unselectedLabelColor: appcolor().mediumGreyColor,
+                          unselectedLabelStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                          ),
+                          indicatorColor: appcolor().mainColor,
+                          labelColor: appcolor().bluetextcolor,
+                          labelStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: appcolor().mainColor,
+                            fontSize: 18,
+                          ),
+                          controller: pcontroller.tabController,
+                          tabs: [
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 10),
+                              child: const Text('All'),
+                            ),
+                            SizedBox(
+                              width: Get.width * 0.26,
+                              child: const Text('Products'),
+                            ),
+                            const Text('Services'),
+                          ],
+                        ),
+                      ),
+                      // a text saying Errandia Suggest the following businesses that might have your product
+                      // Container(
+                      //   margin: EdgeInsets.only(
+                      //     top: Get.height * 0.01,
+                      //     left: Get.width * 0.03,
+                      //   ),
+                      //   child: Expanded(
+                      //     child: Text(
+                      //       'Errandia Suggest the following businesses that might have your product',
+                      //       textAlign: TextAlign.center,
+                      //       style: TextStyle(
+                      //         color: appcolor().mediumGreyColor,
+                      //         fontSize: 12,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      Expanded(
+                        child: TabBarView(
+                            controller: pcontroller.tabController,
+                            children: [
+                              all(ctx),
+                              Products(ctx),
+                              Services(ctx),
+                            ]),
+                      ),
+                    ],
+                  ),
+                ),
+              )),
 
 
-      ],
-    );
+        ],
+      );
   }
 }
 

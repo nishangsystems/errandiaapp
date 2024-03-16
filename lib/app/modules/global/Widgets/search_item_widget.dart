@@ -39,7 +39,7 @@ class SearchItemWidget extends StatelessWidget {
             shadowColor: Colors.transparent,
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 6),
-              height: Get.height * 0.43,
+              height: Get.height * 0.37,
               // color: Colors.blue,
               width: Get.width * 0.43,
               child: Column(
@@ -152,45 +152,45 @@ class SearchItemWidget extends StatelessWidget {
                     height: Get.height * 0.01,
                   ),
                   // contact shop button
-                  SizedBox(
-                    width: Get.width * 0.4,
-                    // height: 50,
-                    child: blockButton(
-                      title: const Padding(
-                        padding: EdgeInsets.all(4.0),
-                        child: Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.call,
-                              color: Colors.white,
-                              size: 15,
-                            ),
-                            SizedBox(
-                              width: 7,
-                            ),
-                            Text(
-                              // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
-                              'Contact Shop',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ontap: () {
-                        launchCaller(item['shop']['phone']);
-                      },
-                      color: appcolor().mainColor,
-                    ),
-                  ).paddingOnly(
-                    left: 4,
-                    right: 4,
-                  ),
+                  // SizedBox(
+                  //   width: Get.width * 0.4,
+                  //   // height: 50,
+                  //   child: blockButton(
+                  //     title: const Padding(
+                  //       padding: EdgeInsets.all(4.0),
+                  //       child: Row(
+                  //         mainAxisAlignment:
+                  //         MainAxisAlignment.center,
+                  //         children: [
+                  //           Icon(
+                  //             Icons.call,
+                  //             color: Colors.white,
+                  //             size: 15,
+                  //           ),
+                  //           SizedBox(
+                  //             width: 7,
+                  //           ),
+                  //           Text(
+                  //             // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
+                  //             'Contact Shop',
+                  //             style: TextStyle(
+                  //               fontSize: 11,
+                  //               color: Colors.white,
+                  //               fontWeight: FontWeight.w600,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //     ontap: () {
+                  //       launchCaller(item['shop']['phone']);
+                  //     },
+                  //     color: appcolor().mainColor,
+                  //   ),
+                  // ).paddingOnly(
+                  //   left: 4,
+                  //   right: 4,
+                  // ),
                 ],
               ),
             ),
@@ -220,15 +220,17 @@ class SearchItemWidget extends StatelessWidget {
                   width: 7,
                 ),
 
-                Text(
-                  capitalizeAll(item['shop']['name']),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: appcolor().mainColor,
-                    fontWeight: FontWeight.w600,
+                Flexible(
+                  child: Text(
+                    capitalizeAll(item['shop']['name']),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: appcolor().mainColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
