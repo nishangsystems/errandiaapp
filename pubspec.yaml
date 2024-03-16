@@ -73,6 +73,7 @@ dependencies:
   http_parser: any
   intl: ^0.17.0
   flutter_carousel_widget: ^2.2.0
+  firebase_messaging: ^14.7.10
 
 dev_dependencies:
   flutter_test:

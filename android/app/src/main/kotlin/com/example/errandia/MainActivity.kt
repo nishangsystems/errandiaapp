@@ -1,4 +1,4 @@
-package com.example.errandia
+package com.nishangsystems.errandia
 
 import io.flutter.embedding.android.FlutterActivity
 
