@@ -74,7 +74,7 @@ class _home_view_1State extends State<home_view_1> {
         final decodedData = jsonDecode(catalogJson);
         var productsData = decodedData["data"];
         categor.Items = List.from(productsData)
-            .map<Caegory>((product) => Caegory.fromJson(product))
+            .map<Category>((product) => Category.fromJson(product))
             .toList();
         setState(() {});
       }

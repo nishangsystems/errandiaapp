@@ -716,170 +716,170 @@ class search_errand_prodState extends State<search_errand_prod>
                     },
                   ),
 
-                  IconButton(
-                    icon: const Icon(
-                      FontAwesomeIcons.arrowDownWideShort,
-                      size: 20,
-                      color: Colors.blueGrey,
-                    ),
-                    onPressed: () {
-                      Get.bottomSheet(
-                        Container(
-                          color: const Color.fromRGBO(255, 255, 255, 1),
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.start,
-                            children: [
-                              Text(
-                                'Sort List',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22,
-                                  color: appcolor().mainColor,
-                                ),
-                              ),
-                              // z-a
-                              Row(
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(fontSize: 16),
-                                      children: [
-                                        TextSpan(
-                                          text: 'Product Name : ',
-                                          style: TextStyle(
-                                            color: appcolor().mainColor,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: 'Desc Z-A',
-                                          style: TextStyle(
-                                            color: appcolor().mediumGreyColor,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Obx(
-                                        () => Radio(
-                                      value: 'sort descending',
-                                      groupValue: manageProductController
-                                          .allProducts_sort_group_value.value,
-                                      onChanged: (val) {
-                                        manageProductController
-                                            .allProducts_sort_group_value
-                                            .value = val.toString();
-                                      },
-                                    ),
-                                  )
-                                ],
-                              ),
-
-                              // a-z
-                              Row(
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(fontSize: 16),
-                                      children: [
-                                        TextSpan(
-                                          text: 'Product Name : ',
-                                          style: TextStyle(
-                                            color: appcolor().mainColor,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: 'Asc A-Z',
-                                          style: TextStyle(
-                                            color: appcolor().mediumGreyColor,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Obx(() => Radio(
-                                    value: 'sort ascending',
-                                    groupValue: manageProductController
-                                        .allProducts_sort_group_value.value,
-                                    onChanged: (val) {
-                                      manageProductController
-                                          .allProducts_sort_group_value
-                                          .value = val.toString();
-                                    },
-                                  ))
-                                ],
-                              ),
-
-                              // distance nearest to me
-                              Row(
-                                children: [
-                                  RichText(
-                                      text: TextSpan(
-                                          style: TextStyle(fontSize: 16),
-                                          children: [
-                                            TextSpan(
-                                              text: 'Date',
-                                              style: TextStyle(
-                                                color: appcolor().mainColor,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: 'Last Modified',
-                                            ),
-                                          ])),
-                                  Spacer(),
-                                  Obx(() => Radio(
-                                    value: 'Date Last modified ',
-                                    groupValue: manageProductController
-                                        .allProducts_sort_group_value.value,
-                                    onChanged: (val) {
-                                      manageProductController
-                                          .allProducts_sort_group_value
-                                          .value = val.toString();
-                                    },
-                                  ))
-                                ],
-                              ),
-
-                              //recentaly added
-                              Row(
-                                children: [
-                                  Text(
-                                    'Price',
-                                    style: TextStyle(
-                                        color: appcolor().mainColor, fontSize: 16),
-                                  ),
-                                  Icon(
-                                    Icons.arrow_upward,
-                                    size: 25,
-                                    color: appcolor().mediumGreyColor,
-                                  ),
-                                  Spacer(),
-                                  Obx(
-                                        () => Radio(
-                                      value: 'Price',
-                                      groupValue: manageProductController
-                                          .allProducts_sort_group_value.value,
-                                      onChanged: (val) {
-                                        manageProductController
-                                            .allProducts_sort_group_value
-                                            .value = val.toString();
-                                        print(val.toString());
-                                      },
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ).paddingSymmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: const Icon(
+                  //     FontAwesomeIcons.arrowDownWideShort,
+                  //     size: 20,
+                  //     color: Colors.blueGrey,
+                  //   ),
+                  //   onPressed: () {
+                  //     Get.bottomSheet(
+                  //       Container(
+                  //         color: const Color.fromRGBO(255, 255, 255, 1),
+                  //         child: Wrap(
+                  //           crossAxisAlignment: WrapCrossAlignment.start,
+                  //           children: [
+                  //             Text(
+                  //               'Sort List',
+                  //               style: TextStyle(
+                  //                 fontWeight: FontWeight.bold,
+                  //                 fontSize: 22,
+                  //                 color: appcolor().mainColor,
+                  //               ),
+                  //             ),
+                  //             // z-a
+                  //             Row(
+                  //               children: [
+                  //                 RichText(
+                  //                   text: TextSpan(
+                  //                     style: TextStyle(fontSize: 16),
+                  //                     children: [
+                  //                       TextSpan(
+                  //                         text: 'Product Name : ',
+                  //                         style: TextStyle(
+                  //                           color: appcolor().mainColor,
+                  //                         ),
+                  //                       ),
+                  //                       TextSpan(
+                  //                         text: 'Desc Z-A',
+                  //                         style: TextStyle(
+                  //                           color: appcolor().mediumGreyColor,
+                  //                         ),
+                  //                       )
+                  //                     ],
+                  //                   ),
+                  //                 ),
+                  //                 Spacer(),
+                  //                 Obx(
+                  //                       () => Radio(
+                  //                     value: 'sort descending',
+                  //                     groupValue: manageProductController
+                  //                         .allProducts_sort_group_value.value,
+                  //                     onChanged: (val) {
+                  //                       manageProductController
+                  //                           .allProducts_sort_group_value
+                  //                           .value = val.toString();
+                  //                     },
+                  //                   ),
+                  //                 )
+                  //               ],
+                  //             ),
+                  //
+                  //             // a-z
+                  //             Row(
+                  //               children: [
+                  //                 RichText(
+                  //                   text: TextSpan(
+                  //                     style: TextStyle(fontSize: 16),
+                  //                     children: [
+                  //                       TextSpan(
+                  //                         text: 'Product Name : ',
+                  //                         style: TextStyle(
+                  //                           color: appcolor().mainColor,
+                  //                         ),
+                  //                       ),
+                  //                       TextSpan(
+                  //                         text: 'Asc A-Z',
+                  //                         style: TextStyle(
+                  //                           color: appcolor().mediumGreyColor,
+                  //                         ),
+                  //                       )
+                  //                     ],
+                  //                   ),
+                  //                 ),
+                  //                 Spacer(),
+                  //                 Obx(() => Radio(
+                  //                   value: 'sort ascending',
+                  //                   groupValue: manageProductController
+                  //                       .allProducts_sort_group_value.value,
+                  //                   onChanged: (val) {
+                  //                     manageProductController
+                  //                         .allProducts_sort_group_value
+                  //                         .value = val.toString();
+                  //                   },
+                  //                 ))
+                  //               ],
+                  //             ),
+                  //
+                  //             // distance nearest to me
+                  //             Row(
+                  //               children: [
+                  //                 RichText(
+                  //                     text: TextSpan(
+                  //                         style: TextStyle(fontSize: 16),
+                  //                         children: [
+                  //                           TextSpan(
+                  //                             text: 'Date',
+                  //                             style: TextStyle(
+                  //                               color: appcolor().mainColor,
+                  //                             ),
+                  //                           ),
+                  //                           TextSpan(
+                  //                             text: 'Last Modified',
+                  //                           ),
+                  //                         ])),
+                  //                 Spacer(),
+                  //                 Obx(() => Radio(
+                  //                   value: 'Date Last modified ',
+                  //                   groupValue: manageProductController
+                  //                       .allProducts_sort_group_value.value,
+                  //                   onChanged: (val) {
+                  //                     manageProductController
+                  //                         .allProducts_sort_group_value
+                  //                         .value = val.toString();
+                  //                   },
+                  //                 ))
+                  //               ],
+                  //             ),
+                  //
+                  //             //recentaly added
+                  //             Row(
+                  //               children: [
+                  //                 Text(
+                  //                   'Price',
+                  //                   style: TextStyle(
+                  //                       color: appcolor().mainColor, fontSize: 16),
+                  //                 ),
+                  //                 Icon(
+                  //                   Icons.arrow_upward,
+                  //                   size: 25,
+                  //                   color: appcolor().mediumGreyColor,
+                  //                 ),
+                  //                 Spacer(),
+                  //                 Obx(
+                  //                       () => Radio(
+                  //                     value: 'Price',
+                  //                     groupValue: manageProductController
+                  //                         .allProducts_sort_group_value.value,
+                  //                     onChanged: (val) {
+                  //                       manageProductController
+                  //                           .allProducts_sort_group_value
+                  //                           .value = val.toString();
+                  //                       print(val.toString());
+                  //                     },
+                  //                   ),
+                  //                 )
+                  //               ],
+                  //             ),
+                  //           ],
+                  //         ).paddingSymmetric(
+                  //           horizontal: 20,
+                  //           vertical: 10,
+                  //         ),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
 
                   IconButton(
                     icon: const Icon(Icons.search),
@@ -962,7 +962,8 @@ class search_errand_prodState extends State<search_errand_prod>
                     ],
                   ),
                 ),
-              )),
+              )
+          ),
 
 
         ],

@@ -2,6 +2,8 @@ import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/modal/Shop.dart';
 import 'package:errandia/modal/category.dart';
+import 'package:errandia/modal/subcategory.dart';
+import 'package:errandia/modal/subcatgeory.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -19,6 +21,7 @@ class add_product_cotroller extends GetxController{
   var categoryList = List<dynamic>.empty(growable: true).obs;
 
   RxBool isLoadingShops = false.obs;
+  RxBool isLoadingCategories = false.obs;
 
   @override
   void onInit() {
@@ -74,15 +77,20 @@ class add_product_cotroller extends GetxController{
   }
 
   void loadCategories() async {
-    var data = await api().getCategories();
-    print("categories data: $data");
-    if (data != null && data.isNotEmpty) {
-      categoryList.addAll(data);
-    }
-    categor.Items = List.from(data)
-        .map<Caegory>((category) => Caegory.fromJson(category))
-        .toList();
-    print("categoryList: $categoryList");
+    isLoadingCategories.value = true;
+    await api().getSubCategories().then((data) {
+      print("categories data: $data");
+      if (data != null && data.isNotEmpty) {
+        categoryList.addAll(data);
+      }
+      subCategories.Items = List<SubCategory>.from(data.map((sub) => SubCategory.fromJson(sub)));
+      print("categoryList: $categoryList");
+      isLoadingCategories.value = false;
+    }).catchError((error) {
+      print("Error loading categories: $error");
+      isLoadingCategories.value = false;
+    });
+
   }
 
   void resetFields() {

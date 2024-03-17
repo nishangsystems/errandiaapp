@@ -10,7 +10,7 @@ class Shop {
   final String name;
   final String? description;
   final String? image;
-  final Caegory? category;
+  final Category? category;
   final String? slogan;
   final String? address;
   final String? phone;
@@ -33,7 +33,7 @@ class Shop {
       name: json['name'],
       description: json['description'],
       image: json['image'],
-      category: json['category'] != null ? Caegory.fromJson(json['category']) : null,
+      category: json['category'] != null ? Category.fromJson(json['category']) : null,
       slogan: json['slogan'],
       address: json['address'],
       phone: json['phone'],
