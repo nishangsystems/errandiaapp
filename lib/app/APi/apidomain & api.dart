@@ -304,12 +304,36 @@ class api {
     var token = prefs.getString('token');
 
     final response =
-        await http.get(Uri.parse('${apiDomain().domain}/sub_categories'),
+        await http.get(Uri.parse('${apiDomain().domain}/categories'),
             headers: ({
               'Content-Type': 'application/json; charset=UTF-8',
               'Accept': 'application/json',
               'Authorization': 'Bearer $token'
             }));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
+
+  // get all sub categories
+  Future getSubCategories() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response =
+    await http.get(Uri.parse('${apiDomain().domain}/sub_categories'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (kDebugMode) {

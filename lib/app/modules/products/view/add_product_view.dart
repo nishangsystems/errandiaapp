@@ -1,30 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:errandia/app/APi/product.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
-import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
-import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
-import 'package:errandia/app/modules/profile/view/profile_view.dart';
-import 'package:errandia/modal/Shop.dart';
-import 'package:errandia/modal/category.dart';
-import 'package:errandia/utils/helper.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:http/http.dart'as http;
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
-import 'package:path/path.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
-import 'package:errandia/modal/subcatgeory.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
+import 'package:errandia/modal/Shop.dart';
+import 'package:errandia/modal/subcategory.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
-import '../../../APi/apidomain & api.dart';
-import '../../buiseness/controller/add_business_controller.dart';
-import '../../buiseness/view/manage_business_view.dart';
+
 import '../../global/Widgets/blockButton.dart';
 
 class add_product_view extends StatefulWidget {
@@ -262,13 +252,20 @@ class _add_product_viewState extends State<add_product_view> {
                                   color: Colors.grey[600],
                                 ),
                               );
+                            } else if (product_controller.shopList.isEmpty) {
+                              return Text('No Shops found',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[600],
+                                ),
+                              );
                             } else {
                               return DropdownButtonFormField<Shop>(
                                 value: selectedShop,
                                 iconSize: 0.0,
                                 isDense: true,
                                 isExpanded: true,
-                                padding: EdgeInsets.zero,
+                                padding: const EdgeInsets.only(bottom: 8),
                                 decoration: const InputDecoration.collapsed(
                                   hintText: 'Select a Shop *',
                                   hintStyle: TextStyle(
@@ -321,32 +318,55 @@ class _add_product_viewState extends State<add_product_view> {
                       ),
                     ),
                     contentPadding: EdgeInsets.zero,
-                    title: DropdownButtonFormField(
-                      iconSize: 0.0,
-                      isDense: true,
-                      isExpanded: true,
-                      padding: EdgeInsets.zero,
-                      decoration: const InputDecoration.collapsed(
-                        hintText: 'Product Category *',
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                      value: category,
-                      onChanged: (value) {
-                        setState(() {
-                          category = value as int;
-                        });
-                        print("category_id: $category");
-                      },
-                      items: categor.Items.map((e) => DropdownMenuItem(
-                        value: e.id,
-                        child: Text(
-                          e.name.toString(),
-                          style: const TextStyle(
-                              fontSize: 15, color: Colors.black),
-                        ),
-                      )).toList(),
+                    title: Obx(
+                        () {
+                          if (product_controller.isLoadingCategories.value) {
+                            return Text('Loading Categories...',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[600],
+                              ),
+                            );
+                          } else if (product_controller.categoryList.isEmpty) {
+                            return Text('No Categories found',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[600],
+                              ),
+                            );
+                          } else {
+                            return DropdownButtonFormField<dynamic>(
+                              value: category,
+                              iconSize: 0.0,
+                              isDense: true,
+                              isExpanded: true,
+                              padding: const EdgeInsets.only(bottom: 8),
+                              decoration: const InputDecoration.collapsed(
+                                hintText: 'Select a Category *',
+                                hintStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                              onChanged: (dynamic newValue) {
+                                setState(() {
+                                  category = newValue as int;
+                                });
+                                print("selected category: $category");
+                              },
+                              items: product_controller.categoryList.map<DropdownMenuItem<dynamic>>((dynamic category) {
+                                return DropdownMenuItem<dynamic>(
+                                  value: category['id'],
+                                  child: Text(capitalizeAll(category['name']),
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            );
+                          }
+                        }
                     ),
                   ),
                   Divider(

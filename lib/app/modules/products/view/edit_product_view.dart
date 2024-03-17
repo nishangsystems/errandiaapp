@@ -11,6 +11,8 @@ import 'package:errandia/app/modules/products/controller/add_product_controller.
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/modal/Shop.dart';
 import 'package:errandia/modal/category.dart';
+import 'package:errandia/modal/subcategory.dart';
+import 'package:errandia/modal/subcatgeory.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -320,7 +322,7 @@ class EditProductViewState extends State<EditProductView> {
                             iconSize: 0.0,
                             isDense: true,
                             isExpanded: true,
-                            padding: EdgeInsets.zero,
+                            padding: const EdgeInsets.only(bottom: 8),
                             decoration: const InputDecoration.collapsed(
                               hintText: 'Select a Shop *',
                               hintStyle: TextStyle(
@@ -374,32 +376,55 @@ class EditProductViewState extends State<EditProductView> {
                     ),
                   ),
                   contentPadding: EdgeInsets.zero,
-                  title: DropdownButtonFormField(
-                    iconSize: 0.0,
-                    isDense: true,
-                    isExpanded: true,
-                    padding: EdgeInsets.zero,
-                    decoration: const InputDecoration.collapsed(
-                      hintText: 'Product Category *',
-                      hintStyle: TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                    value: category,
-                    onChanged: (value) {
-                      setState(() {
-                        category = value as int;
-                      });
-                      print("category_id: $category");
-                    },
-                    items: categor.Items.map((e) => DropdownMenuItem(
-                      value: e.id,
-                      child: Text(
-                        e.name.toString(),
-                        style: const TextStyle(
-                            fontSize: 15, color: Colors.black),
-                      ),
-                    )).toList(),
+                  title: Obx(
+                          () {
+                        if (product_controller.isLoadingCategories.value) {
+                          return Text('Loading Categories...',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                          );
+                        } else if (product_controller.categoryList.isEmpty) {
+                          return Text('No Categories found',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                          );
+                        } else {
+                          return DropdownButtonFormField<dynamic>(
+                            value: category,
+                            iconSize: 0.0,
+                            isDense: true,
+                            isExpanded: true,
+                            padding: const EdgeInsets.only(bottom: 8),
+                            decoration: const InputDecoration.collapsed(
+                              hintText: 'Select a Category *',
+                              hintStyle: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                            onChanged: (dynamic newValue) {
+                              setState(() {
+                                category = newValue as int;
+                              });
+                              print("selected category: $category");
+                            },
+                            items: product_controller.categoryList.map<DropdownMenuItem<dynamic>>((dynamic category) {
+                              return DropdownMenuItem<dynamic>(
+                                value: category['id'],
+                                child: Text(capitalizeAll(category['name']),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        }
+                      }
                   ),
                 ),
 

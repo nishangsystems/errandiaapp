@@ -58,7 +58,7 @@ class add_business_controller extends GetxController{
       categoryList.addAll(data);
     }
     categor.Items = List.from(data)
-        .map<Caegory>((category) => Caegory.fromJson(category))
+        .map<Category>((category) => Category.fromJson(category))
         .toList();
     print("categoryList: $categoryList");
   }

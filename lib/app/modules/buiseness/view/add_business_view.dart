@@ -1009,7 +1009,7 @@ class _add_business_viewState extends State<add_business_view> {
                     contentPadding: EdgeInsets.zero,
                     title: DropdownButtonFormField(
                       iconSize: 0.0,
-                      padding: EdgeInsets.zero,
+                      padding: const EdgeInsets.only(bottom: 8),
                       isDense: true,
                       isExpanded: true,
                       decoration: const InputDecoration.collapsed(
@@ -1066,7 +1066,7 @@ class _add_business_viewState extends State<add_business_view> {
                         iconSize: 0.0,
                         isDense: true,
                         isExpanded: true,
-                        padding: EdgeInsets.zero,
+                        padding: const EdgeInsets.only(bottom: 8),
                         decoration: InputDecoration.collapsed(
                           hintText: 'Town (optional)',
                           hintStyle: TextStyle(

@@ -21,6 +21,7 @@ class SearchErrandProdController extends GetxController {
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+  TextEditingController drawerSearchCtl = TextEditingController();
 
   @override
   void onInit() {

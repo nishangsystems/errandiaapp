@@ -1,15 +1,10 @@
 import 'package:errandia/app/modules/Dashboard/view/dashboard_view.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
-import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
-import 'package:errandia/app/modules/categories/view/categories.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/errands/view/run_an_errand_1.dart';
-import 'package:errandia/app/modules/following/view/following_view.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
-import 'package:errandia/app/modules/manage_review/view/manage_review_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/setting/view/setting_view.dart';
-import 'package:errandia/app/modules/subscribers/view/subscriber_view.dart';
 import 'package:errandia/auth_services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -104,17 +99,6 @@ class CustomEndDrawer extends StatelessWidget {
                     color: appcolor().mediumGreyColor,
                   )
                 : Container()),
-            Obx(() => homeController.loggedIn.value
-                ? Container()
-                : drawerItemWidget(
-                    text: 'Categories',
-                    imagePath:
-                        'assets/images/sidebar_icon/icon-profile-errands.png',
-                    callback: () {
-                      Get.back();
-                      Get.to(() => const categories_view());
-                    },
-                  )),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
               text: 'Manage Businesses',
