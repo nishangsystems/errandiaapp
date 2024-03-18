@@ -1,3 +1,4 @@
+
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/subscription/controller/subscription_controller.dart';
@@ -5,14 +6,14 @@ import 'package:errandia/app/modules/subscription/view/subscription_processing_v
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class renew_subscription extends StatefulWidget {
-  renew_subscription();
+class NewSubscription extends StatefulWidget {
+  NewSubscription();
 
   @override
-  State<renew_subscription> createState() => _renew_subscriptionState();
+  State<NewSubscription> createState() => _NewSubscriptionState();
 }
 
-class _renew_subscriptionState extends State<renew_subscription> {
+class _NewSubscriptionState extends State<NewSubscription> {
   // RxString subscription_type_group_value = 'yearly'.obs;
   RxString payment_group_value = 'mtn'.obs;
   subscription_controller controller = Get.put(subscription_controller());
@@ -32,7 +33,7 @@ class _renew_subscriptionState extends State<renew_subscription> {
         elevation: 2,
         backgroundColor: Colors.white,
         title: Text(
-          'Renew Subscription',
+          'New Subscription',
           style: TextStyle(color: appcolor().mediumGreyColor),
         ),
         leading: IconButton(
@@ -149,71 +150,71 @@ class _renew_subscriptionState extends State<renew_subscription> {
 
             // Subscription plans
             ListTile(
-              leading: Container(
-                padding: const EdgeInsets.only(left: 12, right: 0),
-                child: const Icon(
-                  Icons.subscriptions_outlined,
-                  color: Colors.black,
+                leading: Container(
+                  padding: const EdgeInsets.only(left: 12, right: 0),
+                  child: const Icon(
+                    Icons.subscriptions_outlined,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
-              trailing: Container(
-                padding: const EdgeInsets.only(left: 0, right: 12),
-                child: const Icon(
-                  Icons.arrow_forward_ios_outlined,
-                  color: Colors.black,
+                trailing: Container(
+                  padding: const EdgeInsets.only(left: 0, right: 12),
+                  child: const Icon(
+                    Icons.arrow_forward_ios_outlined,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
-              contentPadding: EdgeInsets.zero,
-              title: Obx(
-                  () {
-                    if (controller.isPlansLoading.value) {
-                      return Text('Loading...',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[600],
-                        ),
-                      );
-                    } else if (controller.plansList.isEmpty){
-                      return Text('No plans available',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 13,
-                        ),
-                      );
-                    } else {
-                      return DropdownButtonFormField<dynamic>(
-                        value: planSelected,
-                        iconSize: 0.0,
-                        isDense: true,
-                        isExpanded: true,
-                        padding: const EdgeInsets.only(bottom: 5),
-                        decoration: const InputDecoration.collapsed(
-                          hintText: "Select Plan *",
-                          hintStyle: TextStyle(
-                            color: Colors.black,
+                contentPadding: EdgeInsets.zero,
+                title: Obx(
+                        () {
+                      if (controller.isPlansLoading.value) {
+                        return Text('Loading...',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
                           ),
-                        ),
-                        onChanged: (dynamic newValue) {
-                          setState(() {
-                            planSelected = newValue;
-                          });
-                          print("Selected Plan: $planSelected");
-                        },
-                        items: controller.plansList.map((plan) {
-                          return DropdownMenuItem<dynamic>(
-                            value: plan,
-                            child: Text(plan['name'],
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                              )
+                        );
+                      } else if (controller.plansList.isEmpty){
+                        return Text('No plans available',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 13,
+                          ),
+                        );
+                      } else {
+                        return DropdownButtonFormField<dynamic>(
+                          value: planSelected,
+                          iconSize: 0.0,
+                          isDense: true,
+                          isExpanded: true,
+                          padding: const EdgeInsets.only(bottom: 5),
+                          decoration: const InputDecoration.collapsed(
+                            hintText: "Select Plan *",
+                            hintStyle: TextStyle(
+                              color: Colors.black,
                             ),
-                          );
-                        }).toList(),
-                      );
+                          ),
+                          onChanged: (dynamic newValue) {
+                            setState(() {
+                              planSelected = newValue;
+                            });
+                            print("Selected Plan: $planSelected");
+                          },
+                          items: controller.plansList.map((plan) {
+                            return DropdownMenuItem<dynamic>(
+                              value: plan,
+                              child: Text(plan['name'],
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                  )
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      }
                     }
-                  }
-              )
+                )
             ),
 
             const SizedBox(
@@ -276,7 +277,7 @@ class _renew_subscriptionState extends State<renew_subscription> {
                   ),
                   const Spacer(),
                   Obx(
-                    () => Radio(
+                        () => Radio(
                       activeColor: appcolor().mainColor,
                       value: 'mtn',
                       groupValue: payment_group_value.value,
@@ -292,29 +293,29 @@ class _renew_subscriptionState extends State<renew_subscription> {
             // mobile number container
 
             Obx(
-              () => payment_group_value.value == 'mtn'
+                  () => payment_group_value.value == 'mtn'
                   ? Container(
-                      decoration: BoxDecoration(
-                        color: appcolor().skyblueColor,
-                        border: Border(
-                          bottom: BorderSide(
-                            color: appcolor().mediumGreyColor,
-                          ),
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 5,
-                      ),
-                      child: TextFormField(
-                        keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.only(left: 38),
-                          border: InputBorder.none,
-                          hintText: 'Enter Mobile Money no.',
-                        ),
-                      ),
-                    )
+                decoration: BoxDecoration(
+                  color: appcolor().skyblueColor,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: appcolor().mediumGreyColor,
+                    ),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 5,
+                ),
+                child: TextFormField(
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    contentPadding: EdgeInsets.only(left: 38),
+                    border: InputBorder.none,
+                    hintText: 'Enter Mobile Money no.',
+                  ),
+                ),
+              )
                   : Container(),
             ),
             // Orange Money
@@ -350,7 +351,7 @@ class _renew_subscriptionState extends State<renew_subscription> {
                   ),
                   const Spacer(),
                   Obx(
-                    () => Radio(
+                        () => Radio(
                       activeColor: appcolor().mainColor,
                       value: 'orange',
                       groupValue: payment_group_value.value,
@@ -363,108 +364,58 @@ class _renew_subscriptionState extends State<renew_subscription> {
               ),
             ),
 
-            // cash
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  bottom: BorderSide(
-                    color: appcolor().mediumGreyColor,
-                  ),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 5,
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(
-                    height: 30,
-                    child: Image(
-                      image: AssetImage(
-                        'assets/images/icon-payment-cash.png',
-                      ),
-                    ),
-                  ),
-                  const Text(
-                    '  Cash',
-                    style: TextStyle(
-                      // color: appcolor().mainColor,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const Spacer(),
-                  Obx(
-                    () => Radio(
-                      activeColor: appcolor().mainColor,
-                      value: 'cash',
-                      groupValue: payment_group_value.value,
-                      onChanged: (val) {
-                        payment_group_value.value = val.toString();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             // cash renew
             Obx(
-              () => payment_group_value.value == 'cash'
+                  () => payment_group_value.value == 'cash'
                   ? Container(
-                      decoration: BoxDecoration(
-                        color: appcolor().skyblueColor,
-                        border: Border(
-                          bottom: BorderSide(
-                            color: appcolor().mediumGreyColor,
-                          ),
+                decoration: BoxDecoration(
+                  color: appcolor().skyblueColor,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: appcolor().mediumGreyColor,
+                    ),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 8,
+                ),
+                child: RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      color: appcolor().mainColor,
+                      fontSize: 16,
+                    ),
+                    children: const [
+                      TextSpan(
+                        text: 'Tap the ',
+                      ),
+                      TextSpan(
+                        text: 'Subscribe',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 8,
-                      ),
-                      child: RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            color: appcolor().mainColor,
-                            fontSize: 16,
-                          ),
-                          children: const [
-                            TextSpan(
-                              text: 'Tap the ',
-                            ),
-                            TextSpan(
-                              text: 'Renew Subscription',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            TextSpan(
-                                text:
-                                    ' button below and we\'ll contact you as soon as possible to complete the procedure of renewing your subscription.'),
-                          ],
-                        ),
-                      ),
-                    )
+                      TextSpan(
+                          text:
+                          ' button below and we\'ll contact you as soon as possible to complete the procedure of your new subscription.'),
+                    ],
+                  ),
+                ),
+              )
                   : Container(),
             ),
 
             // total subscription
-            const SizedBox(
-              height: 15,
+            SizedBox(
+              height: Get.height * 0.03,
             ),
 
             Container(
               width: Get.width,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
-                border: Border(
-                  top: BorderSide(
-                    color: appcolor().mediumGreyColor,
-                  ),
-                ),
+
               ),
               padding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -481,7 +432,6 @@ class _renew_subscriptionState extends State<renew_subscription> {
             ),
 
             // Price
-
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -515,16 +465,17 @@ class _renew_subscriptionState extends State<renew_subscription> {
             ),
 
             SizedBox(
-              height: Get.height * 0.05,
+              height: Get.height * 0.03,
             ),
 
             blockButton(
               title: const Text(
-                'Renew Susbscription',
+                'SUBSCRIBE',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+
                 ),
               ),
               ontap: () {
