@@ -48,6 +48,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
   var town;
   var category;
   var phoneNumber;
+  var whatsappNumber;
   bool focusInEmailField = false;
 
   String? businessTitle;
@@ -78,13 +79,14 @@ class EditBusinessViewState extends State<EditBusinessView> {
     add_controller.phone_controller.text = widget.data['phone'].toString().contains("237") ? widget.data['phone'].toString().substring(4).trim() : widget.data['phone'].toString();
     add_controller.email_controller.text  = widget.data['email'] ?? '';
     add_controller.description_controller.text = widget.data['description'] ?? '';
-    add_controller.whatsapp_controller.text = widget.data['whatsapp'] ?? '';
+    add_controller.whatsapp_controller.text = widget.data['whatsapp'].toString().contains("237") ? widget.data['whatsapp'].toString().substring(4).trim() : widget.data['whatsapp'].toString();
 
     imageController.image_path.value = widget.data['image'] ?? '' ;
     print("image path:  ${widget.data['image']}");
 
     setState(() {
       phoneNumber = widget.data['phone'];
+      whatsappNumber = widget.data['whatsapp'] != "" ? widget.data['whatsapp'] : "";
       category = widget.data['category']['id'] as int;
       regionCode = widget.data['region'] != null ? widget.data['region']['id'] as int : null;
       town = widget.data['town'] != null ? widget.data['town']['id'] as int : null;
@@ -145,7 +147,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
         "description": description,
         "slogan": businessInfo,
         "phone": phoneNumber.toString(),
-        "whatsapp": whatsapp ?? "",
+        "whatsapp": whatsappNumber.toString() ?? "",
         "category_id": category.toString(),
         // "image_path": imageController.image_path.toString(),
         "street": address ?? "",
@@ -286,11 +288,19 @@ class EditBusinessViewState extends State<EditBusinessView> {
                 onPressed: () {
                   updateBusiness(context);
                 },
-                child: const Text(
+                child: Text(
                   'UPDATE',
 
-                  style:
-                  TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18,
+                  color: appcolor().mainColor,
+                  letterSpacing: 1.2,
+                  shadows: [
+                    Shadow(
+                      color: appcolor().mainColor,
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
                 ))
           ],
         ),
@@ -761,12 +771,6 @@ class EditBusinessViewState extends State<EditBusinessView> {
                       ),
                     ),
                   ),
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
 
                   // phone number
                   Container(
@@ -829,37 +833,57 @@ class EditBusinessViewState extends State<EditBusinessView> {
                     ),
                   ),
 
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
 
                   Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                    child: TextFormField(
-                      controller: add_controller.whatsapp_controller,
-                      keyboardType: TextInputType.phone,
-                      maxLength: 9,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          FontAwesomeIcons.whatsapp,
-                          color: Colors.black,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Whatsapp Number (optional)',
-                        counterText: '',
-                        suffixIcon: Icon(
-                          color: Colors.black,
-                          Icons.edit,
-                        ),
-                      ),
-                    ),
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                      child: Row(
+                          children: [
+                            //    intl whatsapp phone field
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5, bottom: 0, left: 10),
+                              child: SizedBox(
+                                width: Get.width * 0.86,
+                                child: IntlPhoneField(
+                                  controller: add_controller.whatsapp_controller,
+                                  decoration: const InputDecoration(
+                                    contentPadding: EdgeInsets.only(top: 12),
+                                    border: InputBorder.none,
+                                    counter: SizedBox(),
+                                    hintText: 'Whatsapp (optional)',
+                                    hintStyle: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 17,
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  initialCountryCode: 'CM',
+                                  showDropdownIcon: false,
+                                  dropdownTextStyle: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 17,
+                                  ),
+                                  validator: (value) {
+                                    if (value == null) {
+                                      print(value);
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (phone) {
+                                    // add_controller.phone_controller.text = phone.completeNumber;
+                                    print("phone: ${phone.completeNumber}");
+                                    setState(() {
+                                      whatsappNumber = phone.completeNumber;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ]
+                      )
                   ),
 
                   Divider(

@@ -49,6 +49,7 @@ class _add_business_viewState extends State<add_business_view> {
   var town;
   var category;
   var phoneNumber;
+  var whatsappNumber;
   bool focusInEmailField = false;
 
   // var regionValue;
@@ -88,6 +89,8 @@ class _add_business_viewState extends State<add_business_view> {
     var email = add_controller.email_controller.text.toString();
     var whatsapp = add_controller.whatsapp_controller.text.toString();
 
+    print("whatsapp number controller: $whatsapp");
+
     if (name == '') {
       alertDialogBox(context, "Error", 'Please enter company name');
     } else if (category == null) {
@@ -119,7 +122,7 @@ class _add_business_viewState extends State<add_business_view> {
         "description": description,
         "slogan": businessInfo,
         "phone": phoneNumber.toString(),
-        "whatsapp": whatsapp ?? "",
+        "whatsapp": whatsappNumber.toString() ?? "",
         "category_id": category.toString(),
         // "image_path": imageController.image_path.toString(),
         "street": address ?? "",
@@ -142,6 +145,7 @@ class _add_business_viewState extends State<add_business_view> {
       var response;
 
       print("phone number: $phoneNumber");
+      print("whatsapp number: $whatsappNumber");
 
       // check if logo image is empty
       if (imageController.image_path.toString() == '') {
@@ -206,6 +210,7 @@ class _add_business_viewState extends State<add_business_view> {
                         town = null;
                         category = null;
                         selectedFilters_.clear();
+
                       }),
                       imageController.reset(),
                       // home_controller()
@@ -267,9 +272,19 @@ class _add_business_viewState extends State<add_business_view> {
                 onPressed: () {
                   createBusiness(context);
                 },
-                child: const Text(
+                child: Text(
                   'Publish',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18,
+                    color: appcolor().mainColor,
+                    letterSpacing: 1.2,
+                    shadows: [
+                      Shadow(
+                        color: appcolor().mainColor,
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
                 ))
           ],
         ),
@@ -741,12 +756,6 @@ class _add_business_viewState extends State<add_business_view> {
                       ),
                     ),
                   ),
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
 
                   // phone number
                   Container(
@@ -834,38 +843,58 @@ class _add_business_viewState extends State<add_business_view> {
                   //     ),
                   //   ),
                   // ),
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
 
                   // whatsapp number
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                    child: TextFormField(
-                      controller: add_controller.whatsapp_controller,
-                      keyboardType: TextInputType.phone,
-                      maxLength: 9,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          FontAwesomeIcons.whatsapp,
-                          color: Colors.black,
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                    child: Row(
+                      children: [
+                      //    intl whatsapp phone field
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 0, left: 10),
+                          child: SizedBox(
+                            width: Get.width * 0.86,
+                            child: IntlPhoneField(
+                              controller: add_controller.whatsapp_controller,
+                              decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.only(top: 12),
+                                  border: InputBorder.none,
+                                counter: SizedBox(),
+                                hintText: 'Whatsapp (optional)',
+                                hintStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                              ),
+                              keyboardType: TextInputType.number,
+                              initialCountryCode: 'CM',
+                              showDropdownIcon: false,
+                              dropdownTextStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                              ),
+                              validator: (value) {
+                                if (value == null) {
+                                  print(value);
+                                }
+                                return null;
+                              },
+                              onChanged: (phone) {
+                                // add_controller.phone_controller.text = phone.completeNumber;
+                                print("phone: ${phone.completeNumber}");
+                                setState(() {
+                                  whatsappNumber = phone.completeNumber;
+                                });
+                              },
+                            ),
+                          ),
                         ),
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Whatsapp Number (optional)',
-                        counterText: '',
-                        suffixIcon: Icon(
-                          color: Colors.black,
-                          Icons.edit,
-                        ),
-                      ),
-                    ),
+                      ]
+                    )
                   ),
 
                   Divider(

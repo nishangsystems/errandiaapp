@@ -66,8 +66,6 @@ class _add_service_viewState extends State<add_service_view> {
       alertDialogBox(context, "Error", "Unit price is required");
     } else if (productDescription == '') {
       alertDialogBox(context, "Error", "Product description is required");
-    } else if (tags == '') {
-      alertDialogBox(context, "Error", "Product tags is required");
     } else if (category == null) {
       alertDialogBox(context, "Error", "Category is required");
     } else {
@@ -76,7 +74,7 @@ class _add_service_viewState extends State<add_service_view> {
         "shop_id": shopId,
         "unit_price": unitPrice,
         "description": productDescription,
-        "tags": tags,
+        "tags": tags ?? "",
         "category_id": category.toString(),
         "quantity": "0",
         "service": "1"
@@ -735,7 +733,7 @@ class _add_service_viewState extends State<add_service_view> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Service Tags *',
+                        hintText: 'Service Tags (optional)',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
