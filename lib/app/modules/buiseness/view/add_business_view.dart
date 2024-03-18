@@ -272,9 +272,19 @@ class _add_business_viewState extends State<add_business_view> {
                 onPressed: () {
                   createBusiness(context);
                 },
-                child: const Text(
+                child: Text(
                   'Publish',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18,
+                    color: appcolor().mainColor,
+                    letterSpacing: 1.2,
+                    shadows: [
+                      Shadow(
+                        color: appcolor().mainColor,
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
                 ))
           ],
         ),

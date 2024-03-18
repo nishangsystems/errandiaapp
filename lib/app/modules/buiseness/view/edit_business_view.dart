@@ -288,11 +288,19 @@ class EditBusinessViewState extends State<EditBusinessView> {
                 onPressed: () {
                   updateBusiness(context);
                 },
-                child: const Text(
+                child: Text(
                   'UPDATE',
 
-                  style:
-                  TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18,
+                  color: appcolor().mainColor,
+                  letterSpacing: 1.2,
+                  shadows: [
+                    Shadow(
+                      color: appcolor().mainColor,
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
                 ))
           ],
         ),
