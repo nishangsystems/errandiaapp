@@ -99,6 +99,7 @@ class add_business_controller extends GetxController{
     phone_controller.clear();
     email_controller.clear();
     description_controller.clear();
+    whatsapp_controller.clear();
 
   }
 
