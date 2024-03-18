@@ -50,21 +50,17 @@ class _add_product_viewState extends State<add_product_view> {
       alertDialogBox(context, "Error", "Unit price is required");
     } else if (productDescription == '') {
       alertDialogBox(context, "Error", "Product description is required");
-    } else if (tags == '') {
-      alertDialogBox(context, "Error", "Product tags is required");
     } else if (category == null) {
       alertDialogBox(context, "Error", "Category is required");
-    } else if (qty == "null" || qty == "") {
-      alertDialogBox(context, "Error", "Quantity is required");
     } else {
       var value = {
         "name": name,
         "shop_id": shopId,
         "unit_price": unitPrice,
         "description": productDescription,
-        "tags": tags,
+        "tags": tags ?? "",
         "category_id": category.toString(),
-        "quantity": qty,
+        "quantity": qty ?? 0,
       };
 
       setState(() {
@@ -423,13 +419,20 @@ class _add_product_viewState extends State<add_product_view> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Quantity *',
+                        hintText: 'Quantity (optional)',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
                         ),
                       ),
                     ),
+                  ),
+
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
                   ),
 
                   // Business info
@@ -730,7 +733,7 @@ class _add_product_viewState extends State<add_product_view> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Product Tags *',
+                        hintText: 'Product Tags (optional)',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,

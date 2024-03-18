@@ -67,7 +67,7 @@ class EditProductViewState extends State<EditProductView> {
       product_controller.product_desc_controller.text = widget.data!['description'] ?? '';
       product_controller.product_tags_controller.text = widget.data!['tags'] ?? '';
       product_controller.category_controller.text = widget.data!['category']['name'];
-      product_controller.quantity_controller.text = widget.data!['quantity'].toString();
+      product_controller.quantity_controller.text = widget.data!['quantity'].toString() == 'null' ? '' : widget.data!['quantity'].toString();
 
       imageController.image_path.value = widget.data!['featured_image'] ?? '';
 
@@ -111,12 +111,8 @@ class EditProductViewState extends State<EditProductView> {
       alertDialogBox(context, "Error", "Unit price is required");
     } else if (productDescription == '') {
       alertDialogBox(context, "Error", "Product description is required");
-    } else if (tags == '') {
-      alertDialogBox(context, "Error", "Product tags is required");
     } else if (category == null) {
       alertDialogBox(context, "Error", "Category is required");
-    } else if (qty == "null" || qty == "") {
-      alertDialogBox(context, "Error", "Quantity is required");
     } else {
       var value = {
         "name": name,
@@ -458,6 +454,38 @@ class EditProductViewState extends State<EditProductView> {
                     ),
                   ),
                 ),
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
+
+                // product quantity
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                  child: TextFormField(
+                    controller: product_controller.quantity_controller,
+                    keyboardType: TextInputType.number,
+
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: Icon(
+                        color: Colors.black,
+                        FontAwesomeIcons.cubes,
+                      ),
+                      hintStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                      hintText: 'Quantity (optional)',
+                      suffixIcon: Icon(
+                        color: Colors.black,
+                        Icons.edit,
+                      ),
+                    ),
+                  ),
+                ),
+
                 Divider(
                   color: appcolor().greyColor,
                   thickness: 1,
@@ -1232,7 +1260,7 @@ class EditProductViewState extends State<EditProductView> {
                       hintStyle: TextStyle(
                         color: Colors.black,
                       ),
-                      hintText: 'Product Tags *',
+                      hintText: 'Product Tags (optional)',
                       suffixIcon: Icon(
                         color: Colors.black,
                         Icons.edit,

@@ -103,19 +103,15 @@ class EditServiceViewState extends State<EditServiceView> {
       alertDialogBox(context, "Error", "Unit price is required");
     } else if (productDescription == '') {
       alertDialogBox(context, "Error", "Product description is required");
-    } else if (tags == '') {
-      alertDialogBox(context, "Error", "Product tags is required");
     } else if (category == null) {
       alertDialogBox(context, "Error", "Category is required");
-    } else if (qty == "null" || qty == "") {
-      alertDialogBox(context, "Error", "Quantity is required");
     } else {
       var value = {
         "name": name,
         "shop_id": shopId,
         "unit_price": unitPrice,
         "description": productDescription,
-        "tags": tags,
+        "tags": tags ?? "",
         "category_id": category.toString(),
         "quantity": qty,
       };
@@ -131,7 +127,7 @@ class EditServiceViewState extends State<EditServiceView> {
         print("product data: $value");
 
         if (imageController.image_path.toString() == '') {
-          ProductAPI.updateProductOrService(value, context, _localServiceData?['slug']).then((response_) {
+          ProductAPI.updateProductOrService(value, context, _localServiceData['slug']).then((response_) {
             response = jsonDecode(response_);
             print("product response: $response");
             if (response['status'] == "success") {
@@ -769,7 +765,7 @@ class EditServiceViewState extends State<EditServiceView> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Service Tags *',
+                        hintText: 'Service Tags (optional)',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
