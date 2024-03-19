@@ -49,4 +49,30 @@ class SubscriptionAPI {
       return da;
     }
   }
+
+  // subscribe to a plan
+  static Future subscribeToPlan(Map<String, dynamic> value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.post(Uri.parse('${apiDomain().domain}/user/subscriptions'),
+      headers: ({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      }),
+      body: jsonEncode(value)
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return jsonEncode({'status': 'success', 'data': data});
+    } else {
+      var da = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'data': da});
+    }
+  }
 }

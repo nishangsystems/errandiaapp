@@ -45,6 +45,18 @@ class subscription_viewState extends State<subscription_view> with WidgetsBindin
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (Get.arguments != null) {
+      Get.arguments.listen((data) {
+        if (data == 'Reload Subscriptions') {
+          controller.reloadSubscriptions();
+        }
+      });
+    }
+  }
+
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
@@ -168,7 +180,7 @@ class subscription_viewState extends State<subscription_view> with WidgetsBindin
                                     ),
                                   ),
                                   Text(
-                                    formatPrice(item['amount']),
+                                    formatPrice(double.parse(item['amount'].toString())),
                                     style: TextStyle(
                                       color: appcolor().mainColor,
                                       fontSize: 12,
@@ -187,12 +199,21 @@ class subscription_viewState extends State<subscription_view> with WidgetsBindin
                                             fontSize: 10,
                                             fontWeight: FontWeight.w600),
                                       ),
-                                      Text(
-                                        formatDate(item['expired_at']),
+                                      item['expired_at'] != null
+                                          ? Text(
+                                        formatDate(DateTime.parse(item['expired_at'])),
                                         style: TextStyle(
                                             color: controller.list[index].color,
                                             fontSize: 10,
                                             fontWeight: FontWeight.w600),
+                                      )
+                                          : Text(
+                                        'N/A',
+                                        style: TextStyle(
+                                          color: appcolor().mainColor,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                       const SizedBox(
                                         width: 15,
@@ -240,7 +261,7 @@ class subscription_viewState extends State<subscription_view> with WidgetsBindin
                               const Spacer(),
                               IconButton(
                                 onPressed: () {
-                                  Get.bottomSheet(customBottomSheet());
+                                  Get.bottomSheet(customBottomSheet(item));
                                 },
                                 icon: const Icon(
                                   Icons.more_vert,
@@ -261,7 +282,7 @@ class subscription_viewState extends State<subscription_view> with WidgetsBindin
   }
 }
 
-Widget customBottomSheet() {
+Widget customBottomSheet(item) {
   return Container(
     padding: const EdgeInsets.symmetric(
       horizontal: 15,
@@ -281,7 +302,7 @@ Widget customBottomSheet() {
         InkWell(
           onTap: () {
             Get.back();
-            Get.to(renew_subscription());
+            Get.to(() => RenewSubscription(subscriptionData: item));
           },
           child: const Row(
             children: [
