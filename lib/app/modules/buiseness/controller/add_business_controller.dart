@@ -35,6 +35,7 @@ class add_business_controller extends GetxController{
   ].obs;
   var group_value= 'Abhishek'.obs;
   var categoryList = List<dynamic>.empty(growable: true).obs;
+  var townList = RxList<dynamic>([]);
 
   RxBool isRegionSelected = false.obs;
   RxBool isTownsLoading = false.obs;
@@ -64,22 +65,27 @@ class add_business_controller extends GetxController{
   }
 
   void loadTownsData(regionId) async {
+    // Towns.Items = [];
+    townList.clear();
+    print("townList cleared: $townList");
+
     isTownsLoading.value = true;
+
     var data = await api().getTownsByRegion(regionId);
     print("towns data: $data");
 
     isTownsLoading.value = false;
-    // empty previous towns items
-    Towns.Items.clear();
 
     if (data != null && data.isNotEmpty) {
-      Towns.Items = List.from(data)
-          .map<Town>((town) => Town.fromJson(town))
-          .toList();
+      final uniqueTowns = data.toSet().toList();
+      townList.addAll(uniqueTowns);
+      // Towns.Items = List.from(data)
+      //     .map<Town>((town) => Town.fromJson(town))
+      //     .toList();
     }
 
     update();
-    print("towns: $Towns.Items");
+    print("towns: $townList");
   }
 
   void resetFields() {
