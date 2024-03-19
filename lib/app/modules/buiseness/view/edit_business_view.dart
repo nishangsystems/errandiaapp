@@ -49,6 +49,8 @@ class EditBusinessViewState extends State<EditBusinessView> {
   var category;
   var phoneNumber;
   var whatsappNumber;
+  var wcode;
+  var wcountry;
   bool focusInEmailField = false;
 
   String? businessTitle;
@@ -79,17 +81,18 @@ class EditBusinessViewState extends State<EditBusinessView> {
     add_controller.phone_controller.text = widget.data['phone'].toString().contains("237") ? widget.data['phone'].toString().substring(4).trim() : widget.data['phone'].toString();
     add_controller.email_controller.text  = widget.data['email'] ?? '';
     add_controller.description_controller.text = widget.data['description'] ?? '';
-    add_controller.whatsapp_controller.text = widget.data['whatsapp'].toString().contains("237") ? widget.data['whatsapp'].toString().substring(4).trim() : widget.data['whatsapp'].toString();
+    add_controller.whatsapp_controller.text = widget.data['whatsapp'].toString();
 
     imageController.image_path.value = widget.data['image'] ?? '' ;
     print("image path:  ${widget.data['image']}");
 
     setState(() {
       phoneNumber = widget.data['phone'];
-      whatsappNumber = widget.data['whatsapp'] != "" ? widget.data['whatsapp'] : "";
       category = widget.data['category']['id'] as int;
       regionCode = widget.data['region'] != null ? widget.data['region']['id'] as int : null;
       town = widget.data['town'] != null ? widget.data['town']['id'] as int : null;
+
+      add_controller.loadTownsData(regionCode);
     });
 
     print("phone NUmber: $phoneNumber");
@@ -147,7 +150,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
         "description": description,
         "slogan": businessInfo,
         "phone": phoneNumber.toString(),
-        "whatsapp": whatsappNumber.toString() ?? "",
+        "whatsapp": whatsapp ?? "",
         "category_id": category.toString(),
         // "image_path": imageController.image_path.toString(),
         "street": address ?? "",
@@ -834,56 +837,83 @@ class EditBusinessViewState extends State<EditBusinessView> {
                   ),
 
 
+                  // Container(
+                  //     padding:
+                  //     const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                  //     child: Row(
+                  //         children: [
+                  //           //    intl whatsapp phone field
+                  //           Padding(
+                  //             padding: const EdgeInsets.only(top: 5, bottom: 0, left: 10),
+                  //             child: SizedBox(
+                  //               width: Get.width * 0.86,
+                  //               child: IntlPhoneField(
+                  //                 controller: add_controller.whatsapp_controller,
+                  //                 decoration: const InputDecoration(
+                  //                   contentPadding: EdgeInsets.only(top: 12),
+                  //                   border: InputBorder.none,
+                  //                   counter: SizedBox(),
+                  //                   hintText: 'Whatsapp (optional)',
+                  //                   hintStyle: TextStyle(
+                  //                     color: Colors.black,
+                  //                   ),
+                  //                 ),
+                  //                 style: const TextStyle(
+                  //                   color: Colors.black,
+                  //                   fontSize: 17,
+                  //                 ),
+                  //                 keyboardType: TextInputType.number,
+                  //                 initialCountryCode: wcountry.code,
+                  //                 showDropdownIcon: false,
+                  //                 dropdownTextStyle: const TextStyle(
+                  //                   color: Colors.black,
+                  //                   fontSize: 17,
+                  //                 ),
+                  //                 validator: (value) {
+                  //                   if (value == null) {
+                  //                     print(value);
+                  //                   }
+                  //                   return null;
+                  //                 },
+                  //                 onChanged: (phone) {
+                  //                   // add_controller.phone_controller.text = phone.completeNumber;
+                  //                   print("phone: ${phone.completeNumber}");
+                  //                   setState(() {
+                  //                     whatsappNumber = "${phone.countryCode} ${phone.number}";
+                  //                   });
+                  //                 },
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ]
+                  //     )
+                  // ),
+
+                  // whatsapp number
                   Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                      child: Row(
-                          children: [
-                            //    intl whatsapp phone field
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5, bottom: 0, left: 10),
-                              child: SizedBox(
-                                width: Get.width * 0.86,
-                                child: IntlPhoneField(
-                                  controller: add_controller.whatsapp_controller,
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.only(top: 12),
-                                    border: InputBorder.none,
-                                    counter: SizedBox(),
-                                    hintText: 'Whatsapp (optional)',
-                                    hintStyle: TextStyle(
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 17,
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  initialCountryCode: 'CM',
-                                  showDropdownIcon: false,
-                                  dropdownTextStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 17,
-                                  ),
-                                  validator: (value) {
-                                    if (value == null) {
-                                      print(value);
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (phone) {
-                                    // add_controller.phone_controller.text = phone.completeNumber;
-                                    print("phone: ${phone.completeNumber}");
-                                    setState(() {
-                                      whatsappNumber = phone.completeNumber;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ]
-                      )
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: TextFormField(
+                      controller: add_controller.whatsapp_controller,
+                      keyboardType: TextInputType.phone,
+                      maxLength: 25,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          FontAwesomeIcons.whatsapp,
+                          color: Colors.black,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Whatsapp Number (optional)',
+                        counterText: '',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
+                        ),
+                      ),
+                    ),
                   ),
 
                   Divider(
@@ -1010,6 +1040,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
                       onChanged: (value) async {
                         setState(() {
                           regionCode = value as int;
+                          town = null;
                         });
                         print("regionCode: $regionCode");
                         add_controller.loadTownsData(regionCode);
@@ -1047,35 +1078,38 @@ class EditBusinessViewState extends State<EditBusinessView> {
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
-                      }
-                      return DropdownButtonFormField(
-                        iconSize: 0.0,
-                        isDense: true,
-                        isExpanded: true,
-                        padding: EdgeInsets.zero,
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Town (optional)',
-                          hintStyle: TextStyle(
-                              color: regionCode == null
-                                  ? Colors.grey
-                                  : Colors.black),
-                        ),
-                        value: town,
-                        onChanged: (value) {
-                          setState(() {
-                            town = value as int;
-                          });
-                          print("townId: $town");
-                        },
-                        items: Towns.Items.map((e) => DropdownMenuItem(
-                          value: e.id,
-                          child: Text(
-                            e.name.toString(),
-                            style: const TextStyle(
-                                fontSize: 15, color: Colors.black),
+                      } else {
+                        return DropdownButtonFormField(
+                          iconSize: 0.0,
+                          isDense: true,
+                          isExpanded: true,
+                          padding: const EdgeInsets.only(bottom: 8),
+                          decoration: InputDecoration.collapsed(
+                            hintText: 'Town (optional)',
+                            hintStyle: TextStyle(
+                                color: regionCode == null
+                                    ? Colors.grey
+                                    : Colors.black),
                           ),
-                        )).toList(),
-                      );
+                          value: town,
+                          onChanged: (value) {
+                            setState(() {
+                              town = value as int;
+                            });
+                            print("townId: $town");
+                          },
+                          items: add_controller.townList.map((e) {
+                            return DropdownMenuItem(
+                              value: e['id'],
+                              child: Text(
+                                e['name'].toString(),
+                                style: const TextStyle(
+                                    fontSize: 15, color: Colors.black),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      }
                     }),
                   ),
                   Divider(
