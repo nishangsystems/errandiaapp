@@ -3,8 +3,11 @@ import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/subscription/controller/subscription_controller.dart';
 import 'package:errandia/app/modules/subscription/view/subscription_processing_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/countries.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 class NewSubscription extends StatefulWidget {
   NewSubscription();
@@ -19,10 +22,23 @@ class _NewSubscriptionState extends State<NewSubscription> {
   subscription_controller controller = Get.put(subscription_controller());
 
   var planSelected;
+  var momoPhoneNumber;
+  var filteredCountries = ["CM"];
+
+  List<Country> filter = [];
+
 
   @override
   void initState() {
     super.initState();
+
+    countries.forEach((element) {
+      filteredCountries.forEach((filteredC) {
+        if (element.code == filteredC) {
+          filter.add(element);
+        }
+      });
+    });
 
     controller.loadSubscriptionPlans();
   }
@@ -199,6 +215,7 @@ class _NewSubscriptionState extends State<NewSubscription> {
                               planSelected = newValue;
                             });
                             print("Selected Plan: $planSelected");
+                            controller.subscriptionSelected.value = newValue;
                           },
                           items: controller.plansList.map((plan) {
                             return DropdownMenuItem<dynamic>(
@@ -237,7 +254,7 @@ class _NewSubscriptionState extends State<NewSubscription> {
                 vertical: 15,
               ),
               child: Text(
-                'Select Payment Method',
+                'Enter Mobile Money Number',
                 style: TextStyle(
                   color: appcolor().darkBlueColor,
                   fontSize: 18,
@@ -247,81 +264,54 @@ class _NewSubscriptionState extends State<NewSubscription> {
             ),
 
             // MTN Mobile money
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(
-                  color: appcolor().mediumGreyColor,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 5,
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(
-                    height: 30,
-                    child: Image(
-                      image: AssetImage(
-                        'assets/images/icon-payment-mtnMomo.png',
-                      ),
-                    ),
-                  ),
-                  const Text(
-                    '  MTN Mobile money',
-                    style: TextStyle(
-                      // color: appcolor().mainColor,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const Spacer(),
-                  Obx(
-                        () => Radio(
-                      activeColor: appcolor().mainColor,
-                      value: 'mtn',
-                      groupValue: payment_group_value.value,
-                      onChanged: (val) {
-                        payment_group_value.value = val.toString();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Container(
+            //   decoration: BoxDecoration(
+            //     color: Colors.white,
+            //     border: Border.all(
+            //       color: appcolor().mediumGreyColor,
+            //     ),
+            //   ),
+            //   padding: const EdgeInsets.symmetric(
+            //     horizontal: 12,
+            //     vertical: 5,
+            //   ),
+            //   child: Row(
+            //     children: [
+            //       const SizedBox(
+            //         height: 30,
+            //         child: Image(
+            //           image: AssetImage(
+            //             'assets/images/icon-payment-mtnMomo.png',
+            //           ),
+            //         ),
+            //       ),
+            //       const Text(
+            //         '  MTN Mobile money',
+            //         style: TextStyle(
+            //           // color: appcolor().mainColor,
+            //           fontSize: 16,
+            //         ),
+            //       ),
+            //       const Spacer(),
+            //       Obx(
+            //             () => Radio(
+            //           activeColor: appcolor().mainColor,
+            //           value: 'mtn',
+            //           groupValue: payment_group_value.value,
+            //           onChanged: (val) {
+            //             payment_group_value.value = val.toString();
+            //           },
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // mobile number container
 
-            Obx(
-                  () => payment_group_value.value == 'mtn'
-                  ? Container(
-                decoration: BoxDecoration(
-                  color: appcolor().skyblueColor,
-                  border: Border(
-                    bottom: BorderSide(
-                      color: appcolor().mediumGreyColor,
-                    ),
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 5,
-                ),
-                child: TextFormField(
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.only(left: 38),
-                    border: InputBorder.none,
-                    hintText: 'Enter Mobile Money no.',
-                  ),
-                ),
-              )
-                  : Container(),
-            ),
-            // Orange Money
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: appcolor().skyblueColor,
                 border: Border(
                   bottom: BorderSide(
                     color: appcolor().mediumGreyColor,
@@ -334,77 +324,100 @@ class _NewSubscriptionState extends State<NewSubscription> {
               ),
               child: Row(
                 children: [
-                  const SizedBox(
-                    height: 30,
-                    child: Image(
-                      image: AssetImage(
-                        'assets/images/icon-payment-mtnMomoorange-money.png',
+                  // intl phone input
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 0, left: 0),
+                    child: SizedBox(
+                      width: Get.width * 0.86,
+                      child: IntlPhoneField(
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.only(top: 12),
+                          border: InputBorder.none,
+                          counter: SizedBox(),
+                          hintText: 'MTN or Orange Money Number *',
+                          hintStyle: TextStyle(
+                            color: Colors.black,
+                            fontSize: 13
+                          ),
+                        ),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                        ),
+                        keyboardType: TextInputType.number,
+                        initialCountryCode: 'CM',
+                        countries: filter,
+                        showDropdownIcon: false,
+                        dropdownTextStyle: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                        ),
+                        validator: (value) {
+                          if (value == null) {
+                            print(value);
+                          }
+                          return null;
+                        },
+                        onChanged: (phone) {
+                          // add_controller.phone_controller.text = phone.completeNumber;
+                          print("phone: ${phone.completeNumber}");
+                          setState(() {
+                            momoPhoneNumber = phone.completeNumber;
+                          });
+                        },
                       ),
-                    ),
-                  ),
-                  const Text(
-                    '  Orange Money',
-                    style: TextStyle(
-                      // color: appcolor().mainColor,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const Spacer(),
-                  Obx(
-                        () => Radio(
-                      activeColor: appcolor().mainColor,
-                      value: 'orange',
-                      groupValue: payment_group_value.value,
-                      onChanged: (val) {
-                        payment_group_value.value = val.toString();
-                      },
-                    ),
-                  ),
-                ],
-              ),
+                    )
+                  )
+                ]
+              )
             ),
+            // Orange Money
+            // Container(
+            //   decoration: BoxDecoration(
+            //     color: Colors.white,
+            //     border: Border(
+            //       bottom: BorderSide(
+            //         color: appcolor().mediumGreyColor,
+            //       ),
+            //     ),
+            //   ),
+            //   padding: const EdgeInsets.symmetric(
+            //     horizontal: 12,
+            //     vertical: 5,
+            //   ),
+            //   child: Row(
+            //     children: [
+            //       const SizedBox(
+            //         height: 30,
+            //         child: Image(
+            //           image: AssetImage(
+            //             'assets/images/icon-payment-mtnMomoorange-money.png',
+            //           ),
+            //         ),
+            //       ),
+            //       const Text(
+            //         '  Orange Money',
+            //         style: TextStyle(
+            //           // color: appcolor().mainColor,
+            //           fontSize: 16,
+            //         ),
+            //       ),
+            //       const Spacer(),
+            //       Obx(
+            //             () => Radio(
+            //           activeColor: appcolor().mainColor,
+            //           value: 'orange',
+            //           groupValue: payment_group_value.value,
+            //           onChanged: (val) {
+            //             payment_group_value.value = val.toString();
+            //           },
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // cash renew
-            Obx(
-                  () => payment_group_value.value == 'cash'
-                  ? Container(
-                decoration: BoxDecoration(
-                  color: appcolor().skyblueColor,
-                  border: Border(
-                    bottom: BorderSide(
-                      color: appcolor().mediumGreyColor,
-                    ),
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 8,
-                ),
-                child: RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      color: appcolor().mainColor,
-                      fontSize: 16,
-                    ),
-                    children: const [
-                      TextSpan(
-                        text: 'Tap the ',
-                      ),
-                      TextSpan(
-                        text: 'Subscribe',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                          text:
-                          ' button below and we\'ll contact you as soon as possible to complete the procedure of your new subscription.'),
-                    ],
-                  ),
-                ),
-              )
-                  : Container(),
-            ),
 
             // total subscription
             SizedBox(
@@ -422,7 +435,7 @@ class _NewSubscriptionState extends State<NewSubscription> {
                 vertical: 15,
               ),
               child: Text(
-                'Total Subscription',
+                'Subscription Price',
                 style: TextStyle(
                   color: appcolor().darkBlueColor,
                   fontSize: 18,
@@ -452,14 +465,29 @@ class _NewSubscriptionState extends State<NewSubscription> {
                     ),
                   ),
                   const Spacer(),
-                  Text(
-                    'XAF 6000',
-                    style: TextStyle(
-                      color: appcolor().mainColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  Obx(
+                      () {
+                        if (controller.subscriptionSelected.isEmpty) {
+                          return Text(
+                            '0',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: appcolor().mainColor,
+                            ),
+                          );
+                        } else {
+                          return Text(
+                            formatPrice(double.parse(controller.subscriptionSelected['unit_price'].toString())),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: appcolor().mainColor,
+                            ),
+                          );
+                        }
+                      }
+                  )
                 ],
               ),
             ),

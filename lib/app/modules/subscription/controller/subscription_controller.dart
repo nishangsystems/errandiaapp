@@ -17,6 +17,8 @@ class subscription_controller extends GetxController{
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
 
+  RxMap subscriptionSelected = {}.obs;
+
   RxList<subscription_model> list= <subscription_model> [
     subscription_model(
       title: 'Yearly',
