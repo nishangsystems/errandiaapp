@@ -97,10 +97,11 @@ class _NewSubscriptionState extends State<NewSubscription> {
           });
           Get.snackbar(
             'Error',
-            data['message'],
+            data['data']['message'],
             snackPosition: SnackPosition.TOP,
             backgroundColor: appcolor().redColor,
             colorText: Colors.white,
+            duration: const Duration(seconds: 7),
           );
         }
       }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:errandia/app/APi/firebase_api.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/Widgets/snackBar.dart';
@@ -199,6 +200,7 @@ class api {
       prefs.setString("user", jsonEncode(user));
       // save image profile
       prefs.setString('userProfileImg', user['profile'] ?? user['photo'] ?? "");
+      await FirebaseAPI().initialize();
 
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => navigator));
