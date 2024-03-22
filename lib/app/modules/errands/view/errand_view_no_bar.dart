@@ -434,7 +434,7 @@ Widget PostedErrands(BuildContext ctx) {
                                           Object exception,
                                           StackTrace? stackTrace) {
                                         return Image.asset(
-                                          'assets/images/errandia_logo.png',
+                                          'assets/images/errandia_logo.jpeg',
                                           fit: BoxFit.fill,
                                         );
                                       },

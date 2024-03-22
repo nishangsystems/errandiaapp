@@ -380,13 +380,13 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                         height: Get.height * 0.15,
                                         color: appcolor().lightgreyColor,
                                         child: FadeInImage.assetNetwork(
-                                          placeholder: 'assets/images/errandia_logo.png',
+                                          placeholder: 'assets/images/errandia_logo.jpeg',
                                           image: getImagePathWithSize(business['image'].toString(), height: 200),
                                           fit: BoxFit.contain,
                                           width: double.infinity,
                                           imageErrorBuilder:  (context, error, stackTrace) {
-                                            return Image.asset('assets/images/errandia_logo.png',
-                                              fit: BoxFit.contain,
+                                            return Image.asset('assets/images/errandia_logo.jpeg',
+                                              fit: BoxFit.fill,
                                               width: double.infinity,
                                             );
                                           },
@@ -477,7 +477,7 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                     ),
                     onRefresh: () async {
                       Get.find<business_controller>().currentPage.value = 1;
-                      Get.find<business_controller>().loadBusinesses();
+                      Get.find<business_controller>().reloadBusinesses();
                     });
               }
             }),

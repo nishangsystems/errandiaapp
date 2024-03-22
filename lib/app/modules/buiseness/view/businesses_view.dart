@@ -1,6 +1,4 @@
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
-import 'package:errandia/app/modules/buiseness/view/business_item.dart';
-import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -41,7 +39,7 @@ class Businesses_View extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.05,
                 ),
-                Text(
+                const Text(
                   'Update Your Business Info',
                   style: TextStyle(fontSize: 13),
                 ),

@@ -385,13 +385,13 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 width: Get.width,
                 child: ClipRRect(
                   child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/images/errandia_logo.png',
+                    placeholder: 'assets/images/errandia_logo.jpeg',
                     image: getImagePath(_localService['featured_image']),
                     fit: BoxFit.contain,
                     width: double.infinity,
                     imageErrorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/images/errandia_logo.png',
+                        'assets/images/errandia_logo.jpeg',
                         fit: BoxFit.contain,
                         width: double.infinity,
                       );
@@ -470,7 +470,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Image.asset(
-                                      'assets/images/errandia_logo.png',
+                                      'assets/images/errandia_logo.jpeg',
                                       fit: BoxFit.cover,
                                     );
                                   },
@@ -641,7 +641,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
               //                   fit: BoxFit.cover,
               //                   errorBuilder: (context, error, stackTrace) {
               //                     return Image.asset(
-              //                       'assets/images/errandia_logo.png',
+              //                       'assets/images/errandia_logo.jpeg',
               //                       fit: BoxFit.cover,
               //                     );
               //                   },

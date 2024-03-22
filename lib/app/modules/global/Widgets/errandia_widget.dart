@@ -34,14 +34,14 @@ class errandia_widget extends StatelessWidget {
               // height: Get.height * 0.15,
               color: appcolor().lightgreyColor,
               child: FadeInImage.assetNetwork(
-                placeholder: 'assets/images/errandia_logo.png', // Local asset image
+                placeholder: 'assets/images/errandia_logo.jpeg', // Local asset image
                 image: getImagePathWithSize(imagePath.toString(), width: 200, height: 180),
                 fit: BoxFit.contain,
                 width: double.infinity,
                 imageErrorBuilder: (context, error, stackTrace) {
                   return Image.asset(
-                    'assets/images/errandia_logo.png', // Your fallback image
-                    fit: BoxFit.contain,
+                    'assets/images/errandia_logo.jpeg', // Your fallback image
+                    fit: BoxFit.fill,
                     width: double.infinity,
                     height: Get.height * 0.17,
                   );
