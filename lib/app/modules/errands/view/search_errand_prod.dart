@@ -46,6 +46,7 @@ class search_errand_prodState extends State<search_errand_prod>
   late SearchErrandProdController searchProdController;
   late ScrollController _scrollController;
   late ScrollController _scrollController2;
+  late ScrollController _scrollController3;
 
 
   late String _localSearchTerm;
@@ -58,6 +59,7 @@ class search_errand_prodState extends State<search_errand_prod>
     searchProdController = Get.put(SearchErrandProdController());
     _scrollController = ScrollController();
     _scrollController2 = ScrollController();
+    _scrollController3 = ScrollController();
 
     print("search term: $_localSearchTerm");
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -78,6 +80,14 @@ class search_errand_prodState extends State<search_errand_prod>
     _scrollController2.addListener(() {
       if (_scrollController2.position.pixels ==
           _scrollController2.position.maxScrollExtent) {
+        // manageProductController.loadAllProducts(_localSearchTerm);
+        searchProdController.searchItem(_localSearchTerm);
+      }
+    });
+
+    _scrollController3.addListener(() {
+      if (_scrollController3.position.pixels ==
+          _scrollController3.position.maxScrollExtent) {
         // manageProductController.loadAllProducts(_localSearchTerm);
         searchProdController.searchItem(_localSearchTerm);
       }
@@ -117,93 +127,19 @@ class search_errand_prodState extends State<search_errand_prod>
     Widget all(BuildContext ctx) {
       return SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: Get.height * 0.01,
-            ),
-            Container(
-              child: Row(
-                children: [
-                  Obx(
-                     () {
-                       if (searchProdController.isLoading.isTrue) {
-                         return Text(
-                           'Loading...',
-                           style: TextStyle(
-                             fontWeight: FontWeight.w500,
-                             fontSize: 20,
-                             color: appcolor().mainColor,
-                           ),
-                         );
-                       } else if (searchProdController.isSearchError.isTrue) {
-                         return Text(
-                           'No Products found',
-                           style: TextStyle(
-                             fontWeight: FontWeight.w500,
-                             fontSize: 20,
-                             color: appcolor().mainColor,
-                           ),
-                         );
-                       } else if (searchProdController.productsList.isEmpty) {
-                         return Text(
-                           'No Products found',
-                           style: TextStyle(
-                             fontWeight: FontWeight.w500,
-                             fontSize: 20,
-                             color: appcolor().mainColor,
-                           ),
-                         );
-                       } else {
-                         return Text(
-                           '${searchProdController.productsList.length > 6 ? 6 : searchProdController.productsList.length} Suggested Product${searchProdController.productsList.length > 1 ? 's' : ''}',
-                           style: TextStyle(
-                             fontWeight: FontWeight.w700,
-                             fontSize: 20,
-                             color: appcolor().mainColor,
-                           ),
-                         );
-                       }
-                     }
-                 ),
-                  const Spacer(),
-                  Obx(
-                      () {
-                        if (searchProdController.isLoading.isTrue) {
-                          return Container();
-                        } else if (searchProdController.isSearchError.isTrue) {
-                          return TextButton(
-                            onPressed: () {
-                              searchProdController.reloadProducts();
-                            },
-                            child: const Text('Retry'),
-                          );
-                        } else if (searchProdController.productsList.isEmpty) {
-                          return Container();
-                        } else {
-                          return TextButton(
-                            onPressed: () {
-                              // screen for the list of all products
-                              pcontroller.tabController.animateTo(1);
-                            },
-                            child: const Text('See All'),
-                          );
-                        }
-                      }
-                  ),
-                ],
-              ).paddingSymmetric(horizontal: 20),
-            ),
             Obx(
                 () {
                   if (searchProdController.isLoading.isTrue) {
                     return SizedBox(
-                      height: Get.height * 0.4,
+                      height: Get.height * 0.68,
                       child: buildLoadingWidget(),
                     );
                   } else if (searchProdController.isSearchError.isTrue) {
                     return Container(
                       padding: const EdgeInsets.all(30),
-                      height: Get.height * 0.4,
+                      height: Get.height * 0.68,
                       child: buildErrorWidget(
                         message: 'There was an error loading products, please try again later',
                         callback: () {
@@ -211,12 +147,12 @@ class search_errand_prodState extends State<search_errand_prod>
                         },
                       ),
                     );
-                  } else if (searchProdController.productsList.isEmpty) {
+                  } else if (searchProdController.itemList.isEmpty) {
                     return SizedBox(
-                      height: Get.height * 0.3,
+                      height: Get.height * 0.68,
                       child: Center(
                         child: Text(
-                          'No products found',
+                          'No items found',
                           style: TextStyle(
                             color: appcolor().mediumGreyColor,
                             fontSize: 15,
@@ -225,166 +161,45 @@ class search_errand_prodState extends State<search_errand_prod>
                       ),
                     );
                   } else {
-                    return Container(
-                      margin: const EdgeInsets.all(10),
-                      height: Get.height * 0.45,
-                      child: ListView.builder(
-                          itemCount: searchProdController.productsList.length > 6
-                              ? 6
-                              : searchProdController.productsList.length,
-                          primary: false,
-                          shrinkWrap: false,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            var item = searchProdController.productsList[index];
-                            print("item: $item");
-                            return InkWell(
-                              onTap: () {
+                    return GridView.builder(
+                        key: UniqueKey(),
+                        controller: _scrollController,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1 / 1.74,
+                          crossAxisSpacing: 1 / 2.66,
+                          mainAxisSpacing: 1 / 1.88,
+                        ),
+                        itemCount: searchProdController.itemList.length,
+                        primary: false,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (context, index) {
+                          var item = searchProdController.itemList[index];
+                          print("item: $item");
+                          return InkWell(
+                            onTap: () {
+                              if (item['is_service'] == 1) {
+                                Get.to(() => ServiceDetailsView(service: item));
+                              } else {
                                 Get.to(() => Product_view(
                                   item: item,
                                 ));
-                              },
-                              child: SearchItemWidget(
-                                item: item, key: UniqueKey(),
-                              ),
-                            );
-                          }),
-                    );
+                              }
+                            },
+                            child: SearchItemWidget(
+                              item: item, key: UniqueKey(),
+                            ),
+                          );
+                        });
                   }
                 }
             ),
-            Container(
-              child: Row(
-                children: [
-                  Obx(
-                        () {
-                          if (searchProdController.isLoading.isTrue) {
-                            return Text(
-                              'Loading...',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 20,
-                                color: appcolor().mainColor,
-                              ),
-                            );
-                          } else if (searchProdController.isSearchError.isTrue) {
-                            return Text(
-                              'No Services found',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 20,
-                                color: appcolor().mainColor,
-                              ),
-                            );
-                          } else if (searchProdController.productsList.isEmpty) {
-                            return Text(
-                              'No Services found',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 20,
-                                color: appcolor().mainColor,
-                              ),
-                            );
-                          } else {
-                            return Text(
-                              '${searchProdController.servicesList.length > 6 ? 6 : searchProdController.servicesList.length} Suggested Service${searchProdController.servicesList.length > 1 ? 's' : ''}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 20,
-                                color: appcolor().mainColor,
-                              ),
-                            );
-                          }
-                        }
-                  ),
-                  const Spacer(),
-                  Obx(
-                      () {
-                        if (searchProdController.isLoading.isTrue) {
-                          return Container();
-                        } else if (searchProdController.isSearchError.isTrue) {
-                          return TextButton(
-                            onPressed: () {
-                              searchProdController.reloadServices();
-                            },
-                            child: const Text('Retry'),
-                          );
-                        } else if (searchProdController.servicesList.isEmpty) {
-                          return Container();
-                        } else {
-                          return TextButton(
-                            onPressed: () {
-                              // screen for the list of all services
-                              pcontroller.tabController.animateTo(2);
-                            },
-                            child: const Text('See All'),
-                          );
-                        }
-                      }
-                  )
-                ],
-              ).paddingSymmetric(horizontal: 20),
-            ),
-            Obx(
-                () {
-                  if (searchProdController.isLoading.isTrue) {
-                    return SizedBox(
-                      height: Get.height * 0.4,
-                      child: buildLoadingWidget(),
-                    );
-                  } else if (searchProdController.isSearchError.isTrue) {
-                    return Container(
-                      padding: const EdgeInsets.all(30),
-                      height: Get.height * 0.4,
-                      child: buildErrorWidget(
-                        message: 'There was an error loading services, please try again later',
-                        callback: () {
-                          searchProdController.reloadAll();
-                        },
-                      ),
-                    );
-                  } else if (searchProdController.servicesList.isEmpty) {
-                    return SizedBox(
-                      height: Get.height * 0.3,
-                      child: Center(
-                        child: Text(
-                          'No services found',
-                          style: TextStyle(
-                            color: appcolor().mediumGreyColor,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    );
-                  } else {
-                    return Container(
-                      margin: const EdgeInsets.all(10),
-                      height: Get.height * 0.45,
-                      child: ListView.builder(
-                          itemCount: searchProdController.servicesList.length > 6
-                              ? 6
-                              : searchProdController.servicesList.length,
-                          primary: false,
-                          shrinkWrap: false,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            final item = searchProdController.servicesList[index];
 
-                            return InkWell(
-                              onTap: () {
-                                if (kDebugMode) {
-                                  print("service item: $item");
-                                }
-                                Get.to(() => ServiceDetailsView(service: item));
-                              },
-                              child: SearchItemWidget(
-                                item: item, key: UniqueKey(),
-                              ),
-                            );
-                          }),
-                    );
-                  }
-                }
+            SizedBox(
+              height: Get.height * 0.02,
             ),
           ],
         ).paddingOnly(
@@ -400,48 +215,48 @@ class search_errand_prodState extends State<search_errand_prod>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Obx(
-                      () {
-                    if (searchProdController.isLoading.isTrue) {
-                      return Text(
-                        'Loading...',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20,
-                          color: appcolor().mainColor,
-                        ),
-                      );
-                    } else if (searchProdController.isSearchError.isTrue) {
-                      return Container();
-                    } else if (searchProdController.productsList.isEmpty) {
-                      return Container();
-                    } else {
-                      return Text(
-                        '${searchProdController.productsList.length} Suggested Product${searchProdController.productsList.length > 1 ? 's' : ''}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                          color: appcolor().mainColor,
-                        ),
-                      );
-                    }
-                  }
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            //   child: Obx(
+            //           () {
+            //         if (searchProdController.isLoading.isTrue) {
+            //           return Text(
+            //             'Loading...',
+            //             style: TextStyle(
+            //               fontWeight: FontWeight.w500,
+            //               fontSize: 20,
+            //               color: appcolor().mainColor,
+            //             ),
+            //           );
+            //         } else if (searchProdController.isSearchError.isTrue) {
+            //           return Container();
+            //         } else if (searchProdController.productsList.isEmpty) {
+            //           return Container();
+            //         } else {
+            //           return Text(
+            //             '${searchProdController.productsList.length} Suggested Product${searchProdController.productsList.length > 1 ? 's' : ''}',
+            //             style: TextStyle(
+            //               fontWeight: FontWeight.w700,
+            //               fontSize: 20,
+            //               color: appcolor().mainColor,
+            //             ),
+            //           );
+            //         }
+            //       }
+            //   ),
+            // ),
 
             Obx(
                 () {
                   if (searchProdController.isLoading.isTrue) {
                     return SizedBox(
-                      height: Get.height * 0.4,
+                      height: Get.height * 0.68,
                       child: buildLoadingWidget(),
                     );
                   } else if (searchProdController.isSearchError.isTrue) {
                     return Container(
                       padding: const EdgeInsets.all(30),
-                      height: Get.height * 0.4,
+                      height: Get.height * 0.68,
                       child: buildErrorWidget(
                         message: 'There was an error loading products, please try again later',
                         callback: () {
@@ -451,7 +266,7 @@ class search_errand_prodState extends State<search_errand_prod>
                     );
                   } else if (searchProdController.productsList.isEmpty) {
                     return SizedBox(
-                      height: Get.height * 0.3,
+                      height: Get.height * 0.68,
                       child: Center(
                         child: Text(
                           'No products found',
@@ -465,7 +280,7 @@ class search_errand_prodState extends State<search_errand_prod>
                   } else {
                     return GridView.builder(
                       key: UniqueKey(),
-                      controller: _scrollController,
+                      controller: _scrollController2,
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
@@ -517,48 +332,48 @@ class search_errand_prodState extends State<search_errand_prod>
             // SizedBox(
             //   height: Get.height * 0.01,
             // ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Obx(
-                  () {
-                    if (searchProdController.isLoading.isTrue) {
-                      return Text(
-                        'Loading...',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20,
-                          color: appcolor().mainColor,
-                        ),
-                      );
-                    } else if (searchProdController.isSearchError.isTrue) {
-                      return Container();
-                    } else if (searchProdController.servicesList.isEmpty) {
-                      return Container();
-                    } else {
-                      return Text(
-                        '${searchProdController.servicesList.length} Suggested Service${searchProdController.servicesList.length > 1 ? 's' : ''}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                          color: appcolor().mainColor,
-                        ),
-                      );
-                    }
-                  }
-              )
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            //   child: Obx(
+            //       () {
+            //         if (searchProdController.isLoading.isTrue) {
+            //           return Text(
+            //             'Loading...',
+            //             style: TextStyle(
+            //               fontWeight: FontWeight.w500,
+            //               fontSize: 20,
+            //               color: appcolor().mainColor,
+            //             ),
+            //           );
+            //         } else if (searchProdController.isSearchError.isTrue) {
+            //           return Container();
+            //         } else if (searchProdController.servicesList.isEmpty) {
+            //           return Container();
+            //         } else {
+            //           return Text(
+            //             '${searchProdController.servicesList.length} Suggested Service${searchProdController.servicesList.length > 1 ? 's' : ''}',
+            //             style: TextStyle(
+            //               fontWeight: FontWeight.w700,
+            //               fontSize: 20,
+            //               color: appcolor().mainColor,
+            //             ),
+            //           );
+            //         }
+            //       }
+            //   )
+            // ),
 
             Obx(
                 () {
                   if (searchProdController.isLoading.isTrue) {
                     return SizedBox(
-                      height: Get.height * 0.4,
+                      height: Get.height * 0.68,
                       child: buildLoadingWidget(),
                     );
                   } else if (searchProdController.isSearchError.isTrue) {
                     return Container(
                       padding: const EdgeInsets.all(30),
-                      height: Get.height * 0.4,
+                      height: Get.height * 0.68,
                       child: buildErrorWidget(
                         message: 'There was an error loading services, please try again later',
                         callback: () {
@@ -568,7 +383,7 @@ class search_errand_prodState extends State<search_errand_prod>
                     );
                   } else if (searchProdController.servicesList.isEmpty) {
                     return SizedBox(
-                      height: Get.height * 0.3,
+                      height: Get.height * 0.68,
                       child: Center(
                         child: Text(
                           'No services found',
@@ -582,7 +397,7 @@ class search_errand_prodState extends State<search_errand_prod>
                   } else {
                     return GridView.builder(
                       key: UniqueKey(),
-                      controller: _scrollController,
+                      controller: _scrollController3,
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
