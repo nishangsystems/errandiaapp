@@ -43,7 +43,7 @@ class buildErrorWidget extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            ElevatedButton(
+            actionText != '' ? ElevatedButton(
               onPressed: callback ?? () {},
               style: ElevatedButton.styleFrom(
                 primary: appcolor().mainColor,
@@ -52,7 +52,7 @@ class buildErrorWidget extends StatelessWidget {
                 actionText ?? 'Retry',
                 style: TextStyle(color: appcolor().lightgreyColor),
               ),
-            ),
+            ) : Container(),
           ],
         ),
       )

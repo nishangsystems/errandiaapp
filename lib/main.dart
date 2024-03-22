@@ -11,7 +11,6 @@ import 'package:get_storage/get_storage.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseAPI().initialize();
   await GetStorage.init();
 
   runApp(const ErrandiaApp());

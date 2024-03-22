@@ -4,6 +4,7 @@ import 'package:errandia/app/APi/subscription.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/subscription/model/subscription_model.dart';
 import 'package:errandia/modal/SubscriptionPlans.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class subscription_controller extends GetxController{
@@ -16,6 +17,9 @@ class subscription_controller extends GetxController{
 
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
+
+  RxMap subscriptionSelected = {}.obs;
+  TextEditingController subscriptionController = TextEditingController();
 
   RxList<subscription_model> list= <subscription_model> [
     subscription_model(
@@ -104,6 +108,10 @@ class subscription_controller extends GetxController{
       if (data != null && data.isNotEmpty) {
         total.value = data['total'];
         subscriptionList.addAll(data['items']);
+
+        // filter out those that are with status 'SUCCESS'
+        subscriptionList.removeWhere((element) => element['status'] != 'SUCCESS');
+
         currentPage.value++;
       }
 

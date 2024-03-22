@@ -5,6 +5,7 @@ import 'package:errandia/app/modules/errands/view/run_an_errand_1.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/setting/view/setting_view.dart';
+import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
 import 'package:errandia/auth_services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -146,8 +147,12 @@ class CustomEndDrawer extends StatelessWidget {
                     imagePath:
                         'assets/images/sidebar_icon/icon-profile-subscribers.png',
                     callback: () {
-                      // Get.back();
+                      Get.back();
                       // Get.to(() => subscriber_view());
+                      Get.to(() => const subscription_view(),
+                        transition: Transition.fade,
+                        duration: const Duration(milliseconds: 500),
+                      );
                     },
                   )
                 : Container()),
