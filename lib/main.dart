@@ -1,5 +1,6 @@
 import 'package:errandia/app/APi/firebase_api.dart';
 import 'package:errandia/app/modules/splashScreen/splash_screen.dart';
+import 'package:errandia/common/initialize_device.dart';
 import 'package:errandia/languages/language.dart';
 import 'package:errandia/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,6 +12,7 @@ import 'package:get_storage/get_storage.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await InitializeDevice().initialize();
   await GetStorage.init();
 
   runApp(const ErrandiaApp());

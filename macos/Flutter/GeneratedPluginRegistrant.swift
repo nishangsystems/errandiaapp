@@ -5,6 +5,7 @@
 import FlutterMacOS
 import Foundation
 
+import device_uuid
 import file_selector_macos
 import firebase_auth
 import firebase_core
@@ -17,6 +18,7 @@ import smart_auth
 import url_launcher_macos
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  DeviceUuidPlugin.register(with: registry.registrar(forPlugin: "DeviceUuidPlugin"))
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
   FLTFirebaseAuthPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseAuthPlugin"))
   FLTFirebaseCorePlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseCorePlugin"))

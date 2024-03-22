@@ -1,3 +1,4 @@
+import 'package:errandia/app/APi/firebase_api.dart';
 import 'package:errandia/app/modules/auth/Register/registration_successful_view.dart';
 import 'package:errandia/app/modules/auth/Register/service_Provider/view/Register_serviceprovider_view.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
@@ -244,13 +245,18 @@ class _signin_otp_verification_screenState
                                   if (kDebugMode) {
                                     print("otp code: ${otpController?.text}");
                                   }
+                                  final SharedPreferences prefs = await _prefs;
+                                  await FirebaseAPI().initialize();
+
                                   var value = {
                                     "code": otpController?.text,
                                     "uuid": await getUuid(),
+                                    "device_uuid": prefs.getString('deviceUuid'),
+                                    "push_token": prefs.getString('firebaseToken'),
                                   };
 
                                   if (kDebugMode) {
-                                    print("value: $value");
+                                    print("otp value: $value");
                                   }
 
                                   // Home_view home = Home_view();
@@ -270,6 +276,15 @@ class _signin_otp_verification_screenState
                                               "name": "login",
                                             }
                                         ));
+                                  } catch (e) {
+                                    print("Error: $e");
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                    Get.snackbar('Error', 'An error occurred, please try again later',
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
                                   } finally {
                                     setState(() {
                                       isLoading = false;
