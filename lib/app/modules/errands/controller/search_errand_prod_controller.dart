@@ -32,6 +32,8 @@ class SearchErrandProdController extends GetxController {
 
   TextEditingController drawerSearchCtl = TextEditingController();
 
+  RxString regionCode = "".obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -48,7 +50,7 @@ class SearchErrandProdController extends GetxController {
 
     try {
       isLoading.value = true;
-      var response = await SearchAPI.searchItem(q, currentPage.value);
+      var response = await SearchAPI.searchItem(q, currentPage.value, region: regionCode.value);
       print("Response: $response");
 
       var data = jsonDecode(response);
@@ -101,7 +103,7 @@ class SearchErrandProdController extends GetxController {
 
     try {
       isServiceLoading.value = true;
-      var response = await SearchAPI.searchItem(q, serviceCurrentPage.value, service: '1');
+      var response = await SearchAPI.searchItem(q, serviceCurrentPage.value, service: '1', region: regionCode.value);
       print("Service Response: $response");
 
       var data = jsonDecode(response);
@@ -148,7 +150,7 @@ class SearchErrandProdController extends GetxController {
 
     try {
       isProductLoading.value = true;
-      var response = await SearchAPI.searchItem(q, productCurrentPage.value, service: '0');
+      var response = await SearchAPI.searchItem(q, productCurrentPage.value, service: '0', region: regionCode.value);
       print("Response: $response");
 
       var data = jsonDecode(response);
@@ -181,6 +183,50 @@ class SearchErrandProdController extends GetxController {
       );
     } finally {
       isProductLoading.value = false;
+    }
+  }
+
+  void searchFilter(regionCode) async {
+    final SharedPreferences prefs = await _prefs;
+
+    if (isLoading.isTrue || (itemList.isNotEmpty && itemList.length >= total.value)) {
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      var response = await SearchAPI.searchItem(regionCode, currentPage.value, region: regionCode);
+      print("Filter Response: $response");
+
+      var data = jsonDecode(response);
+
+      print("Search Data: ${data['data']['data']['items']}");
+
+      if (data['status'] == 'success') {
+        total.value = data['data']['data']['total'];
+        itemList.assignAll(data['data']['data']['items']);
+
+        currentPage.value++;
+
+        isSearchError.value = false;
+      } else {
+        print("Error: ${data['data']['message']}");
+        isSearchError.value = true;
+        Get.snackbar('Error', data['data']['message'],
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+
+    } catch(e) {
+      print("Error: $e");
+      isSearchError.value = true;
+      Get.snackbar('Error', 'An error occurred, please try again later',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
     }
   }
 

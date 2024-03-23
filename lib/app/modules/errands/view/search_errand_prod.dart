@@ -531,7 +531,13 @@ class search_errand_prodState extends State<search_errand_prod>
                       color: Colors.blueGrey,
                     ),
                     onPressed: () {
-                      Get.to(filter_product_view());
+                      Get.to(() => filter_product_view())?.then((value) {
+                        if (value != null) {
+                          print("Filter Value: $value");
+                          // searchProdController.filterItem(value);
+                          pcontroller.tabController.animateTo(0);
+                        }
+                      });
                     },
                   ),
 
