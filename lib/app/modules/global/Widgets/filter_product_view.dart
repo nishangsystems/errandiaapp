@@ -1,3 +1,4 @@
+import 'package:errandia/app/modules/errands/controller/search_errand_prod_controller.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/modal/Region.dart';
@@ -16,6 +17,7 @@ class filter_product_view extends StatefulWidget {
 class _filter_product_viewState extends State<filter_product_view> {
 
   late add_product_cotroller product_controller;
+  late SearchErrandProdController search_controller;
   var category;
   var regionCode;
 
@@ -24,7 +26,21 @@ class _filter_product_viewState extends State<filter_product_view> {
   void initState() {
     super.initState();
     product_controller = Get.put(add_product_cotroller());
+    search_controller = Get.put(SearchErrandProdController());
     product_controller.loadCategories();
+  }
+
+  void filterSearch(BuildContext context) {
+    // filter the search results
+    try {
+      search_controller.regionCode.value = regionCode.toString();
+      search_controller.reloadAll();
+      search_controller.reloadProducts();
+      search_controller.reloadServices();
+      Get.back(result: 'all');
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
   @override
@@ -51,7 +67,8 @@ class _filter_product_viewState extends State<filter_product_view> {
         actions: [
           TextButton(
             onPressed: () {
-              Get.back();
+              filterSearch(context);
+              // Get.back();
             },
             child: const Text(
               'Apply',
@@ -206,7 +223,7 @@ class _filter_product_viewState extends State<filter_product_view> {
                       isExpanded: true,
                       padding: const EdgeInsets.only(bottom: 8),
                       decoration: const InputDecoration.collapsed(
-                        hintText: 'Select a Category *',
+                        hintText: 'Select a Category',
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
@@ -276,7 +293,7 @@ class _filter_product_viewState extends State<filter_product_view> {
               isDense: true,
               isExpanded: true,
               decoration: const InputDecoration.collapsed(
-                hintText: 'Region *',
+                hintText: 'Region',
                 hintStyle: TextStyle(
                   color: Colors.black,
                 ),

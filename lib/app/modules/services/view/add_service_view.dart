@@ -68,6 +68,8 @@ class _add_service_viewState extends State<add_service_view> {
       alertDialogBox(context, "Error", "Product description is required");
     } else if (category == null) {
       alertDialogBox(context, "Error", "Category is required");
+    } else if (imageController.image_path.isEmpty) {
+      alertDialogBox(context, "Error", "Service Cover image is required");
     } else {
       var value = {
         "name": name,

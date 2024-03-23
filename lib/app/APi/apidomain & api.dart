@@ -200,7 +200,6 @@ class api {
       prefs.setString("user", jsonEncode(user));
       // save image profile
       prefs.setString('userProfileImg', user['profile'] ?? user['photo'] ?? "");
-      await FirebaseAPI().initialize();
 
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => navigator));

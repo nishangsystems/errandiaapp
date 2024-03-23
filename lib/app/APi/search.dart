@@ -8,9 +8,10 @@ import 'package:http/http.dart' as http;
 class SearchAPI {
 
   // search any item by query q and page number
-  static Future searchItem(String q, int page) async {
+  static Future searchItem(String q, int page,
+      {String service='', String region='', String town=''}) async {
     var response = await http.get(
-      Uri.parse('${apiDomain().domain}/search?q=$q&page=$page'),
+      Uri.parse('${apiDomain().domain}/search?q=$q&page=$page&service=$service&region=$region&town=$town'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

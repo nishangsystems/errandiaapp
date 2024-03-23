@@ -8,10 +8,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SearchErrandProdController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool isSearchError = false.obs;
-  // RxBool isSearchServiceError =
+
+  RxBool isProductLoading = false.obs;
+  RxBool isProductSearchError = false.obs;
+
+  RxBool isServiceLoading = false.obs;
+  RxBool isServiceSearchError = false.obs;
 
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
+  RxInt productCurrentPage = 1.obs;
+  RxInt productTotal = 0.obs;
+  RxInt serviceCurrentPage = 1.obs;
+  RxInt serviceTotal = 0.obs;
 
   var itemList = List<dynamic>.empty(growable: true).obs;
   var serviceItemList = List<dynamic>.empty(growable: true).obs;
@@ -22,6 +31,8 @@ class SearchErrandProdController extends GetxController {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   TextEditingController drawerSearchCtl = TextEditingController();
+
+  RxString regionCode = "".obs;
 
   @override
   void onInit() {
@@ -39,7 +50,7 @@ class SearchErrandProdController extends GetxController {
 
     try {
       isLoading.value = true;
-      var response = await SearchAPI.searchItem(q, currentPage.value);
+      var response = await SearchAPI.searchItem(q, currentPage.value, region: regionCode.value);
       print("Response: $response");
 
       var data = jsonDecode(response);
@@ -50,13 +61,13 @@ class SearchErrandProdController extends GetxController {
         total.value = data['data']['data']['total'];
         itemList.assignAll(data['data']['data']['items']);
 
-        // filter out only products where is_service equals 0
-        productsList.assignAll(itemList.where((element) => element['is_service'] == 0).toList());
-        print("Products: $productsList");
-
-        // filter out only services where is_service equals 1
-        servicesList.assignAll(itemList.where((element) => element['is_service'] == 1).toList());
-        print("Services: $servicesList");
+        // // filter out only products where is_service equals 0
+        // productsList.assignAll(itemList.where((element) => element['is_service'] == 0).toList());
+        // print("Products: $productsList");
+        //
+        // // filter out only services where is_service equals 1
+        // servicesList.assignAll(itemList.where((element) => element['is_service'] == 1).toList());
+        // print("Services: $servicesList");
         currentPage.value++;
 
         isSearchError.value = false;
@@ -86,32 +97,30 @@ class SearchErrandProdController extends GetxController {
 
     prefs.setString("previousQuery", q);
 
-    if (isLoading.isTrue || (serviceItemList.isNotEmpty && serviceItemList.length >= total.value)) {
+    if (isServiceLoading.isTrue || (serviceItemList.isNotEmpty && serviceItemList.length >= serviceTotal.value)) {
       return;
     }
 
     try {
-      isLoading.value = true;
-      var response = await SearchAPI.searchItem(q, currentPage.value);
-      print("Response: $response");
+      isServiceLoading.value = true;
+      var response = await SearchAPI.searchItem(q, serviceCurrentPage.value, service: '1', region: regionCode.value);
+      print("Service Response: $response");
 
       var data = jsonDecode(response);
 
       print("Search Data: ${data['data']['data']['items']}");
 
       if (data['status'] == 'success') {
-        total.value = data['data']['data']['total'];
+        serviceTotal.value = data['data']['data']['total'];
         serviceItemList.assignAll(data['data']['data']['items']);
 
-        // filter out only services where is_service equals 1
-        servicesList.assignAll(serviceItemList.where((element) => element['is_service'] == 1).toList());
-        print("Services: $servicesList");
-        currentPage.value++;
+        print("Services: $serviceItemList");
+        serviceCurrentPage.value++;
 
-        isSearchError.value = false;
+        isServiceSearchError.value = false;
       } else {
         print("Error: ${data['data']['message']}");
-        isSearchError.value = true;
+        isServiceSearchError.value = true;
         Get.snackbar('Error', data['data']['message'],
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -120,13 +129,13 @@ class SearchErrandProdController extends GetxController {
 
     } catch(e) {
       print("Error: $e");
-      isSearchError.value = true;
+      isServiceSearchError.value = true;
       Get.snackbar('Error', 'An error occurred, please try again later',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
     } finally {
-      isLoading.value = false;
+      isServiceLoading.value = false;
     }
   }
 
@@ -135,13 +144,13 @@ class SearchErrandProdController extends GetxController {
 
     prefs.setString("previousQuery", q);
 
-    if (isLoading.isTrue || (productItemList.isNotEmpty && productItemList.length >= total.value)) {
+    if (isProductLoading.isTrue || (productItemList.isNotEmpty && productItemList.length >= productTotal.value)) {
       return;
     }
 
     try {
-      isLoading.value = true;
-      var response = await SearchAPI.searchItem(q, currentPage.value);
+      isProductLoading.value = true;
+      var response = await SearchAPI.searchItem(q, productCurrentPage.value, service: '0', region: regionCode.value);
       print("Response: $response");
 
       var data = jsonDecode(response);
@@ -149,12 +158,54 @@ class SearchErrandProdController extends GetxController {
       print("Search Data: ${data['data']['data']['items']}");
 
       if (data['status'] == 'success') {
-        total.value = data['data']['data']['total'];
+        productTotal.value = data['data']['data']['total'];
         productItemList.assignAll(data['data']['data']['items']);
 
-        // filter out only products where is_service equals 0
-        productsList.assignAll(productItemList.where((element) => element['is_service'] == 0).toList());
-        print("Products: $productsList");
+        print("Products: $productItemList");
+        productCurrentPage.value++;
+
+        isProductSearchError.value = false;
+      } else {
+        print("Error: ${data['data']['message']}");
+        isProductSearchError.value = true;
+        Get.snackbar('Error', data['data']['message'],
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+
+    } catch(e) {
+      print("Error: $e");
+      isProductSearchError.value = true;
+      Get.snackbar('Error', 'An error occurred, please try again later',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isProductLoading.value = false;
+    }
+  }
+
+  void searchFilter(regionCode) async {
+    final SharedPreferences prefs = await _prefs;
+
+    if (isLoading.isTrue || (itemList.isNotEmpty && itemList.length >= total.value)) {
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      var response = await SearchAPI.searchItem(regionCode, currentPage.value, region: regionCode);
+      print("Filter Response: $response");
+
+      var data = jsonDecode(response);
+
+      print("Search Data: ${data['data']['data']['items']}");
+
+      if (data['status'] == 'success') {
+        total.value = data['data']['data']['total'];
+        itemList.assignAll(data['data']['data']['items']);
+
         currentPage.value++;
 
         isSearchError.value = false;
@@ -199,12 +250,12 @@ class SearchErrandProdController extends GetxController {
 
     serviceItemList.clear();
     servicesList.clear();
-    currentPage.value = 1;
-    total.value = 0;
+    serviceCurrentPage.value = 1;
+    productTotal.value = 0;
     // searchItem with previous query
     var q = prefs.getString("previousQuery");
     if (q != null) {
-      searchItem(q);
+      searchItemServices(q);
     }
   }
 
@@ -213,12 +264,12 @@ class SearchErrandProdController extends GetxController {
 
     productItemList.clear();
     productsList.clear();
-    currentPage.value = 1;
-    total.value = 0;
+    productCurrentPage.value = 1;
+    productTotal.value = 0;
     // searchItem with previous query
     var q = prefs.getString("previousQuery");
     if (q != null) {
-      searchItem(q);
+      searchItemProducts(q);
     }
   }
 

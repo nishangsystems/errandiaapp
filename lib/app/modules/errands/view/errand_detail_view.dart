@@ -216,7 +216,7 @@ class errand_detail_view extends StatelessWidget {
                         : FadeInImage
                         .assetNetwork(
                       placeholder:
-                      'assets/images/errandia_logo.png',
+                      'assets/images/errandia_logo.jpeg',
                       image: getImagePath(
                           data['user']
                           ['photo']
@@ -487,13 +487,13 @@ class errand_detail_view extends StatelessWidget {
                         ),
                         child: Center(
                           child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/images/errandia_logo.png',
+                            placeholder: 'assets/images/errandia_logo.jpeg',
                             image: getImagePath(
                                 data['images'][index]['url'].toString()),
                             fit: BoxFit.cover,
                             imageErrorBuilder: (context, error, stackTrace) {
                               return Image.asset(
-                                'assets/images/errandia_logo.png',
+                                'assets/images/errandia_logo.jpeg',
                                 fit: BoxFit.cover,
                               );
                             },

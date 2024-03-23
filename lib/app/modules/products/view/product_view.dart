@@ -503,7 +503,7 @@ class _Product_viewState extends State<Product_view>
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Image.asset(
-                                      'assets/images/errandia_logo.png',
+                                      'assets/images/errandia_logo.jpeg',
                                       fit: BoxFit.cover,
                                     );
                                   },
@@ -686,7 +686,7 @@ class _Product_viewState extends State<Product_view>
               //                         Object exception,
               //                         StackTrace? stackTrace) {
               //                       return Image.asset(
-              //                         'assets/images/errandia_logo.png',
+              //                         'assets/images/errandia_logo.jpeg',
               //                         fit: BoxFit.cover,
               //                         height: Get.height * 0.17,
               //                         width: Get.width * 0.4,
@@ -969,7 +969,7 @@ Widget image_select_widget(BuildContext context, final item) {
       //             errorBuilder: (BuildContext context, Object exception,
       //                 StackTrace? stackTrace) {
       //               return Image.asset(
-      //                 'assets/images/errandia_logo.png',
+      //                 'assets/images/errandia_logo.jpeg',
       //                 fit: BoxFit.fill,
       //               );
       //             }
@@ -988,7 +988,7 @@ Widget image_select_widget(BuildContext context, final item) {
       //         fit: BoxFit.cover, errorBuilder: (BuildContext context,
       //             Object exception, StackTrace? stackTrace) {
       //       return Image.asset(
-      //         'assets/images/errandia_logo.png',
+      //         'assets/images/errandia_logo.jpeg',
       //         fit: BoxFit.fill,
       //         height: Get.height * 0.17,
       //         width: Get.width * 0.4,
@@ -1020,13 +1020,13 @@ Widget image_select_widget(BuildContext context, final item) {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(0),
                 child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/images/errandia_logo.png',
+                    placeholder: 'assets/images/errandia_logo.jpeg',
                     image: imageUrl,
                     fit: BoxFit.contain,
                     width: double.infinity,
                     imageErrorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/images/errandia_logo.png',
+                        'assets/images/errandia_logo.jpeg',
                         fit: BoxFit.contain,
                         width: double.infinity,
                       );
@@ -1068,13 +1068,13 @@ Widget image_select_widget(BuildContext context, final item) {
                     // child: Center(child: Image.network(image['url'].toString())),
                     child: Center(
                         child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/images/errandia_logo.png',
+                            placeholder: 'assets/images/errandia_logo.jpeg',
                             image: getImagePath(image['url'].toString()),
                             fit: BoxFit.cover,
                             width: double.infinity,
                             imageErrorBuilder: (context, error, stackTrace) {
                               return Image.asset(
-                                'assets/images/errandia_logo.png',
+                                'assets/images/errandia_logo.jpeg',
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                               );

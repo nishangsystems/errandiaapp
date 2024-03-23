@@ -4,24 +4,18 @@ import 'package:errandia/app/modules/buiseness/controller/business_controller.da
 import 'package:errandia/app/modules/buiseness/controller/errandia_business_view_controller.dart';
 import 'package:errandia/app/modules/buiseness/verify_business_otp.dart';
 import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
-import 'package:errandia/app/modules/categories/CategoryData.dart';
-import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
-import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
-import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../APi/business.dart';
-import '../../errands/view/Product/serivces.dart';
 import '../../global/Widgets/CustomDialog.dart';
 import '../../global/Widgets/bottomsheet_item.dart';
 import '../../global/Widgets/popupBox.dart';
@@ -495,13 +489,13 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                   height: Get.height * 0.3,
                   width: Get.width,
                   child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/images/errandia_logo.png',
+                    placeholder: 'assets/images/errandia_logo.jpeg',
                     image: getImagePath(_localBusinessData['image'].toString()),
                     fit: BoxFit.contain,
                     width: double.infinity,
                     imageErrorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/images/errandia_logo.png',
+                        'assets/images/errandia_logo.jpeg',
                         fit: BoxFit.contain,
                         width: double.infinity,
                       );
@@ -833,13 +827,13 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                                                   border: Border.all(),
                                                 ),
                                                 child: FadeInImage.assetNetwork(
-                                                  placeholder: 'assets/images/errandia_logo.png',
+                                                  placeholder: 'assets/images/errandia_logo.jpeg',
                                                   image: getImagePath(data['image'].toString()),
                                                   fit: BoxFit.contain,
                                                   width: 60,
                                                   imageErrorBuilder: (context, error, stackTrace) {
                                                     return Image.asset(
-                                                      'assets/images/errandia_logo.png',
+                                                      'assets/images/errandia_logo.jpeg',
                                                       fit: BoxFit.contain,
                                                       width: 60,
                                                     );
@@ -849,24 +843,30 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                                               Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
+                                                  SizedBox(
+                                                      width: Get.width * 0.5,
+                                                      child: Text(
                                                     capitalizeAll(data['name'] ?? ""),
                                                     style: const TextStyle(
                                                       fontWeight: FontWeight.w500,
                                                     ),
                                                     maxLines: 1,
                                                     overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                  data['street'] != null ? Text(
-                                                    data['street'],
-                                                    style: TextStyle(
-                                                      color: appcolor().mediumGreyColor,
-                                                    ),
-                                                    maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ): const Text(
+                                                  )),
+                                                  data['street'] != null && data['street'] != "" ?
+                                                      SizedBox(
+                                                        width: Get.width * 0.5,
+                                                        child: Text(
+                                                          data['street'],
+                                                          style: TextStyle(
+                                                            color: appcolor().mediumGreyColor,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        )
+                                                      ) : const Text(
                                                     'No street provided',
-                                                    style: TextStyle(
+                                                    style: TextStyle( 
                                                       color: Colors.grey,
                                                       fontStyle: FontStyle.italic,
                                                       fontSize: 11,

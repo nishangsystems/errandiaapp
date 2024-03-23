@@ -48,13 +48,13 @@ class SearchItemWidget extends StatelessWidget {
                   SizedBox(
                     height: Get.height * 0.2,
                     child: FadeInImage.assetNetwork(
-                      placeholder: 'assets/images/errandia_logo.png',
+                      placeholder: 'assets/images/errandia_logo.jpeg',
                       image: getImagePathWithSize(item['featured_image'], width: 200, height: 180),
                       fit: BoxFit.contain,
                       imageErrorBuilder: (context, error, stackTrace) {
                         return Image.asset(
-                          'assets/images/errandia_logo.png',
-                          fit: BoxFit.contain,
+                          'assets/images/errandia_logo.jpeg',
+                          fit: BoxFit.fill,
                         );
                       },
                     ),
@@ -205,12 +205,12 @@ class SearchItemWidget extends StatelessWidget {
                 SizedBox(
                   height: 10,
                   child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/images/errandia_logo.png',
+                    placeholder: 'assets/images/errandia_logo.jpeg',
                     image: getImagePath(item['shop']['image']),
                     fit: BoxFit.contain,
                     imageErrorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/images/errandia_logo.png',
+                        'assets/images/errandia_logo.jpeg',
                         fit: BoxFit.contain,
                       );
                     },
