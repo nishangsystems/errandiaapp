@@ -483,6 +483,7 @@ class search_errand_prodState extends State<search_errand_prod>
                           setState(() {
                             _localSearchTerm = searchProdController.drawerSearchCtl.text;
                           });
+                          searchProdController.resetFilters();
                           searchProdController.itemList.clear();
                           searchProdController.productsList.clear();
                           searchProdController.servicesList.clear();

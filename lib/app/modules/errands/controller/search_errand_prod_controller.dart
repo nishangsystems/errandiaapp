@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/APi/search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,8 @@ class SearchErrandProdController extends GetxController {
 
   RxBool isProductLoading = false.obs;
   RxBool isProductSearchError = false.obs;
+
+  RxBool isTownsLoading = false.obs;
 
   RxBool isServiceLoading = false.obs;
   RxBool isServiceSearchError = false.obs;
@@ -28,11 +31,15 @@ class SearchErrandProdController extends GetxController {
   var productsList = List<dynamic>.empty(growable: true).obs;
   var servicesList = List<dynamic>.empty(growable: true).obs;
 
+  var townList = RxList<dynamic>([]);
+
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   TextEditingController drawerSearchCtl = TextEditingController();
 
   RxString regionCode = "".obs;
+  RxString townCode = "".obs;
+  RxString category = "".obs;
 
   @override
   void onInit() {
@@ -50,7 +57,7 @@ class SearchErrandProdController extends GetxController {
 
     try {
       isLoading.value = true;
-      var response = await SearchAPI.searchItem(q, currentPage.value, region: regionCode.value);
+      var response = await SearchAPI.searchItem(q, currentPage.value, region: regionCode.value, town: townCode.value, category: category.value);
       print("Response: $response");
 
       var data = jsonDecode(response);
@@ -103,7 +110,7 @@ class SearchErrandProdController extends GetxController {
 
     try {
       isServiceLoading.value = true;
-      var response = await SearchAPI.searchItem(q, serviceCurrentPage.value, service: '1', region: regionCode.value);
+      var response = await SearchAPI.searchItem(q, serviceCurrentPage.value, service: '1', region: regionCode.value, town: townCode.value, category: category.value);
       print("Service Response: $response");
 
       var data = jsonDecode(response);
@@ -150,7 +157,7 @@ class SearchErrandProdController extends GetxController {
 
     try {
       isProductLoading.value = true;
-      var response = await SearchAPI.searchItem(q, productCurrentPage.value, service: '0', region: regionCode.value);
+      var response = await SearchAPI.searchItem(q, productCurrentPage.value, service: '0', region: regionCode.value, town: townCode.value, category: category.value);
       print("Response: $response");
 
       var data = jsonDecode(response);
@@ -230,6 +237,30 @@ class SearchErrandProdController extends GetxController {
     }
   }
 
+  void loadTownsData(regionId) async {
+    // Towns.Items = [];
+    townList.clear();
+    print("townList cleared: $townList");
+
+    isTownsLoading.value = true;
+
+    var data = await api().getTownsByRegion(regionId);
+    print("towns data: $data");
+
+    isTownsLoading.value = false;
+
+    if (data != null && data.isNotEmpty) {
+      final uniqueTowns = data.toSet().toList();
+      townList.addAll(uniqueTowns);
+      // Towns.Items = List.from(data)
+      //     .map<Town>((town) => Town.fromJson(town))
+      //     .toList();
+    }
+
+    update();
+    print("towns: $townList");
+  }
+
   void reloadAll() async {
     final SharedPreferences prefs = await _prefs;
 
@@ -271,6 +302,12 @@ class SearchErrandProdController extends GetxController {
     if (q != null) {
       searchItemProducts(q);
     }
+  }
+
+  void resetFilters() {
+    regionCode.value = "";
+    townCode.value = "";
+    category.value = "";
   }
 
   @override

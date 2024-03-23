@@ -20,6 +20,7 @@ class _filter_product_viewState extends State<filter_product_view> {
   late SearchErrandProdController search_controller;
   var category;
   var regionCode;
+  var townCode;
 
 
   @override
@@ -33,10 +34,22 @@ class _filter_product_viewState extends State<filter_product_view> {
   void filterSearch(BuildContext context) {
     // filter the search results
     try {
-      search_controller.regionCode.value = regionCode.toString();
+      if (category != null) {
+        search_controller.category.value = category.toString();
+      }
+
+      if (regionCode != null) {
+        search_controller.regionCode.value = regionCode.toString();
+      }
+
+      if (townCode != null) {
+        search_controller.townCode.value = townCode.toString();
+      }
+
       search_controller.reloadAll();
       search_controller.reloadProducts();
       search_controller.reloadServices();
+
       Get.back(result: 'all');
     } catch (e) {
       print("Error: $e");
@@ -302,9 +315,10 @@ class _filter_product_viewState extends State<filter_product_view> {
               onChanged: (value) async {
                 setState(() {
                   regionCode = value as int;
+                  townCode = null;
                 });
                 print("regionCode: $regionCode");
-                // add_controller.loadTownsData(regionCode);
+                search_controller.loadTownsData(regionCode);
               },
               items: Regions.Items.map((e) => DropdownMenuItem(
                 value: e.id,
@@ -317,6 +331,78 @@ class _filter_product_viewState extends State<filter_product_view> {
             ),
           ),
 
+          SizedBox(
+            height: Get.height * 0.1,
+          ),
+
+          const Text(
+            'Towns',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ).paddingSymmetric(horizontal: 10, vertical: 5),
+
+          Divider(
+            color: appcolor().greyColor,
+            thickness: 1,
+            height: 1,
+            indent: 0,
+          ),
+
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.only(left: 15, right: 0),
+              child: Icon(FontAwesomeIcons.city,
+                  color:
+                  regionCode == null ? Colors.grey : Colors.black),
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.only(left: 0, right: 15),
+              child: Icon(Icons.arrow_forward_ios_outlined,
+                  color:
+                  regionCode == null ? Colors.grey : Colors.black),
+            ),
+            contentPadding: EdgeInsets.zero,
+            title: Obx(() {
+              if (search_controller.isTownsLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                return DropdownButtonFormField(
+                  iconSize: 0.0,
+                  isDense: true,
+                  isExpanded: true,
+                  padding: const EdgeInsets.only(bottom: 8),
+                  decoration: InputDecoration.collapsed(
+                    hintText: 'Town',
+                    hintStyle: TextStyle(
+                        color: regionCode == null
+                            ? Colors.grey
+                            : Colors.black),
+                  ),
+                  value: townCode,
+                  onChanged: (value) {
+                    setState(() {
+                      townCode = value as int;
+                    });
+                    print("townId: $townCode");
+                  },
+                  items: search_controller.townList.map((e) {
+                    return DropdownMenuItem(
+                      value: e['id'],
+                      child: Text(
+                        e['name'].toString(),
+                        style: const TextStyle(
+                            fontSize: 15, color: Colors.black),
+                      ),
+                    );
+                  }).toList(),
+                );
+              }
+            }),
+          ),
         ],
       ),),
     );
