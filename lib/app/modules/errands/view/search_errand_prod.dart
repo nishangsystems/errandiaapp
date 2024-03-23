@@ -65,6 +65,8 @@ class search_errand_prodState extends State<search_errand_prod>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // manageProductController.loadAllProducts(_localSearchTerm);
       searchProdController.searchItem(_localSearchTerm);
+      searchProdController.searchItemProducts(_localSearchTerm);
+      searchProdController.searchItemServices(_localSearchTerm);
       print("product List: ${searchProdController.productsList}");
       searchProdController.drawerSearchCtl.text = _localSearchTerm;
     });
@@ -81,7 +83,7 @@ class search_errand_prodState extends State<search_errand_prod>
       if (_scrollController2.position.pixels ==
           _scrollController2.position.maxScrollExtent) {
         // manageProductController.loadAllProducts(_localSearchTerm);
-        searchProdController.searchItem(_localSearchTerm);
+        searchProdController.searchItemProducts(_localSearchTerm);
       }
     });
 
@@ -89,7 +91,7 @@ class search_errand_prodState extends State<search_errand_prod>
       if (_scrollController3.position.pixels ==
           _scrollController3.position.maxScrollExtent) {
         // manageProductController.loadAllProducts(_localSearchTerm);
-        searchProdController.searchItem(_localSearchTerm);
+        searchProdController.searchItemServices(_localSearchTerm);
       }
     });
   }
@@ -107,6 +109,8 @@ class search_errand_prodState extends State<search_errand_prod>
       // manageProductController.loadAllProducts(_localSearchTerm);
       // searchProdController.searchItem(_localSearchTerm);
       searchProdController.reloadAll();
+      searchProdController.reloadProducts();
+      searchProdController.reloadServices();
     }
   }
 
@@ -248,12 +252,12 @@ class search_errand_prodState extends State<search_errand_prod>
 
             Obx(
                 () {
-                  if (searchProdController.isLoading.isTrue) {
+                  if (searchProdController.isProductLoading.isTrue) {
                     return SizedBox(
                       height: Get.height * 0.68,
                       child: buildLoadingWidget(),
                     );
-                  } else if (searchProdController.isSearchError.isTrue) {
+                  } else if (searchProdController.isProductSearchError.isTrue) {
                     return Container(
                       padding: const EdgeInsets.all(30),
                       height: Get.height * 0.68,
@@ -264,7 +268,7 @@ class search_errand_prodState extends State<search_errand_prod>
                         },
                       ),
                     );
-                  } else if (searchProdController.productsList.isEmpty) {
+                  } else if (searchProdController.productItemList.isEmpty) {
                     return SizedBox(
                       height: Get.height * 0.68,
                       child: Center(
@@ -289,13 +293,13 @@ class search_errand_prodState extends State<search_errand_prod>
                         crossAxisSpacing: 1 / 2.66,
                         mainAxisSpacing: 1 / 1.88,
                       ),
-                      itemCount: searchProdController.productsList.length,
+                      itemCount: searchProdController.productItemList.length,
                       primary: false,
                         scrollDirection: Axis.vertical,
 
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        var item = searchProdController.productsList[index];
+                        var item = searchProdController.productItemList[index];
                         print("item: $item");
                         return InkWell(
                           onTap: () {
@@ -365,12 +369,12 @@ class search_errand_prodState extends State<search_errand_prod>
 
             Obx(
                 () {
-                  if (searchProdController.isLoading.isTrue) {
+                  if (searchProdController.isServiceLoading.isTrue) {
                     return SizedBox(
                       height: Get.height * 0.68,
                       child: buildLoadingWidget(),
                     );
-                  } else if (searchProdController.isSearchError.isTrue) {
+                  } else if (searchProdController.isServiceSearchError.isTrue) {
                     return Container(
                       padding: const EdgeInsets.all(30),
                       height: Get.height * 0.68,
@@ -381,7 +385,7 @@ class search_errand_prodState extends State<search_errand_prod>
                         },
                       ),
                     );
-                  } else if (searchProdController.servicesList.isEmpty) {
+                  } else if (searchProdController.serviceItemList.isEmpty) {
                     return SizedBox(
                       height: Get.height * 0.68,
                       child: Center(
@@ -406,12 +410,12 @@ class search_errand_prodState extends State<search_errand_prod>
                         crossAxisSpacing: 1 / 2.66,
                         mainAxisSpacing: 1 / 1.88,
                       ),
-                      itemCount: searchProdController.servicesList.length,
+                      itemCount: searchProdController.serviceItemList.length,
                       primary: false,
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        final item = searchProdController.servicesList[index];
+                        final item = searchProdController.serviceItemList[index];
 
                         return InkWell(
                           onTap: () {

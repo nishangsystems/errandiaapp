@@ -103,6 +103,8 @@ class _add_business_viewState extends State<add_business_view> {
       alertDialogBox(context, "Error", 'Please enter a valid email address');
     } else if (regionCode == null) {
       alertDialogBox(context, "Error", 'Please select region');
+    } else if (imageController.image_path.isEmpty) {
+      alertDialogBox(context, "Error", "Business Logo is required");
     } else {
       var file = "";
 
@@ -148,49 +150,49 @@ class _add_business_viewState extends State<add_business_view> {
       // print("whatsapp number: $whatsappNumber");
 
       // check if logo image is empty
-      if (imageController.image_path.toString() == '') {
-        BusinessAPI.createBusiness(value, context).then((response_) => {
-              response = jsonDecode(response_),
-              print("added business: $response"),
-              if (response['status'] == 'success')
-                {
-                  popup = PopupBox(
-                    title: 'Success',
-                    description: response['data']['message'],
-                    type: PopupType.success,
-                  ),
-                  // reset all form fields
-                  add_controller.resetFields(),
-                  setState(() {
-                    regionCode = null;
-                    town = null;
-                    category = null;
-                    selectedFilters_.clear();
-                  }),
-                  imageController.reset(),
-                  // home_controller()
-                  //     .featuredBusinessData
-                  //     .clear(),
-                  // home_controller()
-                  //     .fetchFeaturedBusinessesData(),
-                  profileController.reloadMyBusinesses(),
-                }
-              else
-                {
-                  popup = PopupBox(
-                    title: 'Error',
-                    description: response['data']['data']['error'],
-                    type: PopupType.error,
-                  )
-                },
-              Future.delayed(const Duration(seconds: 2), () {
-                setState(() {
-                  isLoading = false;
-                });
-              }),
-              popup.showPopup(context),
-            });
-      } else {
+      // if (imageController.image_path.toString() == '') {
+      //   BusinessAPI.createBusiness(value, context).then((response_) => {
+      //         response = jsonDecode(response_),
+      //         print("added business: $response"),
+      //         if (response['status'] == 'success')
+      //           {
+      //             popup = PopupBox(
+      //               title: 'Success',
+      //               description: response['data']['message'],
+      //               type: PopupType.success,
+      //             ),
+      //             // reset all form fields
+      //             add_controller.resetFields(),
+      //             setState(() {
+      //               regionCode = null;
+      //               town = null;
+      //               category = null;
+      //               selectedFilters_.clear();
+      //             }),
+      //             imageController.reset(),
+      //             // home_controller()
+      //             //     .featuredBusinessData
+      //             //     .clear(),
+      //             // home_controller()
+      //             //     .fetchFeaturedBusinessesData(),
+      //             profileController.reloadMyBusinesses(),
+      //           }
+      //         else
+      //           {
+      //             popup = PopupBox(
+      //               title: 'Error',
+      //               description: response['data']['data']['error'],
+      //               type: PopupType.error,
+      //             )
+      //           },
+      //         Future.delayed(const Duration(seconds: 2), () {
+      //           setState(() {
+      //             isLoading = false;
+      //           });
+      //         }),
+      //         popup.showPopup(context),
+      //       });
+      // } else {
         print("image path: ${imageController.image_path.toString()}");
         BusinessAPI.createBusinessWithImageLogo(
                 value, context, imageController.image_path.toString())
@@ -236,7 +238,7 @@ class _add_business_viewState extends State<add_business_view> {
                   }),
                   popup.showPopup(context),
                 });
-      }
+      // }
     }
   }
 
