@@ -9,14 +9,16 @@ class SearchAPI {
 
   // search any item by query q and page number
   static Future searchItem(String q, int page,
-      {String service='', String region='', String town=''}) async {
+      {String service='', String region='', String town='', String category = ''}) async {
     var response = await http.get(
-      Uri.parse('${apiDomain().domain}/search?q=$q&page=$page&service=$service&region=$region&town=$town'),
+      Uri.parse('${apiDomain().domain}/search?q=$q&page=$page&service=$service&region=$region&town=$town&category=$category'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
     );
+
+    print('url: ${apiDomain().domain}/search?q=$q&page=$page&service=$service&region=$region&town=$town&category=$category');
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
