@@ -223,7 +223,7 @@ class _filter_product_viewState extends State<filter_product_view> {
                       isExpanded: true,
                       padding: const EdgeInsets.only(bottom: 8),
                       decoration: const InputDecoration.collapsed(
-                        hintText: 'Select a Category *',
+                        hintText: 'Select a Category',
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
@@ -293,7 +293,7 @@ class _filter_product_viewState extends State<filter_product_view> {
               isDense: true,
               isExpanded: true,
               decoration: const InputDecoration.collapsed(
-                hintText: 'Region *',
+                hintText: 'Region',
                 hintStyle: TextStyle(
                   color: Colors.black,
                 ),
