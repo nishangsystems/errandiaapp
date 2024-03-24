@@ -23,7 +23,8 @@ class ErrandiaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    precacheImage(const AssetImage('assets/images/errandia_logo.jpeg'), context);
+    precacheImage(const AssetImage('assets/images/errandia_logo.png'), context);
+    precacheImage(const AssetImage('assets/images/errandia_logo_1.jpeg'), context);
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,

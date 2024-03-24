@@ -46,11 +46,11 @@ class BusinessItem extends StatelessWidget {
             width: Get.width * 0.16,
             height: Get.height * 0.06,
             child: FadeInImage.assetNetwork(
-              placeholder: 'assets/images/errandia_logo.jpeg',
+              placeholder: 'assets/images/errandia_logo.png',
               image: getImagePath(image),
               fit: BoxFit.contain,
               imageErrorBuilder: (context, error, stackTrace) {
-                return Image.asset('assets/images/errandia_logo.jpeg',
+                return Image.asset('assets/images/errandia_logo.png',
                   fit: BoxFit.fill,
                 );
               }

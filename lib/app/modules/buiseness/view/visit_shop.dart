@@ -307,13 +307,13 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                           width: Get.width,
                           color: appcolor().lightgreyColor,
                           child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/images/errandia_logo.jpeg',
+                            placeholder: 'assets/images/errandia_logo.png',
                             image: getImagePath(data['image'].toString()),
                             fit: BoxFit.contain,
                             width: double.infinity,
                             imageErrorBuilder: (context, error, stackTrace) {
                               return Image.asset(
-                                'assets/images/errandia_logo.jpeg',
+                                'assets/images/errandia_logo.png',
                                 // Your fallback image
                                 fit: BoxFit.contain,
                                 width: double.infinity,
@@ -570,14 +570,14 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                                       ? const Icon(Icons.person)
                                       : FadeInImage.assetNetwork(
                                           placeholder:
-                                              'assets/images/errandia_logo.jpeg',
+                                              'assets/images/errandia_logo.png',
                                           image: getImagePath(
                                               data['user']['photo'].toString()),
                                           fit: BoxFit.cover,
                                           imageErrorBuilder:
                                               (context, error, stackTrace) {
                                             return Image.asset(
-                                              'assets/images/errandia_logo.jpeg',
+                                              'assets/images/errandia_logo.png',
                                               // Your fallback image
                                               fit: BoxFit.cover,
                                             );
@@ -620,21 +620,21 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                               child: data['images'].length > 0
                                   ? FadeInImage.assetNetwork(
                                       placeholder:
-                                          'assets/images/errandia_logo.jpeg',
+                                          'assets/images/errandia_logo.png',
                                       image: getImagePath(
                                           data['images'][0]['url'].toString()),
                                       fit: BoxFit.cover,
                                       imageErrorBuilder:
                                           (context, error, stackTrace) {
                                         return Image.asset(
-                                          'assets/images/errandia_logo.jpeg',
+                                          'assets/images/errandia_logo.png',
                                           // Your fallback image
                                           fit: BoxFit.cover,
                                         );
                                       },
                                     )
                                   : Image.asset(
-                                      'assets/images/errandia_logo.jpeg',
+                                      'assets/images/errandia_logo.png',
                                       // Your fallback image
                                       fit: BoxFit.cover,
                                     ),

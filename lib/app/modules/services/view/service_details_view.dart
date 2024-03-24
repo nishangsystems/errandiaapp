@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:errandia/app/APi/product.dart';
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
-import 'package:errandia/app/modules/categories/CategoryData.dart';
-import 'package:errandia/app/modules/errands/view/Product/serivces.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
@@ -11,20 +9,13 @@ import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/product_controller.dart';
 import 'package:errandia/app/modules/products/view/product_view.dart';
-import 'package:errandia/app/modules/products/view/products_send_enquiry.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
-import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
-import 'package:errandia/app/modules/reviews/views/add_review.dart';
-import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:errandia/app/modules/services/view/edit_service_view.dart';
 import 'package:errandia/utils/helper.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:share/share.dart';
 
 class ServiceDetailsView extends StatefulWidget {
   var service;
@@ -380,18 +371,19 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // service image
-              SizedBox(
-                height: Get.height * 0.3,
+              Container(
+                margin: const EdgeInsets.all(0.0),
+                // height: Get.height * 0.3,
                 width: Get.width,
                 child: ClipRRect(
                   child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/images/errandia_logo.jpeg',
-                    image: getImagePath(_localService['featured_image']),
+                    placeholder: 'assets/images/errandia_logo_1.jpeg',
+                    image: getImagePathWithSize(_localService['featured_image'], width: 720, height: 500),
                     fit: BoxFit.contain,
                     width: double.infinity,
                     imageErrorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/images/errandia_logo.jpeg',
+                        'assets/images/errandia_logo_1.jpeg',
                         fit: BoxFit.contain,
                         width: double.infinity,
                       );
@@ -470,7 +462,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Image.asset(
-                                      'assets/images/errandia_logo.jpeg',
+                                      'assets/images/errandia_logo.png',
                                       fit: BoxFit.cover,
                                     );
                                   },
@@ -641,7 +633,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
               //                   fit: BoxFit.cover,
               //                   errorBuilder: (context, error, stackTrace) {
               //                     return Image.asset(
-              //                       'assets/images/errandia_logo.jpeg',
+              //                       'assets/images/errandia_logo.png',
               //                       fit: BoxFit.cover,
               //                     );
               //                   },

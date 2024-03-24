@@ -489,14 +489,14 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                   height: Get.height * 0.3,
                   width: Get.width,
                   child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/images/errandia_logo.jpeg',
+                    placeholder: 'assets/images/errandia_logo_1.jpeg',
                     image: getImagePath(_localBusinessData['image'].toString()),
                     fit: BoxFit.contain,
                     width: double.infinity,
                     imageErrorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/images/errandia_logo.jpeg',
-                        fit: BoxFit.contain,
+                        'assets/images/errandia_logo_1.jpeg',
+                        fit: BoxFit.fill,
                         width: double.infinity,
                       );
                     },
@@ -827,13 +827,13 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                                                   border: Border.all(),
                                                 ),
                                                 child: FadeInImage.assetNetwork(
-                                                  placeholder: 'assets/images/errandia_logo.jpeg',
+                                                  placeholder: 'assets/images/errandia_logo.png',
                                                   image: getImagePath(data['image'].toString()),
                                                   fit: BoxFit.contain,
                                                   width: 60,
                                                   imageErrorBuilder: (context, error, stackTrace) {
                                                     return Image.asset(
-                                                      'assets/images/errandia_logo.jpeg',
+                                                      'assets/images/errandia_logo.png',
                                                       fit: BoxFit.contain,
                                                       width: 60,
                                                     );
@@ -1246,19 +1246,26 @@ void errandia_view_bottomsheet() {
 Widget product_review_widget(Map<String, dynamic> data) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              capitalizeAll(data['name'] ?? ""),
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 17,
-              ),
+            SizedBox(
+              width: Get.width * 0.45,
+              child: Text(
+                  capitalizeAll(data['name'] ?? ""),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17,
+                  ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                ),
             ),
             SizedBox(
-              width: Get.width * 0.04,
+              width: Get.width * 0.01,
             ),
             if (data['phone_verified'] == 1)
               Icon(

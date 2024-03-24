@@ -328,14 +328,14 @@ class _home_view_1State extends State<home_view_1> {
                                       ? const Icon(Icons.person)
                                       : FadeInImage.assetNetwork(
                                           placeholder:
-                                              'assets/images/errandia_logo.jpeg',
+                                              'assets/images/errandia_logo.png',
                                           image: getImagePath(
                                               data['user']['photo'].toString()),
                                           fit: BoxFit.cover,
                                           imageErrorBuilder:
                                               (context, error, stackTrace) {
                                             return Image.asset(
-                                              'assets/images/errandia_logo.jpeg',
+                                              'assets/images/errandia_logo.png',
                                               // Your fallback image
                                               fit: BoxFit.cover,
                                             );
@@ -382,7 +382,7 @@ class _home_view_1State extends State<home_view_1> {
                               child:  data['images'].length > 0
                                   ? FadeInImage.assetNetwork(
                                 placeholder:
-                                'assets/images/errandia_logo.jpeg',
+                                'assets/images/errandia_logo.png',
                                 image: getImagePath(
                                     data['images'][0]['url']
                                         .toString()),
@@ -390,14 +390,14 @@ class _home_view_1State extends State<home_view_1> {
                                 imageErrorBuilder: (context,
                                     error, stackTrace) {
                                   return Image.asset(
-                                    'assets/images/errandia_logo.jpeg',
+                                    'assets/images/errandia_logo.png',
                                     // Your fallback image
                                     fit: BoxFit.cover,
                                   );
                                 },
                               )
                                   : Image.asset(
-                                'assets/images/errandia_logo.jpeg',
+                                'assets/images/errandia_logo.png',
                                 // Your fallback image
                                 fit: BoxFit.cover,
                               ),
@@ -552,14 +552,14 @@ class _home_view_1State extends State<home_view_1> {
                           width: Get.width * 0.4,
                           color: appcolor().lightgreyColor,
                           child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/images/errandia_logo.jpeg',
+                            placeholder: 'assets/images/errandia_logo.png',
                             image: getImagePathWithSize(
                                 data['image'].toString(), width: 200, height: 180),
                             fit: BoxFit.contain,
                             width: double.infinity,
                             imageErrorBuilder: (context, error, stackTrace) {
                               return Image.asset(
-                                'assets/images/errandia_logo.jpeg',
+                                'assets/images/errandia_logo.png',
                                 // Your fallback image
                                 fit: BoxFit.fill,
                                 // width: double.infinity,
@@ -902,7 +902,7 @@ Widget Categories_List_Widget() {
                                     semanticsLabel: 'A red up arrow')
                                 : Image(
                                     image: const AssetImage(
-                                      'assets/images/errandia_logo.jpeg',
+                                      'assets/images/errandia_logo.png',
                                     ),
                                     height: Get.height * 0.05,
                                     width: Get.width * 0.1,

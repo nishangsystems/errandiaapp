@@ -196,7 +196,7 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                                       : FadeInImage
                                                           .assetNetwork(
                                                           placeholder:
-                                                              'assets/images/errandia_logo.jpeg',
+                                                              'assets/images/errandia_logo.png',
                                                           image: getImagePath(
                                                               data['user']
                                                                       ['photo']
@@ -206,7 +206,7 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                                               (context, error,
                                                                   stackTrace) {
                                                             return Image.asset(
-                                                              'assets/images/errandia_logo.jpeg',
+                                                              'assets/images/errandia_logo.png',
                                                               // Your fallback image
                                                               fit: BoxFit.cover,
                                                             );
@@ -262,7 +262,7 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                             child: data['images'].length > 0
                                                 ? FadeInImage.assetNetwork(
                                                     placeholder:
-                                                        'assets/images/errandia_logo.jpeg',
+                                                        'assets/images/errandia_logo.png',
                                                     image: getImagePath(
                                                         data['images'][0]['url']
                                                             .toString()),
@@ -270,14 +270,14 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                                     imageErrorBuilder: (context,
                                                         error, stackTrace) {
                                                       return Image.asset(
-                                                        'assets/images/errandia_logo.jpeg',
+                                                        'assets/images/errandia_logo.png',
                                                         // Your fallback image
                                                         fit: BoxFit.cover,
                                                       );
                                                     },
                                                   )
                                                 : Image.asset(
-                                                    'assets/images/errandia_logo.jpeg',
+                                                    'assets/images/errandia_logo.png',
                                                     // Your fallback image
                                                     fit: BoxFit.cover,
                                                   ),
