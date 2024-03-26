@@ -1,6 +1,7 @@
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/services/controller/manage_service_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,11 +22,15 @@ class ErrandViewWithoutBar extends StatelessWidget {
   ErrandViewWithoutBar({super.key});
 
   final errand_tab_controller tabController = Get.put(errand_tab_controller());
+  final home_controller homeController = Get.put(home_controller());
 
   @override
   Widget build(BuildContext context) {
+    homeController.loadIsLoggedIn();
+
     return Scaffold(
-        floatingActionButton: Column(
+        floatingActionButton: homeController.loggedIn.value
+            ? Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             // InkWell(
@@ -67,7 +72,7 @@ class ErrandViewWithoutBar extends StatelessWidget {
             // SizedBox(height: 20,),
             InkWell(
               onTap: () {
-                Get.to(() => New_Errand());
+                Get.to(() => const New_Errand());
               },
               child: Container(
                 width: Get.width * 0.44,
@@ -96,7 +101,8 @@ class ErrandViewWithoutBar extends StatelessWidget {
               ),
             ),
           ],
-        ),
+        )
+            : Container(),
         endDrawer: Drawer(
           width: Get.width * 0.7,
           child: SafeArea(

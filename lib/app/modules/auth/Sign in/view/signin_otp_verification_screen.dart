@@ -246,7 +246,11 @@ class _signin_otp_verification_screenState
                                     print("otp code: ${otpController?.text}");
                                   }
                                   final SharedPreferences prefs = await _prefs;
-                                  await FirebaseAPI().initialize();
+                                  if (prefs.getString('deviceUuid') == null) {
+                                    await FirebaseAPI().initialize();
+                                  }
+
+                                  print("device uuid: ${prefs.getString('deviceUuid')}");
 
                                   var value = {
                                     "code": otpController?.text,
