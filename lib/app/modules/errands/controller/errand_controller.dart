@@ -1,4 +1,5 @@
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/app/APi/errands.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,10 +8,17 @@ class errand_controller extends GetxController{
   RxBool isErrandLoading = false.obs;
   RxBool isErrandError = false.obs;
 
+  RxBool isMyErrandLoading = false.obs;
+  RxBool isMyErrandError = false.obs;
+
   var errandList = List<dynamic>.empty(growable: true).obs;
+  var myErrandList = List<dynamic>.empty(growable: true).obs;
 
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
+
+  RxInt myCurrentPage = 1.obs;
+  RxInt myTotal = 0.obs;
 
   @override
   void onInit() {
@@ -48,11 +56,49 @@ class errand_controller extends GetxController{
     }
   }
 
+  void fetchMyErrands() async {
+    print("fetching my errands");
+    if (isMyErrandLoading.isTrue || (
+    myErrandList.isNotEmpty && myErrandList.length >= myTotal.value)) return;
+
+    isMyErrandLoading.value = true;
+
+    try {
+      var data = await ErrandsAPI.getMyErrands(myCurrentPage.value);
+      print("response my errands: $data");
+
+      if (data != null && data.isNotEmpty) {
+        myCurrentPage.value++;
+        myErrandList.addAll(data['items']);
+        myTotal.value = data['total'];
+        isMyErrandLoading.value = false;
+        isMyErrandError.value = false;
+
+        print("myErrandList: $myErrandList");
+      }
+
+      update();
+    } catch (e) {
+      // Handle exception
+      printError(info: e.toString());
+      isMyErrandLoading.value = false;
+      isMyErrandError.value = true;
+    }
+  }
+
   void reloadErrands() {
     errandList.clear();
     currentPage.value = 1;
     total.value = 0;
     fetchErrands();
+    update();
+  }
+
+  void reloadMyErrands() {
+    myErrandList.clear();
+    myCurrentPage.value = 1;
+    myTotal.value = 0;
+    fetchMyErrands();
     update();
   }
   

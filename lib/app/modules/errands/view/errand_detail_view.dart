@@ -275,7 +275,7 @@ class errand_detail_view extends StatelessWidget {
             const SizedBox(
               height: 25,
             ),
-            Row(
+            data['user']['phone'] != null && data['user']['phone'] != '' ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
@@ -380,11 +380,11 @@ class errand_detail_view extends StatelessWidget {
                   ],
                 )
               ],
-            ),
+            ) : Container(),
 
-            const SizedBox(
+            data['user']['phone'] != null && data['user']['phone'] != '' ? const SizedBox(
               height: 15,
-            ),
+            ): Container(),
 
             data['user']['email'] != "" && data['user']['email'] != null ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,12 +405,17 @@ class errand_detail_view extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      data['user']['email'],
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                      ),
+                    SizedBox(
+                      width: Get.width * 0.55,
+                      child: Text(
+                          data['user']['email'],
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis
+                      )
                     ),
                     Row(
                       children: [

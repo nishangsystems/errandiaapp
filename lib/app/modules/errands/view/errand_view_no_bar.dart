@@ -1,8 +1,10 @@
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
+import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/services/controller/manage_service_controller.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -18,15 +20,326 @@ import 'New_Errand.dart';
 manage_service_controller service_controller =
     Get.put(manage_service_controller());
 
-class ErrandViewWithoutBar extends StatelessWidget {
+class ErrandViewWithoutBar extends StatefulWidget {
   ErrandViewWithoutBar({super.key});
 
-  final errand_tab_controller tabController = Get.put(errand_tab_controller());
-  final home_controller homeController = Get.put(home_controller());
+  @override
+  ErrandViewWithoutBarState createState() => ErrandViewWithoutBarState();
+}
+
+class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with WidgetsBindingObserver {
+  late errand_tab_controller tabController;
+  late home_controller homeController;
+  late errand_controller errandController;
+
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
+    _scrollController = ScrollController();
+    errandController = Get.put(errand_controller());
+    homeController = Get.put(home_controller());
+    tabController = Get.put(errand_tab_controller());
+
+    homeController.loadIsLoggedIn();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      errandController.fetchMyErrands();
+    });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+        errandController.fetchMyErrands();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      homeController.loadIsLoggedIn();
+      errandController.reloadMyErrands();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    homeController.loadIsLoggedIn();
+
+    Widget PostedErrands(BuildContext ctx) {
+      return Obx(() {
+          if (errandController.isMyErrandLoading.isTrue) {
+            return buildLoadingWidget();
+          } else if (errandController.isMyErrandError.isTrue) {
+            return buildErrorWidget(
+              message: 'An error occured',
+              callback: () {
+                errandController.reloadMyErrands();
+              },
+            );
+          } else if (errandController.myErrandList.isEmpty) {
+            return buildErrorWidget(
+              message: 'No errands found',
+              callback: () {
+                errandController.reloadMyErrands();
+              },
+            );
+          } else {
+            return ListView.builder(
+              key: UniqueKey(),
+              controller: _scrollController,
+              itemCount: errandController.myErrandList.length,
+              scrollDirection: Axis.vertical,
+              itemBuilder: (context, index) {
+                var data_ = errandController.myErrandList[index];
+                var date = data_['created_at'].split('T');
+                var date1 = date[0].split('-');
+                return Container(
+                  padding: const EdgeInsets.all(
+                    10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(
+                      10,
+                    ),
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    children: [
+                      // image container
+                      // Container(
+                      //     margin: const EdgeInsets.only(
+                      //       right: 10,
+                      //     ),
+                      //     decoration: BoxDecoration(
+                      //       borderRadius: BorderRadius.circular(
+                      //         8,
+                      //       ),
+                      //     ),
+                      //     width: Get.width * 0.12,
+                      //     height: Get.height * 0.06,
+                      //     child: ListView.builder(
+                      //         itemCount: data_['images'].length,
+                      //         itemBuilder: (context, index) {
+                      //           var image = data_['images'][index];
+                      //           return Image.network(
+                      //             image['url'].toString(),
+                      //             errorBuilder: (BuildContext context,
+                      //                 Object exception,
+                      //                 StackTrace? stackTrace) {
+                      //               return Image.asset(
+                      //                 'assets/images/errandia_logo.png',
+                      //                 fit: BoxFit.fill,
+                      //               );
+                      //             },
+                      //           );
+                      //         })),
+
+                      // display first image if available otherwise show default errandia_logo image
+                      Container(
+                        margin: const EdgeInsets.only(
+                          right: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ),
+                        ),
+                        width: Get.width * 0.14,
+                        height: Get.height * 0.06,
+                        child: data_['images'].length > 0
+                            ? FadeInImage.assetNetwork(
+                          placeholder: 'assets/images/errandia_logo.png',
+                          image: getImagePathWithSize(data_['images'][0].toString(), width: 200, height: 180),
+                          fit: BoxFit.fill,
+                          imageErrorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'assets/images/errandia_logo.png',
+                              fit: BoxFit.fill,
+                            );
+                          },
+                        )
+                            : Image.asset(
+                                'assets/images/errandia_logo.png',
+                                fit: BoxFit.fill,
+                              ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: Get.width * 0.45,
+                            child: Text(
+                              data_['title'].toString(),
+                              softWrap: false,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: appcolor().mainColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                'posted on :',
+                                style: TextStyle(
+                                  color: appcolor().mediumGreyColor,
+                                  fontSize: 10,
+                                ),
+                              ),
+                              Text(
+                                '${date1[2]}-${date1[1]}-${date1[0]}',
+                                style: TextStyle(
+                                  color: appcolor().mainColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(
+                                width: Get.width * 0.04,
+                              ),
+                              found_pending_cancel(index, 3),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 2,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: appcolor().lightgreyColor,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              data_['description'].length >= 30
+                                  ? '${data_['description'] + '..'}'
+                                  .substring(0, 30)
+                                  : data_['description'].toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: appcolor().mediumGreyColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      InkWell(
+                        onTap: () {
+                          print(index.toString());
+                          Get.bottomSheet(
+                            // backgroundColor: Colors.white,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              color: Colors.white,
+                              child: Wrap(
+                                crossAxisAlignment:
+                                WrapCrossAlignment.center,
+                                children: [
+                                  const Center(
+                                    child: Icon(
+                                      Icons.horizontal_rule,
+                                      size: 25,
+                                    ),
+                                  ),
+                                  // Text(index.toString()),
+                                  managebottomSheetWidgetitem(
+                                    title: 'Edit Errand',
+                                    icondata: Icons.edit,
+                                    callback: () async {
+                                      if (kDebugMode) {
+                                        print('tapped');
+                                      }
+                                      Get.back();
+                                    },
+                                  ),
+                                  managebottomSheetWidgetitem(
+                                    title: 'View Errand',
+                                    icondata: FontAwesomeIcons.eye,
+                                    callback: () {
+                                      Get.back();
+                                      Get.to(errand_detail_view(
+                                        data: data_,
+                                      ));
+                                    },
+                                  ),
+                                  managebottomSheetWidgetitem(
+                                    title: 'Mark as found',
+                                    icondata: FontAwesomeIcons.circleCheck,
+                                    callback: () {},
+                                  ),
+                                  managebottomSheetWidgetitem(
+                                    title: 'Move to trash',
+                                    icondata: Icons.delete,
+                                    callback: () {
+                                      var value = {
+                                        "errand_id": data_['id']
+                                      };
+                                      api().deleteUpdate(
+                                          'errand/delete', 1, value);
+                                      Future.delayed(const Duration(seconds: 2),
+                                              () {
+                                            Get.to(errand_view());
+                                          });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            enableDrag: true,
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              'View',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: appcolor().mediumGreyColor,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border:
+                                Border.all(color: appcolor().greyColor),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Icon(
+                                Icons.more_horiz,
+                                color: appcolor().greyColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+      });
+    }
 
     return Scaffold(
         floatingActionButton: homeController.loggedIn.value
@@ -212,412 +525,7 @@ class ErrandViewWithoutBar extends StatelessWidget {
   }
 }
 
-Widget PostedErrands(BuildContext ctx) {
-  return FutureBuilder(
-      future: api().getErrands(1),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Center(
-            child: Text('No data Fond'),
-          );
-        } else if (snapshot.hasData) {
-          print("snapshot: ${snapshot.data['items']}");
-          var data = snapshot.data['items'];
-          return Column(
-            children: [
-              filter_sort_container(
-                () {
-                  Get.to(filter_product_view());
-                },
-                () {
-                  Get.bottomSheet(
-                    Container(
-                      color: const Color.fromRGBO(255, 255, 255, 1),
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        children: [
-                          Text(
-                            'Sort List',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 22,
-                              color: appcolor().mainColor,
-                            ),
-                          ),
-                          // z-a
-                          Row(
-                            children: [
-                              RichText(
-                                text: TextSpan(
-                                  style: const TextStyle(fontSize: 16),
-                                  children: [
-                                    TextSpan(
-                                      text: 'Errand Name : ',
-                                      style: TextStyle(
-                                        color: appcolor().mainColor,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Desc Z-A',
-                                      style: TextStyle(
-                                        color: appcolor().mediumGreyColor,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              const Spacer(),
-                              Obx(
-                                () => Radio(
-                                  value: 'sort descending',
-                                  groupValue: service_controller
-                                      .manage_service_sort_group_value.value,
-                                  onChanged: (val) {
-                                    service_controller
-                                        .manage_service_sort_group_value
-                                        .value = val.toString();
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
 
-                          // a-z
-                          Row(
-                            children: [
-                              RichText(
-                                text: TextSpan(
-                                  style: const TextStyle(fontSize: 16),
-                                  children: [
-                                    TextSpan(
-                                      text: 'Errand Name : ',
-                                      style: TextStyle(
-                                        color: appcolor().mainColor,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Asc A-Z',
-                                      style: TextStyle(
-                                        color: appcolor().mediumGreyColor,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              const Spacer(),
-                              Obx(
-                                () => Radio(
-                                  value: 'sort ascending',
-                                  groupValue: service_controller
-                                      .manage_service_sort_group_value.value,
-                                  onChanged: (val) {
-                                    service_controller
-                                        .manage_service_sort_group_value
-                                        .value = val.toString();
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          // distance nearest to me
-                          Row(
-                            children: [
-                              RichText(
-                                  text: TextSpan(
-                                      style: const TextStyle(fontSize: 16),
-                                      children: [
-                                    TextSpan(
-                                      text: 'Date',
-                                      style: TextStyle(
-                                        color: appcolor().mainColor,
-                                      ),
-                                    ),
-                                    const TextSpan(
-                                      text: 'Last Modified',
-                                    ),
-                                  ])),
-                              const Spacer(),
-                              Obx(() => Radio(
-                                    value: 'Date Last modified ',
-                                    groupValue: service_controller
-                                        .manage_service_sort_group_value.value,
-                                    onChanged: (val) {
-                                      service_controller
-                                          .manage_service_sort_group_value
-                                          .value = val.toString();
-                                    },
-                                  ))
-                            ],
-                          ),
-
-                          //recently added
-                          Row(
-                            children: [
-                              Text(
-                                'Price',
-                                style: TextStyle(
-                                    color: appcolor().mainColor, fontSize: 16),
-                              ),
-                              Icon(
-                                Icons.arrow_upward,
-                                size: 25,
-                                color: appcolor().mediumGreyColor,
-                              ),
-                              const Spacer(),
-                              Obx(
-                                () => Radio(
-                                  value: 'Price',
-                                  groupValue: service_controller
-                                      .manage_service_sort_group_value.value,
-                                  onChanged: (val) {
-                                    service_controller
-                                        .manage_service_sort_group_value
-                                        .value = val.toString();
-                                    print(val.toString());
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
-                      ).paddingSymmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                    ),
-                  );
-                },
-                () {
-                  Scaffold.of(ctx).openEndDrawer();
-                },
-              ),
-              SizedBox(
-                height: Get.height * 0.01,
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    var data_ = data[index];
-                    var date = data_['created_at'].split('T');
-                    var date1 = date[0].split('-');
-                    return Container(
-                      padding: const EdgeInsets.all(
-                        10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(
-                          10,
-                        ),
-                      ),
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
-                      ),
-                      child: Row(
-                        children: [
-                          // image container
-                          Container(
-                              margin: const EdgeInsets.only(
-                                right: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  8,
-                                ),
-                              ),
-                              width: Get.width * 0.12,
-                              height: Get.height * 0.06,
-                              child: ListView.builder(
-                                  itemCount: data_['images'].length,
-                                  itemBuilder: (context, index) {
-                                    var image = data_['images'][index];
-                                    return Image.network(
-                                        image['url'].toString(),
-                                      errorBuilder: (BuildContext context,
-                                          Object exception,
-                                          StackTrace? stackTrace) {
-                                        return Image.asset(
-                                          'assets/images/errandia_logo.png',
-                                          fit: BoxFit.fill,
-                                        );
-                                      },
-                                    );
-                                  })),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                width: Get.width * 0.45,
-                                child: Text(
-                                  data_['title'].toString(),
-                                  softWrap: false,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: appcolor().mainColor,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    'posted on :',
-                                    style: TextStyle(
-                                      color: appcolor().mediumGreyColor,
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${date1[2]}-${date1[1]}-${date1[0]}',
-                                    style: TextStyle(
-                                      color: appcolor().mainColor,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: Get.width * 0.04,
-                                  ),
-                                  found_pending_cancel(index, 3),
-                                ],
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 2,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: appcolor().lightgreyColor,
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: Text(
-                                  data_['description'].length >= 30
-                                      ? '${data_['description'] + '..'}'
-                                          .substring(0, 30)
-                                      : data_['description'].toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  softWrap: false,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: appcolor().mediumGreyColor,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Spacer(),
-                          InkWell(
-                            onTap: () {
-                              print(index.toString());
-                              Get.bottomSheet(
-                                // backgroundColor: Colors.white,
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  color: Colors.white,
-                                  child: Wrap(
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    children: [
-                                      const Center(
-                                        child: Icon(
-                                          Icons.horizontal_rule,
-                                          size: 25,
-                                        ),
-                                      ),
-                                      // Text(index.toString()),
-                                      managebottomSheetWidgetitem(
-                                        title: 'Edit Errand',
-                                        icondata: Icons.edit,
-                                        callback: () async {
-                                          if (kDebugMode) {
-                                            print('tapped');
-                                          }
-                                          Get.back();
-                                        },
-                                      ),
-                                      managebottomSheetWidgetitem(
-                                        title: 'View Errand',
-                                        icondata: FontAwesomeIcons.eye,
-                                        callback: () {
-                                          Get.back();
-                                          Get.to(errand_detail_view(
-                                            data: data_,
-                                          ));
-                                        },
-                                      ),
-                                      managebottomSheetWidgetitem(
-                                        title: 'Mark as found',
-                                        icondata: FontAwesomeIcons.circleCheck,
-                                        callback: () {},
-                                      ),
-                                      managebottomSheetWidgetitem(
-                                        title: 'Move to trash',
-                                        icondata: Icons.delete,
-                                        callback: () {
-                                          var value = {
-                                            "errand_id": data_['id']
-                                          };
-                                          api().deleteUpdate(
-                                              'errand/delete', 1, value);
-                                          Future.delayed(const Duration(seconds: 2),
-                                              () {
-                                            Get.to(errand_view());
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                enableDrag: true,
-                              );
-                            },
-                            child: Column(
-                              children: [
-                                Text(
-                                  'View',
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: appcolor().mediumGreyColor,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: appcolor().greyColor),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Icon(
-                                    Icons.more_horiz,
-                                    color: appcolor().greyColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              )
-            ],
-          ).paddingOnly(
-            left: 10,
-            right: 10,
-            top: 10,
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      });
-}
 
 Widget RecievedErrands(BuildContext ctx) {
   return Column(
