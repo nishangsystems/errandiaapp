@@ -11,8 +11,12 @@ class errand_controller extends GetxController{
   RxBool isMyErrandLoading = false.obs;
   RxBool isMyErrandError = false.obs;
 
+  RxBool isRegionSelected = false.obs;
+  RxBool isTownsLoading = false.obs;
+
   var errandList = List<dynamic>.empty(growable: true).obs;
   var myErrandList = List<dynamic>.empty(growable: true).obs;
+  var townList = RxList<dynamic>([]);
 
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
@@ -84,6 +88,30 @@ class errand_controller extends GetxController{
       isMyErrandLoading.value = false;
       isMyErrandError.value = true;
     }
+  }
+
+  void loadTownsData(regionId) async {
+    // Towns.Items = [];
+    townList.clear();
+    print("townList cleared: $townList");
+
+    isTownsLoading.value = true;
+
+    var data = await api().getTownsByRegion(regionId);
+    print("towns data: $data");
+
+    isTownsLoading.value = false;
+
+    if (data != null && data.isNotEmpty) {
+      final uniqueTowns = data.toSet().toList();
+      townList.addAll(uniqueTowns);
+      // Towns.Items = List.from(data)
+      //     .map<Town>((town) => Town.fromJson(town))
+      //     .toList();
+    }
+
+    update();
+    print("towns: $townList");
   }
 
   void reloadErrands() {

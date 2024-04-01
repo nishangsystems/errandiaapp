@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
+import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -18,7 +19,6 @@ import '../controller/newErradiaController.dart';
 import '2nd_screen_new_errand.dart';
 import 'errand_view.dart';
 
-new_errandia_controller product_controller = Get.put(new_errandia_controller());
 
 imagePickercontroller imageController = Get.put(imagePickercontroller());
 
@@ -30,16 +30,21 @@ class New_Errand extends StatefulWidget {
 }
 
 class _NewErrandState extends State<New_Errand> {
+  late errand_controller errandController;
+  late new_errandia_controller newErrandController;
+
   var value;
-  var regionCode;
-  var town;
   var streetvalue;
+  var town_;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    street();
+    // street();
+    errandController = Get.put(errand_controller());
+    newErrandController = Get.put(new_errandia_controller());
+
   }
 
   @override
@@ -107,7 +112,10 @@ class _NewErrandState extends State<New_Errand> {
               child: TextFormField(
                 keyboardType: TextInputType.name,
                 textCapitalization: TextCapitalization.sentences,
-                controller: product_controller.title,
+                controller: newErrandController.titleController,
+                onChanged: (value) {
+                  newErrandController.update();
+                },
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
@@ -161,35 +169,53 @@ class _NewErrandState extends State<New_Errand> {
               indent: 0,
             ),
 
-            // service categories
+            // regions
             ListTile(
-              leading: const Icon(
-                FontAwesomeIcons.locationCrosshairs,
-              ),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
-              ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 10, bottom: 10),
-                child: DropdownButtonFormField(
-                  iconSize: 0.0,
-                  decoration: const InputDecoration.collapsed(
-                    hintText: 'Region',
-                  ),
-                  value: value,
-                  onChanged: (value) {
-                    setState(() {
-                      regionCode = value as int;
-                    });
-                  },
-                  items: Regions.Items.map((e) => DropdownMenuItem(
-                        value: e.id,
-                        child: Text(
-                          e.name.toString(),
-                          style: const TextStyle(fontSize: 11),
-                        ),
-                      )).toList(),
+              leading: Container(
+                padding: const EdgeInsets.only(left: 15, right: 0),
+                child: const Icon(
+                  FontAwesomeIcons.earthAmericas,
+                  color: Colors.black,
                 ),
+              ),
+              trailing: Container(
+                padding: const EdgeInsets.only(left: 0, right: 15),
+                child: const Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  color: Colors.black,
+                ),
+              ),
+              contentPadding: EdgeInsets.zero,
+              title: DropdownButtonFormField(
+                iconSize: 0.0,
+                padding: const EdgeInsets.only(bottom: 8),
+                isDense: true,
+                isExpanded: true,
+                decoration: const InputDecoration.collapsed(
+                  hintText: 'Region *',
+                  hintStyle: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+                value: value,
+                onChanged: (value) async {
+                  // setState(() {
+                  //
+                  // });
+                  newErrandController.regionCode.value = value as String;
+                  newErrandController.town.value = '';
+                  print("regionCode: ${newErrandController.regionCode.value}");
+                  errandController.loadTownsData(int.parse(newErrandController.regionCode.value));
+                  newErrandController.update();
+                },
+                items: Regions.Items.map((e) => DropdownMenuItem(
+                  value: e.id.toString(),
+                  child: Text(
+                    e.name.toString(),
+                    style: const TextStyle(
+                        fontSize: 15, color: Colors.black),
+                  ),
+                )).toList(),
               ),
             ),
             Divider(
@@ -199,34 +225,60 @@ class _NewErrandState extends State<New_Errand> {
               indent: 0,
             ),
 
-            //  price
+            //  towns
             ListTile(
-              leading: const Icon(FontAwesomeIcons.locationArrow),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
+              leading: Container(
+                padding: const EdgeInsets.only(left: 15, right: 0),
+                child: Icon(FontAwesomeIcons.city,
+                    color:
+                    newErrandController.regionCode.value == '' ? Colors.grey : Colors.black),
               ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 10, bottom: 10),
-                child: DropdownButtonFormField(
-                  iconSize: 0.0,
-                  decoration: const InputDecoration.collapsed(
-                    hintText: 'Town',
-                  ),
-                  value: value,
-                  onChanged: (value) {
-                    setState(() {
-                      town = value as int;
-                    });
-                  },
-                  items: Towns.Items.map((e) => DropdownMenuItem(
-                        value: e.id,
+              trailing: Container(
+                padding: const EdgeInsets.only(left: 0, right: 15),
+                child: Icon(Icons.arrow_forward_ios_outlined,
+                    color:
+                    newErrandController.regionCode.value == '' ? Colors.grey : Colors.black),
+              ),
+              contentPadding: EdgeInsets.zero,
+              title: Obx(() {
+                if (errandController.isTownsLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return DropdownButtonFormField(
+                    iconSize: 0.0,
+                    isDense: true,
+                    isExpanded: true,
+                    padding: const EdgeInsets.only(bottom: 8),
+                    decoration: InputDecoration.collapsed(
+                      hintText: 'Town *',
+                      hintStyle: TextStyle(
+                          color: newErrandController.regionCode.value == ''
+                              ? Colors.grey
+                              : Colors.black),
+                    ),
+                    value: town_,
+                    onChanged: (value) {
+                      setState(() {
+                      });
+                      newErrandController.town.value = value.toString();
+                      print("townId: ${newErrandController.town.value}");
+                      newErrandController.update();
+                    },
+                    items: errandController.townList.map((e) {
+                      return DropdownMenuItem(
+                        value: e['id'],
                         child: Text(
-                          e.name.toString(),
-                          style: const TextStyle(fontSize: 11),
+                          e['name'].toString(),
+                          style: const TextStyle(
+                              fontSize: 15, color: Colors.black),
                         ),
-                      )).toList(),
-                ),
-              ),
+                      );
+                    }).toList(),
+                  );
+                }
+              }),
             ),
             Divider(
               color: appcolor().greyColor,
@@ -234,43 +286,43 @@ class _NewErrandState extends State<New_Errand> {
               height: 4,
               indent: 0,
             ),
-            ListTile(
-              leading: const Icon(
-                FontAwesomeIcons.locationCrosshairs,
-              ),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
-              ),
-              title: Padding(
-                padding: const EdgeInsets.only(right: 10, bottom: 10),
-                child: DropdownButtonFormField(
-                  iconSize: 0.0,
-                  decoration: const InputDecoration.collapsed(
-                    hintText: 'Street',
-                  ),
-                  value: value,
-                  onChanged: (value) {
-                    setState(() {
-                      streetvalue = value as int;
-                    });
-                  },
-                  items: Street.Items.map((e) => DropdownMenuItem(
-                        value: e.id,
-                        child: Text(
-                          e.name.toString(),
-                          style: const TextStyle(fontSize: 11),
-                        ),
-                      )).toList(),
-                ),
-              ),
-            ),
+            // ListTile(
+            //   leading: const Icon(
+            //     FontAwesomeIcons.locationCrosshairs,
+            //   ),
+            //   trailing: const Icon(
+            //     Icons.arrow_forward_ios_outlined,
+            //   ),
+            //   title: Padding(
+            //     padding: const EdgeInsets.only(right: 10, bottom: 10),
+            //     child: DropdownButtonFormField(
+            //       iconSize: 0.0,
+            //       decoration: const InputDecoration.collapsed(
+            //         hintText: 'Street',
+            //       ),
+            //       value: value,
+            //       onChanged: (value) {
+            //         setState(() {
+            //           streetvalue = value as int;
+            //         });
+            //       },
+            //       items: Street.Items.map((e) => DropdownMenuItem(
+            //             value: e.id,
+            //             child: Text(
+            //               e.name.toString(),
+            //               style: const TextStyle(fontSize: 11),
+            //             ),
+            //           )).toList(),
+            //     ),
+            //   ),
+            // ),
 
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 4,
-              indent: 0,
-            ),
+            // Divider(
+            //   color: appcolor().greyColor,
+            //   thickness: 1,
+            //   height: 4,
+            //   indent: 0,
+            // ),
             //  info
             Container(
               height: Get.height * 0.2,
@@ -278,9 +330,12 @@ class _NewErrandState extends State<New_Errand> {
               child: TextFormField(
                 keyboardType: TextInputType.name,
                 textCapitalization: TextCapitalization.sentences,
-                controller: product_controller.description,
+                controller: newErrandController.descriptionController,
                 minLines: 1,
                 maxLines: 4,
+                onChanged: (value) {
+                  newErrandController.update();
+                },
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
@@ -309,594 +364,67 @@ class _NewErrandState extends State<New_Errand> {
             ),
             InkWell(
               onTap: () {
-                if (product_controller.title.text != '' &&
-                    product_controller.description.text != '') {
+                if (newErrandController.titleController.text != '' &&
+                    newErrandController.descriptionController.text != '') {
                   Get.to(nd_screen(
-                    title: product_controller.title.text.toString(),
-                    description: product_controller.description.text.toString(),
-                    region: regionCode,
+                    title: newErrandController.titleController.text.toString(),
+                    description: newErrandController.descriptionController.text.toString(),
+                    region: newErrandController.regionCode,
                     street: street,
-                    town: town,
+                    town: newErrandController.town,
                   ));
                 } else {
                   alertDialogBox(context, 'Alert', 'Please Fill Fields');
                 }
-                product_controller.title.clear();
-                product_controller.description.clear();
+                // newErrandController.title..clear();
+                // newErrandController.description.clear();
               },
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                child: Container(
-                  height: Get.height * 0.09,
-                  width: Get.width * 0.9,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Color(0xffe0e6ec),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Proceed',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blueGrey),
-                    ),
-                  ),
-                ),
-              ),
+              child: Obx(() {
+                if (newErrandController.isFormFilled) {
+                  return Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                      child: Container(
+                        height: Get.height * 0.09,
+                        width: Get.width * 0.9,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: appcolor().mainColor,
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Next',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
+                          ),
+                        ),
+                      )
+                  );
+                } else {
+                  return Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                      child: Container(
+                        height: Get.height * 0.09,
+                        width: Get.width * 0.9,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: const Color(0xffe0e6ec),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Next',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.blueGrey),
+                          ),
+                        ),
+                      )
+                  );
+                }
+              }),
             ),
-
-            // cover image
-            // Obx(
-            //       () => Container(
-            //     height: imageController.image_path.isEmpty
-            //         ? null
-            //         : Get.height * 0.28,
-            //     child: imageController.image_path.isEmpty
-            //         ? InkWell(
-            //       onTap: () {
-            //         showDialog(
-            //           context: context,
-            //           builder: (context) {
-            //             return AlertDialog(
-            //               insetPadding: EdgeInsets.symmetric(
-            //                 horizontal: 20,
-            //               ),
-            //               contentPadding: EdgeInsets.symmetric(
-            //                 horizontal: 8,
-            //                 vertical: 20,
-            //               ),
-            //               scrollable: true,
-            //               content: Container(
-            //                 // height: Get.height * 0.7,
-            //                 width: Get.width,
-            //                 child: Column(
-            //                   mainAxisAlignment: MainAxisAlignment.center,
-            //                   crossAxisAlignment:
-            //                   CrossAxisAlignment.start,
-            //                   children: [
-            //                     Text(
-            //                       'Cover Image',
-            //                       style: TextStyle(
-            //                         color: appcolor().mainColor,
-            //                         fontSize: 18,
-            //                         fontWeight: FontWeight.bold,
-            //                       ),
-            //                     ),
-            //                     SizedBox(
-            //                       height: Get.height * 0.05,
-            //                     ),
-            //                     Column(
-            //                       children: [
-            //                         blockButton(
-            //                           title: Row(
-            //                             mainAxisAlignment:
-            //                             MainAxisAlignment.center,
-            //                             children: [
-            //                               Icon(
-            //                                 FontAwesomeIcons.image,
-            //                                 color: appcolor().mainColor,
-            //                                 size: 22,
-            //                               ),
-            //                               Text(
-            //                                 '  Image Gallery',
-            //                                 style: TextStyle(
-            //                                     color:
-            //                                     appcolor().mainColor),
-            //                               ),
-            //                             ],
-            //                           ),
-            //                           ontap: () {
-            //                             Get.back();
-            //                             imageController
-            //                                 .getImagefromgallery();
-            //                           },
-            //                           color: appcolor().greyColor,
-            //                         ),
-            //                         SizedBox(
-            //                           height: Get.height * 0.015,
-            //                         ),
-            //                         blockButton(
-            //                           title: Row(
-            //                             mainAxisAlignment:
-            //                             MainAxisAlignment.center,
-            //                             children: [
-            //                               Icon(
-            //                                 FontAwesomeIcons.camera,
-            //                                 color: appcolor().mainColor,
-            //                                 size: 22,
-            //                               ),
-            //                               Text(
-            //                                 '  Take Photo',
-            //                                 style: TextStyle(
-            //                                   color: appcolor().mainColor,
-            //                                 ),
-            //                               ),
-            //                             ],
-            //                           ),
-            //                           ontap: () {
-            //                             Get.back();
-            //                             imageController
-            //                                 .getimagefromCamera();
-            //                           },
-            //                           color: Color(0xfffafafa),
-            //                         ),
-            //                       ],
-            //                     )
-            //                   ],
-            //                 ).paddingSymmetric(
-            //                   horizontal: 10,
-            //                   vertical: 10,
-            //                 ),
-            //               ),
-            //             );
-            //           },
-            //         );
-            //       },
-            //       child: Container(
-            //         padding: EdgeInsets.symmetric(
-            //             horizontal: 15, vertical: 20),
-            //         child: Row(
-            //           children: [
-            //             Icon(Icons.image),
-            //             Text('  Cover Image *'),
-            //             Spacer(),
-            //             Icon(
-            //               Icons.edit,
-            //             )
-            //           ],
-            //         ),
-            //       ),
-            //     )
-            //         : Container(
-            //       height: Get.height * 0.15,
-            //       child: Column(
-            //         children: [
-            //           Row(
-            //             children: [
-            //               Icon(Icons.image),
-            //               Text(
-            //                 '  Company Logo *',
-            //                 style: TextStyle(
-            //                   fontSize: 16,
-            //                 ),
-            //               ),
-            //               Spacer(),
-            //               InkWell(
-            //                 onTap: () {},
-            //                 child: Icon(
-            //                   Icons.edit,
-            //                 ),
-            //               )
-            //             ],
-            //           ).paddingSymmetric(
-            //             vertical: 15,
-            //             horizontal: 15,
-            //           ),
-            //           Divider(
-            //             color: appcolor().greyColor,
-            //             thickness: 1,
-            //             height: 1,
-            //             indent: 0,
-            //           ),
-            //           Stack(
-            //             children: [
-            //               Image(
-            //                 image: FileImage(
-            //                   File(
-            //                     imageController.image_path.toString(),
-            //                   ),
-            //                 ),
-            //                 height: Get.height * 0.19,
-            //                 width: double.infinity,
-            //                 fit: BoxFit.fill,
-            //               ).paddingSymmetric(horizontal: 20),
-            //               Container(
-            //                 height: Get.height * 0.19,
-            //                 child: Row(
-            //                   mainAxisAlignment: MainAxisAlignment.center,
-            //                   crossAxisAlignment: CrossAxisAlignment.end,
-            //                   children: [
-            //                     InkWell(
-            //                       onTap: () {
-            //                         imageController.getImagefromgallery();
-            //                       },
-            //                       child: Container(
-            //                         height: 35,
-            //                         width: 60,
-            //                         color: Colors.lightGreen,
-            //                         child: Center(
-            //                           child: Text(
-            //                             'Edit',
-            //                             style: TextStyle(
-            //                               color: Colors.white,
-            //                             ),
-            //                           ),
-            //                         ),
-            //                       ),
-            //                     ),
-            //                     InkWell(
-            //                       onTap: () {
-            //                         imageController.reset();
-            //                       },
-            //                       child: Container(
-            //                         height: 35,
-            //                         width: 60,
-            //                         color: appcolor().greyColor,
-            //                         child: Center(
-            //                           child: Text(
-            //                             'Remove',
-            //                             style: TextStyle(),
-            //                           ),
-            //                         ),
-            //                       ),
-            //                     ),
-            //                   ],
-            //                 ),
-            //               )
-            //             ],
-            //           ),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Divider(
-            //   color: appcolor().greyColor,
-            //   thickness: 1,
-            //   height: 1,
-            //   indent: 0,
-            // ),
-            //
-            // // multiple image
-            // Container(
-            //   padding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-            //   child: Row(
-            //     children: [
-            //       Icon(
-            //         Icons.image,
-            //       ),
-            //       Text(
-            //         '  Service Image Gallery',
-            //       ),
-            //       Spacer(),
-            //       Icon(Icons.edit),
-            //     ],
-            //   ),
-            // ),
-            //
-            // Obx(
-            //       () => Container(
-            //     height: imageController.imageList.isEmpty ? null : null,
-            //     child: imageController.imageList.isEmpty
-            //         ? InkWell(
-            //       onTap: () {
-            //         showDialog(
-            //           context: context,
-            //           builder: (context) {
-            //             return AlertDialog(
-            //               insetPadding: EdgeInsets.symmetric(
-            //                 horizontal: 20,
-            //               ),
-            //               contentPadding: EdgeInsets.symmetric(
-            //                 horizontal: 8,
-            //                 vertical: 20,
-            //               ),
-            //               scrollable: true,
-            //               content: Container(
-            //                 // height: Get.height * 0.7,
-            //                 width: Get.width,
-            //                 child: Column(
-            //                   mainAxisAlignment: MainAxisAlignment.center,
-            //                   crossAxisAlignment:
-            //                   CrossAxisAlignment.start,
-            //                   children: [
-            //                     Text(
-            //                       'Select Images',
-            //                       style: TextStyle(
-            //                         color: appcolor().mainColor,
-            //                         fontSize: 18,
-            //                         fontWeight: FontWeight.bold,
-            //                       ),
-            //                     ),
-            //                     SizedBox(
-            //                       height: Get.height * 0.05,
-            //                     ),
-            //                     Column(
-            //                       children: [
-            //                         blockButton(
-            //                           title: Row(
-            //                             mainAxisAlignment:
-            //                             MainAxisAlignment.center,
-            //                             children: [
-            //                               Icon(
-            //                                 FontAwesomeIcons.image,
-            //                                 color: appcolor().mainColor,
-            //                                 size: 22,
-            //                               ),
-            //                               Text(
-            //                                 '  Image Gallery',
-            //                                 style: TextStyle(
-            //                                     color:
-            //                                     appcolor().mainColor),
-            //                               ),
-            //                             ],
-            //                           ),
-            //                           ontap: () {
-            //                             Get.back();
-            //                             imageController
-            //                                 .getmultipleImage();
-            //                           },
-            //                           color: appcolor().greyColor,
-            //                         ),
-            //                         SizedBox(
-            //                           height: Get.height * 0.015,
-            //                         ),
-            //                         blockButton(
-            //                           title: Row(
-            //                             mainAxisAlignment:
-            //                             MainAxisAlignment.center,
-            //                             children: [
-            //                               Icon(
-            //                                 FontAwesomeIcons.camera,
-            //                                 color: appcolor().mainColor,
-            //                                 size: 22,
-            //                               ),
-            //                               Text(
-            //                                 '  Take Photo',
-            //                                 style: TextStyle(
-            //                                   color: appcolor().mainColor,
-            //                                 ),
-            //                               ),
-            //                             ],
-            //                           ),
-            //                           ontap: () {
-            //                             Get.back();
-            //                             imageController
-            //                                 .getimagefromCamera();
-            //                           },
-            //                           color: Color(0xfffafafa),
-            //                         ),
-            //                       ],
-            //                     )
-            //                   ],
-            //                 ).paddingSymmetric(
-            //                   horizontal: 10,
-            //                   vertical: 10,
-            //                 ),
-            //               ),
-            //             );
-            //           },
-            //         );
-            //       },
-            //       child: Container(
-            //           child: Column(
-            //             children: [
-            //               Container(
-            //                 color: appcolor().greyColor,
-            //                 height: Get.height * 0.22,
-            //                 child: Column(
-            //                   mainAxisAlignment:
-            //                   MainAxisAlignment.spaceEvenly,
-            //                   children: [
-            //                     // SizedBox(height: Get.height*0.05,),
-            //                     Center(
-            //                       child: Row(
-            //                         mainAxisAlignment:
-            //                         MainAxisAlignment.center,
-            //                         children: [
-            //                           Icon(
-            //                             FontAwesomeIcons.images,
-            //                             size: 60,
-            //                             color: appcolor().mediumGreyColor,
-            //                           ),
-            //                           Text(
-            //                             '     Browse Images',
-            //                             style: TextStyle(
-            //                               color: appcolor().bluetextcolor,
-            //                               fontWeight: FontWeight.w400,
-            //                             ),
-            //                           )
-            //                         ],
-            //                       ),
-            //                     ),
-            //                     // SizedBox(
-            //                     //   height: Get.height * 0.05,
-            //                     // ),
-            //                     Text(
-            //                       'Other variations of the main product image',
-            //                       style: TextStyle(
-            //                         fontSize: 10,
-            //                         color: appcolor().mediumGreyColor,
-            //                         fontWeight: FontWeight.w500,
-            //                       ),
-            //                     ),
-            //                   ],
-            //                 ),
-            //               ),
-            //             ],
-            //           )),
-            //     )
-            //         : Container(
-            //       padding:
-            //       EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            //       height: Get.height * 0.24,
-            //       child: Center(
-            //         child: ListView.builder(
-            //           shrinkWrap: true,
-            //           itemCount: imageController.imageList.length,
-            //           scrollDirection: Axis.horizontal,
-            //           itemBuilder: (context, index) {
-            //             return Column(
-            //               children: [
-            //                 Container(
-            //                   height: Get.height * 0.15,
-            //                   width: Get.width * 0.40,
-            //                   decoration:
-            //                   BoxDecoration(border: Border.all()),
-            //                   child: Image(
-            //                     image: FileImage(
-            //                       File(
-            //                         imageController.imageList[index].path
-            //                             .toString(),
-            //                       ),
-            //                     ),
-            //                     fit: BoxFit.fill,
-            //                   ),
-            //                 ),
-            //                 Container(
-            //                   child: Row(
-            //                     mainAxisAlignment:
-            //                     MainAxisAlignment.center,
-            //                     crossAxisAlignment:
-            //                     CrossAxisAlignment.end,
-            //                     children: [
-            //                       InkWell(
-            //                         onTap: () {
-            //                           imageController.edit(index);
-            //                         },
-            //                         child: Container(
-            //                           height: 35,
-            //                           width: Get.width * 0.20,
-            //                           color: Colors.lightGreen,
-            //                           child: Center(
-            //                             child: Text(
-            //                               'Edit',
-            //                               style: TextStyle(
-            //                                 color: Colors.white,
-            //                               ),
-            //                             ),
-            //                           ),
-            //                         ),
-            //                       ),
-            //                       InkWell(
-            //                         onTap: () {
-            //                           imageController.removeat(index);
-            //                         },
-            //                         child: Container(
-            //                           height: 35,
-            //                           width: Get.width * 0.2,
-            //                           color: appcolor().greyColor,
-            //                           child: Center(
-            //                             child: Text(
-            //                               'Remove',
-            //                               style: TextStyle(),
-            //                             ),
-            //                           ),
-            //                         ),
-            //                       ),
-            //                     ],
-            //                   ),
-            //                 )
-            //               ],
-            //             ).paddingSymmetric(horizontal: 5);
-            //           },
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            //
-            // //  image container
-            // Obx(
-            //       () => Container(
-            //     child: imageController.imageList.isEmpty
-            //         ? null
-            //         : InkWell(
-            //       onTap: (){
-            //         imageController.getmultipleImage();
-            //       },
-            //       child: Container(
-            //         margin: EdgeInsets.symmetric(horizontal: 15),
-            //         decoration: BoxDecoration(
-            //           color: appcolor().skyblueColor,
-            //           borderRadius: BorderRadius.circular(10,),
-            //         ),
-            //         height: Get.height*0.08,
-            //         child: Row(
-            //           crossAxisAlignment: CrossAxisAlignment.center,
-            //           mainAxisAlignment: MainAxisAlignment.center,
-            //           children: [
-            //             Icon(
-            //               Icons.image,
-            //             ),
-            //             Text(
-            //               '   Add more images',
-            //             ),
-            //           ],
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Divider(
-            //   color: appcolor().greyColor,
-            //   thickness: 1,
-            //   height: 1,
-            //   indent: 0,
-            // ),
-            //
-            // // product tags
-            // Container(
-            //   padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-            //   child: TextFormField(
-            //     decoration: InputDecoration(
-            //       border: InputBorder.none,
-            //       prefixIcon: Icon(
-            //         FontAwesomeIcons.tags,
-            //         color: Color.fromARGB(255, 108, 105, 105),
-            //       ),
-            //       hintStyle: TextStyle(
-            //         color: Colors.black,
-            //       ),
-            //       hintText: 'Service Tags *',
-            //       suffixIcon: Icon(
-            //         color: Colors.black,
-            //         Icons.edit,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Divider(
-            //   color: appcolor().greyColor,
-            //   thickness: 1,
-            //   height: 1,
-            //   indent: 0,
-            // ),
-            //
-            // Text(
-            //   'Enter words related to service separated by comma',
-            //   textAlign: TextAlign.center,
-            //   style: TextStyle(
-            //     color: Colors.grey,
-            //   ),
-            // ).paddingSymmetric(
-            //   horizontal: 16,
-            //   vertical: 10,
-            // ),
-            // SizedBox(
-            //   height: Get.height * 0.1,
-            // ),
           ],
         ),
       ),

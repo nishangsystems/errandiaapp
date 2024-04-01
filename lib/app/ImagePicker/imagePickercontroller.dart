@@ -20,13 +20,15 @@ class imagePickercontroller extends GetxController {
   late RxList<dynamic> imageList;
   late RxString image_path;
 
+  late RxList<String> imagePaths;
+
   @override
   void onInit() {
     super.onInit();
     imageList = <dynamic>[].obs;
     image_path = ''.obs;
     onlineImageList = <String>[].obs;
-
+    imagePaths = <String>[].obs;
     // initialize update status list
   }
 
@@ -134,9 +136,11 @@ print("selectedImages: $selectedImages");
     if (selectedImages.isNotEmpty) {
       for (int i = 0; i < selectedImages.length; i++) {
         imageList.add(selectedImages[i]);
+        imagePaths.add(selectedImages[i].path);
         uploadStatusList[i] = UploadStatus.pending;
         refresh();
       }
+      print("imageList: $imageList");
 
       print("uploadStatusList ===: $uploadStatusList");
     } else {

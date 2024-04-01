@@ -20,6 +20,16 @@ class FirebaseAPI {
       sound: true,
     );
 
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    FirebaseMessaging.onMessage.listen((message) {
+      print('onMessage: $message');
+    });
+
     await _firebaseMessaging.getToken().then((token) {
       print('Firebase Token: $token');
 

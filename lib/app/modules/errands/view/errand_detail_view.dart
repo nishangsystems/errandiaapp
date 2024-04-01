@@ -482,7 +482,7 @@ class errand_detail_view extends StatelessWidget {
                         margin: const EdgeInsets.symmetric(
                           horizontal: 5,
                         ),
-                        height: 80,
+                        height: 100,
                         width: 100,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(
@@ -490,18 +490,23 @@ class errand_detail_view extends StatelessWidget {
                           ),
                           color: Colors.grey[300],
                         ),
-                        child: Center(
-                          child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/images/errandia_logo.png',
-                            image: getImagePath(
-                                data['images'][index]['url'].toString()),
-                            fit: BoxFit.cover,
-                            imageErrorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                'assets/images/errandia_logo.png',
-                                fit: BoxFit.cover,
-                              );
-                            },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            10,
+                          ),
+                          child: Center(
+                            child: FadeInImage.assetNetwork(
+                              placeholder: 'assets/images/errandia_logo.png',
+                              image: getImagePathWithSize(
+                                  data['images'][index]['image_path'], width: 100, height: 100),
+                              fit: BoxFit.contain,
+                              imageErrorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/errandia_logo.png',
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       );

@@ -163,7 +163,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
                         child: data_['images'].length > 0
                             ? FadeInImage.assetNetwork(
                           placeholder: 'assets/images/errandia_logo.png',
-                          image: getImagePathWithSize(data_['images'][0].toString(), width: 200, height: 180),
+                          image: getImagePathWithSize(data_['images'][0]['image_path'], width: 200, height: 180),
                           fit: BoxFit.fill,
                           imageErrorBuilder: (context, error, stackTrace) {
                             return Image.asset(

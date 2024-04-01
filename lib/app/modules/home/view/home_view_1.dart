@@ -324,23 +324,12 @@ class _home_view_1State extends State<home_view_1> {
                                 CircleAvatar(
                                   radius: 25,
                                   backgroundColor: appcolor().mainColor,
+                                  backgroundImage: data['user']['photo'] == ""
+                                      ? const AssetImage('assets/images/errandia_logo.png') // Fallback image
+                                      : NetworkImage(getImagePath(data['user']['photo'].toString())) as ImageProvider,
                                   child: data['user']['photo'] == ""
                                       ? const Icon(Icons.person)
-                                      : FadeInImage.assetNetwork(
-                                          placeholder:
-                                              'assets/images/errandia_logo.png',
-                                          image: getImagePath(
-                                              data['user']['photo'].toString()),
-                                          fit: BoxFit.cover,
-                                          imageErrorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Image.asset(
-                                              'assets/images/errandia_logo.png',
-                                              // Your fallback image
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
+                                      : null, // Only show the icon if there is no photo
                                 ),
                                 SizedBox(
                                   width: Get.width * 0.02,

@@ -33,30 +33,48 @@ class ErrandsAPI {
     }
   }
 
-  // create a new errand
-  static Future createErrand(Map<String, dynamic> value) async {
+  // create a new errand with image list upload form data
+  static Future createErrand(Map<String, dynamic> value,
+    List<String> imageList) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
 
-    final response = await http.post(Uri.parse('${apiDomain().domain}/user/errands'),
-      headers: ({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
-      }),
-      body: jsonEncode(value)
-    );
+    var request = http.MultipartRequest('POST', Uri.parse('${apiDomain().domain}/user/errands'));
+
+    request.headers.addAll({
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'multipart/form-data',
+    });
+
+    for (int i = 0; i < imageList.length; i++) {
+      for (var image in imageList) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'images[]', // Field name for each image
+            image,
+          ),
+        );
+      }
+    }
+
+    for (var key in value.keys) {
+      request.fields[key] = value[key];
+    }
+
+    var response = await request.send();
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(await response.stream.bytesToString());
       if (kDebugMode) {
         print(data);
       }
-      return data;
+      return jsonEncode({'status': 'success', 'message': 'Errand created successfully'});
     } else {
-      var da = jsonDecode(response.body);
-      return da;
+      var da = jsonDecode(await response.stream.bytesToString());
+      return jsonEncode({'status': 'error', 'message': da['message']});
     }
+
   }
 
 }
