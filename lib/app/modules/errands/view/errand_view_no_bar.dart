@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:errandia/app/APi/errands.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
+import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/services/controller/manage_service_controller.dart';
 import 'package:errandia/utils/helper.dart';
@@ -33,6 +38,9 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
   late errand_controller errandController;
 
   late ScrollController _scrollController;
+
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  late PopupBox popup;
 
   @override
   void initState() {
@@ -294,12 +302,89 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
                                       var value = {
                                         "errand_id": data_['id']
                                       };
-                                      api().deleteUpdate(
-                                          'errand/delete', 1, value);
-                                      Future.delayed(const Duration(seconds: 2),
-                                              () {
-                                            Get.to(errand_view());
-                                          });
+                                      // api().deleteUpdate(
+                                      //     'errand/delete', 1, value);
+                                      // Future.delayed(const Duration(seconds: 2),
+                                      //         () {
+                                      //       Get.to(errand_view());
+                                      //     });
+
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext dialogContext) {
+                                          // Use dialogContext
+                                          var response;
+                                          return CustomAlertDialog(
+                                              title: "Delete Errand",
+                                              message:
+                                              "Are you sure you want to delete this errand?\n"
+                                                  "This action cannot be undone.\n",
+                                              dialogType: MyDialogType.error,
+                                              onConfirm: () {
+                                                // delete product
+                                                print(
+                                                    "delete errand: ${data_['id']}");
+                                                ErrandsAPI.deleteErrand(data_['id'].toString())
+                                                    .then((response_) {
+                                                  if (response_ != null) {
+                                                    response = jsonDecode(response_);
+                                                    print(
+                                                        "delete business response: $response");
+
+                                                    if (mounted) {
+                                                      // Check if the widget is still in the tree
+                                                      if (response["status"] ==
+                                                          'success') {
+                                                        errandController.reloadMyErrands();
+
+                                                        Navigator.of(dialogContext)
+                                                            .pop(); // Close the dialog
+
+                                                        // Show success popup
+                                                        popup = PopupBox(
+                                                          title: 'Success',
+                                                          description: response['data']
+                                                          ['message'],
+                                                          type: PopupType.success,
+                                                        );
+                                                      } else {
+                                                        Navigator.of(dialogContext)
+                                                            .pop(); // Close the dialog
+
+                                                        // Show error popup
+                                                        popup = PopupBox(
+                                                          title: 'Error',
+                                                          description: response['data']
+                                                          ['data'],
+                                                          type: PopupType.error,
+                                                        );
+                                                      }
+
+                                                      popup.showPopup(
+                                                          context); // Show the popup
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                              onCancel: () {
+                                                // cancel delete
+                                                print("cancel delete");
+                                                Navigator.of(dialogContext)
+                                                    .pop(); // Close the dialog
+                                              });
+                                        },
+                                      ).then((_) {
+                                        if (mounted) {
+                                          try {
+                                            popup.dismissPopup(navigatorKey
+                                                .currentContext!); // Dismiss the popup
+                                          } catch (e) {
+                                            print("error dismissing popup: $e");
+                                          }
+                                          errandController.reloadMyErrands();
+                                          Get.back();
+                                        }
+                                      });
                                     },
                                   ),
                                 ],
