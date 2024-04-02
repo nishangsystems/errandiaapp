@@ -47,6 +47,15 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
     });
   }
 
+  String _formatAddress(Map<String, dynamic> item) {
+    print("item: $item");
+    // String street = item['street'].toString() != '[]' && '';
+    String townName = item['town'].toString() != '[]' ? item['town']['name'] : '';
+    String regionName = item['region'].toString() != '[]' ? item['region']['name'].split(" -")[0] : '';
+
+    return [townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
+  }
+
   @override
   void dispose() {
     scrollController.dispose();
@@ -187,31 +196,13 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                               children: [
                                                 CircleAvatar(
                                                   radius: 25,
-                                                  backgroundColor:
-                                                      appcolor().mainColor,
-                                                  child: data['user']
-                                                              ['photo'] ==
-                                                          ""
+                                                  backgroundColor: appcolor().mainColor,
+                                                  backgroundImage: data['user']['photo'] == ""
+                                                      ? const AssetImage('assets/images/errandia_logo.png') // Fallback image
+                                                      : NetworkImage(getImagePath(data['user']['photo'].toString())) as ImageProvider,
+                                                  child: data['user']['photo'] == ""
                                                       ? const Icon(Icons.person)
-                                                      : FadeInImage
-                                                          .assetNetwork(
-                                                          placeholder:
-                                                              'assets/images/errandia_logo.png',
-                                                          image: getImagePath(
-                                                              data['user']
-                                                                      ['photo']
-                                                                  .toString()),
-                                                          fit: BoxFit.cover,
-                                                          imageErrorBuilder:
-                                                              (context, error,
-                                                                  stackTrace) {
-                                                            return Image.asset(
-                                                              'assets/images/errandia_logo.png',
-                                                              // Your fallback image
-                                                              fit: BoxFit.cover,
-                                                            );
-                                                          },
-                                                        ),
+                                                      : null, // Only show the icon if there is no photo
                                                 ),
                                                 SizedBox(
                                                   width: Get.width * 0.02,
@@ -259,28 +250,28 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                               horizontal: 8, vertical: 0),
                                           color: Colors.white,
                                           child: Center(
-                                            child: data['images'].length > 0
+                                            child:  data['images'].length > 0
                                                 ? FadeInImage.assetNetwork(
-                                                    placeholder:
-                                                        'assets/images/errandia_logo.png',
-                                                    image: getImagePath(
-                                                        data['images'][0]['url']
-                                                            .toString()),
-                                                    fit: BoxFit.cover,
-                                                    imageErrorBuilder: (context,
-                                                        error, stackTrace) {
-                                                      return Image.asset(
-                                                        'assets/images/errandia_logo.png',
-                                                        // Your fallback image
-                                                        fit: BoxFit.cover,
-                                                      );
-                                                    },
-                                                  )
+                                              placeholder:
+                                              'assets/images/errandia_logo.png',
+                                              image: getImagePathWithSize(
+                                                  data['images'][0]['image_path']
+                                                      .toString(), width: 550, height: 350),
+                                              fit: BoxFit.cover,
+                                              imageErrorBuilder: (context,
+                                                  error, stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/errandia_logo.png',
+                                                  // Your fallback image
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
+                                            )
                                                 : Image.asset(
-                                                    'assets/images/errandia_logo.png',
-                                                    // Your fallback image
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                              'assets/images/errandia_logo.png',
+                                              // Your fallback image
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                         ),
                                         Divider(
@@ -324,30 +315,35 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                               SizedBox(
                                                 height: Get.height * 0.003,
                                               ),
-                                              data['street'] != "" &&
-                                                      data['street'] != null
+                                              data['region'].toString() != '[]' ||
+                                                  data['town'].toString() != '[]'
                                                   ? Row(
-                                                      children: [
-                                                        Icon(
-                                                          Icons.location_on,
-                                                          size: 13,
-                                                          color: appcolor()
-                                                              .mediumGreyColor,
-                                                        ),
-                                                        Text(
-                                                          data['street']
-                                                              .toString(),
-                                                          style: TextStyle(
-                                                            color: appcolor()
-                                                                .mediumGreyColor,
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )
+                                                children: [
+                                                  Icon(
+                                                    Icons.location_on,
+                                                    size: 13,
+                                                    color: appcolor()
+                                                        .mediumGreyColor,
+                                                  ),
+                                                  SizedBox(
+                                                    width: Get.width * 0.35,
+                                                    child: Text(
+                                                      _formatAddress(data),
+                                                      style: TextStyle(
+                                                        color: appcolor()
+                                                            .mediumGreyColor,
+                                                        fontSize: 12,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                      TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
                                                   : const SizedBox(
-                                                      height: 6,
-                                                    )
+                                                height: 6,
+                                              ),
                                             ],
                                           ),
                                         ),
