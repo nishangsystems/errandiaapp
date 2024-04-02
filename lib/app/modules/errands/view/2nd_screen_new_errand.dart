@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:errandia/app/APi/errands.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
+import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
@@ -23,8 +24,6 @@ import '../../global/Widgets/blockButton.dart';
 import 'errand_view.dart';
 
 add_product_cotroller product_controller = Get.put(add_product_cotroller());
-
-imagePickercontroller imageController = Get.put(imagePickercontroller());
 
 class nd_screen extends StatefulWidget {
   final title;
@@ -47,6 +46,8 @@ class nd_screen extends StatefulWidget {
 
 class _nd_screenState extends State<nd_screen> {
   late add_product_cotroller product_controller;
+  late errand_controller errandController;
+  late imagePickercontroller imageController;
 
   var selectedOption;
 
@@ -67,6 +68,8 @@ class _nd_screenState extends State<nd_screen> {
     // TODO: implement initState
     super.initState();
     product_controller = Get.put(add_product_cotroller());
+    errandController = Get.put(errand_controller());
+    imageController = Get.put(imagePickercontroller());
     product_controller.loadCategories();
     ischip2 = List.filled(
       subCetegoryData.Items.length,
@@ -77,10 +80,8 @@ class _nd_screenState extends State<nd_screen> {
   void runErrand(BuildContext context) async {
     print("categories listing: ${listToString(selectedFilters)}");
     print("imageList: ${imageController.imageList}");
-    if (selectedFilters.isEmpty) {
-      alertDialogBox(context, "Error", 'Please select at least one category');
-    } else if (imageController.imageList.isEmpty) {
-      alertDialogBox(context, "Error", 'Please select at least one image');
+    if (widget.title == null || widget.title == "") {
+      alertDialogBox(context, "Error", 'Product/Service Name is required');
     } else {
       var file = "";
 
@@ -112,6 +113,7 @@ class _nd_screenState extends State<nd_screen> {
           if (kDebugMode) {
             print("Errand created successfully");
           }
+          errandController.reloadMyErrands();
           setState(() {
             isLoading = false;
             imageController.imageList.clear();

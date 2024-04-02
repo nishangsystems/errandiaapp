@@ -50,28 +50,20 @@ class _EditErrandState extends State<EditErrand> {
     print("errand data: ${widget.data}");
 
     newErrandController.titleController.text = widget.data['title'];
-    newErrandController.descriptionController.text = widget.data['description'];
-    newErrandController.regionCode.value = widget.data['region']['id'].toString();
-    newErrandController.town.value = widget.data['town']['id'].toString();
+    newErrandController.descriptionController.text = widget.data['description'] ?? '';
+    newErrandController.regionCode.value = widget.data['region']['id'].toString() != '[]' ? widget.data['region']['id'].toString() : '';
+    newErrandController.town.value = widget.data['town'].toString() != '[]' ?  widget.data['town']['id'].toString() : '';
 
     setState(() {
-      value = widget.data['region'] != null ? widget.data['region']['id'] as int : null;
+      value = widget.data['region'].toString() != '[]' ? widget.data['region']['id'] as int : null;
       errandController.loadTownsData(int.parse(newErrandController.regionCode.value));
 
-      town_ = widget.data['town'] != null ? widget.data['town']['id'] as int : null;
+      town_ = widget.data['town'].toString() != '[]' ? widget.data['town']['id'] as int : null;
 
 
     });
 
     // errandController.loadTownsData(int.parse(newErrandController.regionCode.value));
-
-    imageController.imageList.clear();
-    imageController.imagePaths.clear();
-
-    for (var image in widget.data['images']) {
-      imageController.imageList.add(File(getImagePath(image['image_path'])));
-      imageController.imagePaths.add(getImagePath(image['image_path']));
-    }
 
   }
 
@@ -220,7 +212,7 @@ class _EditErrandState extends State<EditErrand> {
                 isDense: true,
                 isExpanded: true,
                 decoration: const InputDecoration.collapsed(
-                  hintText: 'Region *',
+                  hintText: 'Region',
                   hintStyle: TextStyle(
                     color: Colors.black,
                   ),
@@ -280,7 +272,7 @@ class _EditErrandState extends State<EditErrand> {
                     isExpanded: true,
                     padding: const EdgeInsets.only(bottom: 8),
                     decoration: InputDecoration.collapsed(
-                      hintText: 'Town *',
+                      hintText: 'Town',
                       hintStyle: TextStyle(
                           color: newErrandController.regionCode.value == ''
                               ? Colors.grey
@@ -373,7 +365,7 @@ class _EditErrandState extends State<EditErrand> {
                   hintStyle: TextStyle(
                     color: Colors.black,
                   ),
-                  hintText: 'Description *',
+                  hintText: 'Description',
                   suffixIcon: Icon(
                     color: Colors.black,
                     Icons.edit,

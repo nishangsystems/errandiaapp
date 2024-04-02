@@ -192,7 +192,7 @@ class _NewErrandState extends State<New_Errand> {
                 isDense: true,
                 isExpanded: true,
                 decoration: const InputDecoration.collapsed(
-                  hintText: 'Region *',
+                  hintText: 'Region',
                   hintStyle: TextStyle(
                     color: Colors.black,
                   ),
@@ -252,7 +252,7 @@ class _NewErrandState extends State<New_Errand> {
                     isExpanded: true,
                     padding: const EdgeInsets.only(bottom: 8),
                     decoration: InputDecoration.collapsed(
-                      hintText: 'Town *',
+                      hintText: 'Town',
                       hintStyle: TextStyle(
                           color: newErrandController.regionCode.value == ''
                               ? Colors.grey
@@ -345,7 +345,7 @@ class _NewErrandState extends State<New_Errand> {
                   hintStyle: TextStyle(
                     color: Colors.black,
                   ),
-                  hintText: 'Description *',
+                  hintText: 'Description',
                   suffixIcon: Icon(
                     color: Colors.black,
                     Icons.edit,

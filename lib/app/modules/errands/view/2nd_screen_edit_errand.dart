@@ -25,8 +25,6 @@ import 'errand_view.dart';
 
 add_product_cotroller product_controller = Get.put(add_product_cotroller());
 
-imagePickercontroller imageController = Get.put(imagePickercontroller());
-
 class EditErrand2 extends StatefulWidget {
   final data;
 
@@ -99,12 +97,10 @@ class _EditErrand2 extends State<EditErrand2> {
 
   void updateErrand(BuildContext context) async {
     print("categories listing: ${listToString(selectedFilters)}");
-    print("imageList: ${imageController.imageList}");
-    if (selectedFilters.isEmpty) {
-      alertDialogBox(context, "Error", 'Please select at least one category');
-    } else if (imageController.imageList.isEmpty) {
-      alertDialogBox(context, "Error", 'Please select at least one image');
-    } else {
+    print("imageList: ${imageController2.imageList}");
+    if (widget.data['title'] == null || widget.data['title'] == "") {
+      alertDialogBox(context, "Error", 'Product/Service Name is required');
+    }  else {
       var file = "";
 
       for (int i = 1; i < selectedFilters_.length; i++) {
@@ -630,7 +626,7 @@ class _EditErrand2 extends State<EditErrand2> {
                   Obx(
                         () => Container(
                       margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: imageController.imageList.isEmpty
+                      child: imageController2.imageList.isEmpty
                           ? null
                           : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1023,38 +1019,38 @@ class _EditErrand2 extends State<EditErrand2> {
     );
   }
 
-  Future<void> PanDocumentInfoupload(
-    String title,
-    description,
-    category,
-    streetid,
-    townid,
-    regionid,
-  ) async {
-    var file = selectedFilterss[0].toString();
-    // Create a MultipartRequest
-//print(selectedFilterss);
-
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('token');
-    for (int i = 1; i < selectedFilterss.length; i++) {
-      file = file + "," + selectedFilterss[i].toString();
-    }
-    print(file);
-    var uri = Uri.parse(
-        '${apiDomain().domain}errands?title=${title}&description=${description}&categories=$file&image_count=${imageController.imageList.length}');
-    var request = http.MultipartRequest("POST", uri)
-      ..headers['Authorization'] = 'Bearer $token';
-    for (int i = 0; i < imageController.imageList.length; i++) {
-      for (var image in imageController.imageList) {
-        request.files.add(
-          await http.MultipartFile.fromPath(
-            'image_${i + 1}', // Field name for each image
-            image.path,
-          ),
-        );
-      }
-    }
+//   Future<void> PanDocumentInfoupload(
+//     String title,
+//     description,
+//     category,
+//     streetid,
+//     townid,
+//     regionid,
+//   ) async {
+//     var file = selectedFilterss[0].toString();
+//     // Create a MultipartRequest
+// //print(selectedFilterss);
+//
+//     final SharedPreferences prefs = await SharedPreferences.getInstance();
+//     var token = prefs.getString('token');
+//     for (int i = 1; i < selectedFilterss.length; i++) {
+//       file = file + "," + selectedFilterss[i].toString();
+//     }
+//     print(file);
+//     var uri = Uri.parse(
+//         '${apiDomain().domain}errands?title=${title}&description=${description}&categories=$file&image_count=${imageController.imageList.length}');
+//     var request = http.MultipartRequest("POST", uri)
+//       ..headers['Authorization'] = 'Bearer $token';
+//     for (int i = 0; i < imageController.imageList.length; i++) {
+//       for (var image in imageController.imageList) {
+//         request.files.add(
+//           await http.MultipartFile.fromPath(
+//             'image_${i + 1}', // Field name for each image
+//             image.path,
+//           ),
+//         );
+//       }
+//     }
 
     // request.fields['title'] =  '$title';
     //   request.fields['description'] =  '$description';
@@ -1063,21 +1059,21 @@ class _EditErrand2 extends State<EditErrand2> {
     //   request.fields['town'] =  '$townid';
     //   request.fields['region'] =  '$regionid';
     // Send the request
-    try {
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        Get.offAll(() => errand_view());
-        setState(() {
-          isLoading = false;
-          imageController.imageList.clear();
-        });
-        // Handle the API response here
-      } else {
-        print('Failed to upload images. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error uploading images: $e');
-    }
+    // try {
+    //   var response = await request.send();
+    //   if (response.statusCode == 200) {
+    //     Get.offAll(() => errand_view());
+    //     setState(() {
+    //       isLoading = false;
+    //       imageController.imageList.clear();
+    //     });
+    //     // Handle the API response here
+    //   } else {
+    //     print('Failed to upload images. Status code: ${response.statusCode}');
+    //   }
+    // } catch (e) {
+    //   print('Error uploading images: $e');
+    // }
     //
     // try {
     //   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1118,5 +1114,5 @@ class _EditErrand2 extends State<EditErrand2> {
     // } catch (e) {
     //   print("Error: $e");
     // }
-  }
+  // }
 }
