@@ -8,6 +8,7 @@ import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/modal/subcategory.dart';
 import 'package:errandia/modal/subcatgeory.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -73,19 +74,6 @@ class _nd_screenState extends State<nd_screen> {
     );
   }
 
-  // convert a list to a string separated by comma
-  String listToString(List<int?> list) {
-    String result = "";
-    for (int i = 0; i < list.length; i++) {
-      if (result == "") {
-        result = list[i].toString();
-      } else {
-        result = "$result,${list[i]}";
-      }
-    }
-    return result;
-  }
-
   void runErrand(BuildContext context) async {
     print("categories listing: ${listToString(selectedFilters)}");
     print("imageList: ${imageController.imageList}");
@@ -135,12 +123,14 @@ class _nd_screenState extends State<nd_screen> {
             description: response['message'],
             type: PopupType.success,
             callback: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => errand_view(),
-                ),
-                (route) => false,
-              );
+              // Navigator.of(context).pushAndRemoveUntil(
+              //   MaterialPageRoute(
+              //     builder: (context) => errand_view(),
+              //   ),
+              //   (route) => false,
+              // );
+              Get.back();
+              Get.back();
             },
           );
           popup.showPopup(context);

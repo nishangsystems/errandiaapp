@@ -139,3 +139,16 @@ String formatDate(DateTime date) {
   final format = DateFormat('dd-MM-yyyy');
   return format.format(date);
 }
+
+// convert a list to a string separated by comma
+String listToString(List<int?> list) {
+  String result = "";
+  for (int i = 0; i < list.length; i++) {
+    if (result == "") {
+      result = list[i].toString();
+    } else {
+      result = "$result,${list[i]}";
+    }
+  }
+  return result;
+}

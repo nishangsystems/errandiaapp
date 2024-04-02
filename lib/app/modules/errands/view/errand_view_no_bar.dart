@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:errandia/app/APi/errands.dart';
+import 'package:errandia/app/modules/errands/view/edit_errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
@@ -278,6 +279,9 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
                                         print('tapped');
                                       }
                                       Get.back();
+                                      Get.to(() => EditErrand(
+                                        data: data_,
+                                      ), transition: Transition.rightToLeft, duration: const Duration(milliseconds: 500));
                                     },
                                   ),
                                   managebottomSheetWidgetitem(
@@ -299,16 +303,6 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
                                     title: 'Move to trash',
                                     icondata: Icons.delete,
                                     callback: () {
-                                      var value = {
-                                        "errand_id": data_['id']
-                                      };
-                                      // api().deleteUpdate(
-                                      //     'errand/delete', 1, value);
-                                      // Future.delayed(const Duration(seconds: 2),
-                                      //         () {
-                                      //       Get.to(errand_view());
-                                      //     });
-
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext dialogContext) {
@@ -470,20 +464,27 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
             // SizedBox(height: 20,),
             InkWell(
               onTap: () {
-                Get.to(() => const New_Errand());
+                Get.to(() => New_Errand());
               },
               child: Container(
                 width: Get.width * 0.44,
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: appcolor().skyblueColor,
-                  borderRadius: BorderRadius.circular(8),
+                  color: appcolor().mainColor,
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                      color: appcolor().mainColor.withOpacity(0.5),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      Icons.search,
-                      color: appcolor().mainColor,
+                      Icons.add,
+                      color: appcolor().skyblueColor,
                       size: 28,
                     ),
                     const Spacer(),
@@ -491,7 +492,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
                       'New Errand',
                       style: TextStyle(
                         fontSize: 16,
-                        color: appcolor().mainColor,
+                        color: appcolor().skyblueColor,
                       ),
                     ),
                   ],

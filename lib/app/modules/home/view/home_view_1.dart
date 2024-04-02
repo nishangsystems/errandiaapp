@@ -194,6 +194,15 @@ class _home_view_1State extends State<home_view_1> {
     }
   }
 
+  String _formatAddress(Map<String, dynamic> item) {
+    print("item: $item");
+    // String street = item['street'].toString() != '[]' && '';
+    String townName = item['town'].toString() != '[]' ? item['town']['name'] : '';
+    String regionName = item['region'].toString() != '[]' ? item['region']['name'].split(" -")[0] : '';
+
+    return [townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
+  }
+
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey =
@@ -372,9 +381,9 @@ class _home_view_1State extends State<home_view_1> {
                                   ? FadeInImage.assetNetwork(
                                 placeholder:
                                 'assets/images/errandia_logo.png',
-                                image: getImagePath(
-                                    data['images'][0]['url']
-                                        .toString()),
+                                image: getImagePathWithSize(
+                                    data['images'][0]['image_path']
+                                        .toString(), width: 200, height: 180),
                                 fit: BoxFit.cover,
                                 imageErrorBuilder: (context,
                                     error, stackTrace) {
@@ -433,8 +442,8 @@ class _home_view_1State extends State<home_view_1> {
                                 SizedBox(
                                   height: Get.height * 0.001,
                                 ),
-                                data['street'] != "" &&
-                                    data['street'] != null
+                                data['region'].toString() != '[]' ||
+                                    data['town'].toString() != '[]'
                                     ? Row(
                                   children: [
                                     Icon(
@@ -446,8 +455,7 @@ class _home_view_1State extends State<home_view_1> {
                                     SizedBox(
                                       width: Get.width * 0.35,
                                       child: Text(
-                                        data['street']
-                                            .toString(),
+                                        _formatAddress(data),
                                         style: TextStyle(
                                           color: appcolor()
                                               .mediumGreyColor,
@@ -537,7 +545,7 @@ class _home_view_1State extends State<home_view_1> {
                         //   // width: Get.width * 0.3,
                         // )
                         Container(
-                          // height: Get.height * 0.15,
+                          height: Get.height * 0.16,
                           width: Get.width * 0.4,
                           color: appcolor().lightgreyColor,
                           child: FadeInImage.assetNetwork(

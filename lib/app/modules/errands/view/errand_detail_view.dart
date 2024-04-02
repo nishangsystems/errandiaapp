@@ -15,6 +15,18 @@ class errand_detail_view extends StatelessWidget {
   late errandia_detail_view_controller detailcontroller =
       Get.put(errandia_detail_view_controller());
 
+  // convert categories to string
+  String categoriesString(List categories) {
+    String categoryString = "";
+    for (int i = 0; i < categories.length; i++) {
+      categoryString += categories[i]['name'];
+      if (i != categories.length - 1) {
+        categoryString += ", ";
+      }
+    }
+    return categoryString;
+  }
+
   @override
   Widget build(BuildContext context) {
     print("errand details: $data");
@@ -156,7 +168,7 @@ class errand_detail_view extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            data['categories'] != "" ? Row(
+            data['categories'].toString() != "[]" ? Row(
               children: [
                 SizedBox(
                   width: Get.width * 0.3,
@@ -173,7 +185,7 @@ class errand_detail_view extends StatelessWidget {
                 ),
                  Expanded(
                   child: ReadMoreText(
-                   data['categories'].toString(),
+                    categoriesString(data['categories']),
                     style: const TextStyle(
                       fontStyle: FontStyle.italic,
                       fontSize: 17,
@@ -206,33 +218,14 @@ class errand_detail_view extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.3,
                   child: CircleAvatar(
-                    radius: 35,
-                    backgroundColor:
-                    appcolor().mainColor,
-                    child: data['user']
-                    ['photo'] ==
-                        ""
+                    radius: 25,
+                    backgroundColor: appcolor().mainColor,
+                    backgroundImage: data['user']['photo'] == ""
+                        ? const AssetImage('assets/images/errandia_logo.png') // Fallback image
+                        : NetworkImage(getImagePath(data['user']['photo'].toString())) as ImageProvider,
+                    child: data['user']['photo'] == ""
                         ? const Icon(Icons.person)
-                        : FadeInImage
-                        .assetNetwork(
-                      placeholder:
-                      'assets/images/errandia_logo.png',
-                      image: getImagePath(
-                          data['user']
-                          ['photo']
-                              .toString()),
-                      fit: BoxFit.fill,
-                      imageErrorBuilder:
-                          (context, error,
-                          stackTrace) {
-                        return Icon(
-                            Icons.person,
-                            color: appcolor()
-                            .lightgreyColor,
-                            size: 45,
-                        );
-                      },
-                    ),
+                        : null, // Only show the icon if there is no photo
                   ),
                 ),
                 SizedBox(
@@ -294,13 +287,13 @@ class errand_detail_view extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '+237 ${data['user']['phone']}',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
+                    // Text(
+                    //   '+237 ${data['user']['phone']}',
+                    //   style: const TextStyle(
+                    //     fontSize: 18,
+                    //     fontWeight: FontWeight.w400,
+                    //   ),
+                    // ),
                     Row(
                       children: [
                         InkWell(
