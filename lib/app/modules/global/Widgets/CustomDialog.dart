@@ -30,7 +30,7 @@ class CustomAlertDialog extends StatelessWidget {
         case MyDialogType.success:
           return Colors.green;
         case MyDialogType.info:
-          return Colors.blue;
+          return Colors.cyan;
         default:
           return Colors.grey;
       }

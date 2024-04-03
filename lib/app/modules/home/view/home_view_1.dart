@@ -347,13 +347,18 @@ class _home_view_1State extends State<home_view_1> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      capitalizeAll(
-                                          data['user']['name']),
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight:
-                                          FontWeight.bold),
+                                    SizedBox(
+                                      width: Get.width * 0.33,
+                                      child: Text(
+                                        capitalizeAll(
+                                            data['user']['name']),
+                                        style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight:
+                                            FontWeight.bold),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                     Text(
                                       DateFormat('dd-MM-yyyy')

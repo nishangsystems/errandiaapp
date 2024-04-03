@@ -142,6 +142,31 @@ class ErrandsAPI {
 
   }
 
+  // run an errand
+  static Future runErrand(String errandId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.get(Uri.parse('${apiDomain().domain}/user/errands/$errandId/run'),
+      headers: ({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      })
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return jsonEncode({'status': 'success', 'message': 'Errand is now running in the background.', 'data': data['data']});
+    } else {
+      var da = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'message': da['message']});
+    }
+  }
+
   // remove image from errand
   static Future removeErrandImage(String errandId, String imageId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

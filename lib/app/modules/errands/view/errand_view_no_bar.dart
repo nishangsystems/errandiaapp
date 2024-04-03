@@ -203,30 +203,8 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
                               ),
                             ),
                           ),
-                          Row(
-                            children: [
-                              Text(
-                                'posted on :',
-                                style: TextStyle(
-                                  color: appcolor().mediumGreyColor,
-                                  fontSize: 10,
-                                ),
-                              ),
-                              Text(
-                                '${date1[2]}-${date1[1]}-${date1[0]}',
-                                style: TextStyle(
-                                  color: appcolor().mainColor,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(
-                                width: Get.width * 0.04,
-                              ),
-                              found_pending_cancel(index, 3),
-                            ],
-                          ),
                           Container(
+                            width: Get.width * 0.56,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 2,
                               vertical: 2,
@@ -248,6 +226,29 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
                                 color: appcolor().mediumGreyColor,
                               ),
                             ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                'posted on :',
+                                style: TextStyle(
+                                  color: appcolor().mediumGreyColor,
+                                  fontSize: 10,
+                                ),
+                              ),
+                              Text(
+                                '${date1[2]}-${date1[1]}-${date1[0]}',
+                                style: TextStyle(
+                                  color: appcolor().mainColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(
+                                width: Get.width * 0.04,
+                              ),
+                              // found_pending_cancel(index, 3),
+                            ],
                           ),
                         ],
                       ),
