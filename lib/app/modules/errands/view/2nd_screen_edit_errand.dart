@@ -7,6 +7,7 @@ import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/modal/subcategory.dart';
 import 'package:errandia/utils/helper.dart';
@@ -41,6 +42,7 @@ class _EditErrand2 extends State<EditErrand2> {
   late ScrollController _scrollController;
   late imagePickercontroller imageController2;
   late errand_controller errandController;
+  late home_controller homeController;
 
   var selectedOption;
 
@@ -69,6 +71,7 @@ class _EditErrand2 extends State<EditErrand2> {
     _scrollController = ScrollController();
     imageController2 = Get.put(imagePickercontroller());
     errandController = Get.put(errand_controller());
+    homeController = Get.put(home_controller());
 
     product_controller.loadCategories();
 
@@ -138,6 +141,8 @@ class _EditErrand2 extends State<EditErrand2> {
             // imageController2.imagePaths.clear();
             // selectedFilters.clear();
           });
+          homeController.reloadRecentlyPostedItems();
+          errandController.reloadMyErrands();
           popup = PopupBox(
             title: 'Success',
             description: response['message'],
@@ -149,7 +154,6 @@ class _EditErrand2 extends State<EditErrand2> {
               //   ),
               //   (route) => false,
               // );
-              errandController.reloadMyErrands();
               Get.back();
               Get.back();
             },
@@ -188,7 +192,7 @@ class _EditErrand2 extends State<EditErrand2> {
           titleSpacing: 8,
           title: Text(
             'Update Errand'.tr,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Color(0xff113d6b),
             ),
@@ -203,8 +207,8 @@ class _EditErrand2 extends State<EditErrand2> {
             onPressed: () {
               Get.back();
             },
-            icon: Icon(Icons.arrow_back_ios),
-            color: Color(0xff113d6b),
+            icon: const Icon(Icons.arrow_back_ios),
+            color: const Color(0xff113d6b),
           ),
           // actions: [
           //   TextButton(
@@ -221,13 +225,13 @@ class _EditErrand2 extends State<EditErrand2> {
               child: Wrap(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 15,
                       vertical: 15,
                     ),
                     child: Text(
                       '2- Upload Photos'.tr,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),

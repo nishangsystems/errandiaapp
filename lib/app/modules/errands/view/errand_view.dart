@@ -333,6 +333,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                                     if (response["status"] ==
                                                         'success') {
                                                       errandController.reloadMyErrands();
+                                                      homeController.reloadRecentlyPostedItems();
 
                                                       Navigator.of(dialogContext)
                                                           .pop(); // Close the dialog

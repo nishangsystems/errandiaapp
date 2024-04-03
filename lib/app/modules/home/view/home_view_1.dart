@@ -33,7 +33,7 @@ class home_view_1 extends StatefulWidget {
   State<home_view_1> createState() => _home_view_1State();
 }
 
-class _home_view_1State extends State<home_view_1> {
+class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
   String? isLoggedIn;
   late home_controller homeController;
   late profile_controller profileController;

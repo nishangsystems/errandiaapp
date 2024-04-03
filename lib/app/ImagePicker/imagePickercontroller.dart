@@ -127,6 +127,30 @@ class imagePickercontroller extends GetxController {
     }
   }
 
+  // replace errand image
+  Future replaceErrandImage(int index, String itemId) async {
+    // dynamic image = imageList[index];
+    final _picker = ImagePicker();
+    try {
+      final temp_image = await _picker.pickImage(source: ImageSource.gallery);
+      if (temp_image != null) {
+        // delete the previous image from the server
+        if (imageList[index]['id'] != null && imageList[index] is Map) {
+          print("image to replace: ${imageList[index]['id']}");
+
+          await deleteErrandImage(itemId, index).then((_) {
+            print("image deleted ====");
+          });
+        }
+
+        imageList[index] = temp_image;
+        uploadErrandImage(temp_image.path, itemId, index);
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
 
   Future<void> getmultipleImage() async {
     final ImagePicker _picker = ImagePicker();

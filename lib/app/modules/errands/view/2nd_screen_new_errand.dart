@@ -6,6 +6,7 @@ import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/modal/subcategory.dart';
 import 'package:errandia/modal/subcatgeory.dart';
@@ -48,6 +49,7 @@ class _nd_screenState extends State<nd_screen> {
   late add_product_cotroller product_controller;
   late errand_controller errandController;
   late imagePickercontroller imageController;
+  late home_controller homeController;
 
   var selectedOption;
 
@@ -65,11 +67,11 @@ class _nd_screenState extends State<nd_screen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     product_controller = Get.put(add_product_cotroller());
     errandController = Get.put(errand_controller());
     imageController = Get.put(imagePickercontroller());
+    homeController = Get.put(home_controller());
     product_controller.loadCategories();
     ischip2 = List.filled(
       subCetegoryData.Items.length,
@@ -106,7 +108,7 @@ class _nd_screenState extends State<nd_screen> {
 
       print("value: $value");
 
-      await ErrandsAPI.createErrand(value, imageController.imagePaths).then((response_) {
+      await ErrandsAPI.createErrand(value, imageController.imageList).then((response_) {
         print("reponse: $response_");
         var response = jsonDecode(response_);
         if (response['status'] == 'success') {
@@ -114,6 +116,7 @@ class _nd_screenState extends State<nd_screen> {
             print("Errand created successfully");
           }
           errandController.reloadMyErrands();
+          homeController.reloadRecentlyPostedItems();
           setState(() {
             isLoading = false;
             imageController.imageList.clear();

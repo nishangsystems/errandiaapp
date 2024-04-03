@@ -330,6 +330,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar> with Widgets
                                                       if (response["status"] ==
                                                           'success') {
                                                         errandController.reloadMyErrands();
+                                                        homeController.reloadRecentlyPostedItems();
 
                                                         Navigator.of(dialogContext)
                                                             .pop(); // Close the dialog

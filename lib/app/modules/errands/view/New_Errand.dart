@@ -345,7 +345,7 @@ class _NewErrandState extends State<New_Errand> {
                   hintStyle: TextStyle(
                     color: Colors.black,
                   ),
-                  hintText: 'Description',
+                  hintText: 'Description *',
                   suffixIcon: Icon(
                     color: Colors.black,
                     Icons.edit,
@@ -364,17 +364,18 @@ class _NewErrandState extends State<New_Errand> {
             ),
             InkWell(
               onTap: () {
-                if (newErrandController.titleController.text != '' &&
-                    newErrandController.descriptionController.text != '') {
-                  Get.to(nd_screen(
+                if (newErrandController.titleController.text.isEmpty) {
+                  alertDialogBox(context, 'Alert', 'Product/Service Name is Required');
+                } else if (newErrandController.descriptionController.text.isEmpty) {
+                  alertDialogBox(context, 'Alert', 'Description is Required');
+                } else {
+                  Get.to(() => nd_screen(
                     title: newErrandController.titleController.text.toString(),
                     description: newErrandController.descriptionController.text.toString(),
                     region: newErrandController.regionCode,
                     street: street,
                     town: newErrandController.town,
-                  ));
-                } else {
-                  alertDialogBox(context, 'Alert', 'Please Fill Fields');
+                  ), transition: Transition.rightToLeft, duration: const Duration(milliseconds: 500));
                 }
                 // newErrandController.title..clear();
                 // newErrandController.description.clear();

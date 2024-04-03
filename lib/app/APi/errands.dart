@@ -1,8 +1,10 @@
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,7 +37,7 @@ class ErrandsAPI {
 
   // create a new errand with image list upload form data
   static Future createErrand(Map<String, dynamic> value,
-    List<String> imageList) async {
+    List<dynamic> imageList) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
 
@@ -47,19 +49,21 @@ class ErrandsAPI {
       'Content-Type': 'multipart/form-data',
     });
 
-    for (int i = 0; i < imageList.length; i++) {
+    print("image list to send: $imageList");
+
+    if (imageList.isNotEmpty) {
       for (var image in imageList) {
         request.files.add(
           await http.MultipartFile.fromPath(
             'images[]', // Field name for each image
-            image,
+            image.path,
           ),
         );
       }
     }
 
     for (var key in value.keys) {
-      request.fields[key] = value[key];
+      request.fields[key] = value[key].toString();
     }
 
     var response = await request.send();
