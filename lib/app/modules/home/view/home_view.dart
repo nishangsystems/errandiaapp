@@ -49,6 +49,15 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      homeController.checkLoginStatus();
+      homeController.reloadRecentlyPostedItems();
+      homeController.reloadFeaturedBusinessesData();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appbar(),

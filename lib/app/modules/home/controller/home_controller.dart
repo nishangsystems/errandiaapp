@@ -92,6 +92,7 @@ class home_controller extends GetxController {
   void reloadRecentlyPostedItems() {
     recentlyPostedItemsData.clear();
     isRPILoading.value = true;
+    isRPIError.value = false;
     fetchRecentlyPostedItemsData();
   }
 

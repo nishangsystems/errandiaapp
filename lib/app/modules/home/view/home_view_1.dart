@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
-import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
@@ -33,7 +33,7 @@ class home_view_1 extends StatefulWidget {
   State<home_view_1> createState() => _home_view_1State();
 }
 
-class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
+class _home_view_1State extends State<home_view_1> {
   String? isLoggedIn;
   late home_controller homeController;
   late profile_controller profileController;
@@ -691,7 +691,11 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
                       const Spacer(),
                       ElevatedButton(
                           onPressed: () {
-                            Get.to(New_Errand());
+                            if (homeController.loggedIn.value) {
+                              Get.to(() => const New_Errand());
+                            } else {
+                              Get.to(() => const signin_view());
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white),
