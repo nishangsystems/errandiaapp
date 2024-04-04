@@ -189,9 +189,9 @@ class _home_view_1State extends State<home_view_1> {
     subCategoryData();
     homeController.featuredBusinessData();
     homeController.recentlyPostedItemsData();
-    if (homeController.loggedIn.value) {
+    // if (homeController.loggedIn.value) {
       profileController.getUser();
-    }
+    // }
   }
 
   String _formatAddress(Map<String, dynamic> item) {

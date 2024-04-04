@@ -116,6 +116,8 @@ class profile_controller extends GetxController {
       isProductError.value = true;
       isProductLoading.value = false;
       print("error loading products: $e");
+    } finally {
+      update();
     }
   }
 
@@ -151,6 +153,7 @@ class profile_controller extends GetxController {
 
   void reloadMyBusinesses() {
     currentPage.value = 1;
+    isError.value = false;
     itemList.clear();
     loadMyBusinesses();
     update();
@@ -158,6 +161,7 @@ class profile_controller extends GetxController {
 
   void reloadMyProducts() {
     productCurrentPage.value = 1;
+    isProductError.value = false;
     productItemList.clear();
     loadMyProducts();
     update();
@@ -165,6 +169,7 @@ class profile_controller extends GetxController {
 
   void reloadMyServices() {
     serviceCurrentPage.value = 1;
+    isServiceError.value = false;
     serviceItemList.clear();
     loadMyServices();
     update();

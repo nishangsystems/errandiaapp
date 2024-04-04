@@ -59,7 +59,7 @@ class _Profile_viewState extends State<Profile_view>
         userData['photo'] =
             userProfileImg == null || userProfileImg.toString() == ""
                 ? null
-                : getImagePath(userProfileImg);
+                : getImagePathWithSize(userProfileImg, width: 200, height: 200);
       });
     }
     print("user profile image: ${userData['photo']}");
@@ -139,9 +139,11 @@ class _Profile_viewState extends State<Profile_view>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(message),
+                    Text(message,
+                      textAlign: TextAlign.center,
+                    ),
                     ElevatedButton(
-                      onPressed: onReload,
+                      onPressed: () => onReload(),
                       style: ElevatedButton.styleFrom(
                         primary: appcolor().mainColor,
                       ),
@@ -152,7 +154,7 @@ class _Profile_viewState extends State<Profile_view>
                     ),
                   ],
                 ),
-              ),
+              ).paddingAll(10),
             )
           : buildLoadingWidget();
     }
@@ -166,9 +168,11 @@ class _Profile_viewState extends State<Profile_view>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(message),
+                  Text(message,
+                    textAlign: TextAlign.center,
+                  ),
                     ElevatedButton(
-                      onPressed: onReload,
+                      onPressed: () => onReload(),
                       style: ElevatedButton.styleFrom(
                         primary: appcolor().mainColor,
                       ),
@@ -179,7 +183,7 @@ class _Profile_viewState extends State<Profile_view>
                     ),
                   ],
                 ),
-              ),
+              ).paddingAll(10),
             )
           : buildLoadingWidget();
     }
@@ -193,9 +197,11 @@ class _Profile_viewState extends State<Profile_view>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(message),
+                    Text(message,
+                      textAlign: TextAlign.center,
+                    ),
                     ElevatedButton(
-                      onPressed: onReload,
+                      onPressed: () => onReload(),
                       style: ElevatedButton.styleFrom(
                         primary: appcolor().mainColor,
                       ),
@@ -206,7 +212,7 @@ class _Profile_viewState extends State<Profile_view>
                     ),
                   ],
                 ),
-              ),
+              ).paddingAll(10),
             )
           : buildLoadingWidget();
     }
@@ -296,9 +302,7 @@ class _Profile_viewState extends State<Profile_view>
             return buildLoadingWidget();
           } else if (profileController.isProductError.value) {
             return _buildMyProductsErrorWidget(
-                'An error occurred while loading your products', () {
-              profileController.reloadMyBusinesses();
-            });
+                'An error occurred while loading your products', profileController.reloadMyProducts);
           } else if (profileController.productItemList.isEmpty) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -377,9 +381,7 @@ class _Profile_viewState extends State<Profile_view>
             return buildLoadingWidget();
           } else if (profileController.isServiceError.value) {
             return _buildMyServicesErrorWidget(
-                'An error occurred while loading your services', () {
-              profileController.loadMyServices();
-            });
+                'An error occurred while loading your services', profileController.reloadMyServices);
           } else if (profileController.serviceItemList.isEmpty) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -477,7 +479,7 @@ class _Profile_viewState extends State<Profile_view>
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child: userData['photo'] != null
-                            ? Image.network(userData['photo'], fit: BoxFit.contain,
+                            ? Image.network(userData['photo'], fit: BoxFit.cover,
                                 errorBuilder: (BuildContext context,
                                     Object exception, StackTrace? stackTrace) {
                                 return Center(

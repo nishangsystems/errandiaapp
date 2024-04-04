@@ -8,6 +8,7 @@ import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/bottomsheet_item.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
@@ -28,6 +29,7 @@ class edit_profile_view extends StatefulWidget {
 class edit_profile_viewState extends State<edit_profile_view> {
   imagePickercontroller imageController = Get.put(imagePickercontroller());
   profile_controller profileController = Get.put(profile_controller());
+  home_controller homeController = Get.put(home_controller());
 
   final TextEditingController emailController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
@@ -648,6 +650,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                         // Handle the response as needed
 
                         if (response['image_path'] != '') {
+                          homeController.reloadRecentlyPostedItems();
                           PopupBox popupBox = PopupBox(
                             title: 'Success',
                             description: 'Profile Image Updated',

@@ -81,65 +81,28 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                       Navigator.of(dialogContext).pop(); // Close the dialog
 
                       // Show success popup
-                      // Get.snackbar("Info", response['message'],
-                      //     snackPosition: SnackPosition.TOP,
-                      //     backgroundColor: Colors.green,
-                      //     colorText: Colors.white,
-                      //     duration: const Duration(seconds: 8));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(response['message']),
+                      Get.snackbar("Info", response['message'],
+                          snackPosition: SnackPosition.BOTTOM,
                           backgroundColor: Colors.green,
-                          behavior: SnackBarBehavior.floating,
-                          elevation: 1,
+                          colorText: Colors.white,
                           duration: const Duration(seconds: 5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 15,
-                          ),
                           margin: const EdgeInsets.symmetric(
                             horizontal: 20,
-                            vertical: 10,
-                          ),
-                          key: const ValueKey("rerun_snackbar"),
-                        ),
+                            vertical: 15,)
                       );
                     } else {
-                      // Navigator.of(dialogContext)
-                      //     .pop(); // Close the dialog
+                      Navigator.of(dialogContext).pop(); // Close the dialog
 
-                      // Show error popup
-                      // popup = PopupBox(
-                      //   title: 'Error',
-                      //   description: response['data']
-                      //   ['data'],
-                      //   type: PopupType.error,
-                      // );
-                      print("rerun errand error: ${response}");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(response['message']),
-                            backgroundColor: Colors.red,
-                            behavior: SnackBarBehavior.floating,
-                            elevation: 1,
-                            duration: const Duration(seconds: 5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 15,
-                            ),
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
-                            key: const ValueKey("rerun_snackbar_error"),
-                          ),
+                      Get.snackbar("Error", response['message'],
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                          duration: const Duration(seconds: 5),
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 15,)
                       );
+                      print("rerun errand error: ${response}");
                     }
 
                     // popup.showPopup(context); // Show the popup
@@ -368,7 +331,8 @@ class _errand_detail_viewState extends State<errand_detail_view> {
             Row(
               children: [
                 SizedBox(
-                  width: Get.width * 0.3,
+                  // width: Get.width * 0.5,
+                  height: Get.height * 0.1,
                   child: CircleAvatar(
                     radius: 25,
                     backgroundColor: appcolor().mainColor,
@@ -384,7 +348,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                   ),
                 ),
                 SizedBox(
-                  width: Get.width * 0.035,
+                  width: Get.width * 0.2,
                 ),
                 Expanded(
                   child: Column(
@@ -398,6 +362,8 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                           fontSize: 15,
                           color: appcolor().mainColor,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       widget.data['user']['street'] != ""
                           ? Text(
