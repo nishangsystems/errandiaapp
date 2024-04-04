@@ -92,7 +92,11 @@ class _EditErrand2 extends State<EditErrand2> {
     // add all selected categories to selectedFilters
     if (widget.data!['categories'] != null) {
       for (var category in widget.data!['categories']) {
-        selectedFilters.add(category['id']);
+        if (category.runtimeType != int) {
+          selectedFilters.add(category['id']);
+        } else {
+          selectedFilters.add(category);
+        }
       }
     }
     print("selectedFilters: $selectedFilters");
@@ -181,6 +185,16 @@ class _EditErrand2 extends State<EditErrand2> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
+        setState(() {
+          updatedData = {
+            'title': widget.data['title'],
+            'description': widget.data['description'],
+            'region': widget.data['region'],
+            'town': widget.data['town'],
+            'images': imageController2.imageList,
+            'categories': selectedFilters,
+          };
+        });
         Get.back(result: updatedData);
         return true;
       },
@@ -205,7 +219,17 @@ class _EditErrand2 extends State<EditErrand2> {
           leading: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () {
-              Get.back();
+              setState(() {
+                updatedData = {
+                  'title': widget.data['title'],
+                  'description': widget.data['description'],
+                  'region': widget.data['region'],
+                  'town': widget.data['town'],
+                  'images': imageController2.imageList,
+                  'categories': selectedFilters,
+                };
+              });
+              Get.back(result: updatedData);
             },
             icon: const Icon(Icons.arrow_back_ios),
             color: const Color(0xff113d6b),
@@ -476,12 +500,13 @@ class _EditErrand2 extends State<EditErrand2> {
                                           decoration:
                                           BoxDecoration(border: Border.all()),
                                           child:  imageController2.imageList[index] is Map && imageController2.imageList[index].containsKey('image_path')
-                                              ? Image.network(
-                                            getImagePath(
-                                              imageController2.imageList[index]['image_path'],
+                                              ? FadeInImage.assetNetwork(
+                                            placeholder: 'assets/images/errandia_logo.png',
+                                            image: getImagePathWithSize(
+                                              imageController2.imageList[index]['image_path'], width: 200, height: 200
                                             ),
                                             fit: BoxFit.fill,
-                                            errorBuilder: (BuildContext context,
+                                            imageErrorBuilder: (BuildContext context,
                                                 Object exception,
                                                 StackTrace? stackTrace) {
                                               return Container();
