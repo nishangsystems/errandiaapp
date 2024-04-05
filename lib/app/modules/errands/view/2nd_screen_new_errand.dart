@@ -13,6 +13,7 @@ import 'package:errandia/modal/subcatgeory.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -79,7 +80,85 @@ class _nd_screenState extends State<nd_screen> {
     );
   }
 
-  void runErrand(BuildContext context) async {
+  void runErrand(Map<String, dynamic> response) async {
+    await ErrandsAPI.runErrand(response['data']['item']['id'].toString()).then((response_) {
+      if (response_ != null) {
+        response = jsonDecode(response_);
+        print("rerun errand response: $response");
+
+        // Check if the widget is still in the tree
+        if (response["status"] == 'success') {
+          errandController.reloadMyErrands();
+          homeController.reloadRecentlyPostedItems();
+
+          // Navigator.of(dialogContext).pop(); // Close the dialog
+
+          // Show success popup
+          Get.snackbar("Info", response['message'],
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 5),
+              margin: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,)
+          );
+        } else {
+          // Navigator.of(dialogContext).pop(); // Close the dialog
+          Get.back();
+          Get.back();
+          Get.snackbar("Error", response['message'],
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 5),
+              margin: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,)
+          );
+          print("rerun errand error: ${response}");
+        }
+
+        // popup.showPopup(context); // Show the popup
+      }
+    });
+  }
+
+  void runErrandInBackground(Map<String, dynamic> response) async {
+    const config = FlutterBackgroundAndroidConfig(
+      notificationTitle: 'Errandia',
+      notificationText: 'Your errand is running in the background',
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon: AndroidResource(
+        name: 'ic_launcher',
+        defType: 'mipmap',
+      ),
+      enableWifiLock: true,
+      showBadge: true,
+    );
+
+    var hasPermissions = await FlutterBackground.hasPermissions;
+    
+    if (!hasPermissions) {
+      var requestPermissions;
+      // await FlutterBackground.requestPermissions;
+      print("PERMISSIONS NOT PROVIDED");
+    }
+    
+    hasPermissions = await FlutterBackground.initialize(androidConfig: config);
+
+    if (hasPermissions) {
+      if (hasPermissions) {
+        final backgroundExecution = await FlutterBackground.enableBackgroundExecution();
+
+        if (backgroundExecution) {
+         runErrand(response);
+        }
+      }
+    }
+  }
+
+  void createErrand(BuildContext context) async {
     print("categories listing: ${listToString(selectedFilters)}");
     print("imageList: ${imageController.imageList}");
     if (widget.title == null || widget.title == "") {
@@ -108,7 +187,7 @@ class _nd_screenState extends State<nd_screen> {
 
       print("value: $value");
 
-      await ErrandsAPI.createErrand(value, imageController.imageList).then((response_) {
+      await ErrandsAPI.createErrand(value, imageController.imageList).then((response_) async {
         print("reponse: $response_");
         var response = jsonDecode(response_);
         if (response['status'] == 'success') {
@@ -123,6 +202,9 @@ class _nd_screenState extends State<nd_screen> {
             imageController.imagePaths.clear();
             selectedFilters.clear();
           });
+
+          runErrandInBackground(response);
+
           popup = PopupBox(
             title: 'Success',
             description: response['message'],
@@ -136,9 +218,13 @@ class _nd_screenState extends State<nd_screen> {
               // );
               Get.back();
               Get.back();
+              // print("response: $response");
+
             },
           );
           popup.showPopup(context);
+
+
         } else {
           setState(() {
             isLoading = false;
@@ -155,6 +241,12 @@ class _nd_screenState extends State<nd_screen> {
         alertDialogBox(context, "Error", "Failed to create errand");
       });
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    FlutterBackground.disableBackgroundExecution();
   }
 
   @override
@@ -724,7 +816,7 @@ class _nd_screenState extends State<nd_screen> {
                     // });
                     // uploadImage(widget.title, widget.description, selectedFilters, widget.street, widget.town, widget.region);
                     //  PanDocumentInfoupload(widget.title, widget.description, selectedFilters, widget.street, widget.town, widget.region);
-                    runErrand(context);
+                    createErrand(context);
                   },
                   child: Padding(
                     padding:

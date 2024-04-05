@@ -73,7 +73,7 @@ class ErrandsAPI {
       if (kDebugMode) {
         print(data);
       }
-      return jsonEncode({'status': 'success', 'message': 'Errand created successfully'});
+      return jsonEncode({'status': 'success', 'message': 'Errand created successfully', 'data': data['data']});
     } else {
       var da = jsonDecode(await response.stream.bytesToString());
       return jsonEncode({'status': 'error', 'message': da['message']});
@@ -167,6 +167,56 @@ class ErrandsAPI {
     }
   }
 
+  // get errandResults
+  static Future getErrandResults(String errandId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.get(Uri.parse('${apiDomain().domain}/user/errands/$errandId/results'),
+        headers: ({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        })
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
+
+  // get errands received
+  static Future getErrandsReceived(int page) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.get(Uri.parse('${apiDomain().domain}/user/errands_received?page=$page'),
+        headers: ({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        })
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return data['data'];
+    } else {
+      var da = jsonDecode(response.body);
+      return da;
+    }
+  }
+
   // remove image from errand
   static Future removeErrandImage(String errandId, String imageId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -186,6 +236,31 @@ class ErrandsAPI {
         print(data);
       }
       return jsonEncode({'status': 'success', 'message': 'Image removed successfully'});
+    } else {
+      var da = jsonDecode(response.body);
+      return jsonEncode({'status': 'error', 'message': da['message']});
+    }
+  }
+
+  // delete all errand images
+  static Future deleteAllErrandImages(String errandId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.delete(Uri.parse('${apiDomain().domain}/user/errands/$errandId/remove_images'),
+      headers: ({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      })
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(data);
+      }
+      return jsonEncode({'status': 'success', 'message': 'All images removed successfully'});
     } else {
       var da = jsonDecode(response.body);
       return jsonEncode({'status': 'error', 'message': da['message']});

@@ -328,11 +328,10 @@ class _NewErrandState extends State<New_Errand> {
               height: Get.height * 0.2,
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
               child: TextFormField(
-                keyboardType: TextInputType.name,
-                textCapitalization: TextCapitalization.sentences,
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
                 controller: newErrandController.descriptionController,
-                minLines: 1,
-                maxLines: 4,
+                maxLines: null,
                 onChanged: (value) {
                   newErrandController.update();
                 },
