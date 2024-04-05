@@ -152,3 +152,8 @@ String listToString(List<int?> list) {
   }
   return result;
 }
+
+// check if location info is available
+bool isLocationAvailable(Map<String, dynamic> value) {
+  return value['region'] != "" && value['region'] != null && value['town'] != "" && value['town'] != null;
+}

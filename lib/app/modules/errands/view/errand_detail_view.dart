@@ -16,8 +16,9 @@ import 'package:readmore/readmore.dart';
 
 class errand_detail_view extends StatefulWidget {
   final data;
+  bool received;
 
-  const errand_detail_view({super.key, this.data});
+  errand_detail_view({super.key, this.data, this.received = false});
 
   @override
   _errand_detail_viewState createState() => _errand_detail_viewState();
@@ -158,6 +159,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
           size: 30,
         ),
         actions: [
+          if (!widget.received)
           IconButton(
             onPressed: () {
               // rerun an errand

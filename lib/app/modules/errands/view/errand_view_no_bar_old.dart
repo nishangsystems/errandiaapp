@@ -92,15 +92,6 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
     return [townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
   }
 
-  // show email if phone is not available and vice versa
-  bool isPhoneAvailable(Map<String, dynamic> item) {
-    return item['phone'] != null && item['phone'] != "";
-  }
-
-  bool isEmailAvailable(Map<String, dynamic> item) {
-    return item['email'] != null && item['email'] != "";
-  }
-
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -494,84 +485,123 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
               var data_ = errandController.receivedList[index];
               var date = data_['created_at'].split('T');
               var date1 = date[0].split('-');
-              return GestureDetector(
-                onTap: () {
-                  Get.to(() => errand_detail_view(
-                        data: data_, received: true,
-                      ), transition: Transition.fadeIn,
-                    duration: const Duration(milliseconds: 500)
-                  );
-                },
-                child: Container(
-                  // height: Get.height * 0.15,
-                  padding: const EdgeInsets.all(
+              return Container(
+                // height: Get.height * 0.15,
+                padding: const EdgeInsets.all(
+                  10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(
                     10,
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(
-                      10,
-                    ),
-                  ),
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // top row
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          // image container
+                ),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 10,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // top row
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        // image container
+                        Container(
+                          margin: const EdgeInsets.only(
+                            right: 10,
+                          ),
+                          width: Get.width * 0.05,
+                          height: Get.height * 0.03,
+                          child: CircleAvatar(
+                            radius: 50,
+                            // backgroundColor: Colors.white,
+                            backgroundImage: data_['user']['photo'] == "" ||
+                                    data_['user']['photo'] == null
+                                ? const AssetImage(
+                                    'assets/images/errandia_logo.png') // Fallback image
+                                : NetworkImage(getImagePath(
+                                        data_['user']['photo'].toString()))
+                                    as ImageProvider,
+                            child: data_['user']['photo'] == "" ||
+                                    data_['user']['photo'] == null
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        border: Border.all(
+                                            width: 0.5,
+                                            color: appcolor().darkBlueColor)),
+                                    child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        child: Image.asset(
+                                            'assets/images/errandia_logo.png')))
+                                : null, // Only show the icon if there is no photo
+                          ),
+                        ),
+                        SizedBox(
+                          width: Get.width * 0.002,
+                        ),
+                        SizedBox(
+                          width: isLocationAvailable(data_['user'])
+                              ? Get.width * 0.28
+                              : Get.width * 0.34,
+                          child: Text(
+                            data_['user']['name'].toString(),
+                            style: TextStyle(
+                              color: appcolor().mainColor.withOpacity(0.6),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 10,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+
+                        SizedBox(
+                          width: Get.width * 0.003,
+                        ),
+
+                        // dot
+                        if (isLocationAvailable(data_['user']))
                           Container(
-                            margin: const EdgeInsets.only(
-                              right: 10,
-                            ),
-                            width: Get.width * 0.05,
-                            height: Get.height * 0.03,
-                            child: CircleAvatar(
-                              radius: 50,
-                              // backgroundColor: Colors.white,
-                              backgroundImage: data_['user']['photo'] == "" ||
-                                      data_['user']['photo'] == null
-                                  ? const AssetImage(
-                                      'assets/images/errandia_logo.png') // Fallback image
-                                  : NetworkImage(getImagePath(
-                                          data_['user']['photo'].toString()))
-                                      as ImageProvider,
-                              child: data_['user']['photo'] == "" ||
-                                      data_['user']['photo'] == null
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                          border: Border.all(
-                                              width: 0.5,
-                                              color: appcolor().darkBlueColor)),
-                                      child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                          child: Image.asset(
-                                              'assets/images/errandia_logo.png')))
-                                  : null, // Only show the icon if there is no photo
+                            width: Get.width * 0.01,
+                            height: Get.height * 0.01,
+                            decoration: BoxDecoration(
+                              color: appcolor().darkBlueColor.withOpacity(0.5),
+                              shape: BoxShape.circle,
                             ),
                           ),
+
+                        if (isLocationAvailable(data_['user']))
                           SizedBox(
-                            width: Get.width * 0.002,
+                            width: Get.width * 0.02,
                           ),
+
+                        // location icon
+                        if (isLocationAvailable(data_['user']))
+                          Icon(
+                            Icons.location_on,
+                            color: appcolor().mediumGreyColor.withRed(300),
+                            size: 12,
+                          ),
+
+                        // location text with formatAddress
+                        if (isLocationAvailable(data_['user']))
                           SizedBox(
-                            width: isLocationAvailable(data_['user'])
-                                ? Get.width * 0.28
-                                : Get.width * 0.34,
+                            width: Get.width * 0.02,
+                          ),
+                        if (isLocationAvailable(data_['user']))
+                          SizedBox(
+                            width: Get.width * 0.25,
                             child: Text(
-                              data_['user']['name'].toString(),
+                              _formatAddress(data_['user']),
                               style: TextStyle(
-                                color: appcolor().mainColor.withOpacity(0.6),
-                                fontWeight: FontWeight.w600,
+                                color: appcolor().mediumGreyColor,
                                 fontSize: 10,
                               ),
                               maxLines: 1,
@@ -579,304 +609,231 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                             ),
                           ),
 
-                          SizedBox(
-                            width: Get.width * 0.003,
-                          ),
+                        const Spacer(),
 
-                          // dot
-                          if (isLocationAvailable(data_['user']))
-                            Container(
-                              width: Get.width * 0.01,
-                              height: Get.height * 0.01,
-                              decoration: BoxDecoration(
-                                color: appcolor().darkBlueColor.withOpacity(0.5),
-                                shape: BoxShape.circle,
+                        // delete icon with text
+                        InkWell(
+                          onTap: () {
+                            Get.snackbar(
+                              'Delete',
+                              'Delete this errand',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: appcolor().redColor,
+                              colorText: Colors.white,
+                              duration: const Duration(seconds: 5),
+                              margin: const EdgeInsets.only(
+                                bottom: 15,
+                                left: 10,
+                                right: 10,
                               ),
-                            ),
-
-                          if (isLocationAvailable(data_['user']))
-                            SizedBox(
-                              width: Get.width * 0.02,
-                            ),
-
-                          // location icon
-                          if (isLocationAvailable(data_['user']))
-                            Icon(
-                              Icons.location_on,
-                              color: appcolor().mediumGreyColor.withRed(300),
-                              size: 12,
-                            ),
-
-                          // location text with formatAddress
-                          if (isLocationAvailable(data_['user']))
-                            SizedBox(
-                              width: Get.width * 0.02,
-                            ),
-                          if (isLocationAvailable(data_['user']))
-                            SizedBox(
-                              width: Get.width * 0.25,
-                              child: Text(
-                                _formatAddress(data_['user']),
-                                style: TextStyle(
-                                  color: appcolor().mediumGreyColor,
-                                  fontSize: 10,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-
-                          const Spacer(),
-
-                          // delete icon with text
-                          InkWell(
-                            onTap: () {
-                              Get.snackbar(
-                                'Delete',
-                                'Delete this errand',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: appcolor().redColor,
-                                colorText: Colors.white,
-                                duration: const Duration(seconds: 5),
-                                margin: const EdgeInsets.only(
-                                  bottom: 15,
-                                  left: 10,
-                                  right: 10,
-                                ),
-                                mainButton: TextButton(
-                                  onPressed: () {
-                                    Get.back();
-                                  },
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      color: appcolor().mainColor,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  child: Icon(
-                                    Icons.delete_forever_outlined,
-                                    color: appcolor().redColor.withOpacity(0.6),
-                                    size: 14,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: Get.width * 0.002,
-                                ),
-                                Text(
-                                  'Reject',
+                              mainButton: TextButton(
+                                onPressed: () {
+                                  Get.back();
+                                },
+                                child: Text(
+                                  'Cancel',
                                   style: TextStyle(
-                                      fontSize: 12,
-                                      color: appcolor().redColor.withOpacity(0.6),
-                                      fontWeight: FontWeight.w600),
+                                    color: appcolor().mainColor,
+                                  ),
                                 ),
-                              ],
+                              ),
+                            );
+                          },
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                child: Icon(
+                                  Icons.delete_forever_outlined,
+                                  color: appcolor().redColor.withOpacity(0.6),
+                                  size: 14,
+                                ),
+                              ),
+                              SizedBox(
+                                width: Get.width * 0.002,
+                              ),
+                              Text(
+                                'Reject',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: appcolor().redColor.withOpacity(0.6),
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: Get.height * 0.005,
+                    ),
+                    // middle row
+                    Row(children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: Get.width * 0.7,
+                            child: Text(
+                              capitalizeAll(data_['title'] + " lsl slskieowiut eowieo wowieieow eoei"),
+                              softWrap: false,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: appcolor().mainColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                child: Text(
+                                  'posted on :',
+                                  style: TextStyle(
+                                    color: appcolor().mediumGreyColor,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                child: Text(
+                                  '02 Apr 2023',
+                                  style: TextStyle(
+                                    color: appcolor().mainColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ).paddingOnly(top: 2),
+                          Row(
+                            children: [
+                              Container(
+                                child: Text(
+                                  'By',
+                                  style: TextStyle(
+                                    color: appcolor().mediumGreyColor,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                child: Text(
+                                  '  Dr.Pearline Commins',
+                                  style: TextStyle(
+                                    color: appcolor().mainColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ).paddingOnly(
+                            top: 2,
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 2,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: appcolor().lightgreyColor,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              'Molyko-Buea',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: appcolor().mediumGreyColor,
+                              ),
                             ),
                           ),
                         ],
                       ),
-
-                      SizedBox(
-                        height: Get.height * 0.005,
-                      ),
-                      // middle row
-                      Row(children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                      Spacer(),
+                      InkWell(
+                        onTap: () {
+                          print(index.toString());
+                          Get.bottomSheet(
+                            // backgroundColor: Colors.white,
                             Container(
-                              width: Get.width * 0.88,
-                              child: Text(
-                                capitalizeAll(data_['title']),
-                                softWrap: false,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: appcolor().mainColor,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
-                                ),
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              color: Colors.white,
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Center(
+                                    child: Icon(
+                                      Icons.horizontal_rule,
+                                      size: 25,
+                                    ),
+                                  ),
+                                  // Text(index.toString()),
+                                  managebottomSheetWidgetitem(
+                                    title: 'View Details',
+                                    icondata: FontAwesomeIcons.eye,
+                                    callback: () async {
+                                      print('tapped');
+                                      Get.back();
+                                    },
+                                  ),
+                                  managebottomSheetWidgetitem(
+                                    title: 'Call +XXXXXXXXXX',
+                                    icondata: Icons.call,
+                                    callback: () {
+                                      Get.back();
+                                    },
+                                  ),
+                                  managebottomSheetWidgetitem(
+                                    title: 'Send Email',
+                                    icondata: Icons.email,
+                                    callback: () {},
+                                  ),
+                                  managebottomSheetWidgetitem(
+                                    title: 'Delete Errand Permanently',
+                                    icondata: Icons.delete,
+                                    callback: () {},
+                                    color: Colors.red,
+                                  ),
+                                ],
                               ),
                             ),
-                            Container(
-                              width: Get.width * 0.88,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 2,
-                              ),
-                              child: Text(
-                                kDebugMode
-                                    ? data_['description'] +
-                                        " sls sieoiuoe eoieur toieie rorieieowieowieiurow woeieow woeiwowiw wowow wow wiwowiw wowowiw woiw woiw wwoiw wowiw woi  slsksls slsl skslsdkd dldksl sld skdlsks dlskdlskdwopk sldpwi soeir elwoieu erueiow eiur eoiwrwoie w"
-                                    : data_['description'],
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: true,
-                                style: TextStyle(
-                                  fontSize: 12,
+
+                            enableDrag: true,
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              'View',
+                              style: TextStyle(
+                                  fontSize: 13,
                                   color: appcolor().mediumGreyColor,
-                                ),
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: appcolor().greyColor),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Icon(
+                                Icons.more_horiz,
+                                color: appcolor().greyColor,
                               ),
                             ),
                           ],
                         ),
-                      ]),
-
-                      SizedBox(
-                        height: Get.height * 0.013,
                       ),
-                      // bottom row
-                      Row(
-                          children: [
-                            // call button
-                            // if (isPhoneAvailable(data_['user']) || !isEmailAvailable(data_['user']))
-                            InkWell(
-                              onTap: () {
-                                launchCaller(data_['user']['phone'].toString());
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                decoration: BoxDecoration(
-                                  color: appcolor().amberColor,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: Colors.orangeAccent,
-                                  ),
-                                  gradient: Gradient.lerp(
-                                    LinearGradient(
-                                      colors: [
-                                        appcolor().skyblueColor,
-                                        appcolor().amberColor,
-                                      ],
-                                    ),
-                                    LinearGradient(
-                                      colors: [
-                                        appcolor().amberColor,
-                                        appcolor().skyblueColor,
-                                      ],
-                                    ),
-                                    0.5,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.call,
-                                      color: appcolor().darkBlueColor,
-                                      size: 14,
-                                    ),
-                                    SizedBox(
-                                      width: Get.width * 0.01,
-                                    ),
-                                    Text(
-                                      'Call Now',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: appcolor().darkBlueColor,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ]
-                                )
-                              ),
-                            ),
-
-                            // posted when
-                            Spacer(),
-                            Text(
-                              data_['when'],
-                              style: TextStyle(
-                                color: appcolor().mainColor,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-
-                            // accept button
-                            Spacer(),
-                            InkWell(
-                              onTap: () {
-                                Get.snackbar(
-                                  'Accept',
-                                  'Accept this errand',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: appcolor().greenColor,
-                                  colorText: Colors.white,
-                                  duration: const Duration(seconds: 5),
-                                  margin: const EdgeInsets.only(
-                                    bottom: 15,
-                                    left: 10,
-                                    right: 10,
-                                  ),
-                                  mainButton: TextButton(
-                                    onPressed: () {
-                                      Get.back();
-                                    },
-                                    child: Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                        color: appcolor().mainColor,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: Colors.greenAccent[700]!,
-                                  ),
-                                  gradient: Gradient.lerp(
-                                    LinearGradient(
-                                      colors: [
-                                        Colors.green.withOpacity(0.8),
-                                        Colors.greenAccent[700]!,
-                                      ],
-                                    ),
-                                    LinearGradient(
-                                      colors: [
-                                        Colors.green,
-                                        Colors.green.withOpacity(0.5),
-                                      ],
-                                    ),
-                                    0.5,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      size: 14,
-                                    ),
-                                    SizedBox(
-                                      width: Get.width * 0.01,
-                                    ),
-                                    const Text(
-                                      'Accept',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ]
-                                )
-                              ),
-                            ),
-                          ]
-                      )
-                    ],
-                  ),
+                    ])
+                  ],
                 ),
               );
             },
@@ -1055,6 +1012,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                         width: Get.width * 0.26,
                         child: const Text('Received'),
                       ),
+                      const Text('Trashed'),
                     ],
                   ),
                 ),
@@ -1064,6 +1022,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                     children: [
                       PostedErrands(ctx),
                       RecievedErrands(ctx),
+                      Trashed(ctx),
                     ],
                   ),
                 ),

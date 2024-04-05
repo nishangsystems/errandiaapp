@@ -14,15 +14,22 @@ class errand_controller extends GetxController{
   RxBool isRegionSelected = false.obs;
   RxBool isTownsLoading = false.obs;
 
+  RxBool isReceivedLoading = false.obs;
+  RxBool isReceivedError = false.obs;
+
   var errandList = List<dynamic>.empty(growable: true).obs;
   var myErrandList = List<dynamic>.empty(growable: true).obs;
   var townList = RxList<dynamic>([]);
+  var receivedList = List<dynamic>.empty(growable: true).obs;
 
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
 
   RxInt myCurrentPage = 1.obs;
   RxInt myTotal = 0.obs;
+
+  RxInt receivedCurrentPage = 1.obs;
+  RxInt receivedTotal = 0.obs;
 
   @override
   void onInit() {
@@ -90,6 +97,36 @@ class errand_controller extends GetxController{
     }
   }
 
+  void fetchReceivedErrands() async {
+    print("fetching received errands");
+    if (isReceivedLoading.isTrue || (
+    receivedList.isNotEmpty && receivedList.length >= receivedTotal.value)) return;
+
+    isReceivedLoading.value = true;
+
+    try {
+      var data = await ErrandsAPI.getErrandsReceived(receivedCurrentPage.value);
+      print("response received errands: $data");
+
+      if (data != null && data.isNotEmpty) {
+        receivedCurrentPage.value++;
+        receivedList.addAll(data['items']);
+        receivedTotal.value = data['total'];
+        isReceivedLoading.value = false;
+        isReceivedError.value = false;
+
+        print("receivedList: $receivedList");
+      }
+
+      update();
+    } catch (e) {
+      // Handle exception
+      printError(info: e.toString());
+      isReceivedLoading.value = false;
+      isReceivedError.value = true;
+    }
+  }
+
   void loadTownsData(regionId) async {
     // Towns.Items = [];
     townList.clear();
@@ -129,6 +166,15 @@ class errand_controller extends GetxController{
     fetchMyErrands();
     update();
   }
+
+  void reloadReceivedErrands() {
+    receivedList.clear();
+    receivedCurrentPage.value = 1;
+    receivedTotal.value = 0;
+    isReceivedError.value = false;
+    fetchReceivedErrands();
+    update();
+  }
   
 }
 
@@ -138,7 +184,7 @@ class errand_tab_controller extends GetxController with GetSingleTickerProviderS
   @override
   void onInit() {
     // TODO: implement onInit
-    tab_controller = TabController(length: 3, vsync: this);
+    tab_controller = TabController(length: 2, vsync: this);
     super.onInit();
   }
 
