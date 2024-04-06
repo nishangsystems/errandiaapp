@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:errandia/app/APi/errands.dart';
 import 'package:errandia/app/modules/errands/view/edit_errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:errandia/app/modules/errands/view/errand_results.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
@@ -339,8 +340,21 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                 //   icondata: FontAwesomeIcons.circleCheck,
                                 //   callback: () {},
                                 // ),
+
+                                // view errand results
                                 managebottomSheetWidgetitem(
-                                  title: 'Move to trash',
+                                  title: 'View Results',
+                                  icondata: FontAwesomeIcons.list,
+                                  callback: () {
+                                    Get.back();
+                                    Get.to(() => ErrandResults(
+                                      errandId: data_['id'].toString(),
+                                    ));
+                                  },
+                                ),
+
+                                managebottomSheetWidgetitem(
+                                  title: 'Delete',
                                   icondata: Icons.delete,
                                   callback: () {
                                     showDialog(

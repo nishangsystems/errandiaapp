@@ -353,7 +353,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                 ),
 
                                 managebottomSheetWidgetitem(
-                                  title: 'Move to trash',
+                                  title: 'Delete',
                                   icondata: Icons.delete,
                                   callback: () {
                                     showDialog(

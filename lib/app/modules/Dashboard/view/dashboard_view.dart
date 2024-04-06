@@ -362,11 +362,6 @@ void custombottomsheet(BuildContext context) {
               });
             },
           ),
-          bottomSheetWidgetitem(
-            title: 'Add New Manager',
-            imagepath: 'assets/images/sidebar_icon/icon-manager.png',
-            callback: () {},
-          ),
         ],
       ),
     ),
