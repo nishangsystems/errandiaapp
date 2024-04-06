@@ -161,7 +161,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                 ),
                 margin: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 10,
+                  vertical: 5,
                 ),
                 child: Row(
                   children: [
