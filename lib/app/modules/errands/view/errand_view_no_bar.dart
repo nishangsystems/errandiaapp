@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../APi/apidomain & api.dart';
 import '../../global/Widgets/blockButton.dart';
@@ -140,7 +141,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
           );
         } else {
           return ListView.builder(
-            key: UniqueKey(),
+            key: const PageStorageKey('myPostedErrands'),
             controller: _scrollController,
             itemCount: errandController.myErrandList.length,
             scrollDirection: Axis.vertical,
@@ -332,11 +333,11 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                     ));
                                   },
                                 ),
-                                managebottomSheetWidgetitem(
-                                  title: 'Mark as found',
-                                  icondata: FontAwesomeIcons.circleCheck,
-                                  callback: () {},
-                                ),
+                                // managebottomSheetWidgetitem(
+                                //   title: 'Mark as found',
+                                //   icondata: FontAwesomeIcons.circleCheck,
+                                //   callback: () {},
+                                // ),
                                 managebottomSheetWidgetitem(
                                   title: 'Move to trash',
                                   icondata: Icons.delete,
@@ -486,7 +487,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
           );
         } else {
           return ListView.builder(
-            key: UniqueKey(),
+            key: const PageStorageKey("myReceivedErrands"),
             controller: _scrollController2,
             itemCount: errandController.receivedList.length,
             scrollDirection: Axis.vertical,
@@ -886,87 +887,22 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
     }
 
     return Scaffold(
-        floatingActionButton: homeController.loggedIn.value
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  // InkWell(
-                  //   onTap: ()async {
-                  //     final SharedPreferences prefs = await SharedPreferences.getInstance();
-                  //     var token = prefs.getString('token');
-                  //     if(token == ''){
-                  //       Get.to(const register_signin_screen());
-                  //     }else{
-                  //       Get.offAll(New_Errand());
-                  //     }
-                  //   },
-                  //   child: Container(
-                  //     width: Get.width * 0.44,
-                  //     padding: const EdgeInsets.all(15),
-                  //     decoration: BoxDecoration(
-                  //       color: appcolor().skyblueColor,
-                  //       borderRadius: BorderRadius.circular(8),
-                  //     ),
-                  //     // child: Row(
-                  //     //   children: [
-                  //     //     Icon(
-                  //     //       Icons.add,
-                  //     //       color: appcolor().mainColor,
-                  //     //       size: 28,
-                  //     //     ),
-                  //     //     Spacer(),
-                  //     //     Text(
-                  //     //       'New Errand',
-                  //     //       style: TextStyle(
-                  //     //         fontSize: 16,
-                  //     //         color: appcolor().mainColor,
-                  //     //       ),
-                  //     //     ),
-                  //     //   ],
-                  //     // ),
-                  //   ),
-                  // ),
-                  // SizedBox(height: 20,),
-                  InkWell(
-                    onTap: () {
-                      Get.to(() => New_Errand());
-                    },
-                    child: Container(
-                      width: Get.width * 0.44,
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: appcolor().mainColor,
-                        borderRadius: BorderRadius.circular(50),
-                        boxShadow: [
-                          BoxShadow(
-                            color: appcolor().mainColor.withOpacity(0.5),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.add,
-                            color: appcolor().skyblueColor,
-                            size: 28,
-                          ),
-                          const Spacer(),
-                          Text(
-                            'New Errand',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: appcolor().skyblueColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : Container(),
+        floatingActionButton: Obx(() {
+          if (tabController.tabIndex.value == 0) {
+            return FloatingActionButton(
+              onPressed: () async {
+                Get.to(() => const New_Errand());
+              },
+              backgroundColor: appcolor().mainColor,
+              child: Icon(
+                Icons.add,
+                color: appcolor().skyblueColor,
+              ),
+            );
+          } else {
+            return SizedBox.shrink();
+          }
+        }),
         endDrawer: Drawer(
           width: Get.width * 0.7,
           child: SafeArea(

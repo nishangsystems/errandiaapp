@@ -181,10 +181,15 @@ class errand_controller extends GetxController{
 class errand_tab_controller extends GetxController with GetSingleTickerProviderStateMixin{
 
   late TabController tab_controller;
+  var tabIndex = 0.obs;
+
   @override
   void onInit() {
     // TODO: implement onInit
     tab_controller = TabController(length: 2, vsync: this);
+    tab_controller.addListener(() {
+      tabIndex.value = tab_controller.index; // Update the observable on index change
+    });
     super.onInit();
   }
 
