@@ -26,10 +26,6 @@ class FirebaseAPI {
       sound: true,
     );
 
-    FirebaseMessaging.onMessage.listen((message) {
-      print('onMessage: $message');
-    });
-
     await _firebaseMessaging.getToken().then((token) {
       print('Firebase Token: $token');
 
