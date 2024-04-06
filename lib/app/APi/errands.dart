@@ -168,11 +168,11 @@ class ErrandsAPI {
   }
 
   // get errandResults
-  static Future getErrandResults(String errandId) async {
+  static Future getErrandResults(String errandId, int page) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
 
-    final response = await http.get(Uri.parse('${apiDomain().domain}/user/errands/$errandId/results'),
+    final response = await http.get(Uri.parse('${apiDomain().domain}/user/errands/$errandId/results?page=$page'),
         headers: ({
           'Accept': 'application/json',
           'Content-Type': 'application/json; charset=UTF-8',

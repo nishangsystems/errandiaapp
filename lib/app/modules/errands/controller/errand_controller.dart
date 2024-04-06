@@ -17,10 +17,14 @@ class errand_controller extends GetxController{
   RxBool isReceivedLoading = false.obs;
   RxBool isReceivedError = false.obs;
 
+  RxBool isResultsLoading = false.obs;
+  RxBool isResultsError = false.obs;
+
   var errandList = List<dynamic>.empty(growable: true).obs;
   var myErrandList = List<dynamic>.empty(growable: true).obs;
   var townList = RxList<dynamic>([]);
   var receivedList = List<dynamic>.empty(growable: true).obs;
+  var resultsList = List<dynamic>.empty(growable: true).obs;
 
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
@@ -30,6 +34,9 @@ class errand_controller extends GetxController{
 
   RxInt receivedCurrentPage = 1.obs;
   RxInt receivedTotal = 0.obs;
+
+  RxInt resultsCurrentPage = 1.obs;
+  RxInt resultsTotal = 0.obs;
 
   @override
   void onInit() {
@@ -127,6 +134,36 @@ class errand_controller extends GetxController{
     }
   }
 
+  void fetchErrandResults(String errandId) async {
+    print("fetching errand results");
+    if (isResultsLoading.isTrue || (
+    resultsList.isNotEmpty && resultsList.length >= resultsTotal.value)) return;
+
+    isResultsLoading.value = true;
+
+    try {
+      var data = await ErrandsAPI.getErrandResults(errandId, resultsCurrentPage.value);
+      print("response errand results: $data");
+
+      if (data != null && data.isNotEmpty) {
+        resultsCurrentPage.value++;
+        resultsList.addAll(data['items']);
+        resultsTotal.value = data['total'];
+        isResultsLoading.value = false;
+        isResultsError.value = false;
+
+        print("resultsList: $resultsList");
+      }
+
+      update();
+    } catch (e) {
+      // Handle exception
+      printError(info: e.toString());
+      isResultsLoading.value = false;
+      isResultsError.value = true;
+    }
+  }
+
   void loadTownsData(regionId) async {
     // Towns.Items = [];
     townList.clear();
@@ -173,6 +210,25 @@ class errand_controller extends GetxController{
     receivedTotal.value = 0;
     isReceivedError.value = false;
     fetchReceivedErrands();
+    update();
+  }
+
+  void reloadErrandResults(String errandId) {
+    resultsList.clear();
+    resultsCurrentPage.value = 1;
+    resultsTotal.value = 0;
+    isResultsError.value = false;
+    isResultsLoading.value = false;
+    fetchErrandResults(errandId);
+    update();
+  }
+
+  void resetErrandResults() {
+    resultsList.clear();
+    resultsCurrentPage.value = 1;
+    resultsTotal.value = 0;
+    isResultsError.value = false;
+    isResultsLoading.value = false;
     update();
   }
   

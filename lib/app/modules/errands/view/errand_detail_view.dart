@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:errandia/app/APi/errands.dart';
 import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
 import 'package:errandia/app/modules/errands/controller/errandia_detail_view_controller.dart';
+import 'package:errandia/app/modules/errands/view/errand_results.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/pill_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
@@ -12,6 +13,7 @@ import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
@@ -110,6 +112,42 @@ class _errand_detail_viewState extends State<errand_detail_view> {
     return photos.isEmpty;
   }
 
+  void getErrandResultsInBackground(String errandId, Map<String, dynamic> data) async {
+    const config = FlutterBackgroundAndroidConfig(
+      notificationTitle: 'Errandia',
+      notificationText: 'Your errand is running in the background',
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon: AndroidResource(
+        name: 'ic_launcher',
+        defType: 'mipmap',
+      ),
+      enableWifiLock: true,
+      showBadge: true,
+    );
+
+    var hasPermissions = await FlutterBackground.hasPermissions;
+
+    if (!hasPermissions) {
+      var requestPermissions;
+      // await FlutterBackground.requestPermissions;
+      print("PERMISSIONS NOT PROVIDED");
+    }
+
+    hasPermissions = await FlutterBackground.initialize(androidConfig: config);
+
+    if (hasPermissions) {
+      if (hasPermissions) {
+        final backgroundExecution = await FlutterBackground.enableBackgroundExecution();
+
+        if (backgroundExecution) {
+          Future.delayed(const Duration(seconds: 5), () {
+            Get.to(() => ErrandResults(data: data, errandId: errandId));
+          });
+        }
+      }
+    }
+  }
+
 // rerun an errand
   void rerunAnErrand(BuildContext context, id) {
     showDialog(
@@ -135,6 +173,8 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                   if (response["status"] == 'success') {
                     errandController.reloadMyErrands();
                     homeController.reloadRecentlyPostedItems();
+
+                    getErrandResultsInBackground(id.toString(), response['data']);
 
                     Navigator.of(dialogContext).pop(); // Close the dialog
 

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:errandia/app/APi/errands.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
+import 'package:errandia/app/modules/errands/view/errand_results.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
@@ -80,10 +81,10 @@ class _nd_screenState extends State<nd_screen> {
     );
   }
 
-  void runErrand(Map<String, dynamic> response) async {
-    await ErrandsAPI.runErrand(response['data']['item']['id'].toString()).then((response_) {
+  void runErrand(Map<String, dynamic> data) async {
+    await ErrandsAPI.runErrand(data['data']['item']['id'].toString()).then((response_) {
       if (response_ != null) {
-        response = jsonDecode(response_);
+        var response = jsonDecode(response_);
         print("rerun errand response: $response");
 
         // Check if the widget is still in the tree
@@ -92,7 +93,7 @@ class _nd_screenState extends State<nd_screen> {
           homeController.reloadRecentlyPostedItems();
 
           // Navigator.of(dialogContext).pop(); // Close the dialog
-
+          getErrandResultsInBackground(data['data']['item']['id'].toString(), response['data']);
           // Show success popup
           Get.snackbar("Info", response['message'],
               snackPosition: SnackPosition.BOTTOM,
@@ -153,6 +154,43 @@ class _nd_screenState extends State<nd_screen> {
 
         if (backgroundExecution) {
          runErrand(response);
+        }
+      }
+    }
+  }
+
+  // open errand results page after 5 seconds in the background
+  void getErrandResultsInBackground(String errandId, Map<String, dynamic> data) async {
+    const config = FlutterBackgroundAndroidConfig(
+      notificationTitle: 'Errandia',
+      notificationText: 'Your errand is running in the background',
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon: AndroidResource(
+        name: 'ic_launcher',
+        defType: 'mipmap',
+      ),
+      enableWifiLock: true,
+      showBadge: true,
+    );
+
+    var hasPermissions = await FlutterBackground.hasPermissions;
+
+    if (!hasPermissions) {
+      var requestPermissions;
+      // await FlutterBackground.requestPermissions;
+      print("PERMISSIONS NOT PROVIDED");
+    }
+
+    hasPermissions = await FlutterBackground.initialize(androidConfig: config);
+
+    if (hasPermissions) {
+      if (hasPermissions) {
+        final backgroundExecution = await FlutterBackground.enableBackgroundExecution();
+
+        if (backgroundExecution) {
+          Future.delayed(const Duration(seconds: 5), () {
+            Get.to(() => ErrandResults(data: data, errandId: errandId));
+          });
         }
       }
     }
