@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
@@ -21,7 +22,7 @@ import '../../registration_failed_view.dart';
 import '../../registration_successful_view.dart';
 
 class register_serviceprovider_view extends StatefulWidget {
-  register_serviceprovider_view({super.key});
+  const register_serviceprovider_view({super.key});
 
   @override
   State<register_serviceprovider_view> createState() =>
@@ -78,7 +79,7 @@ class _register_serviceprovider_viewState
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: const Text('Close'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -87,7 +88,7 @@ class _register_serviceprovider_viewState
                 });
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Accept'),
+              child: const Text('Accept'),
             ),
           ],
         );
@@ -180,296 +181,296 @@ class _register_serviceprovider_viewState
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
 
-                    SizedBox(
-                      height: Get.height * 0.01,
+                  SizedBox(
+                    height: Get.height * 0.01,
+                  ),
+                  const Text(
+                    'Name',
+                    style: TextStyle(
+                      fontSize: 16,
                     ),
-                    const Text(
-                      'Name',
-                      style: TextStyle(
-                        fontSize: 16,
+                  ),
+
+                  SizedBox(
+                    height: Get.height * 0.001,
+                  ),
+
+                  // text form field
+                  Container(
+                    height: Get.height * 0.07,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: const Color(0xffe0e6ec),
                       ),
+                      color: Colors.white,
                     ),
-
-                    SizedBox(
-                      height: Get.height * 0.001,
-                    ),
-
-                    // text form field
-                    Container(
-                      height: Get.height * 0.07,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: const Color(0xffe0e6ec),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: TextFormField(
+                        controller: name,
+                        keyboardType: TextInputType.emailAddress,
+                        style: const TextStyle(
+                          fontSize: 18,
                         ),
-                        color: Colors.white,
+                        decoration:
+                            const InputDecoration(border: InputBorder.none),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: TextFormField(
-                          controller: name,
-                          keyboardType: TextInputType.emailAddress,
-                          style: const TextStyle(
-                            fontSize: 18,
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: Get.height * 0.02,
+                  ),
+
+                  // buiseness phone number
+                  const Text(
+                    'Phone',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: Get.height * 0.001,
+                  ),
+
+                  // phone number text field
+                  Container(
+                    height: Get.height * 0.09,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: const Color(0xffe0e6ec),
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: SizedBox(
+                            width: Get.width * 0.86,
+                            child: IntlPhoneField(
+                              controller: phoneNo,
+                              decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.only(top: 22),
+                                  border: InputBorder.none),
+                              initialCountryCode: 'CM',
+                              validator: (value) {
+                                if (value == null) {
+                                  print(value);
+                                }
+                                return null;
+                              },
+                              onChanged: (phone) {
+                                if (kDebugMode) {
+                                  print("phone: $phone");
+                                }
+                              },
+                            ),
                           ),
-                          decoration:
-                              const InputDecoration(border: InputBorder.none),
                         ),
+
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 1,
+                            ),
+                            child: TextFormField(
+                              keyboardType: TextInputType.phone,
+                              style: const TextStyle(
+                                fontSize: 18,
+                              ),
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // by registering
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: Get.height * 0.02,
+                  ),
+
+                  // buiseness email
+
+                  const Text(
+                    'Email',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: Get.height * 0.001,
+                  ),
+
+                  // text form field
+                  Container(
+                    height: Get.height * 0.07,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: const Color(0xffe0e6ec),
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: TextFormField(
+                        controller: email,
+                        keyboardType: TextInputType.emailAddress,
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                        decoration:
+                            const InputDecoration(border: InputBorder.none),
                       ),
                     ),
+                  ),
 
-                    SizedBox(
-                      height: Get.height * 0.02,
-                    ),
-
-                    // buiseness phone number
-                    const Text(
-                      'Phone',
-                      style: TextStyle(
-                        fontSize: 16,
+                  // by registering you agree
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // Checkbox(
+                      //   checkColor: Colors.white,
+                      //   // fillColor: Colors.red,
+                      //   value: isSelected,
+                      //   onChanged: (bool? value) {
+                      //     setState(() {
+                      //       isSelected = value!;
+                      //     });
+                      //   },
+                      // ),
+                      const Text(
+                        "By registering, you agree to the Errandia's ",
+                        style: TextStyle(fontSize: 12),
                       ),
-                    ),
+                      InkWell(
+                          onTap: () {
+                            _showTermsAndConditionsDialog(context);
+                          },
+                          child: const Text(
+                            "User's ",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.blue),
+                          ))
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                          onTap: () {
+                            _showTermsAndConditionsDialog(context);
+                          },
+                          child: const Text(
+                            "Agreement ",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.blue),
+                          )),
+                      const Text("and "),
+                      const Text(
+                        "Privacy Policy",
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ],
+                  ),
 
-                    SizedBox(
-                      height: Get.height * 0.001,
-                    ),
+                  SizedBox(
+                    height: Get.height * 0.04,
+                  ),
 
-                    // phone number text field
-                    Container(
+                  //button container
+
+                  InkWell(
+                    onTap: () async {
+                      var Name = name.text.trim().toString();
+                      var Phone = phoneNo.text.trim().toString();
+                      var Email = email.text.trim().toString();
+
+                      if (name == '' &&
+                          email == '' &&
+                          Phone == '') {
+                        alertDialogBox(
+                            context, 'Alert', 'Please Fill Fields');
+                      }
+                      // }else if(isSelected == false){
+                      //   alertBoxdialogBox(context, 'Alert', 'Please agree Terms and Conditon');
+                      else {
+                        var value = {
+                          "name": Name,
+                          "email": Email,
+                          // "country": phone.,
+                          "phone": Phone,
+                        };
+                        print("value: $value");
+                        registration_successful_view home =
+                            registration_successful_view(userAction: const {
+                          "name": "register",
+                            });
+                        registration_failed_view failed =
+                            registration_failed_view();
+                        setState(() {
+                          isLoading = true;
+                        });
+                        // api().registration('register', value, context,home,failed);
+                        try {
+                          await api().registration(value, context, home, failed);
+                        } finally {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                        // Future.delayed(const Duration(seconds: 3),(){
+                        //   setState(() {
+                        //     isLoading = false;
+                        //   });
+                        // });
+                      }
+                      // Get.to(Home_view());
+                    },
+                    child: Container(
                       height: Get.height * 0.09,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: const Color(0xffe0e6ec),
                         ),
-                        color: Colors.white,
+                        color: const Color(0xff113d6b),
                       ),
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: SizedBox(
-                              width: Get.width * 0.86,
-                              child: IntlPhoneField(
-                                controller: phoneNo,
-                                decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.only(top: 22),
-                                    border: InputBorder.none),
-                                initialCountryCode: 'CM',
-                                validator: (value) {
-                                  if (value == null) {
-                                    print(value);
-                                  }
-                                  return null;
-                                },
-                                onChanged: (phone) {
-                                  print("phone: $phone");
-                                },
-                              ),
-                            ),
-                          ),
-
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 1,
-                              ),
-                              child: TextFormField(
-                                keyboardType: TextInputType.phone,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                ),
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
+                      child: Center(
+                        child: isLoading == false
+                            ? const Text(
+                                'CONTINUE',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white),
+                              )
+                            : const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
                                 ),
                               ),
-                            ),
-                          ),
-
-                          // by registering
-                        ],
                       ),
                     ),
-
-                    SizedBox(
-                      height: Get.height * 0.02,
-                    ),
-
-                    // buiseness email
-
-                    const Text(
-                      'Email',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: Get.height * 0.001,
-                    ),
-
-                    // text form field
-                    Container(
-                      height: Get.height * 0.07,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: const Color(0xffe0e6ec),
-                        ),
-                        color: Colors.white,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: TextFormField(
-                          controller: email,
-                          keyboardType: TextInputType.emailAddress,
-                          style: const TextStyle(
-                            fontSize: 18,
-                          ),
-                          decoration:
-                              const InputDecoration(border: InputBorder.none),
-                        ),
-                      ),
-                    ),
-
-                    // by registering you agree
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        // Checkbox(
-                        //   checkColor: Colors.white,
-                        //   // fillColor: Colors.red,
-                        //   value: isSelected,
-                        //   onChanged: (bool? value) {
-                        //     setState(() {
-                        //       isSelected = value!;
-                        //     });
-                        //   },
-                        // ),
-                        const Text(
-                          "By registering, you agree to the Errandia's ",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        InkWell(
-                            onTap: () {
-                              _showTermsAndConditionsDialog(context);
-                            },
-                            child: const Text(
-                              "User's ",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.blue),
-                            ))
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        InkWell(
-                            onTap: () {
-                              _showTermsAndConditionsDialog(context);
-                            },
-                            child: const Text(
-                              "Agreement ",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.blue),
-                            )),
-                        const Text("and "),
-                        const Text(
-                          "Privacy Policy",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(
-                      height: Get.height * 0.04,
-                    ),
-
-                    //button container
-
-                    InkWell(
-                      onTap: () async {
-                        var Name = name.text.trim().toString();
-                        var Phone = phoneNo.text.trim().toString();
-                        var Email = email.text.trim().toString();
-
-                        if (name == '' &&
-                            email == '' &&
-                            Phone == '') {
-                          alertDialogBox(
-                              context, 'Alert', 'Please Fill Fields');
-                        }
-                        // }else if(isSelected == false){
-                        //   alertBoxdialogBox(context, 'Alert', 'Please agree Terms and Conditon');
-                        else {
-                          var value = {
-                            "name": Name,
-                            "email": Email,
-                            // "country": phone.,
-                            "phone": Phone,
-                          };
-                          print("value: $value");
-                          registration_successful_view home =
-                              registration_successful_view(userAction: const {
-                            "name": "register",
-                              });
-                          registration_failed_view failed =
-                              registration_failed_view();
-                          setState(() {
-                            isLoading = true;
-                          });
-                          // api().registration('register', value, context,home,failed);
-                          try {
-                            await api().registration(value, context, home, failed);
-                          } finally {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                          // Future.delayed(const Duration(seconds: 3),(){
-                          //   setState(() {
-                          //     isLoading = false;
-                          //   });
-                          // });
-                        }
-                        // Get.to(Home_view());
-                      },
-                      child: Container(
-                        height: Get.height * 0.09,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: const Color(0xffe0e6ec),
-                          ),
-                          color: const Color(0xff113d6b),
-                        ),
-                        child: Center(
-                          child: isLoading == false
-                              ? const Text(
-                                  'CONTINUE',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
-                                )
-                              : const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             SizedBox(
@@ -479,20 +480,20 @@ class _register_serviceprovider_viewState
               alignment: Alignment.center,
               child: RichText(
                 text: TextSpan(
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xff8ba0b7),
                       fontSize: 17,
                     ),
                     children: [
-                      TextSpan(text: 'Already have an account? '),
+                      const TextSpan(text: 'Already have an account? '),
                       TextSpan(
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             debugPrint('sign in');
-                            Get.offAll(() => signin_view());
+                            Get.off(() => signin_view());
                           },
                         text: 'Sign In',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xff3c7fc6),
                           fontWeight: FontWeight.bold,
                         ),

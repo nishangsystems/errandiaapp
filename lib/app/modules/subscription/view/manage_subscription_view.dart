@@ -58,34 +58,29 @@ class subscription_viewState extends State<subscription_view>
   }
 
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       floatingActionButton: Obx(() {
-        if (controller.subscriptionList.isEmpty) {
-          return Container();
-        } else {
-          return FloatingActionButton.extended(
-            onPressed: () {
-              Get.to(
-                    () => const NewSubscription(),
-                transition: Transition.fadeIn,
-                duration: const Duration(milliseconds: 500),
-              );
-            },
-            backgroundColor: appcolor().mainColor,
-            icon: Icon(
-              Icons.add,
-              color: appcolor().skyblueColor,
-            ),
-            // Adjust text style directly within the label for better alignment and padding
-            label:Text(
-                controller.subscriptionList.isEmpty ? 'Subscribe Now' : 'New',
-                style: TextStyle(
-                  color: appcolor().skyblueColor,
-                  fontSize: 15,
-                )),
-          );
-        }
+        return FloatingActionButton.extended(
+          onPressed: () {
+            Get.to(
+                  () => const NewSubscription(),
+              transition: Transition.fadeIn,
+              duration: const Duration(milliseconds: 500),
+            );
+          },
+          backgroundColor: appcolor().mainColor,
+          icon: Icon(
+            Icons.add,
+            color: appcolor().skyblueColor,
+          ),
+          // Adjust text style directly within the label for better alignment and padding
+          label: Text(
+              controller.subscriptionList.isEmpty ? 'Subscribe Now' : 'New',
+              style: TextStyle(
+                color: appcolor().skyblueColor,
+                fontSize: 15,
+              )),
+        );
       }),
       appBar: AppBar(
         backgroundColor: Colors.white,

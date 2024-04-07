@@ -134,7 +134,18 @@ class setting_view extends StatelessWidget {
             // policies
             mywidget(() {
               Get.to(() => policies_view());
-            }, Icons.notifications, 'Policies & Rules'),
+            }, Icons.policy_outlined, 'Policies & Rules'),
+
+            Divider(
+              color: appcolor().greyColor,
+              thickness: 1,
+              height: 1,
+              indent: 0,
+            ),
+
+            mywidget(() {
+              Get.to(() => policies_view());
+            }, Icons.security, 'Terms & Conditions'),
 
             Divider(
               color: appcolor().greyColor,

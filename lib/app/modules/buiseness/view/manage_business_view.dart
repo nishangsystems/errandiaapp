@@ -191,27 +191,27 @@ class _manage_business_viewState extends State<manage_business_view>
                                       Get.to(() => add_service_view());
                                     },
                                   ),
-                                  bottomSheetWidgetitem(
-                                    title: 'Suspend Business',
-                                    imagepath:
-                                        'assets/images/sidebar_icon/icon-suspend.png',
-                                    callback: () {
-                                      Get.back();
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return businessDialog(
-                                              BusinessAction.suspend);
-                                        },
-                                      );
-                                    },
-                                  ),
-                                  bottomSheetWidgetitem(
-                                    title: 'Update Location',
-                                    imagepath:
-                                        'assets/images/sidebar_icon/icon-location.png',
-                                    callback: () {},
-                                  ),
+                                  // bottomSheetWidgetitem(
+                                  //   title: 'Suspend Business',
+                                  //   imagepath:
+                                  //       'assets/images/sidebar_icon/icon-suspend.png',
+                                  //   callback: () {
+                                  //     Get.back();
+                                  //     showDialog(
+                                  //       context: context,
+                                  //       builder: (context) {
+                                  //         return businessDialog(
+                                  //             BusinessAction.suspend);
+                                  //       },
+                                  //     );
+                                  //   },
+                                  // ),
+                                  // bottomSheetWidgetitem(
+                                  //   title: 'Update Location',
+                                  //   imagepath:
+                                  //       'assets/images/sidebar_icon/icon-location.png',
+                                  //   callback: () {},
+                                  // ),
                                   bottomSheetWidgetitem(
                                     title: 'Move to trash',
                                     imagepath:

@@ -525,7 +525,7 @@ class _signin_viewState extends State<signin_view_1>
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 debugPrint('Register View');
-                                Get.off(register_serviceprovider_view());
+                                Get.off(() => register_serviceprovider_view());
                               },
                             text: 'Register',
                             style: const TextStyle(

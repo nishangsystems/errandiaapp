@@ -6,6 +6,7 @@ import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/modal/category.dart';
 import 'package:errandia/utils/helper.dart';
@@ -37,6 +38,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
   final imagePickercontroller imageController =
   Get.put(imagePickercontroller());
   final profile_controller profileController = Get.put(profile_controller());
+  final home_controller homeController = Get.put(home_controller());
 
   var country;
   var regionCode;
@@ -203,6 +205,8 @@ class EditBusinessViewState extends State<EditBusinessView> {
                 businessTitle = updatedData['name'];
               }),
               print('updated: $updatedData'),
+              homeController.reloadRecentlyPostedItems(),
+              homeController.reloadFeaturedBusinessesData(),
               profileController.reloadMyBusinesses(),
             }
           else

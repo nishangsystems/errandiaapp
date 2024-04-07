@@ -54,14 +54,14 @@
            android:name="com.google.firebase.messaging.default_notification_channel_id"
            android:value="errandia_channel_id" />
 
-       <channel
-           android:name="errandia_channel_id"
-           android:importance="high"
-           android:description="Errandia Channel">
+<!--       <channel-->
+<!--           android:name="errandia_channel_id"-->
+<!--           android:importance="high"-->
+<!--           android:description="Errandia Channel">-->
 
-           <notification android:icon="@mipmap/ic_launcher"
-               android:sound="@raw/alert"/>
-       </channel>
+<!--           <notification android:icon="@mipmap/ic_launcher"-->
+<!--               android:sound="@raw/alert"/>-->
+<!--       </channel>-->
 
     </application>
 

@@ -246,7 +246,8 @@ class _signin_otp_verification_screenState
                                     print("otp code: ${otpController?.text}");
                                   }
                                   final SharedPreferences prefs = await _prefs;
-                                  if (prefs.getString('deviceUuid') == null) {
+                                  if (prefs.getString('firebaseToken') == null) {
+                                    print("initializing firebase");
                                     await FirebaseAPI().initialize();
                                   }
 

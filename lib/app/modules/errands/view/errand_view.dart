@@ -103,6 +103,52 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
     return item['email'] != null && item['email'] != "";
   }
 
+  void markErrandFound(BuildContext context, data) async {
+    await ErrandsAPI.markErrandAsFound(data['id'].toString()).then((response_) {
+      var response = jsonDecode(response_);
+
+      if (response['status'] == "success") {
+        print("response mark errand: $response");
+        errandController.reloadMyErrands();
+        errandController.reloadReceivedErrands();
+        Get.back();
+        Get.snackbar("Info", response['message'],
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 5),
+            margin: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 15,
+            ));
+      } else {
+        Get.back();
+        Get.snackbar("Error", response['message'],
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 5),
+            margin: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 15,
+            ));
+      }
+    }).catchError((e) {
+      print("error marking errand as found: $e");
+      Get.back();
+      Get.snackbar("Error", "An error occurred",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+          margin: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 15,
+          ));
+    });
+  }
+
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -284,7 +330,8 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                             SizedBox(
                               width: Get.width * 0.04,
                             ),
-                            // found_pending_cancel(index, 3),
+                            if (data_['status'] == 1)
+                              found_pending_cancel(index, 3),
                           ],
                         ),
                       ],
@@ -335,11 +382,13 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                     ));
                                   },
                                 ),
-                                // managebottomSheetWidgetitem(
-                                //   title: 'Mark as found',
-                                //   icondata: FontAwesomeIcons.circleCheck,
-                                //   callback: () {},
-                                // ),
+                                managebottomSheetWidgetitem(
+                                  title: 'Mark as found',
+                                  icondata: FontAwesomeIcons.circleCheck,
+                                  callback: () {
+                                    markErrandFound(context, data_);
+                                  },
+                                ),
 
                                 // view errand results
                                 managebottomSheetWidgetitem(
@@ -814,34 +863,11 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                               ),
                             ),
 
-                            // accept button
+                            // message button
                             Spacer(),
                             InkWell(
                               onTap: () {
-                                Get.snackbar(
-                                  'Accept',
-                                  'Accept this errand',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: appcolor().greenColor,
-                                  colorText: Colors.white,
-                                  duration: const Duration(seconds: 5),
-                                  margin: const EdgeInsets.only(
-                                    bottom: 15,
-                                    left: 10,
-                                    right: 10,
-                                  ),
-                                  mainButton: TextButton(
-                                    onPressed: () {
-                                      Get.back();
-                                    },
-                                    child: Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                        color: appcolor().mainColor,
-                                      ),
-                                    ),
-                                  ),
-                                );
+                                launchEmail(data_['user']['email'].toString());
                               },
                               child: Container(
                                   padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
@@ -849,19 +875,19 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(5),
                                     border: Border.all(
-                                      color: Colors.greenAccent[700]!,
+                                      color: Colors.blueAccent[700]!,
                                     ),
                                     gradient: Gradient.lerp(
                                       LinearGradient(
                                         colors: [
-                                          Colors.green.withOpacity(0.8),
-                                          Colors.greenAccent[700]!,
+                                          appcolor().mainColor.withOpacity(0.8),
+                                          appcolor().mainColor,
                                         ],
                                       ),
                                       LinearGradient(
                                         colors: [
-                                          Colors.green,
-                                          Colors.green.withOpacity(0.5),
+                                          appcolor().mainColor,
+                                          appcolor().mainColor.withOpacity(0.5),
                                         ],
                                       ),
                                       0.5,
@@ -870,7 +896,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                   child: Row(
                                       children: [
                                         const Icon(
-                                          Icons.check,
+                                          Icons.mail_outline,
                                           color: Colors.white,
                                           size: 14,
                                         ),
@@ -878,7 +904,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                           width: Get.width * 0.01,
                                         ),
                                         const Text(
-                                          'Accept',
+                                          'Message',
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: Colors.white,

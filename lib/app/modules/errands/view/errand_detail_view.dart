@@ -10,6 +10,7 @@ import 'package:errandia/app/modules/global/Widgets/pill_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,8 @@ class _errand_detail_viewState extends State<errand_detail_view> {
   late PopupBox popup;
 
   late ScrollController _scrollController;
+  late profile_controller profileController;
+
   late Timer _timer;
   int _delta = 1; // How much we scroll every time the timer ticks
   bool _leftToRight = true; // Direction of the scroll
@@ -48,8 +51,11 @@ class _errand_detail_viewState extends State<errand_detail_view> {
     detailController = Get.put(errandia_detail_view_controller());
     errandController = Get.put(errand_controller());
     homeController = Get.put(home_controller());
+    profileController = Get.put(profile_controller());
     _scrollController = ScrollController();
     _startAutoScroll();
+
+    profileController.getUser();
   }
 
   void _startAutoScroll() {
@@ -110,6 +116,11 @@ class _errand_detail_viewState extends State<errand_detail_view> {
   // check if photos are empty
   bool isPhotosEmpty(List photos) {
     return photos.isEmpty;
+  }
+
+  bool hasActiveSubscription() {
+    print("has active subscription: ${profileController.userData['active_subscription']}");
+    return profileController.userData['active_subscription'];
   }
 
   void getErrandResultsInBackground(String errandId, Map<String, dynamic> data) async {
@@ -263,7 +274,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
           size: 30,
         ),
         actions: [
-          if (!widget.received)
+          if (!widget.received && homeController.loggedIn.value)
             IconButton(
               onPressed: () {
                 // rerun an errand
@@ -294,10 +305,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
             SizedBox(
               width: Get.width * 0.88,
               child: Text(
-                kDebugMode
-                    ? capitalizeAll(widget.data['title'] +
-                        " owio owpeoe ieolwli elwos leilw eowilw wwlie lwiw lwiwlei wlwie elei wleiwle ie wleiwl")
-                    : capitalizeAll(widget.data['title']),
+                capitalizeAll(widget.data['title']),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -323,8 +331,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
               ),
             ),
             ReadMoreText(
-              capitalize(widget.data['description'] +
-                  " Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."),
+              capitalize(widget.data['description']),
               trimLength: 150,
               style: TextStyle(
                 fontSize: 15,
@@ -435,7 +442,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                       SizedBox(
                         width: Get.width * 0.71,
                         child: Text(
-                          kDebugMode ? capitalizeAll(widget.data['user']['name'].toString()+" owo eo eoele eoeo eeoeoe sls sls slsls slsls s"): capitalizeAll(widget.data['user']['name'].toString()),
+                          capitalizeAll(widget.data['user']['name'].toString()),
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 13,
@@ -461,7 +468,6 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                           height: Get.height * 0.015,
                         ),
 
-
                       Container(
                         width: Get.width * 0.71,
                         padding: const EdgeInsets.symmetric(
@@ -485,7 +491,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    if (isPhoneAvailable(widget.data['user']))
+                                    if (isPhoneAvailable(widget.data['user']) && hasActiveSubscription())
                                       InkWell(
                                         onTap: () {
                                           launchCaller(widget.data['user']['phone']);
@@ -514,11 +520,11 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                                           ),
                                         ),
                                       ),
-                                    if (isEmailAvailable(widget.data['user']))
+                                    if (isEmailAvailable(widget.data['user']) && hasActiveSubscription())
                                       SizedBox(
                                         width: Get.width * 0.02,
                                       ),
-                                    if (isEmailAvailable(widget.data['user']))
+                                    if (isEmailAvailable(widget.data['user']) && hasActiveSubscription())
                                       InkWell(
                                         onTap: () {
                                           launchEmail(widget.data['user']['email']);

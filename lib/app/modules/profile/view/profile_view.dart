@@ -101,6 +101,17 @@ class _Profile_viewState extends State<Profile_view>
     });
   }
 
+  String _formatAddress(Map<String, dynamic> shop) {
+    String street = shop['street'] ?? '';
+    String townName = shop['town'] != null ? shop['town']['name'] : '';
+    String regionName = shop['region'] != null ? shop['region']['name'] : '';
+
+    return [street, townName, regionName]
+        .where((s) => s.isNotEmpty)
+        .join(", ")
+        .trim();
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -286,7 +297,7 @@ class _Profile_viewState extends State<Profile_view>
                     child: errandia_widget(
                       imagePath: businessData['image'],
                       name: businessData['name'],
-                      location: businessData['street'],
+                      location: _formatAddress(businessData ?? {}),
                     ),
                   );
                 }),
@@ -364,7 +375,7 @@ class _Profile_viewState extends State<Profile_view>
                         cost: item['unit_price'].toString(),
                         imagePath: item['featured_image'],
                         name: item['name'],
-                        location: item['shop'] != null ? item['shop']['street'] : "",
+                        location: item['shop'] != null ? _formatAddress(item['shop']) : "",
                       ));
                 },
               ),
@@ -441,7 +452,7 @@ class _Profile_viewState extends State<Profile_view>
                       cost: item['unit_price'].toString(),
                       imagePath: item['featured_image'],
                       name: item['name'],
-                      location: item['shop'] != null ? item['shop']['street'] : "",
+                      location: item['shop'] != null ? _formatAddress(item['shop']) : "",
                     ),
                   );
                 },

@@ -44,7 +44,6 @@ class _home_view_1State extends State<home_view_1> {
   // bool _isFBLLoading = true;
   // bool isRPIError = false;
   // bool isFBLError = false;
-
   Country() async {
     try {
       final response = await http.get(
@@ -190,15 +189,18 @@ class _home_view_1State extends State<home_view_1> {
     homeController.featuredBusinessData();
     homeController.recentlyPostedItemsData();
     // if (homeController.loggedIn.value) {
-      profileController.getUser();
+    profileController.getUser();
     // }
   }
 
   String _formatAddress(Map<String, dynamic> item) {
     print("item: $item");
     // String street = item['street'].toString() != '[]' && '';
-    String townName = item['town'].toString() != '[]' ? item['town']['name'] : '';
-    String regionName = item['region'].toString() != '[]' ? item['region']['name'].split(" -")[0] : '';
+    String townName =
+        item['town'].toString() != 'null' && item['town'].toString() != '[]'  ? item['town']['name'] : '';
+    String regionName = item['region'].toString() != 'null' && item['region'].toString() != '[]'
+        ? item['region']['name'].split(" -")[0]
+        : '';
 
     return [townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
   }
@@ -334,8 +336,11 @@ class _home_view_1State extends State<home_view_1> {
                                   radius: 25,
                                   backgroundColor: appcolor().mainColor,
                                   backgroundImage: data['user']['photo'] == ""
-                                      ? const AssetImage('assets/images/errandia_logo.png') // Fallback image
-                                      : NetworkImage(getImagePath(data['user']['photo'].toString())) as ImageProvider,
+                                      ? const AssetImage(
+                                          'assets/images/errandia_logo.png') // Fallback image
+                                      : NetworkImage(getImagePath(
+                                              data['user']['photo'].toString()))
+                                          as ImageProvider,
                                   child: data['user']['photo'] == ""
                                       ? const Icon(Icons.person)
                                       : null, // Only show the icon if there is no photo
@@ -350,23 +355,19 @@ class _home_view_1State extends State<home_view_1> {
                                     SizedBox(
                                       width: Get.width * 0.33,
                                       child: Text(
-                                        capitalizeAll(
-                                            data['user']['name']),
+                                        capitalizeAll(data['user']['name']),
                                         style: const TextStyle(
                                             fontSize: 13,
-                                            fontWeight:
-                                            FontWeight.bold),
+                                            fontWeight: FontWeight.bold),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     Text(
-                                      DateFormat('dd-MM-yyyy')
-                                          .format(DateTime.parse(
-                                          data['created_at']
-                                              .toString())),
-                                      style: const TextStyle(
-                                          fontSize: 12),
+                                      DateFormat('dd-MM-yyyy').format(
+                                          DateTime.parse(
+                                              data['created_at'].toString())),
+                                      style: const TextStyle(fontSize: 12),
                                     ),
                                   ],
                                 ),
@@ -382,28 +383,30 @@ class _home_view_1State extends State<home_view_1> {
                                 horizontal: 8, vertical: 0),
                             color: appcolor().lightgreyColor,
                             child: Center(
-                              child:  data['images'].length > 0
+                              child: data['images'].length > 0
                                   ? FadeInImage.assetNetwork(
-                                placeholder:
-                                'assets/images/errandia_logo.png',
-                                image: getImagePathWithSize(
-                                    data['images'][0]['image_path']
-                                        .toString(), width: 200, height: 180),
-                                fit: BoxFit.cover,
-                                imageErrorBuilder: (context,
-                                    error, stackTrace) {
-                                  return Image.asset(
-                                    'assets/images/errandia_logo.png',
-                                    // Your fallback image
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              )
+                                      placeholder:
+                                          'assets/images/errandia_logo.png',
+                                      image: getImagePathWithSize(
+                                          data['images'][0]['image_path']
+                                              .toString(),
+                                          width: 200,
+                                          height: 180),
+                                      fit: BoxFit.cover,
+                                      imageErrorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/errandia_logo.png',
+                                          // Your fallback image
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    )
                                   : Image.asset(
-                                'assets/images/errandia_logo.png',
-                                // Your fallback image
-                                fit: BoxFit.cover,
-                              ),
+                                      'assets/images/errandia_logo.png',
+                                      // Your fallback image
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                           ),
                           Divider(
@@ -438,8 +441,7 @@ class _home_view_1State extends State<home_view_1> {
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color:
-                                        appcolor().mainColor),
+                                        color: appcolor().mainColor),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -448,31 +450,29 @@ class _home_view_1State extends State<home_view_1> {
                                   height: Get.height * 0.001,
                                 ),
                                 data['region'].toString() != '[]' ||
-                                    data['town'].toString() != '[]'
+                                        data['town'].toString() != '[]'
                                     ? Row(
-                                  children: [
-                                    Icon(
-                                      Icons.location_on,
-                                      size: 13,
-                                      color: appcolor()
-                                          .mediumGreyColor,
-                                    ),
-                                    SizedBox(
-                                      width: Get.width * 0.35,
-                                      child: Text(
-                                        _formatAddress(data),
-                                        style: TextStyle(
-                                          color: appcolor()
-                                              .mediumGreyColor,
-                                          fontSize: 12,
-                                        ),
-                                        maxLines: 1,
-                                        overflow:
-                                        TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                )
+                                        children: [
+                                          Icon(
+                                            Icons.location_on,
+                                            size: 13,
+                                            color: appcolor().mediumGreyColor,
+                                          ),
+                                          SizedBox(
+                                            width: Get.width * 0.35,
+                                            child: Text(
+                                              _formatAddress(data),
+                                              style: TextStyle(
+                                                color:
+                                                    appcolor().mediumGreyColor,
+                                                fontSize: 12,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      )
                                     : Container(),
                               ],
                             ),
@@ -528,7 +528,8 @@ class _home_view_1State extends State<home_view_1> {
                 return InkWell(
                   onTap: () {
                     // Get.to(() => errandia_business_view(key: UniqueKey(), businessData: data));
-                    Get.toNamed('/business_view', arguments: data, preventDuplicates: false);
+                    Get.toNamed('/business_view',
+                        arguments: data, preventDuplicates: false);
                   },
                   child: Container(
                     margin:
@@ -556,7 +557,9 @@ class _home_view_1State extends State<home_view_1> {
                           child: FadeInImage.assetNetwork(
                             placeholder: 'assets/images/errandia_logo.png',
                             image: getImagePathWithSize(
-                                data['image'].toString(), width: 200, height: 180),
+                                data['image'].toString(),
+                                width: 200,
+                                height: 180),
                             fit: BoxFit.contain,
                             width: double.infinity,
                             imageErrorBuilder: (context, error, stackTrace) {
@@ -569,23 +572,21 @@ class _home_view_1State extends State<home_view_1> {
                               );
                             },
                           ),
-
                         ).paddingOnly(left: 3, right: 3, top: 10, bottom: 5),
                         SizedBox(
                           height: Get.height * 0.009,
                         ),
                         SizedBox(
-                          width: Get.width * 0.4,
-                          child: Text(
-                            data['category']['name'].toString(),
-                            style: TextStyle(
-                                fontSize: 11,
-                                // fontWeight: FontWeight.bold,
-                                color: appcolor().mediumGreyColor),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ).paddingOnly(left: 3)
-                        ),
+                            width: Get.width * 0.4,
+                            child: Text(
+                              data['category']['name'].toString(),
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  // fontWeight: FontWeight.bold,
+                                  color: appcolor().mediumGreyColor),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ).paddingOnly(left: 3)),
                         SizedBox(
                           height: Get.height * 0.001,
                         ),
@@ -602,41 +603,30 @@ class _home_view_1State extends State<home_view_1> {
                         SizedBox(
                           height: Get.height * 0.001,
                         ),
-                        (data['street'] != '' && data['street'] != null)
-                            ? Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_on,
-                                    color: appcolor().mediumGreyColor,
-                                    size: 15,
-                                  ),
-                                  const SizedBox(
-                                    width: 1,
-                                  ),
-                                  SizedBox(
-                                    width: Get.width * 0.35,
-                                    child: Text(
-                                      data['street'].toString(),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: appcolor().mediumGreyColor,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Text(
-                                "No location provided",
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color: appcolor().mediumGreyColor,
+                              size: 15,
+                            ),
+                            const SizedBox(
+                              width: 1,
+                            ),
+                            SizedBox(
+                              width: Get.width * 0.35,
+                              child: Text(
+                                _formatAddress(data),
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 12,
                                   color: appcolor().mediumGreyColor,
-                                  fontStyle: FontStyle.italic,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),

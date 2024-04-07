@@ -6,6 +6,7 @@ import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/modal/category.dart';
 import 'package:errandia/utils/helper.dart';
@@ -36,6 +37,7 @@ class _add_business_viewState extends State<add_business_view> {
   final imagePickercontroller imageController =
       Get.put(imagePickercontroller());
   final profile_controller profileController = Get.put(profile_controller());
+  final home_controller homeController = Get.put(home_controller());
 
   var country;
 
@@ -219,8 +221,8 @@ class _add_business_viewState extends State<add_business_view> {
 
                       //     .featuredBusinessData
                       //     .clear(),
-                      // home_controller()
-                      //     .fetchFeaturedBusinessesData(),
+                      homeController.reloadRecentlyPostedItems(),
+                      homeController.reloadFeaturedBusinessesData(),
                       profileController.reloadMyBusinesses(),
                     }
                   else
@@ -615,7 +617,7 @@ class _add_business_viewState extends State<add_business_view> {
                                 child: const Row(
                                   children: [
                                     Icon(Icons.image),
-                                    Text('  Upload Company Logo (optional)'),
+                                    Text('  Upload Company Logo *'),
                                     Spacer(),
                                     Icon(
                                       Icons.edit,
