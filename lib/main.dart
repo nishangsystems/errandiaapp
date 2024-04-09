@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
@@ -63,6 +64,8 @@ void _handleMessage(RemoteMessage message) {
 
   }
 }
+
+late final SharedPreferences _prefs;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -120,12 +123,20 @@ Future<void> main() async {
   });
   await InitializeDevice().initialize();
   await GetStorage.init();
+  await ErrandiaApp._initializePrefs();
 
   runApp(const ErrandiaApp());
 }
 
 class ErrandiaApp extends StatelessWidget {
   const ErrandiaApp({super.key});
+
+  static Future<void> _initializePrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  // return loaded prefs
+  static SharedPreferences get prefs => _prefs;
 
   @override
   Widget build(BuildContext context) {

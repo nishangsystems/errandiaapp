@@ -8,10 +8,14 @@ import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/global/Widgets/errand_widget_card.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
+import 'package:errandia/app/modules/home/view/home_view.dart';
+import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -27,6 +31,8 @@ import '../../../../modal/subcatgeory.dart';
 import '../../categories/CategoryData.dart';
 import '../../errands/view/see_all_errands.dart';
 
+// final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+
 class home_view_1 extends StatefulWidget {
   home_view_1({super.key});
 
@@ -34,7 +40,7 @@ class home_view_1 extends StatefulWidget {
   State<home_view_1> createState() => _home_view_1State();
 }
 
-class _home_view_1State extends State<home_view_1> {
+class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
   String? isLoggedIn;
   late home_controller homeController;
   late profile_controller profileController;
@@ -45,43 +51,24 @@ class _home_view_1State extends State<home_view_1> {
   // bool _isFBLLoading = true;
   // bool isRPIError = false;
   // bool isFBLError = false;
-  Country() async {
-    try {
-      final response = await http.get(
-        Uri.parse('${apiDomain().domain}/countries'),
-      );
-      if (response.statusCode == 200) {
-        final catalogJson = response.body;
-        final decodedData = jsonDecode(catalogJson);
-        var productsData = decodedData["data"];
-        Countryy.Itemss = List.from(productsData)
-            .map<CountryCode>((product) => CountryCode.fromJson(product))
-            .toList();
-        setState(() {});
-      }
-    } catch (w) {
-      throw Exception(w.toString());
-    }
-  }
-
-  CountryData() async {
-    try {
-      final response = await http.get(
-        Uri.parse('${apiDomain().domain}/categories'),
-      );
-      if (response.statusCode == 200) {
-        final catalogJson = response.body;
-        final decodedData = jsonDecode(catalogJson);
-        var productsData = decodedData["data"];
-        categor.Items = List.from(productsData)
-            .map<Category>((product) => Category.fromJson(product))
-            .toList();
-        setState(() {});
-      }
-    } catch (w) {
-      throw Exception(w.toString());
-    }
-  }
+  // Country() async {
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse('${apiDomain().domain}/countries'),
+  //     );
+  //     if (response.statusCode == 200) {
+  //       final catalogJson = response.body;
+  //       final decodedData = jsonDecode(catalogJson);
+  //       var productsData = decodedData["data"];
+  //       Countryy.Itemss = List.from(productsData)
+  //           .map<CountryCode>((product) => CountryCode.fromJson(product))
+  //           .toList();
+  //       setState(() {});
+  //     }
+  //   } catch (w) {
+  //     throw Exception(w.toString());
+  //   }
+  // }
 
   RegionData() async {
     try {
@@ -95,44 +82,6 @@ class _home_view_1State extends State<home_view_1> {
         print(productsData);
         Regions.Items = List.from(productsData)
             .map<CountryRegion>((product) => CountryRegion.fromJson(product))
-            .toList();
-        setState(() {});
-      }
-    } catch (w) {
-      throw Exception(w.toString());
-    }
-  }
-
-  TownData() async {
-    try {
-      final response = await http.get(Uri.parse('${apiDomain().domain}/towns'));
-      if (response.statusCode == 200) {
-        final catalogJson = response.body;
-        final decodedData = jsonDecode(catalogJson);
-        var productsData = decodedData["data"];
-
-        Towns.Items = List.from(productsData)
-            .map<Town>((product) => Town.fromJson(product))
-            .toList();
-        setState(() {});
-      }
-    } catch (w) {
-      throw Exception(w.toString());
-    }
-  }
-
-  street() async {
-    try {
-      final response = await http.get(
-        Uri.parse('${apiDomain().domain}/streets'),
-      );
-      if (response.statusCode == 200) {
-        final catalogJson = response.body;
-        final decodedData = jsonDecode(catalogJson);
-        var productsData = decodedData["data"];
-
-        Street.Items = List.from(productsData)
-            .map<Streetid>((product) => Streetid.fromJson(product))
             .toList();
         setState(() {});
       }
@@ -181,11 +130,11 @@ class _home_view_1State extends State<home_view_1> {
     super.initState();
     homeController = Get.put(home_controller());
     profileController = Get.put(profile_controller());
-    CountryData();
+    // CountryData();
     RegionData();
     // TownData();
-    Country();
-    street();
+    // Country();
+    // street();
     subCategoryData();
     homeController.featuredBusinessData();
     homeController.recentlyPostedItemsData();
@@ -482,208 +431,268 @@ class _home_view_1State extends State<home_view_1> {
       });
     }
 
-    return Stack(
-      children: [
-        Image(
-          image: const AssetImage(
-            'assets/images/home_bg.png',
+    return Scaffold(
+      body: Stack(
+        children: [
+          Image(
+            image: const AssetImage(
+              'assets/images/home_bg.png',
+            ),
+            fit: BoxFit.fill,
+            height: Get.height,
+            width: Get.width,
           ),
-          fit: BoxFit.fill,
-          height: Get.height,
-          width: Get.width,
-        ),
-        ListView(
-          // physics: (),
-          children: [
-            // welcome widget
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: SizedBox(
-                height: Get.height * 0.16,
-                width: Get.width,
-                child: Center(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            homeController.loggedIn.value
-                                ? 'Welcome ${capitalizeAll(getLastName(profileController.userData['name']))}'
-                                : 'Welcome',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const Text(
-                            'Start by running an errand',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w300),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      ElevatedButton(
-                          onPressed: () {
-                            if (homeController.loggedIn.value) {
-                              Get.to(() => const New_Errand());
-                            } else {
-                              Get.to(() => const signin_view());
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white),
-                          child: Text(
-                            'Run an Errand',
-                            style: TextStyle(
-                                color: appcolor().mainColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12),
-                          )),
-                    ],
+          // plus icon
+          
+          ListView(
+            // physics: (),
+            children: [
+              // welcome widget
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: SizedBox(
+                  height: Get.height * 0.16,
+                  width: Get.width,
+                  child: Center(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              homeController.loggedIn.value
+                                  ? 'Welcome ${capitalizeAll(getLastName(profileController.userData['name']))}'
+                                  : 'Welcome',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const Text(
+                              'Start by running an errand',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        ElevatedButton(
+                            onPressed: () {
+                              if (homeController.loggedIn.value) {
+                                Get.to(() => const New_Errand());
+                              } else {
+                                Get.to(() => const signin_view());
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white),
+                            child: Text(
+                              'Run an Errand',
+                              style: TextStyle(
+                                  color: appcolor().mainColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12),
+                            )),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            // Container(
-            //   padding: const EdgeInsets.symmetric(horizontal: 6),
-            //   color: appcolor().skyblueColor,
-            //   height: Get.height * 0.06,
-            //   child: Row(
-            //     children: [
-            //       Image(
-            //         image: const AssetImage(
-            //           'assets/images/refresh_location.png',
-            //         ),
-            //         color: appcolor().mainColor,
-            //       ),
-            //       Expanded(
-            //         child: Text(
-            //           homeController.loggedIn.value
-            //               ? 'Update Business Location'.tr
-            //               : 'Update Location'.tr,
-            //           style:
-            //               TextStyle(color: appcolor().mainColor, fontSize: 12),
-            //         ),
-            //       ),
-            //       TextButton(
-            //         onPressed: () async {
-            //           var status = await Permission.location.status;
-            //           if (status.isGranted) {
-            //             ScaffoldMessenger.of(scaffoldKey.currentContext!)
-            //                 .showSnackBar(const SnackBar(
-            //                     content:
-            //                         Text('Camera access permanently denied')));
-            //           } else {
-            //             locationPermission();
-            //           }
-            //         },
-            //         child: Text(
-            //           'Verify Location'.tr,
-            //           style: TextStyle(
-            //             color: appcolor().mainColor,
-            //             fontSize: 10,
-            //             fontWeight: FontWeight.w600,
-            //           ),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
+              // Container(
+              //   padding: const EdgeInsets.symmetric(horizontal: 6),
+              //   color: appcolor().skyblueColor,
+              //   height: Get.height * 0.06,
+              //   child: Row(
+              //     children: [
+              //       Image(
+              //         image: const AssetImage(
+              //           'assets/images/refresh_location.png',
+              //         ),
+              //         color: appcolor().mainColor,
+              //       ),
+              //       Expanded(
+              //         child: Text(
+              //           homeController.loggedIn.value
+              //               ? 'Update Business Location'.tr
+              //               : 'Update Location'.tr,
+              //           style:
+              //               TextStyle(color: appcolor().mainColor, fontSize: 12),
+              //         ),
+              //       ),
+              //       TextButton(
+              //         onPressed: () async {
+              //           var status = await Permission.location.status;
+              //           if (status.isGranted) {
+              //             ScaffoldMessenger.of(scaffoldKey.currentContext!)
+              //                 .showSnackBar(const SnackBar(
+              //                     content:
+              //                         Text('Camera access permanently denied')));
+              //           } else {
+              //             locationPermission();
+              //           }
+              //         },
+              //         child: Text(
+              //           'Verify Location'.tr,
+              //           style: TextStyle(
+              //             color: appcolor().mainColor,
+              //             fontSize: 10,
+              //             fontWeight: FontWeight.w600,
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
 
-            // categories widget
+              // categories widget
 
-            // Container(
-            //   color: Colors.white,
-            //   child: Row(
-            //     children: [
-            //       Text(
-            //         'Categories',
-            //         style: TextStyle(
-            //           fontWeight: FontWeight.w700,
-            //           fontSize: 18,
-            //           color: appcolor().mainColor,
-            //         ),
-            //       ),
-            //       const Spacer(),
-            //       TextButton(
-            //         onPressed: () {
-            //           Get.to(const categories_view());
-            //         },
-            //         child: const Text('See All'),
-            //       ),
-            //     ],
-            //   ).paddingSymmetric(horizontal: 20),
-            // ),
-            //
-            // Categories_List_Widget(),
+              // Container(
+              //   color: Colors.white,
+              //   child: Row(
+              //     children: [
+              //       Text(
+              //         'Categories',
+              //         style: TextStyle(
+              //           fontWeight: FontWeight.w700,
+              //           fontSize: 18,
+              //           color: appcolor().mainColor,
+              //         ),
+              //       ),
+              //       const Spacer(),
+              //       TextButton(
+              //         onPressed: () {
+              //           Get.to(const categories_view());
+              //         },
+              //         child: const Text('See All'),
+              //       ),
+              //     ],
+              //   ).paddingSymmetric(horizontal: 20),
+              // ),
+              //
+              // Categories_List_Widget(),
 
-            // Featured Businesses
+              // Featured Businesses
 
-            Container(
-              color: Colors.white,
-              child: Row(
-                children: [
-                  Text(
-                    'Featured Businesses',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                      color: appcolor().mainColor,
+              Container(
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    Text(
+                      'Featured Businesses',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: appcolor().mainColor,
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      Get.to(() => BusinessesViewWithBar())?.then((_) {
-                        homeController.featuredBusinessData.clear();
-                        homeController.fetchFeaturedBusinessesData();
-                      });
-                    },
-                    child: const Text('See All'),
-                  ),
-                ],
-              ).paddingSymmetric(horizontal: 20),
-            ),
-
-            Featured_Businesses_List(),
-
-            Container(
-              color: Colors.white,
-              child: Row(
-                children: [
-                  Text(
-                    'Recently Posted Errands',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: appcolor().mainColor,
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        Get.to(() => BusinessesViewWithBar())?.then((_) {
+                          homeController.featuredBusinessData.clear();
+                          homeController.fetchFeaturedBusinessesData();
+                        });
+                      },
+                      child: const Text('See All'),
                     ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      Get.to(() => const SeeAllErrands());
-                    },
-                    child: const Text('See All'),
-                  ),
-                ],
-              ).paddingSymmetric(horizontal: 20),
-            ),
+                  ],
+                ).paddingSymmetric(horizontal: 20),
+              ),
 
-            Recently_posted_items_Widget(),
-            Container(
-              height: Get.height * 0.05,
-              color: Colors.white,
-            ),
-          ],
-        ),
-      ],
+              Featured_Businesses_List(),
+
+              Container(
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    Text(
+                      'Recently Posted Errands',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: appcolor().mainColor,
+                      ),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        Get.to(() => const SeeAllErrands());
+                      },
+                      child: const Text('See All'),
+                    ),
+                  ],
+                ).paddingSymmetric(horizontal: 20),
+              ),
+
+              Recently_posted_items_Widget(),
+            ],
+          ),
+
+          // Positioned(
+          //   top: 10,
+          //   // right: 20,
+          //   child: ExpandableFab(
+          //     key: _key,
+          //     overlayStyle: ExpandableFabOverlayStyle(
+          //       // color: Colors.black.withOpacity(0.5),
+          //       blur: 5,
+          //     ),
+          //     onOpen: () {
+          //       debugPrint('onOpen');
+          //     },
+          //     afterOpen: () {
+          //       debugPrint('afterOpen');
+          //     },
+          //     onClose: () {
+          //       debugPrint('onClose');
+          //     },
+          //     afterClose: () {
+          //       debugPrint('afterClose');
+          //     },
+          //     children: [
+          //       FloatingActionButton.small(
+          //         // shape: const CircleBorder(),
+          //         heroTag: null,
+          //         child: const Icon(Icons.edit),
+          //         onPressed: () {
+          //           const SnackBar snackBar = SnackBar(
+          //             content: Text("SnackBar"),
+          //           );
+          //           // scaffoldKey.currentState?.showSnackBar(snackBar);
+          //           HomeMessenger.scaffoldKey.currentState?.showSnackBar(snackBar);
+          //         },
+          //       ),
+          //       FloatingActionButton.small(
+          //         // shape: const CircleBorder(),
+          //         heroTag: null,
+          //         child: const Icon(Icons.search),
+          //         onPressed: () {
+          //           // Navigator.of(context).push(
+          //           //     MaterialPageRoute(builder: ((context) => const NextPage())));
+          //           print("going to next page");
+          //         },
+          //       ),
+          //       FloatingActionButton.small(
+          //         // shape: const CircleBorder(),
+          //         heroTag: null,
+          //         child: const Icon(Icons.share),
+          //         onPressed: () {
+          //           final state = _key.currentState;
+          //           if (state != null) {
+          //             debugPrint('isOpen:${state.isOpen}');
+          //             state.toggle();
+          //           }
+          //         },
+          //       ),
+          //     ],
+          //   ),
+          // )
+        ],
+      ),
     );
   }
 }

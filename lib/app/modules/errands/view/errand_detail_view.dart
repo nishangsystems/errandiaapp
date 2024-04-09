@@ -11,6 +11,7 @@ import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
+import 'package:errandia/main.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,6 @@ class _errand_detail_viewState extends State<errand_detail_view> {
 
   late ScrollController _scrollController;
   late profile_controller profileController;
-  late final SharedPreferences _prefs;
 
   late Timer _timer;
   int _delta = 1; // How much we scroll every time the timer ticks
@@ -56,7 +56,6 @@ class _errand_detail_viewState extends State<errand_detail_view> {
     profileController = Get.put(profile_controller());
     _scrollController = ScrollController();
     _startAutoScroll();
-    _initializePrefs();
 
     profileController.getUser();
   }
@@ -121,18 +120,16 @@ class _errand_detail_viewState extends State<errand_detail_view> {
     return photos.isEmpty;
   }
 
-  void _initializePrefs() async {
-    _prefs = await SharedPreferences.getInstance();
-  }
+
 
   bool hasActiveSubscription() {
     print("has active subscription: ${widget.data['user']['active_subscription']}");
-    String? userDataString = _prefs.getString('user');
+    String? userDataString = ErrandiaApp.prefs.getString('user');
 
     if (userDataString != null) {
       var userData = jsonDecode(userDataString);
       print("user data on errand detail: $userData");
-      return userData['active_subscription'] == 1;
+      return userData['active_subscription'];
     }
 
     return false;

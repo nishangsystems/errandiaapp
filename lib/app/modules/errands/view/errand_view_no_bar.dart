@@ -923,22 +923,22 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
     }
 
     return Scaffold(
-        floatingActionButton: Obx(() {
-          if (tabController.tabIndex.value == 0) {
-            return FloatingActionButton(
-              onPressed: () async {
-                Get.to(() => const New_Errand());
-              },
-              backgroundColor: appcolor().mainColor,
-              child: Icon(
-                Icons.add,
-                color: appcolor().skyblueColor,
-              ),
-            );
-          } else {
-            return SizedBox.shrink();
-          }
-        }),
+        // floatingActionButton: Obx(() {
+        //   if (tabController.tabIndex.value == 0) {
+        //     return FloatingActionButton(
+        //       onPressed: () async {
+        //         Get.to(() => const New_Errand());
+        //       },
+        //       backgroundColor: appcolor().mainColor,
+        //       child: Icon(
+        //         Icons.add,
+        //         color: appcolor().skyblueColor,
+        //       ),
+        //     );
+        //   } else {
+        //     return SizedBox.shrink();
+        //   }
+        // }),
         endDrawer: Drawer(
           width: Get.width * 0.7,
           child: SafeArea(
