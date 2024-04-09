@@ -39,7 +39,7 @@ class EditBusinessViewState extends State<EditBusinessView> {
   Get.put(imagePickercontroller());
   final profile_controller profileController = Get.put(profile_controller());
   final home_controller homeController = Get.put(home_controller());
-
+  final business_controller businessController = Get.put(business_controller());
   var country;
   var regionCode;
   bool isLoading = false;
@@ -208,6 +208,9 @@ class EditBusinessViewState extends State<EditBusinessView> {
               homeController.reloadRecentlyPostedItems(),
               homeController.reloadFeaturedBusinessesData(),
               profileController.reloadMyBusinesses(),
+              profileController.reloadMyProducts(),
+              profileController.reloadMyServices(),
+              businessController.reloadBusinesses(),
             }
           else
             {

@@ -5,6 +5,7 @@ import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
 import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
+import 'package:errandia/app/modules/global/Widgets/errand_widget_card.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
@@ -321,166 +322,9 @@ class _home_view_1State extends State<home_view_1> {
                           data: data,
                         ));
                   },
-                  child: Card(
-                    child: Container(
-                      width: Get.width * 0.5,
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: Get.height * 0.09,
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 25,
-                                  backgroundColor: appcolor().mainColor,
-                                  backgroundImage: data['user']['photo'] == ""
-                                      ? const AssetImage(
-                                          'assets/images/errandia_logo.png') // Fallback image
-                                      : NetworkImage(getImagePath(
-                                              data['user']['photo'].toString()))
-                                          as ImageProvider,
-                                  child: data['user']['photo'] == ""
-                                      ? const Icon(Icons.person)
-                                      : null, // Only show the icon if there is no photo
-                                ),
-                                SizedBox(
-                                  width: Get.width * 0.02,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: Get.width * 0.33,
-                                      child: Text(
-                                        capitalizeAll(data['user']['name']),
-                                        style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    Text(
-                                      DateFormat('dd-MM-yyyy').format(
-                                          DateTime.parse(
-                                              data['created_at'].toString())),
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Divider(
-                            color: appcolor().mediumGreyColor,
-                          ),
-                          Container(
-                            height: Get.height * 0.2,
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 0),
-                            color: appcolor().lightgreyColor,
-                            child: Center(
-                              child: data['images'].length > 0
-                                  ? FadeInImage.assetNetwork(
-                                      placeholder:
-                                          'assets/images/errandia_logo.png',
-                                      image: getImagePathWithSize(
-                                          data['images'][0]['image_path']
-                                              .toString(),
-                                          width: 200,
-                                          height: 180),
-                                      fit: BoxFit.cover,
-                                      imageErrorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Image.asset(
-                                          'assets/images/errandia_logo.png',
-                                          // Your fallback image
-                                          fit: BoxFit.cover,
-                                        );
-                                      },
-                                    )
-                                  : Image.asset(
-                                      'assets/images/errandia_logo.png',
-                                      // Your fallback image
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
-                          ),
-                          Divider(
-                            color: appcolor().mediumGreyColor,
-                          ),
-                          SizedBox(
-                            height: Get.height * 0.009,
-                          ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Text(
-                                //   Featured_Businesses_Item_List[index]
-                                //       .servicetype
-                                //       .toString(),
-                                //   style: TextStyle(
-                                //       fontSize: 13,
-                                //       fontWeight: FontWeight.bold,
-                                //       color: appcolor().mediumGreyColor),
-                                // ),
-                                // SizedBox(
-                                //   height: Get.height * 0.001,
-                                // ),
-                                SizedBox(
-                                  width: Get.width * 0.42,
-                                  child: Text(
-                                    capitalizeAll(data['title'].toString()),
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: appcolor().mainColor),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: Get.height * 0.001,
-                                ),
-                                data['region'].toString() != '[]' ||
-                                        data['town'].toString() != '[]'
-                                    ? Row(
-                                        children: [
-                                          Icon(
-                                            Icons.location_on,
-                                            size: 13,
-                                            color: appcolor().mediumGreyColor,
-                                          ),
-                                          SizedBox(
-                                            width: Get.width * 0.35,
-                                            child: Text(
-                                              _formatAddress(data),
-                                              style: TextStyle(
-                                                color:
-                                                    appcolor().mediumGreyColor,
-                                                fontSize: 12,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : Container(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  child: ErrandWidgetCard(
+                    data: data,
+                  )
                 );
               },
             ),

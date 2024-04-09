@@ -200,9 +200,6 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
                                                   backgroundImage: data['user']['photo'] == ""
                                                       ? const AssetImage('assets/images/errandia_logo.png') // Fallback image
                                                       : NetworkImage(getImagePath(data['user']['photo'].toString())) as ImageProvider,
-                                                  child: data['user']['photo'] == ""
-                                                      ? const Icon(Icons.person)
-                                                      : null, // Only show the icon if there is no photo
                                                 ),
                                                 SizedBox(
                                                   width: Get.width * 0.02,

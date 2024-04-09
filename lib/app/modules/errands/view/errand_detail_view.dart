@@ -18,6 +18,7 @@ import 'package:flutter_background/flutter_background.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class errand_detail_view extends StatefulWidget {
   final data;
@@ -40,6 +41,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
 
   late ScrollController _scrollController;
   late profile_controller profileController;
+  late final SharedPreferences _prefs;
 
   late Timer _timer;
   int _delta = 1; // How much we scroll every time the timer ticks
@@ -54,6 +56,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
     profileController = Get.put(profile_controller());
     _scrollController = ScrollController();
     _startAutoScroll();
+    _initializePrefs();
 
     profileController.getUser();
   }
@@ -118,9 +121,22 @@ class _errand_detail_viewState extends State<errand_detail_view> {
     return photos.isEmpty;
   }
 
+  void _initializePrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
   bool hasActiveSubscription() {
-    print("has active subscription: ${profileController.userData['active_subscription']}");
-    return profileController.userData['active_subscription'];
+    print("has active subscription: ${widget.data['user']['active_subscription']}");
+    String? userDataString = _prefs.getString('user');
+
+    if (userDataString != null) {
+      var userData = jsonDecode(userDataString);
+      print("user data on errand detail: $userData");
+      return userData['active_subscription'] == 1;
+    }
+
+    return false;
+
   }
 
   void getErrandResultsInBackground(String errandId, Map<String, dynamic> data) async {
@@ -491,7 +507,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    if (isPhoneAvailable(widget.data['user']) && hasActiveSubscription())
+                                    if (isPhoneAvailable(widget.data['user']) && hasActiveSubscription() && homeController.loggedIn.value)
                                       InkWell(
                                         onTap: () {
                                           launchCaller(widget.data['user']['phone']);
@@ -520,11 +536,11 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                                           ),
                                         ),
                                       ),
-                                    if (isEmailAvailable(widget.data['user']) && hasActiveSubscription())
+                                    if (isEmailAvailable(widget.data['user']) && hasActiveSubscription() && homeController.loggedIn.value)
                                       SizedBox(
                                         width: Get.width * 0.02,
                                       ),
-                                    if (isEmailAvailable(widget.data['user']) && hasActiveSubscription())
+                                    if (isEmailAvailable(widget.data['user']) && hasActiveSubscription() && homeController.loggedIn.value)
                                       InkWell(
                                         onTap: () {
                                           launchEmail(widget.data['user']['email']);

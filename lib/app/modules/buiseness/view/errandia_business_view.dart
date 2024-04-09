@@ -38,6 +38,8 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
   late final profile_controller profileController = Get.put(profile_controller());
   // List<dynamic> businessBranchesData = [];
   late PopupBox popup;
+  late home_controller homeController;
+  late business_controller businessController;
 
   bool sendingOTPLoading = false;
 
@@ -52,6 +54,7 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
     WidgetsBinding.instance.addObserver(this);
     errandiaBusinessViewController = Get.put(ErrandiaBusinessViewController());
     // widget.businessData = Get.arguments as Map<String, dynamic>;
+    homeController = Get.put(home_controller());
 
     setState(() {
       businessSlug = _localBusinessData['slug'];
@@ -158,9 +161,12 @@ class _errandia_business_viewState extends State<errandia_business_view> with Wi
                           if (mounted) {
                             // Check if the widget is still in the tree
                             if (response["status"] == 'success') {
+                              homeController.reloadFeaturedBusinessesData();
+                              homeController.reloadRecentlyPostedItems();
                               profileController.reloadMyProducts();
                               profileController.reloadMyServices();
-
+                              businessController.reloadBusinesses();
+                              
                               Navigator.of(dialogContext)
                                   .pop(); // Close the dialog
                               Navigator.of(context)
