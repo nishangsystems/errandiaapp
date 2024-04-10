@@ -61,18 +61,22 @@ class _errand_detail_viewState extends State<errand_detail_view> {
   }
 
   void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
-      double maxScroll = _scrollController.position.maxScrollExtent;
-      double currentScroll = _scrollController.position.pixels;
-      double newScroll = currentScroll + _delta;
+    try {
+      _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
+        double maxScroll = _scrollController.position.maxScrollExtent;
+        double currentScroll = _scrollController.position.pixels;
+        double newScroll = currentScroll + _delta;
 
-      if (newScroll > maxScroll || newScroll < 0) {
-        _leftToRight = !_leftToRight;
-        _delta = -_delta; // Reverse the direction
-      }
+        if (newScroll > maxScroll || newScroll < 0) {
+          _leftToRight = !_leftToRight;
+          _delta = -_delta; // Reverse the direction
+        }
 
-      _scrollController.jumpTo(newScroll.clamp(0.0, maxScroll));
-    });
+        _scrollController.jumpTo(newScroll.clamp(0.0, maxScroll));
+      });
+    } catch (e) {
+      print("error starting auto scroll: $e");
+    }
   }
 
   // convert categories to string
@@ -440,9 +444,6 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                           : NetworkImage(getImagePath(
                           widget.data['user']['photo'].toString()))
                       as ImageProvider,
-                      child: widget.data['user']['photo'] == ""
-                          ? const Icon(Icons.person)
-                          : null, // Only show the icon if there is no photo
                     ),
                   ),
                   SizedBox(

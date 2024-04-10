@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:async';
 
@@ -20,110 +21,149 @@ import 'package:get_storage/get_storage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
-final StreamController<String?> selectNotificationStream =
-StreamController<String?>.broadcast();
+late FirebaseMessaging messaging;
+late SharedPreferences _prefs;
+AndroidNotificationChannel? channel;
+FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  channel!.id,
+  channel!.name,
+  icon: '@mipmap/ic_launcher',
+  sound: const RawResourceAndroidNotificationSound('alert'),
+  largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+  channelShowBadge: true,
+  autoCancel: true,
+  styleInformation: DefaultStyleInformation(true, true),
+  setAsGroupSummary: true,
+  importance: Importance.max,
+  priority: Priority.high,
+);
 
-void _configureSelectNotificationSubject() {
-  selectNotificationStream.stream.listen((String? payload) async {
-   Get.to(() => Profile_view());
-  });
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
+  print('Handling a background data ${message.data}');
+  print('Handling a background title ${message.notification?.title}');
+  print('Handling a background body ${message.notification?.body}');
+
+  flutterLocalNotificationsPlugin!.show(
+    Random().nextInt(1000),
+    message.notification?.title,
+    message.notification?.body,
+    NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    ),
+  );
 }
 
-void _handleMessage(RemoteMessage message) {
-  print("notif message: $message");
-  // Extract notification data
-  final String title = message.notification?.title ?? '';
-  final String body = message.notification?.body ?? '';
-  final String? dataPayload = message.data['page']; // Optional data
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  print('notification(${notificationResponse.id}) action tapped: '
+      '${notificationResponse.actionId} with'
+      ' payload: ${notificationResponse.payload}');
 
-  const AndroidNotificationDetails androidNotificationDetails =
-  AndroidNotificationDetails('errandia_channel_id', 'Errandia Channel',
-      channelDescription: 'Errandia Channel Description',
-      importance: Importance.max,
-      priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
-      sound: RawResourceAndroidNotificationSound('alert'),
-      ticker: 'ticker');
-
-  // Display a notification
-  flutterLocalNotificationsPlugin.show(
-    Random().nextInt(1000), // Notification ID
-    title,
-    body,
-    const NotificationDetails(
-      android: androidNotificationDetails,
-    ),
-    payload: dataPayload,
-  );
-
-  // Handle data payload (if any)
-  if (dataPayload != null) {
-    print('Data payload: $dataPayload');
-
+  if (notificationResponse.payload != null) {
+    onSelectNotification(notificationResponse.payload);
   }
 }
 
-late final SharedPreferences _prefs;
+Future<dynamic> onSelectNotification(payload) async {
+  Map<String, dynamic> action = jsonDecode(payload);
+  _handleMessage(action);
+}
+
+Future<void> setupInteractedMessage() async {
+  await FirebaseMessaging.instance
+      .getInitialMessage()
+      .then((value) => _handleMessage(value != null ? value.data : Map()));
+}
+
+void _handleMessage(Map<String, dynamic> data) {
+  if (data['page'] == "subscription") {
+    Get.to(() => const subscription_view());
+  } else if (data['page'] == 'received_errand') {
+    Get.to(() => const errand_view());
+  }
+}
+
+void _showNotifications(RemoteMessage message) {
+  RemoteNotification? notification = message.notification;
+  AndroidNotification? android = message.notification?.android;
+
+  if (notification != null && android != null) {
+    String action = jsonEncode(message.data);
+
+    flutterLocalNotificationsPlugin!.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+      ),
+      payload: action,
+    );
+  }
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp().then((_) {
-    // Request permission for notifications if desired
-    FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
 
-    // Handle background messages
-    // FirebaseMessaging.onBackgroundMessage.listen(_onBackgroundMessage);
-    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
-      if (message != null) {
-        _handleMessage(message); // Handle the received background message
-      }
-      // RemoteMessage message_ = const RemoteMessage(
-      //   data: {
-      //     'title': "Hello"
-      //
-      //   },
-      //   notification: RemoteNotification(
-      //     title: "Hello",
-      //     body: "Welcome back to Errandia 😊",
-      //   ),
-      // );
-      // _onBackgroundMessage(
-      //    message_
-      // );
-      // _handleMessage(message_);
-    });
-
-    // _configureSelectNotificationSubject();
-    // Handle foreground and terminated messages
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      // Handle FCM message received when app is in foreground or terminated
-      _handleMessage(message);
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // Handle FCM message received when app is in background
-      print("opened notification: $message");
-
-      if (message.data['page'] == "subscription") {
-        Get.to(() => const subscription_view());
-      } else if (message.data['page'] == "received_errands") {
-        Get.to(() => ErrandViewWithoutBar());
-      }
-    });
-  });
+  await Firebase.initializeApp();
   await InitializeDevice().initialize();
   await GetStorage.init();
   await ErrandiaApp._initializePrefs();
+
+  messaging = FirebaseMessaging.instance;
+
+  await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  //If subscribe based sent notification then use this token
+  // final fcmToken = await messaging.getToken();
+  // print(fcmToken);
+
+  // await messaging.subscribeToTopic('flutter_notification');
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  channel = const AndroidNotificationChannel(
+      'errandia_channel_id',
+      'Errandia Channel',
+      sound: RawResourceAndroidNotificationSound('alert'),
+      importance: Importance.high,
+      enableLights: true,
+      enableVibration: true,
+      showBadge: true,
+      playSound: true);
+
+  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  const android =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+  const iOS = DarwinInitializationSettings();
+  const initSettings = InitializationSettings(android: android, iOS: iOS);
+
+  await flutterLocalNotificationsPlugin!.initialize(initSettings,
+      onDidReceiveNotificationResponse: notificationTapBackground,
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
+
+  await messaging
+      .setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  FirebaseMessaging.onMessage.listen(_showNotifications);
+
+  FirebaseMessaging.onMessageOpenedApp.listen((message) => _handleMessage(message.data));
 
   runApp(const ErrandiaApp());
 }
