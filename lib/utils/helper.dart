@@ -1,8 +1,10 @@
 
 // capitalize string function
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -156,4 +158,17 @@ String listToString(List<int?> list) {
 // check if location info is available
 bool isLocationAvailable(Map<String, dynamic> value) {
   return value['region'] != "" && value['region'] != null && value['town'] != "" && value['town'] != null;
+}
+
+bool hasActiveSubscription() {
+  String? userDataString = ErrandiaApp.prefs.getString('user');
+
+  if (userDataString != null) {
+    var userData = jsonDecode(userDataString);
+    print("user data on errand detail: $userData");
+    return userData['active_subscription'];
+  }
+
+  return false;
+
 }

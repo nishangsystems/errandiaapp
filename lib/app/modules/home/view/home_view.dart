@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:errandia/app/modules/auth/Sign%20in/controller/signin_controller.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view_1.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
@@ -37,6 +38,7 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
   final home_controller homeController = Get.put(home_controller());
   late profile_controller profileController;
   final isDialOpen = ValueNotifier(false);
+  late signIn_controller signInController;
 
   @override
   void initState() {
@@ -44,6 +46,7 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     profileController = Get.put(profile_controller());
     businessController = Get.put(business_controller());
+    signInController = Get.put(signIn_controller());
     requestLocationPermission();
     homeController.checkLoginStatus();
   }
@@ -212,9 +215,14 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
       const run_an_errand(),
       homeController.isLoggedIn.value
           ? ErrandViewWithoutBar()
-          : signin_view_1(),
-      homeController.isLoggedIn.value ? Profile_view() : Container()
+          : const signin_view_1(),
+      homeController.isLoggedIn.value ? const Profile_view() : Container()
     ];
+
+    if (homeController.currentIndex.value == 2) {
+      print("current index: ${homeController.currentIndex.value}");
+      signInController.fieldFocus.requestFocus();
+    }
 
     return IndexedStack(
       index: homeController.currentIndex.value,

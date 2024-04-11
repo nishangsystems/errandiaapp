@@ -4,6 +4,7 @@ import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/modules/auth/Register/register_ui.dart';
 import 'package:errandia/app/modules/auth/Register/service_Provider/view/Register_serviceprovider_view.dart';
+import 'package:errandia/app/modules/auth/Sign%20in/controller/signin_controller.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/forget_password.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_otp_verification_screen.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/helpers.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,7 +29,9 @@ class signin_view_1 extends StatefulWidget {
 class _signin_viewState extends State<signin_view_1>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late signIn_controller signInController;
 
+  final TextEditingController _phoneContoller = TextEditingController();
   final TextEditingController _otpContoller = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController email = TextEditingController();
@@ -39,19 +43,48 @@ class _signin_viewState extends State<signin_view_1>
   bool isSelected = true;
   bool isSelected2 = false;
   bool isLoading = false;
-  bool isPhone = false;
+  // bool isPhone = false;
+  var filteredCountries = ["CM"];
+  List<Country> filter = [];
+
+  static const phonePattern = r'^[+\d\s]*$';
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    signInController = Get.put(signIn_controller());
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+
+    countries.forEach((element) {
+      filteredCountries.forEach((filteredC) {
+        if (element.code == filteredC) {
+          filter.add(element);
+        }
+      });
+    });
   }
+
+  // bool phoneNumberOrEmailValidator(Control control) {
+  //   if (control.hasError(Validator.required)) {
+  //     return true; // Let required validator handle emptiness
+  //   }
+  //
+  //   final value = control.value as String;
+  //   final phoneRegex = RegExp(r'^[+\d\s]*$'); // Phone number regex pattern
+  //
+  //   if (value.isNotEmpty && phoneRegex.hasMatch(value)) {
+  //     return value.length != 9; // Invalid phone number length
+  //   } else {
+  //     return !value.contains('@'); // Invalid email format
+  //   }
+  //   return null; // Valid
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -108,59 +141,59 @@ class _signin_viewState extends State<signin_view_1>
                           ),
                           child: Padding(
                             padding: const EdgeInsets.only(
-                                left: 15, right: 15, top: 10, bottom: 0),
-                            child: TextFormField(
-                              style: const TextStyle(
-                                fontSize: 18,
-                              ),
-                              controller: _emailPhoneController,
-                              keyboardType: isPhone
-                                  ? TextInputType.phone
-                                  : TextInputType.emailAddress,
-                              maxLength: isPhone ? 9 : 100,
-                              onChanged: (value) {
-                                if (kDebugMode) {
-                                  print("value: $value");
-                                }
-                                if (isNumeric(value)) {
-                                  setState(() {
-                                    isPhone = true;
-                                  });
-                                } else if (value.contains('@') ||
-                                    value.isEmpty) {
-                                  setState(() {
-                                    isPhone = false;
-                                  });
-                                }
-                              },
-                              decoration: InputDecoration(
-                                hintText: "Phone number or email",
-                                border: InputBorder.none,
-                                prefixText: isPhone ? "+237 " : "",
-                                errorBorder: InputBorder.none,
-                                focusedErrorBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                alignLabelWithHint: true,
-                                counter: const Offstage(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter your phone number or email';
-                                }
-
-                                if (isPhone) {
-                                  if (value.length != 9) {
-                                    return 'Please enter a valid phone number';
-                                  }
-                                } else {
-                                  if (!value.contains('@')) {
-                                    return 'Please enter a valid email';
-                                  }
-                                }
-                                // You can add additional validation logic here
-                                return null;
-                              },
-                            ),
+                                left: 15, right: 15, top: 10),
+                            child: Obx(() {
+                              // return TextFormField(
+                              //   style: const TextStyle(
+                              //     fontSize: 18,
+                              //   ),
+                              //   controller: _emailPhoneController,
+                              //   keyboardType: signInController.isPhone.value
+                              //       ? TextInputType.number
+                              //       : TextInputType.emailAddress,
+                              //   maxLength: signInController.isPhone.value ? 9 : 100,
+                              //   onChanged: (value) {
+                              //     if (kDebugMode) {
+                              //       print("value: $value");
+                              //     }
+                              //     // Update isPhone based on input content (excluding prefix)
+                              //     if (value.substring(signInController.isPhone.value ? 3 : 0).isNotEmpty &&
+                              //         isNumeric(value.substring(signInController.isPhone.value ? 3 : 0))) {
+                              //       print("isPhone: ${signInController.isPhone.value}");
+                              //       signInController.isPhone.value = true;
+                              //     } else if (value.isEmpty || value.contains('@')) {
+                              //       signInController.isPhone.value = false;
+                              //     }
+                              //   },
+                              //   decoration: InputDecoration(
+                              //     hintText: "Phone number or email",
+                              //     border: InputBorder.none,
+                              //     prefixText: signInController.isPhone.value ? "+237 " : "",
+                              //     errorBorder: InputBorder.none,
+                              //     focusedErrorBorder: InputBorder.none,
+                              //     focusedBorder: InputBorder.none,
+                              //     alignLabelWithHint: true,
+                              //   ),
+                              //   validator: (value) {
+                              //     if (value == null || value.isEmpty) {
+                              //       return 'Please enter your phone number or email';
+                              //     }
+                              //
+                              //     if (signInController.isPhone.value) {
+                              //       if (value.length != 9) {
+                              //         return 'Please enter a valid phone number';
+                              //       }
+                              //     } else {
+                              //       if (!value.contains('@')) {
+                              //         return 'Please enter a valid email';
+                              //       }
+                              //     }
+                              //     // You can add additional validation logic here
+                              //     return null;
+                              //   },
+                              // );
+                              return Container();
+                            }),
                           ),
                         ),
                       ),

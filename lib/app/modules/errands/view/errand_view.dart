@@ -103,6 +103,10 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
     return item['email'] != null && item['email'] != "";
   }
 
+  bool isWhatsAppAvailable(Map<String, dynamic> item) {
+    return item['whatsapp_number'] != null && item['whatsapp_number'] != "";
+  }
+
   void markErrandFound(BuildContext context, data) async {
     await ErrandsAPI.markErrandAsFound(data['id'].toString()).then((response_) {
       var response = jsonDecode(response_);
@@ -801,56 +805,57 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                           children: [
                             // call button
                             // if (isPhoneAvailable(data_['user']) || !isEmailAvailable(data_['user']))
-                            InkWell(
-                              onTap: () {
-                                launchCaller(data_['user']['phone'].toString());
-                              },
-                              child: Container(
-                                  padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                  decoration: BoxDecoration(
-                                    color: appcolor().amberColor,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      color: Colors.orangeAccent,
-                                    ),
-                                    gradient: Gradient.lerp(
-                                      LinearGradient(
-                                        colors: [
-                                          appcolor().skyblueColor,
-                                          appcolor().amberColor,
-                                        ],
+                            if (hasActiveSubscription() && isPhoneAvailable(data_['user']))
+                              InkWell(
+                                onTap: () {
+                                  launchCaller(data_['user']['phone'].toString());
+                                },
+                                child: Container(
+                                    padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                                    decoration: BoxDecoration(
+                                      color: appcolor().amberColor,
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.orangeAccent,
                                       ),
-                                      LinearGradient(
-                                        colors: [
-                                          appcolor().amberColor,
-                                          appcolor().skyblueColor,
-                                        ],
+                                      gradient: Gradient.lerp(
+                                        LinearGradient(
+                                          colors: [
+                                            appcolor().skyblueColor,
+                                            appcolor().amberColor,
+                                          ],
+                                        ),
+                                        LinearGradient(
+                                          colors: [
+                                            appcolor().amberColor,
+                                            appcolor().skyblueColor,
+                                          ],
+                                        ),
+                                        0.5,
                                       ),
-                                      0.5,
                                     ),
-                                  ),
-                                  child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.call,
-                                          color: appcolor().darkBlueColor,
-                                          size: 14,
-                                        ),
-                                        SizedBox(
-                                          width: Get.width * 0.01,
-                                        ),
-                                        Text(
-                                          'Call Now',
-                                          style: TextStyle(
-                                            fontSize: 12,
+                                    child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.call,
                                             color: appcolor().darkBlueColor,
-                                            fontWeight: FontWeight.w600,
+                                            size: 14,
                                           ),
-                                        ),
-                                      ]
-                                  )
+                                          SizedBox(
+                                            width: Get.width * 0.01,
+                                          ),
+                                          Text(
+                                            'Call Now',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: appcolor().darkBlueColor,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ]
+                                    )
+                                ),
                               ),
-                            ),
 
                             // posted when
                             Spacer(),
@@ -864,57 +869,60 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                             ),
 
                             // message button
-                            Spacer(),
-                            InkWell(
-                              onTap: () {
-                                launchEmail(data_['user']['email'].toString());
-                              },
-                              child: Container(
-                                  padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      color: Colors.blueAccent[700]!,
-                                    ),
-                                    gradient: Gradient.lerp(
-                                      LinearGradient(
-                                        colors: [
-                                          appcolor().mainColor.withOpacity(0.8),
-                                          appcolor().mainColor,
-                                        ],
+                            if (hasActiveSubscription())
+                              Spacer(),
+
+                            if (hasActiveSubscription() && isWhatsAppAvailable(data_['user']))
+                              InkWell(
+                                onTap: () {
+                                  launchWhatsapp(data_['user']['whatsapp_number'].toString());
+                                },
+                                child: Container(
+                                    padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.green[700]!,
                                       ),
-                                      LinearGradient(
-                                        colors: [
-                                          appcolor().mainColor,
-                                          appcolor().mainColor.withOpacity(0.5),
-                                        ],
+                                      gradient: Gradient.lerp(
+                                        LinearGradient(
+                                          colors: [
+                                            appcolor().greenColor.withOpacity(0.8),
+                                            appcolor().greenColor,
+                                          ],
+                                        ),
+                                        LinearGradient(
+                                          colors: [
+                                            appcolor().mainColor,
+                                            appcolor().greenColor.withOpacity(0.5),
+                                          ],
+                                        ),
+                                        0.5,
                                       ),
-                                      0.5,
                                     ),
-                                  ),
-                                  child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.mail_outline,
-                                          color: Colors.white,
-                                          size: 14,
-                                        ),
-                                        SizedBox(
-                                          width: Get.width * 0.01,
-                                        ),
-                                        const Text(
-                                          'Message',
-                                          style: TextStyle(
-                                            fontSize: 12,
+                                    child: Row(
+                                        children: [
+                                          const Icon(
+                                            FontAwesomeIcons.whatsapp,
                                             color: Colors.white,
-                                            fontWeight: FontWeight.w600,
+                                            size: 14,
                                           ),
-                                        ),
-                                      ]
-                                  )
+                                          SizedBox(
+                                            width: Get.width * 0.01,
+                                          ),
+                                          const Text(
+                                            'Message',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ]
+                                    )
+                                ),
                               ),
-                            ),
                           ]
                       )
                     ],

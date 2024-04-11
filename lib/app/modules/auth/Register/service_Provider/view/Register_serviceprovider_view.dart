@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
@@ -16,7 +17,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../registration_failed_view.dart';
 import '../../registration_successful_view.dart';
@@ -42,6 +45,23 @@ class _register_serviceprovider_viewState
 
   bool isSelected = false;
   bool isLoading = false;
+  bool emailValid = false;
+
+  var filteredCountries = ["CM"];
+  List<Country> filter = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    countries.forEach((element) {
+      filteredCountries.forEach((filteredC) {
+        if (element.code == filteredC) {
+          filter.add(element);
+        }
+      });
+    });
+  }
 
   void _showTermsAndConditionsDialog(BuildContext context) {
     showDialog(
@@ -124,6 +144,56 @@ class _register_serviceprovider_viewState
     });
   }
 
+  void registerUser(BuildContext context) async {
+    if (name.text.isEmpty) {
+      alertDialogBox(context, "Error", "Please enter your name");
+    } else if (phoneNo.text.isEmpty) {
+      alertDialogBox(context, "Error", "Please enter your phone number");
+    } else if (email.text.isEmpty) {
+      alertDialogBox( context, "Error", "Please enter your email");
+    } else {
+      var Name = name.text.trim().toString();
+      var Phone = phoneNo.text.trim().toString();
+      var Email = email.text.trim().toString();
+
+      if (name == '' && email == '' && Phone == '') {
+        alertDialogBox(context, 'Alert', 'Please Fill Fields');
+      } else {
+        var value = {
+          "name": Name,
+          "email": Email,
+          // "country": phone.,
+          "phone": Phone,
+        };
+        print("value: $value");
+        registration_successful_view home =
+        registration_successful_view(userAction: const {
+          "name": "register",
+        });
+        registration_failed_view failed =
+        registration_failed_view();
+
+        setState(() {
+          isLoading = true;
+        });
+        // api().registration('register', value, context,home,failed);
+        try {
+          await api()
+              .registration(value, context, home, failed);
+        } finally {
+          setState(() {
+            isLoading = false;
+          });
+        }
+        // Future.delayed(const Duration(seconds: 3),(){
+        //   setState(() {
+        //     isLoading = false;
+        //   });
+        // });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,6 +208,7 @@ class _register_serviceprovider_viewState
         // elevation: 0.8,
         leading: IconButton(
           onPressed: () {
+            print("should go back");
             Get.back();
           },
           icon: const Icon(
@@ -184,7 +255,6 @@ class _register_serviceprovider_viewState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   SizedBox(
                     height: Get.height * 0.01,
                   ),
@@ -213,7 +283,12 @@ class _register_serviceprovider_viewState
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: TextFormField(
                         controller: name,
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType: TextInputType.name,
+                        onChanged: (value) {
+                          if (kDebugMode) {
+                            print("name: $value");
+                          }
+                        },
                         style: const TextStyle(
                           fontSize: 18,
                         ),
@@ -241,7 +316,7 @@ class _register_serviceprovider_viewState
 
                   // phone number text field
                   Container(
-                    height: Get.height * 0.09,
+                    height: Get.height * 0.08,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
@@ -252,15 +327,28 @@ class _register_serviceprovider_viewState
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(top: 20),
+                          padding: const EdgeInsets.only(top: 5, left: 10),
                           child: SizedBox(
                             width: Get.width * 0.86,
                             child: IntlPhoneField(
                               controller: phoneNo,
                               decoration: const InputDecoration(
-                                  contentPadding: EdgeInsets.only(top: 22),
-                                  border: InputBorder.none),
+                                  contentPadding: EdgeInsets.only(top: 12),
+                                  border: InputBorder.none,
+                                  counter: SizedBox(),
+                                hintText: 'Phone Number *',
+                                hintStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                              keyboardType: TextInputType.number,
                               initialCountryCode: 'CM',
+                              showDropdownIcon: false,
+                              countries: filter,
+                              dropdownTextStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                              ),
                               validator: (value) {
                                 if (value == null) {
                                   print(value);
@@ -333,63 +421,110 @@ class _register_serviceprovider_viewState
                         style: const TextStyle(
                           fontSize: 18,
                         ),
+                        onChanged: (value) {
+                          if (kDebugMode) {
+                            print("email: $value");
+                          }
+
+                          if (value.contains('@') && value.contains('.')) {
+                            print('valid email');
+                            setState(() {
+                              emailValid = true;
+                            });
+                          } else {
+                            print('invalid email');
+                            setState(() {
+                              emailValid = false;
+                            });
+                          }
+                        },
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
                         decoration:
                             const InputDecoration(border: InputBorder.none),
                       ),
                     ),
                   ),
 
+                  // error text
+                  emailValid == false
+                      ? const Padding(
+                          padding: EdgeInsets.only(top: 5),
+                          child: Text(
+                            'Please enter a valid email',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 12,
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+
                   // by registering you agree
                   const SizedBox(
                     height: 20,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      // Checkbox(
-                      //   checkColor: Colors.white,
-                      //   // fillColor: Colors.red,
-                      //   value: isSelected,
-                      //   onChanged: (bool? value) {
-                      //     setState(() {
-                      //       isSelected = value!;
-                      //     });
-                      //   },
-                      // ),
-                      const Text(
-                        "By registering, you agree to the Errandia's ",
-                        style: TextStyle(fontSize: 12),
+
+                  Container(
+                    width: Get.width * 0.9,
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: const TextStyle(
+                          color: Color(0xff8ba0b7),
+                          fontSize: 17,
+                        ),
+                        children: [
+                          const TextSpan(text: 'By registering, you agree to the '),
+                          TextSpan(
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // _showTermsAndConditionsDialog(context);
+                                mlaunchUrl(apiDomain().termsUrl);
+                              },
+                            text: 'User\'s Agreement ',
+                            style: const TextStyle(
+                              color: Color(0xff3c7fc6),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const TextSpan(text: 'and '),
+                          TextSpan(
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // _showTermsAndConditionsDialog(context);
+                                mlaunchUrl(apiDomain().policyUrl);
+                              },
+                            text: 'Privacy Policy',
+                            style: const TextStyle(
+                              color: Color(0xff3c7fc6),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                      InkWell(
-                          onTap: () {
-                            _showTermsAndConditionsDialog(context);
-                          },
-                          child: const Text(
-                            "User's ",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.blue),
-                          ))
-                    ],
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      InkWell(
-                          onTap: () {
-                            _showTermsAndConditionsDialog(context);
-                          },
-                          child: const Text(
-                            "Agreement ",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.blue),
-                          )),
-                      const Text("and "),
-                      const Text(
-                        "Privacy Policy",
-                        style: TextStyle(color: Colors.blue),
-                      ),
-                    ],
-                  ),
+
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     InkWell(
+                  //         onTap: () {
+                  //           // _showTermsAndConditionsDialog(context);
+                  //           mlaunchUrl('https://errandia.com/policies/privacy-policy');
+                  //         },
+                  //         child: const Text(
+                  //           "Agreement ",
+                  //           textAlign: TextAlign.center,
+                  //           style: TextStyle(color: Colors.blue),
+                  //         )),
+                  //     const Text("and "),
+                  //     const Text(
+                  //       "Privacy Policy",
+                  //       style: TextStyle(color: Colors.blue),
+                  //     ),
+                  //   ],
+                  // ),
 
                   SizedBox(
                     height: Get.height * 0.04,
@@ -399,49 +534,7 @@ class _register_serviceprovider_viewState
 
                   InkWell(
                     onTap: () async {
-                      var Name = name.text.trim().toString();
-                      var Phone = phoneNo.text.trim().toString();
-                      var Email = email.text.trim().toString();
-
-                      if (name == '' &&
-                          email == '' &&
-                          Phone == '') {
-                        alertDialogBox(
-                            context, 'Alert', 'Please Fill Fields');
-                      }
-                      // }else if(isSelected == false){
-                      //   alertBoxdialogBox(context, 'Alert', 'Please agree Terms and Conditon');
-                      else {
-                        var value = {
-                          "name": Name,
-                          "email": Email,
-                          // "country": phone.,
-                          "phone": Phone,
-                        };
-                        print("value: $value");
-                        registration_successful_view home =
-                            registration_successful_view(userAction: const {
-                          "name": "register",
-                            });
-                        registration_failed_view failed =
-                            registration_failed_view();
-                        setState(() {
-                          isLoading = true;
-                        });
-                        // api().registration('register', value, context,home,failed);
-                        try {
-                          await api().registration(value, context, home, failed);
-                        } finally {
-                          setState(() {
-                            isLoading = false;
-                          });
-                        }
-                        // Future.delayed(const Duration(seconds: 3),(){
-                        //   setState(() {
-                        //     isLoading = false;
-                        //   });
-                        // });
-                      }
+                     registerUser(context);
                       // Get.to(Home_view());
                     },
                     child: Container(
@@ -490,7 +583,7 @@ class _register_serviceprovider_viewState
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             debugPrint('sign in');
-                            Get.off(() => signin_view());
+                            Get.to(() => const signin_view());
                           },
                         text: 'Sign In',
                         style: const TextStyle(

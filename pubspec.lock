@@ -105,6 +105,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.4"
+  ephone_field:
+    dependency: "direct main"
+    description:
+      name: ephone_field
+      sha256: "561743b5b2b2897184ad240f9f54da03707ebede894d94be1d431a4e1f29c48e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   equatable:
     dependency: transitive
     description:

@@ -103,6 +103,10 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
     return item['email'] != null && item['email'] != "";
   }
 
+  bool isWhatsAppAvailable(Map<String, dynamic> item) {
+    return item['whatsapp_number'] != null && item['whatsapp_number'] != "";
+  }
+
   void markErrandFound(BuildContext context, data) async {
     await ErrandsAPI.markErrandAsFound(data['id'].toString()).then((response_) {
       var response = jsonDecode(response_);
@@ -796,6 +800,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                           children: [
                             // call button
                             // if (isPhoneAvailable(data_['user']) || !isEmailAvailable(data_['user']))
+                            if (hasActiveSubscription() && isPhoneAvailable(data_['user']))
                             InkWell(
                               onTap: () {
                                 launchCaller(data_['user']['phone'].toString());
@@ -859,10 +864,13 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                             ),
 
                             // message button
-                            Spacer(),
-                            InkWell(
+                            if (hasActiveSubscription())
+                              Spacer(),
+
+                            if (hasActiveSubscription() && isWhatsAppAvailable(data_['user']))
+                              InkWell(
                               onTap: () {
-                               launchEmail(data_['user']['email'].toString());
+                               launchWhatsapp(data_['user']['whatsapp_number'].toString());
                               },
                               child: Container(
                                 padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
@@ -870,19 +878,19 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(5),
                                   border: Border.all(
-                                    color: Colors.blueAccent[700]!,
+                                    color: Colors.green[700]!,
                                   ),
                                   gradient: Gradient.lerp(
                                     LinearGradient(
                                       colors: [
-                                        appcolor().mainColor.withOpacity(0.8),
-                                        appcolor().mainColor,
+                                        appcolor().greenColor.withOpacity(0.8),
+                                        appcolor().greenColor,
                                       ],
                                     ),
                                     LinearGradient(
                                       colors: [
                                         appcolor().mainColor,
-                                        appcolor().mainColor.withOpacity(0.5),
+                                        appcolor().greenColor.withOpacity(0.5),
                                       ],
                                     ),
                                     0.5,
@@ -891,7 +899,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                 child: Row(
                                   children: [
                                     const Icon(
-                                      Icons.mail_outline,
+                                      FontAwesomeIcons.whatsapp,
                                       color: Colors.white,
                                       size: 14,
                                     ),

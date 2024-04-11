@@ -80,6 +80,7 @@ dependencies:
   flutter_background: ^1.2.0
   flutter_local_notifications: ^17.0.0
   flutter_speed_dial: ^7.0.0
+  ephone_field: ^0.0.2
 
 dev_dependencies:
   flutter_test:

@@ -14,6 +14,8 @@ class apiDomain {
   final domain = 'https://errandia.com/api';
   final imageDomain =
       'https://cznbemgsca.cloudimg.io/https://errandia.com';
+  final policyUrl = "https://errandia.com/policies/privacy-policy";
+  final termsUrl = "https://errandia.com/policies/terms-condition";
 }
 
 class api {

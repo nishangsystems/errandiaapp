@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/update_business_location.dart';
@@ -14,6 +15,7 @@ import 'package:errandia/app/modules/setting/view/notification_setting_view.dart
 import 'package:errandia/app/modules/setting/view/policies&rules.dart';
 import 'package:errandia/app/modules/setting/view/review_view.dart';
 import 'package:errandia/app/modules/setting/view/update_password_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -133,7 +135,7 @@ class setting_view extends StatelessWidget {
 
             // policies
             mywidget(() {
-              Get.to(() => policies_view());
+              mlaunchUrl(apiDomain().policyUrl);
             }, Icons.policy_outlined, 'Policies & Rules'),
 
             Divider(
@@ -144,7 +146,7 @@ class setting_view extends StatelessWidget {
             ),
 
             mywidget(() {
-              Get.to(() => policies_view());
+              mlaunchUrl(apiDomain().termsUrl);
             }, Icons.security, 'Terms & Conditions'),
 
             Divider(

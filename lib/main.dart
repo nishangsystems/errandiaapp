@@ -173,6 +173,9 @@ class ErrandiaApp extends StatelessWidget {
 
   static Future<void> _initializePrefs() async {
     _prefs = await SharedPreferences.getInstance();
+
+    var fcmToken = _prefs.getString('firebaseToken');
+    print("fcmToken: $fcmToken");
   }
 
   // return loaded prefs
