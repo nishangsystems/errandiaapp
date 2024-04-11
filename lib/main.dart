@@ -58,9 +58,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void notificationTapBackground(NotificationResponse notificationResponse) {
-  print('notification(${notificationResponse.id}) action tapped: '
-      '${notificationResponse.actionId} with'
-      ' payload: ${notificationResponse.payload}');
+  print('notification payload: ${notificationResponse}');
 
   if (notificationResponse.payload != null) {
     onSelectNotification(notificationResponse.payload);
@@ -81,7 +79,9 @@ Future<void> setupInteractedMessage() async {
 void _handleMessage(Map<String, dynamic> data) {
   if (data['page'] == "subscription") {
     Get.to(() => const subscription_view());
-  } else if (data['page'] == 'received_errand') {
+  }
+
+  if (data['page'] == 'received_errands') {
     Get.to(() => const errand_view());
   }
 }

@@ -152,6 +152,90 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
     });
   }
 
+  void rejectErrand(BuildContext context, data) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        // Use dialogContext
+        var response;
+        return CustomAlertDialog(
+            title: "Reject Errand",
+            message: "Are you sure you want to reject this errand?\n"
+                "This action cannot be undone.\n",
+            dialogType: MyDialogType.error,
+            onConfirm: () {
+              // delete product
+              print("reject errand: ${data['errand_received_id']}");
+              ErrandsAPI.rejectReceivedErrand(data['errand_received_id'].toString()).then((response_) {
+                if (response_ != null) {
+                  response = jsonDecode(response_);
+                  print("reject business response: $response");
+
+                  if (mounted) {
+                    // Check if the widget is still in the tree
+                    if (response["status"] == 'success') {
+                      errandController.reloadReceivedErrands();
+                      homeController.reloadRecentlyPostedItems();
+
+                      // Close the dialog
+
+                      // Show success popup
+                      Get.snackbar(
+                        'Success',
+                        response['message'],
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        duration: const Duration(seconds: 5),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                      );
+
+                      Navigator.of(dialogContext).pop();
+                    } else {
+                      Navigator.of(dialogContext).pop(); // Close the dialog
+
+                      // Show error popup
+                      Get.snackbar(
+                        'Error',
+                        response['message'],
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        duration: const Duration(seconds: 5),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                      );
+                    }
+
+                    // popup.showPopup(context); // Show the popup
+                  }
+                }
+              });
+            },
+            onCancel: () {
+              // cancel delete
+              print("cancel reject");
+              Get.back(); // Close the dialog
+            });
+      },
+    ).then((_) {
+      // if (mounted) {
+      //   try {
+      //     popup.dismissPopup(navigatorKey.currentContext!); // Dismiss the popup
+      //   } catch (e) {
+      //     print("error dismissing popup: $e");
+      //   }
+      errandController.reloadReceivedErrands();
+      //   Get.back();
+      // }
+    });
+  }
+
 
   @override
   void dispose() {
@@ -192,344 +276,349 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
             },
           );
         } else {
-          return ListView.builder(
-            key: const PageStorageKey('myPostedErrands'),
-            controller: _scrollController,
-            itemCount: errandController.myErrandList.length,
-            scrollDirection: Axis.vertical,
-            itemBuilder: (context, index) {
-              var data_ = errandController.myErrandList[index];
-              var date = data_['created_at'].split('T');
-              var date1 = date[0].split('-');
-              return Container(
-                padding: const EdgeInsets.all(
-                  10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(
+          return RefreshIndicator(
+            onRefresh: () async {
+              errandController.reloadMyErrands();
+            },
+            child: ListView.builder(
+              key: const PageStorageKey('myPostedErrands'),
+              controller: _scrollController,
+              itemCount: errandController.myErrandList.length,
+              scrollDirection: Axis.vertical,
+              itemBuilder: (context, index) {
+                var data_ = errandController.myErrandList[index];
+                var date = data_['created_at'].split('T');
+                var date1 = date[0].split('-');
+                return Container(
+                  padding: const EdgeInsets.all(
                     10,
                   ),
-                ),
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                child: Row(
-                  children: [
-                    // image container
-                    // Container(
-                    //     margin: const EdgeInsets.only(
-                    //       right: 10,
-                    //     ),
-                    //     decoration: BoxDecoration(
-                    //       borderRadius: BorderRadius.circular(
-                    //         8,
-                    //       ),
-                    //     ),
-                    //     width: Get.width * 0.12,
-                    //     height: Get.height * 0.06,
-                    //     child: ListView.builder(
-                    //         itemCount: data_['images'].length,
-                    //         itemBuilder: (context, index) {
-                    //           var image = data_['images'][index];
-                    //           return Image.network(
-                    //             image['url'].toString(),
-                    //             errorBuilder: (BuildContext context,
-                    //                 Object exception,
-                    //                 StackTrace? stackTrace) {
-                    //               return Image.asset(
-                    //                 'assets/images/errandia_logo.png',
-                    //                 fit: BoxFit.fill,
-                    //               );
-                    //             },
-                    //           );
-                    //         })),
-
-                    // display first image if available otherwise show default errandia_logo image
-                    Container(
-                      margin: const EdgeInsets.only(
-                        right: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ),
-                      ),
-                      width: Get.width * 0.14,
-                      height: Get.height * 0.06,
-                      child: data_['images'].length > 0
-                          ? FadeInImage.assetNetwork(
-                        placeholder: 'assets/images/errandia_logo.png',
-                        image: getImagePathWithSize(
-                            data_['images'][0]['image_path'],
-                            width: 200,
-                            height: 180),
-                        fit: BoxFit.fill,
-                        imageErrorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'assets/images/errandia_logo.png',
-                            fit: BoxFit.fill,
-                          );
-                        },
-                      )
-                          : Image.asset(
-                        'assets/images/errandia_logo.png',
-                        fit: BoxFit.fill,
-                      ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(
+                      10,
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: Get.width * 0.45,
-                          child: Text(
-                            data_['title'].toString(),
-                            softWrap: false,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: appcolor().mainColor,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                            ),
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    children: [
+                      // image container
+                      // Container(
+                      //     margin: const EdgeInsets.only(
+                      //       right: 10,
+                      //     ),
+                      //     decoration: BoxDecoration(
+                      //       borderRadius: BorderRadius.circular(
+                      //         8,
+                      //       ),
+                      //     ),
+                      //     width: Get.width * 0.12,
+                      //     height: Get.height * 0.06,
+                      //     child: ListView.builder(
+                      //         itemCount: data_['images'].length,
+                      //         itemBuilder: (context, index) {
+                      //           var image = data_['images'][index];
+                      //           return Image.network(
+                      //             image['url'].toString(),
+                      //             errorBuilder: (BuildContext context,
+                      //                 Object exception,
+                      //                 StackTrace? stackTrace) {
+                      //               return Image.asset(
+                      //                 'assets/images/errandia_logo.png',
+                      //                 fit: BoxFit.fill,
+                      //               );
+                      //             },
+                      //           );
+                      //         })),
+
+                      // display first image if available otherwise show default errandia_logo image
+                      Container(
+                        margin: const EdgeInsets.only(
+                          right: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            8,
                           ),
                         ),
-                        Container(
-                          width: Get.width * 0.56,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 2,
-                          ),
-                          child: Text(
-                            data_['description'].length >= 30
-                                ? '${data_['description'] + '..'}'
-                                .substring(0, 30)
-                                : data_['description'].toString(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            softWrap: false,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: appcolor().mediumGreyColor,
-                            ),
-                          ),
+                        width: Get.width * 0.14,
+                        height: Get.height * 0.06,
+                        child: data_['images'].length > 0
+                            ? FadeInImage.assetNetwork(
+                          placeholder: 'assets/images/errandia_logo.png',
+                          image: getImagePathWithSize(
+                              data_['images'][0]['image_path'],
+                              width: 200,
+                              height: 180),
+                          fit: BoxFit.fill,
+                          imageErrorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'assets/images/errandia_logo.png',
+                              fit: BoxFit.fill,
+                            );
+                          },
+                        )
+                            : Image.asset(
+                          'assets/images/errandia_logo.png',
+                          fit: BoxFit.fill,
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              'posted on :',
-                              style: TextStyle(
-                                color: appcolor().mediumGreyColor,
-                                fontSize: 10,
-                              ),
-                            ),
-                            Text(
-                              '${date1[2]}-${date1[1]}-${date1[0]}',
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: Get.width * 0.45,
+                            child: Text(
+                              data_['title'].toString(),
+                              softWrap: false,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: appcolor().mainColor,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
                               ),
                             ),
-                            SizedBox(
-                              width: Get.width * 0.04,
-                            ),
-                            if (data_['status'] == 1)
-                              found_pending_cancel(index, 3),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    InkWell(
-                      onTap: () {
-                        print(index.toString());
-                        Get.bottomSheet(
-                          // backgroundColor: Colors.white,
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            color: Colors.white,
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                const Center(
-                                  child: Icon(
-                                    Icons.horizontal_rule,
-                                    size: 25,
-                                  ),
-                                ),
-                                // Text(index.toString()),
-                                managebottomSheetWidgetitem(
-                                  title: 'Edit Errand',
-                                  icondata: Icons.edit,
-                                  callback: () async {
-                                    if (kDebugMode) {
-                                      print('tapped');
-                                    }
-                                    Get.back();
-                                    Get.to(
-                                            () => EditErrand(
-                                          data: data_,
-                                        ),
-                                        transition: Transition.rightToLeft,
-                                        duration:
-                                        const Duration(milliseconds: 500));
-                                  },
-                                ),
-                                managebottomSheetWidgetitem(
-                                  title: 'View Errand',
-                                  icondata: FontAwesomeIcons.eye,
-                                  callback: () {
-                                    Get.back();
-                                    Get.to(errand_detail_view(
-                                      data: data_,
-                                    ));
-                                  },
-                                ),
-                                managebottomSheetWidgetitem(
-                                  title: 'Mark as found',
-                                  icondata: FontAwesomeIcons.circleCheck,
-                                  callback: () {
-                                    markErrandFound(context, data_);
-                                  },
-                                ),
-
-                                // view errand results
-                                managebottomSheetWidgetitem(
-                                  title: 'View Results',
-                                  icondata: FontAwesomeIcons.list,
-                                  callback: () {
-                                    Get.back();
-                                    Get.to(() => ErrandResults(
-                                      errandId: data_['id'].toString(),
-                                    ));
-                                  },
-                                ),
-
-                                managebottomSheetWidgetitem(
-                                  title: 'Delete',
-                                  icondata: Icons.delete,
-                                  callback: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext dialogContext) {
-                                        // Use dialogContext
-                                        var response;
-                                        return CustomAlertDialog(
-                                            title: "Delete Errand",
-                                            message:
-                                            "Are you sure you want to delete this errand?\n"
-                                                "This action cannot be undone.\n",
-                                            dialogType: MyDialogType.error,
-                                            onConfirm: () {
-                                              // delete product
-                                              print(
-                                                  "delete errand: ${data_['id']}");
-                                              ErrandsAPI.deleteErrand(
-                                                  data_['id'].toString())
-                                                  .then((response_) {
-                                                if (response_ != null) {
-                                                  response =
-                                                      jsonDecode(response_);
-                                                  print(
-                                                      "delete business response: $response");
-
-                                                  if (mounted) {
-                                                    // Check if the widget is still in the tree
-                                                    if (response["status"] ==
-                                                        'success') {
-                                                      errandController
-                                                          .reloadMyErrands();
-                                                      homeController
-                                                          .reloadRecentlyPostedItems();
-
-                                                      Navigator.of(
-                                                          dialogContext)
-                                                          .pop(); // Close the dialog
-
-                                                      // Show success popup
-                                                      popup = PopupBox(
-                                                        title: 'Success',
-                                                        description:
-                                                        response['data']
-                                                        ['message'],
-                                                        type: PopupType.success,
-                                                      );
-                                                    } else {
-                                                      Navigator.of(
-                                                          dialogContext)
-                                                          .pop(); // Close the dialog
-
-                                                      // Show error popup
-                                                      popup = PopupBox(
-                                                        title: 'Error',
-                                                        description:
-                                                        response['data']
-                                                        ['data'],
-                                                        type: PopupType.error,
-                                                      );
-                                                    }
-
-                                                    popup.showPopup(
-                                                        context); // Show the popup
-                                                  }
-                                                }
-                                              });
-                                            },
-                                            onCancel: () {
-                                              // cancel delete
-                                              print("cancel delete");
-                                              Navigator.of(dialogContext)
-                                                  .pop(); // Close the dialog
-                                            });
-                                      },
-                                    ).then((_) {
-                                      if (mounted) {
-                                        try {
-                                          popup.dismissPopup(navigatorKey
-                                              .currentContext!); // Dismiss the popup
-                                        } catch (e) {
-                                          print("error dismissing popup: $e");
-                                        }
-                                        errandController.reloadMyErrands();
-                                        Get.back();
-                                      }
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
                           ),
-
-                          enableDrag: true,
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          Text(
-                            'View',
-                            style: TextStyle(
-                                fontSize: 13,
+                          Container(
+                            width: Get.width * 0.56,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 2,
+                            ),
+                            child: Text(
+                              data_['description'].length >= 30
+                                  ? '${data_['description'] + '..'}'
+                                  .substring(0, 30)
+                                  : data_['description'].toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                              style: TextStyle(
+                                fontSize: 12,
                                 color: appcolor().mediumGreyColor,
-                                fontWeight: FontWeight.w600),
+                              ),
+                            ),
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: appcolor().greyColor),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Icon(
-                              Icons.more_horiz,
-                              color: appcolor().greyColor,
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                'posted on :',
+                                style: TextStyle(
+                                  color: appcolor().mediumGreyColor,
+                                  fontSize: 10,
+                                ),
+                              ),
+                              Text(
+                                '${date1[2]}-${date1[1]}-${date1[0]}',
+                                style: TextStyle(
+                                  color: appcolor().mainColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(
+                                width: Get.width * 0.04,
+                              ),
+                              if (data_['status'] == 1)
+                                found_pending_cancel(index, 3),
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                      Spacer(),
+                      InkWell(
+                        onTap: () {
+                          print(index.toString());
+                          Get.bottomSheet(
+                            // backgroundColor: Colors.white,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              color: Colors.white,
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  const Center(
+                                    child: Icon(
+                                      Icons.horizontal_rule,
+                                      size: 25,
+                                    ),
+                                  ),
+                                  // Text(index.toString()),
+                                  managebottomSheetWidgetitem(
+                                    title: 'Edit Errand',
+                                    icondata: Icons.edit,
+                                    callback: () async {
+                                      if (kDebugMode) {
+                                        print('tapped');
+                                      }
+                                      Get.back();
+                                      Get.to(
+                                              () => EditErrand(
+                                            data: data_,
+                                          ),
+                                          transition: Transition.rightToLeft,
+                                          duration:
+                                          const Duration(milliseconds: 500));
+                                    },
+                                  ),
+                                  managebottomSheetWidgetitem(
+                                    title: 'View Errand',
+                                    icondata: FontAwesomeIcons.eye,
+                                    callback: () {
+                                      Get.back();
+                                      Get.to(errand_detail_view(
+                                        data: data_,
+                                      ));
+                                    },
+                                  ),
+                                  managebottomSheetWidgetitem(
+                                    title: 'Mark as found',
+                                    icondata: FontAwesomeIcons.circleCheck,
+                                    callback: () {
+                                      markErrandFound(context, data_);
+                                    },
+                                  ),
+
+                                  // view errand results
+                                  managebottomSheetWidgetitem(
+                                    title: 'View Results',
+                                    icondata: FontAwesomeIcons.list,
+                                    callback: () {
+                                      Get.back();
+                                      Get.to(() => ErrandResults(
+                                        errandId: data_['id'].toString(),
+                                      ));
+                                    },
+                                  ),
+
+                                  managebottomSheetWidgetitem(
+                                    title: 'Delete',
+                                    icondata: Icons.delete,
+                                    callback: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext dialogContext) {
+                                          // Use dialogContext
+                                          var response;
+                                          return CustomAlertDialog(
+                                              title: "Delete Errand",
+                                              message:
+                                              "Are you sure you want to delete this errand?\n"
+                                                  "This action cannot be undone.\n",
+                                              dialogType: MyDialogType.error,
+                                              onConfirm: () {
+                                                // delete product
+                                                print(
+                                                    "delete errand: ${data_['id']}");
+                                                ErrandsAPI.deleteErrand(
+                                                    data_['id'].toString())
+                                                    .then((response_) {
+                                                  if (response_ != null) {
+                                                    response =
+                                                        jsonDecode(response_);
+                                                    print(
+                                                        "delete business response: $response");
+
+                                                    if (mounted) {
+                                                      // Check if the widget is still in the tree
+                                                      if (response["status"] ==
+                                                          'success') {
+                                                        errandController
+                                                            .reloadMyErrands();
+                                                        homeController
+                                                            .reloadRecentlyPostedItems();
+
+                                                        Navigator.of(
+                                                            dialogContext)
+                                                            .pop(); // Close the dialog
+
+                                                        // Show success popup
+                                                        popup = PopupBox(
+                                                          title: 'Success',
+                                                          description:
+                                                          response['data']
+                                                          ['message'],
+                                                          type: PopupType.success,
+                                                        );
+                                                      } else {
+                                                        Navigator.of(
+                                                            dialogContext)
+                                                            .pop(); // Close the dialog
+
+                                                        // Show error popup
+                                                        popup = PopupBox(
+                                                          title: 'Error',
+                                                          description:
+                                                          response['data']
+                                                          ['data'],
+                                                          type: PopupType.error,
+                                                        );
+                                                      }
+
+                                                      popup.showPopup(
+                                                          context); // Show the popup
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                              onCancel: () {
+                                                // cancel delete
+                                                print("cancel delete");
+                                                Navigator.of(dialogContext)
+                                                    .pop(); // Close the dialog
+                                              });
+                                        },
+                                      ).then((_) {
+                                        if (mounted) {
+                                          try {
+                                            popup.dismissPopup(navigatorKey
+                                                .currentContext!); // Dismiss the popup
+                                          } catch (e) {
+                                            print("error dismissing popup: $e");
+                                          }
+                                          errandController.reloadMyErrands();
+                                          Get.back();
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            enableDrag: true,
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              'View',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: appcolor().mediumGreyColor,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: appcolor().greyColor),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Icon(
+                                Icons.more_horiz,
+                                color: appcolor().greyColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           );
         }
       });
@@ -554,140 +643,97 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
             },
           );
         } else {
-          return ListView.builder(
-            key: const PageStorageKey("myReceivedErrands"),
-            controller: _scrollController2,
-            itemCount: errandController.receivedList.length,
-            scrollDirection: Axis.vertical,
-            itemBuilder: (context, index) {
-              var data_ = errandController.receivedList[index];
-              var date = data_['created_at'].split('T');
-              var date1 = date[0].split('-');
-              return GestureDetector(
-                onTap: () {
-                  Get.to(() => errand_detail_view(
-                    data: data_, received: true,
-                  ), transition: Transition.fadeIn,
-                      duration: const Duration(milliseconds: 500)
-                  );
-                },
-                child: Container(
-                  // height: Get.height * 0.15,
-                  padding: const EdgeInsets.all(
-                    10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(
+          return RefreshIndicator(
+            onRefresh: () async {
+              errandController.reloadReceivedErrands();
+            },
+            child: ListView.builder(
+              key: const PageStorageKey("myReceivedErrands"),
+              controller: _scrollController2,
+              itemCount: errandController.receivedList.length,
+              scrollDirection: Axis.vertical,
+              itemBuilder: (context, index) {
+                var data_ = errandController.receivedList[index];
+                var date = data_['created_at'].split('T');
+                var date1 = date[0].split('-');
+                return GestureDetector(
+                  onTap: () {
+                    Get.to(() => errand_detail_view(
+                      data: data_, received: true,
+                    ), transition: Transition.fadeIn,
+                        duration: const Duration(milliseconds: 500)
+                    );
+                  },
+                  child: Container(
+                    // height: Get.height * 0.15,
+                    padding: const EdgeInsets.all(
                       10,
                     ),
-                  ),
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // top row
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          // image container
-                          Container(
-                            margin: const EdgeInsets.only(
-                              right: 10,
-                            ),
-                            width: Get.width * 0.05,
-                            height: Get.height * 0.03,
-                            child: CircleAvatar(
-                              radius: 50,
-                              // backgroundColor: Colors.white,
-                              backgroundImage: data_['user']['photo'] == "" ||
-                                  data_['user']['photo'] == null
-                                  ? const AssetImage(
-                                  'assets/images/errandia_logo.png') // Fallback image
-                                  : NetworkImage(getImagePath(
-                                  data_['user']['photo'].toString()))
-                              as ImageProvider,
-                              child: data_['user']['photo'] == "" ||
-                                  data_['user']['photo'] == null
-                                  ? Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                      BorderRadius.circular(100),
-                                      border: Border.all(
-                                          width: 0.5,
-                                          color: appcolor().darkBlueColor)),
-                                  child: ClipRRect(
-                                      borderRadius:
-                                      BorderRadius.circular(100),
-                                      child: Image.asset(
-                                          'assets/images/errandia_logo.png')))
-                                  : null, // Only show the icon if there is no photo
-                            ),
-                          ),
-                          SizedBox(
-                            width: Get.width * 0.002,
-                          ),
-                          SizedBox(
-                            width: isLocationAvailable(data_['user'])
-                                ? Get.width * 0.28
-                                : Get.width * 0.34,
-                            child: Text(
-                              data_['user']['name'].toString(),
-                              style: TextStyle(
-                                color: appcolor().mainColor.withOpacity(0.6),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 10,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-
-                          SizedBox(
-                            width: Get.width * 0.003,
-                          ),
-
-                          // dot
-                          if (isLocationAvailable(data_['user']))
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(
+                        10,
+                      ),
+                    ),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // top row
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // image container
                             Container(
-                              width: Get.width * 0.01,
-                              height: Get.height * 0.01,
-                              decoration: BoxDecoration(
-                                color: appcolor().darkBlueColor.withOpacity(0.5),
-                                shape: BoxShape.circle,
+                              margin: const EdgeInsets.only(
+                                right: 10,
+                              ),
+                              width: Get.width * 0.05,
+                              height: Get.height * 0.03,
+                              child: CircleAvatar(
+                                radius: 50,
+                                // backgroundColor: Colors.white,
+                                backgroundImage: data_['user']['photo'] == "" ||
+                                    data_['user']['photo'] == null
+                                    ? const AssetImage(
+                                    'assets/images/errandia_logo.png') // Fallback image
+                                    : NetworkImage(getImagePath(
+                                    data_['user']['photo'].toString()))
+                                as ImageProvider,
+                                child: data_['user']['photo'] == "" ||
+                                    data_['user']['photo'] == null
+                                    ? Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                        BorderRadius.circular(100),
+                                        border: Border.all(
+                                            width: 0.5,
+                                            color: appcolor().darkBlueColor)),
+                                    child: ClipRRect(
+                                        borderRadius:
+                                        BorderRadius.circular(100),
+                                        child: Image.asset(
+                                            'assets/images/errandia_logo.png')))
+                                    : null, // Only show the icon if there is no photo
                               ),
                             ),
-
-                          if (isLocationAvailable(data_['user']))
                             SizedBox(
-                              width: Get.width * 0.02,
+                              width: Get.width * 0.002,
                             ),
-
-                          // location icon
-                          if (isLocationAvailable(data_['user']))
-                            Icon(
-                              Icons.location_on,
-                              color: appcolor().mediumGreyColor.withRed(300),
-                              size: 12,
-                            ),
-
-                          // location text with formatAddress
-                          if (isLocationAvailable(data_['user']))
                             SizedBox(
-                              width: Get.width * 0.02,
-                            ),
-                          if (isLocationAvailable(data_['user']))
-                            SizedBox(
-                              width: Get.width * 0.25,
+                              width: isLocationAvailable(data_['user'])
+                                  ? Get.width * 0.28
+                                  : Get.width * 0.34,
                               child: Text(
-                                _formatAddress(data_['user']),
+                                data_['user']['name'].toString(),
                                 style: TextStyle(
-                                  color: appcolor().mediumGreyColor,
+                                  color: appcolor().mainColor.withOpacity(0.6),
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 10,
                                 ),
                                 maxLines: 1,
@@ -695,241 +741,287 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                               ),
                             ),
 
-                          const Spacer(),
+                            SizedBox(
+                              width: Get.width * 0.003,
+                            ),
 
-                          // delete icon with text
-                          InkWell(
-                            onTap: () {
-                              Get.snackbar(
-                                'Delete',
-                                'Delete this errand',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: appcolor().redColor,
-                                colorText: Colors.white,
-                                duration: const Duration(seconds: 5),
-                                margin: const EdgeInsets.only(
-                                  bottom: 15,
-                                  left: 10,
-                                  right: 10,
+                            // dot
+                            if (isLocationAvailable(data_['user']))
+                              Container(
+                                width: Get.width * 0.01,
+                                height: Get.height * 0.01,
+                                decoration: BoxDecoration(
+                                  color: appcolor().darkBlueColor.withOpacity(0.5),
+                                  shape: BoxShape.circle,
                                 ),
-                                mainButton: TextButton(
-                                  onPressed: () {
-                                    Get.back();
-                                  },
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      color: appcolor().mainColor,
+                              ),
+
+                            if (isLocationAvailable(data_['user']))
+                              SizedBox(
+                                width: Get.width * 0.02,
+                              ),
+
+                            // location icon
+                            if (isLocationAvailable(data_['user']))
+                              Icon(
+                                Icons.location_on,
+                                color: appcolor().mediumGreyColor.withRed(300),
+                                size: 12,
+                              ),
+
+                            // location text with formatAddress
+                            if (isLocationAvailable(data_['user']))
+                              SizedBox(
+                                width: Get.width * 0.02,
+                              ),
+                            if (isLocationAvailable(data_['user']))
+                              SizedBox(
+                                width: Get.width * 0.25,
+                                child: Text(
+                                  _formatAddress(data_['user']),
+                                  style: TextStyle(
+                                    color: appcolor().mediumGreyColor,
+                                    fontSize: 10,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+
+                            const Spacer(),
+
+                            // delete icon with text
+                            InkWell(
+                              onTap: () {
+                                rejectErrand(context, data_);
+                                // Get.snackbar(
+                                //   'Delete',
+                                //   'Delete this errand',
+                                //   snackPosition: SnackPosition.BOTTOM,
+                                //   backgroundColor: appcolor().redColor,
+                                //   colorText: Colors.white,
+                                //   duration: const Duration(seconds: 5),
+                                //   margin: const EdgeInsets.only(
+                                //     bottom: 15,
+                                //     left: 10,
+                                //     right: 10,
+                                //   ),
+                                //   mainButton: TextButton(
+                                //     onPressed: () {
+                                //       Get.back();
+                                //     },
+                                //     child: Text(
+                                //       'Cancel',
+                                //       style: TextStyle(
+                                //         color: appcolor().mainColor,
+                                //       ),
+                                //     ),
+                                //   ),
+                                // );
+                              },
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    child: Icon(
+                                      Icons.delete_forever_outlined,
+                                      color: appcolor().redColor.withOpacity(0.6),
+                                      size: 14,
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  child: Icon(
-                                    Icons.delete_forever_outlined,
-                                    color: appcolor().redColor.withOpacity(0.6),
-                                    size: 14,
+                                  SizedBox(
+                                    width: Get.width * 0.002,
                                   ),
-                                ),
-                                SizedBox(
-                                  width: Get.width * 0.002,
-                                ),
-                                Text(
-                                  'Reject',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: appcolor().redColor.withOpacity(0.6),
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(
-                        height: Get.height * 0.005,
-                      ),
-                      // middle row
-                      Row(children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: Get.width * 0.88,
-                              child: Text(
-                                capitalizeAll(data_['title']),
-                                softWrap: false,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: appcolor().mainColor,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: Get.width * 0.88,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 2,
-                              ),
-                              child: Text(
-                                kDebugMode
-                                    ? data_['description'] +
-                                    " sls sieoiuoe eoieur toieie rorieieowieowieiurow woeieow woeiwowiw wowow wow wiwowiw wowowiw woiw woiw wwoiw wowiw woi  slsksls slsl skslsdkd dldksl sld skdlsks dlskdlskdwopk sldpwi soeir elwoieu erueiow eiur eoiwrwoie w"
-                                    : data_['description'],
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: true,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: appcolor().mediumGreyColor,
-                                ),
+                                  Text(
+                                    'Reject',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: appcolor().redColor.withOpacity(0.6),
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ]),
 
-                      SizedBox(
-                        height: Get.height * 0.013,
-                      ),
-                      // bottom row
-                      Row(
-                          children: [
-                            // call button
-                            // if (isPhoneAvailable(data_['user']) || !isEmailAvailable(data_['user']))
-                            if (hasActiveSubscription() && isPhoneAvailable(data_['user']))
-                              InkWell(
-                                onTap: () {
-                                  launchCaller(data_['user']['phone'].toString());
-                                },
-                                child: Container(
-                                    padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                    decoration: BoxDecoration(
-                                      color: appcolor().amberColor,
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(
-                                        color: Colors.orangeAccent,
-                                      ),
-                                      gradient: Gradient.lerp(
-                                        LinearGradient(
-                                          colors: [
-                                            appcolor().skyblueColor,
-                                            appcolor().amberColor,
-                                          ],
+                        SizedBox(
+                          height: Get.height * 0.005,
+                        ),
+                        // middle row
+                        Row(children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: Get.width * 0.88,
+                                child: Text(
+                                  capitalizeAll(data_['title']),
+                                  softWrap: false,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: appcolor().mainColor,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: Get.width * 0.88,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 2,
+                                ),
+                                child: Text(
+                                  data_['description'],
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: true,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: appcolor().mediumGreyColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ]),
+
+                        SizedBox(
+                          height: Get.height * 0.013,
+                        ),
+                        // bottom row
+                        Row(
+                            children: [
+                              // call button
+                              // if (isPhoneAvailable(data_['user']) || !isEmailAvailable(data_['user']))
+                              if (hasActiveSubscription() && isPhoneAvailable(data_['user']))
+                                InkWell(
+                                  onTap: () {
+                                    launchCaller(data_['user']['phone'].toString());
+                                  },
+                                  child: Container(
+                                      padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                                      decoration: BoxDecoration(
+                                        color: appcolor().amberColor,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: Colors.orangeAccent,
                                         ),
-                                        LinearGradient(
-                                          colors: [
-                                            appcolor().amberColor,
-                                            appcolor().skyblueColor,
-                                          ],
+                                        gradient: Gradient.lerp(
+                                          LinearGradient(
+                                            colors: [
+                                              appcolor().skyblueColor,
+                                              appcolor().amberColor,
+                                            ],
+                                          ),
+                                          LinearGradient(
+                                            colors: [
+                                              appcolor().amberColor,
+                                              appcolor().skyblueColor,
+                                            ],
+                                          ),
+                                          0.5,
                                         ),
-                                        0.5,
                                       ),
-                                    ),
-                                    child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.call,
-                                            color: appcolor().darkBlueColor,
-                                            size: 14,
-                                          ),
-                                          SizedBox(
-                                            width: Get.width * 0.01,
-                                          ),
-                                          Text(
-                                            'Call Now',
-                                            style: TextStyle(
-                                              fontSize: 12,
+                                      child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.call,
                                               color: appcolor().darkBlueColor,
-                                              fontWeight: FontWeight.w600,
+                                              size: 14,
                                             ),
-                                          ),
-                                        ]
-                                    )
+                                            SizedBox(
+                                              width: Get.width * 0.01,
+                                            ),
+                                            Text(
+                                              'Call Now',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: appcolor().darkBlueColor,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ]
+                                      )
+                                  ),
+                                ),
+
+                              // posted when
+                              const Spacer(),
+                              Text(
+                                data_['when'],
+                                style: TextStyle(
+                                  color: appcolor().mainColor,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
 
-                            // posted when
-                            Spacer(),
-                            Text(
-                              data_['when'],
-                              style: TextStyle(
-                                color: appcolor().mainColor,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                              // message button
+                              if (hasActiveSubscription() && isWhatsAppAvailable(data_['user']))
+                                const Spacer(),
 
-                            // message button
-                            if (hasActiveSubscription())
-                              Spacer(),
-
-                            if (hasActiveSubscription() && isWhatsAppAvailable(data_['user']))
-                              InkWell(
-                                onTap: () {
-                                  launchWhatsapp(data_['user']['whatsapp_number'].toString());
-                                },
-                                child: Container(
-                                    padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(
-                                        color: Colors.green[700]!,
-                                      ),
-                                      gradient: Gradient.lerp(
-                                        LinearGradient(
-                                          colors: [
-                                            appcolor().greenColor.withOpacity(0.8),
-                                            appcolor().greenColor,
-                                          ],
+                              if (hasActiveSubscription() && isWhatsAppAvailable(data_['user']))
+                                InkWell(
+                                  onTap: () {
+                                    launchWhatsapp(data_['user']['whatsapp_number'].toString());
+                                  },
+                                  child: Container(
+                                      padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: Colors.green[700]!,
                                         ),
-                                        LinearGradient(
-                                          colors: [
-                                            appcolor().mainColor,
-                                            appcolor().greenColor.withOpacity(0.5),
-                                          ],
+                                        gradient: Gradient.lerp(
+                                          LinearGradient(
+                                            colors: [
+                                              appcolor().greenColor.withOpacity(0.8),
+                                              appcolor().greenColor,
+                                            ],
+                                          ),
+                                          LinearGradient(
+                                            colors: [
+                                              appcolor().mainColor,
+                                              appcolor().greenColor.withOpacity(0.5),
+                                            ],
+                                          ),
+                                          0.5,
                                         ),
-                                        0.5,
                                       ),
-                                    ),
-                                    child: Row(
-                                        children: [
-                                          const Icon(
-                                            FontAwesomeIcons.whatsapp,
-                                            color: Colors.white,
-                                            size: 14,
-                                          ),
-                                          SizedBox(
-                                            width: Get.width * 0.01,
-                                          ),
-                                          const Text(
-                                            'Message',
-                                            style: TextStyle(
-                                              fontSize: 12,
+                                      child: Row(
+                                          children: [
+                                            const Icon(
+                                              FontAwesomeIcons.whatsapp,
                                               color: Colors.white,
-                                              fontWeight: FontWeight.w600,
+                                              size: 14,
                                             ),
-                                          ),
-                                        ]
-                                    )
+                                            SizedBox(
+                                              width: Get.width * 0.01,
+                                            ),
+                                            const Text(
+                                              'Message',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ]
+                                      )
+                                  ),
                                 ),
-                              ),
-                          ]
-                      )
-                    ],
+                            ]
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         }
       });
