@@ -221,7 +221,7 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
 
     if (homeController.currentIndex.value == 2) {
       print("current index: ${homeController.currentIndex.value}");
-      signInController.fieldFocus.requestFocus();
+      // signInController.fieldFocus.requestFocus();
     }
 
     return IndexedStack(

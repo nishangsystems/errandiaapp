@@ -405,7 +405,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                           Row(
                             children: [
                               Text(
-                                'posted on :',
+                                'Posted on: ',
                                 style: TextStyle(
                                   color: appcolor().mediumGreyColor,
                                   fontSize: 10,
@@ -1396,7 +1396,7 @@ Widget Trashed(BuildContext ctx) {
                         children: [
                           Container(
                             child: Text(
-                              'posted on :',
+                              'Posted on: ',
                               style: TextStyle(
                                 color: appcolor().mediumGreyColor,
                                 fontSize: 10,
@@ -1686,7 +1686,7 @@ Widget managebottomSheetWidgetitem({
 // pending 1,
 // cancelled 0,
 Widget found_pending_cancel(int index, int status) {
-  String s = 'found';
+  String s = 'Found';
   Color color = Colors.green;
   IconData icondata = FontAwesomeIcons.circleCheck;
   if (status == 0) {

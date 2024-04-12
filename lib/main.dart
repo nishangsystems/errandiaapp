@@ -12,6 +12,7 @@ import 'package:errandia/app/modules/subscription/view/manage_subscription_view.
 import 'package:errandia/common/initialize_device.dart';
 import 'package:errandia/languages/language.dart';
 import 'package:errandia/routes.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -113,6 +114,8 @@ Future<void> main() async {
   await GetStorage.init();
   await ErrandiaApp._initializePrefs();
 
+  await getActiveSubscription();
+
   messaging = FirebaseMessaging.instance;
 
   await messaging.requestPermission(
@@ -173,7 +176,6 @@ class ErrandiaApp extends StatelessWidget {
 
   static Future<void> _initializePrefs() async {
     _prefs = await SharedPreferences.getInstance();
-
     var fcmToken = _prefs.getString('firebaseToken');
     print("fcmToken: $fcmToken");
   }

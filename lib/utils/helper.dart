@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/app/APi/subscription.dart';
 import 'package:errandia/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -160,15 +161,44 @@ bool isLocationAvailable(Map<String, dynamic> value) {
   return value['region'] != "" && value['region'] != null && value['town'] != "" && value['town'] != null;
 }
 
-bool hasActiveSubscription() {
-  String? userDataString = ErrandiaApp.prefs.getString('user');
+Future<void> getActiveSubscription() async {
+  // String? userDataString = ErrandiaApp.prefs.getString('user');
+  //
+  // if (userDataString != null) {
+  //   var userData = jsonDecode(userDataString);
+  //   print("user data on errand detail: $userData");
+  //   return userData['active_subscription'];
+  // }
+  //
+  // return false;
 
-  if (userDataString != null) {
-    var userData = jsonDecode(userDataString);
-    print("user data on errand detail: $userData");
-    return userData['active_subscription'];
+  var response_ = await SubscriptionAPI.getCurrentSubscription();
+  var response = jsonDecode(response_);
+  if (response['status'] != 'error') {
+    var data = response['data'];
+    print("subscription data: $data");
+
+    ErrandiaApp.prefs.setString('subscription', jsonEncode(data['data']['item']));
+  } else {
+    print("error getting subscription data: ${response['data']}");
+    ErrandiaApp.prefs.setString('subscription', jsonEncode({}));
   }
 
-  return false;
+}
 
+bool hasActiveSubscription() {
+  String? subscription = ErrandiaApp.prefs.getString('subscription');
+  print("subscription: $subscription");
+
+  if (subscription != null) {
+    var subs = jsonDecode(subscription);
+
+    if (subs['status'] == 'SUCCESS') {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
 }

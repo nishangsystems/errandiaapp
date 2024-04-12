@@ -56,6 +56,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
     profileController = Get.put(profile_controller());
     _scrollController = ScrollController();
     _startAutoScroll();
+    getActiveSubscription();
 
     profileController.getUser();
   }
@@ -126,19 +127,19 @@ class _errand_detail_viewState extends State<errand_detail_view> {
 
 
 
-  bool hasActiveSubscription() {
-    print("has active subscription: ${widget.data['user']['active_subscription']}");
-    String? userDataString = ErrandiaApp.prefs.getString('user');
-
-    if (userDataString != null) {
-      var userData = jsonDecode(userDataString);
-      print("user data on errand detail: $userData");
-      return userData['active_subscription'];
-    }
-
-    return false;
-
-  }
+  // bool hasActiveSubscription() {
+  //   print("has active subscription: ${widget.data['user']['active_subscription']}");
+  //   String? userDataString = ErrandiaApp.prefs.getString('user');
+  //
+  //   if (userDataString != null) {
+  //     var userData = jsonDecode(userDataString);
+  //     print("user data on errand detail: $userData");
+  //     return userData['active_subscription'];
+  //   }
+  //
+  //   return false;
+  //
+  // }
 
   void getErrandResultsInBackground(String errandId, Map<String, dynamic> data) async {
     const config = FlutterBackgroundAndroidConfig(

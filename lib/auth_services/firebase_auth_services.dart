@@ -71,6 +71,7 @@ class AuthService {
     prefs.remove('token');
     prefs.remove('firebaseToken');
     prefs.remove('user');
+    prefs.remove('subscription');
     // prefs.remove('deviceUuid');
     Get.back();
     Get.offAll(() => Home_view());

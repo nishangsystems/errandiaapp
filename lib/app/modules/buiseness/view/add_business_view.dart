@@ -54,6 +54,8 @@ class _add_business_viewState extends State<add_business_view> {
   var whatsappNumber;
   bool focusInEmailField = false;
 
+  final String phonePattern = r'^\+?[0-9]{6,14}$';
+
   // var regionValue;
   // var townValue;
 
@@ -909,7 +911,13 @@ class _add_business_viewState extends State<add_business_view> {
                     child: TextFormField(
                       controller: add_controller.whatsapp_controller,
                       keyboardType: TextInputType.phone,
-                      maxLength: 25,
+                      maxLength: 15,
+                      validator: (value) {
+                        if (value != null && value.isNotEmpty && !RegExp(phonePattern).hasMatch(value)) {
+                          return 'Please enter a valid phone number';
+                        }
+                        return null;
+                      },
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
@@ -919,12 +927,24 @@ class _add_business_viewState extends State<add_business_view> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Whatsapp Number (optional)',
+                        hintText: 'WhatsApp Number (optional)',
                         counterText: '',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
                         ),
+                      ),
+                    ),
+                  ),
+                  // a text hinting the user the correct format for a whatsapp number
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 5),
+                    child: const Text(
+                      'Please enter your whatsapp number in the format: +237 6XX XXX XXX or +1 123 456 7890',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
                       ),
                     ),
                   ),
