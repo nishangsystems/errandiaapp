@@ -725,14 +725,12 @@ class search_errand_prodState extends State<search_errand_prod>
                         top: Get.height * 0.01,
                         left: Get.width * 0.03,
                       ),
-                      child: Expanded(
-                        child: Text(
-                          'Errandia might provide similar products and services',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: appcolor().mediumGreyColor,
-                            fontSize: 12,
-                          ),
+                      child: Text(
+                        'Errandia might provide similar products and services',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: appcolor().mediumGreyColor,
+                          fontSize: 12,
                         ),
                       ),
                     ),
