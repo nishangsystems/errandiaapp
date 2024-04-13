@@ -5,6 +5,7 @@ import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/Widgets/snackBar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -76,8 +77,9 @@ class api {
       }
       prefs.setString('uuid', data_['uuid']);
 
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => navigator));
+      // Navigator.pushReplacement(
+      //     context, MaterialPageRoute(builder: (context) => navigator));
+      Get.to(navigator);
     } else {
       var da = jsonDecode(response.body);
       if (navigator1 == null) {

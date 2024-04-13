@@ -54,8 +54,6 @@ class _add_business_viewState extends State<add_business_view> {
   var whatsappNumber;
   bool focusInEmailField = false;
 
-  final String phonePattern = r'^\+?[0-9]{6,14}$';
-
   // var regionValue;
   // var townValue;
 
@@ -71,7 +69,6 @@ class _add_business_viewState extends State<add_business_view> {
         }
       });
     });
-
   }
 
   void createBusiness(BuildContext context) {
@@ -197,51 +194,50 @@ class _add_business_viewState extends State<add_business_view> {
       //         popup.showPopup(context),
       //       });
       // } else {
-        print("image path: ${imageController.image_path.toString()}");
-        BusinessAPI.createBusinessWithImageLogo(
-                value, context, imageController.image_path.toString())
-            .then((response_) => {
-                  response = jsonDecode(response_),
-                  print("added business: $response"),
-                  if (response['status'] == 'success')
-                    {
-                      popup = PopupBox(
-                        title: 'Success',
-                        description: response['data']['message'],
-                        type: PopupType.success,
-                      ),
-                      add_controller.resetFields(),
-                      setState(() {
-                        regionCode = null;
-                        town = null;
-                        category = null;
-                        selectedFilters_.clear();
-
-                      }),
-                      imageController.reset(),
-                      // home_controller()
-
-                      //     .featuredBusinessData
-                      //     .clear(),
-                      homeController.reloadRecentlyPostedItems(),
-                      homeController.reloadFeaturedBusinessesData(),
-                      profileController.reloadMyBusinesses(),
-                    }
-                  else
-                    {
-                      popup = PopupBox(
-                        title: 'Error',
-                        description: response['data']['data']['error'],
-                        type: PopupType.error,
-                      )
-                    },
-                  Future.delayed(const Duration(seconds: 3), () {
+      print("image path: ${imageController.image_path.toString()}");
+      BusinessAPI.createBusinessWithImageLogo(
+              value, context, imageController.image_path.toString())
+          .then((response_) => {
+                response = jsonDecode(response_),
+                print("added business: $response"),
+                if (response['status'] == 'success')
+                  {
+                    popup = PopupBox(
+                      title: 'Success',
+                      description: response['data']['message'],
+                      type: PopupType.success,
+                    ),
+                    add_controller.resetFields(),
                     setState(() {
-                      isLoading = false;
-                    });
-                  }),
-                  popup.showPopup(context),
-                });
+                      regionCode = null;
+                      town = null;
+                      category = null;
+                      selectedFilters_.clear();
+                    }),
+                    imageController.reset(),
+                    // home_controller()
+
+                    //     .featuredBusinessData
+                    //     .clear(),
+                    homeController.reloadRecentlyPostedItems(),
+                    homeController.reloadFeaturedBusinessesData(),
+                    profileController.reloadMyBusinesses(),
+                  }
+                else
+                  {
+                    popup = PopupBox(
+                      title: 'Error',
+                      description: response['data']['data']['error'],
+                      type: PopupType.error,
+                    )
+                  },
+                Future.delayed(const Duration(seconds: 3), () {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }),
+                popup.showPopup(context),
+              });
       // }
     }
   }
@@ -280,8 +276,9 @@ class _add_business_viewState extends State<add_business_view> {
                 },
                 child: Text(
                   'Publish',
-
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
                     color: appcolor().mainColor,
                     letterSpacing: 1.2,
                     shadows: [
@@ -778,14 +775,15 @@ class _add_business_viewState extends State<add_business_view> {
                       children: [
                         // intl phone field
                         Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 0, left: 10),
+                          padding: const EdgeInsets.only(
+                              top: 5, bottom: 0, left: 10),
                           child: SizedBox(
                             width: Get.width * 0.86,
                             child: IntlPhoneField(
                               controller: add_controller.phone_controller,
                               decoration: const InputDecoration(
-                                  contentPadding: EdgeInsets.only(top: 12),
-                                  border: InputBorder.none,
+                                contentPadding: EdgeInsets.only(top: 12),
+                                border: InputBorder.none,
                                 counter: SizedBox(),
                                 hintText: 'Phone Number *',
                                 hintStyle: TextStyle(
@@ -907,16 +905,26 @@ class _add_business_viewState extends State<add_business_view> {
                   // whatsapp number
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                     child: TextFormField(
                       controller: add_controller.whatsapp_controller,
                       keyboardType: TextInputType.phone,
                       maxLength: 15,
                       validator: (value) {
-                        if (value != null && value.isNotEmpty && !RegExp(phonePattern).hasMatch(value)) {
+                        if (value != null &&
+                            value.isNotEmpty &&
+                            !RegExp(phonePattern).hasMatch(value)) {
                           return 'Please enter a valid phone number';
                         }
                         return null;
+                      },
+                      onChanged: (value) {
+                        if (value.isNotEmpty &&
+                            !RegExp(phonePattern).hasMatch(value)) {
+                          add_controller.updateWhatsappNumberValidity();
+                        } else {
+                          add_controller.updateWhatsappNumberValidity();
+                        }
                       },
                       decoration: const InputDecoration(
                         border: InputBorder.none,
@@ -937,17 +945,23 @@ class _add_business_viewState extends State<add_business_view> {
                     ),
                   ),
                   // a text hinting the user the correct format for a whatsapp number
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 5),
-                    child: const Text(
-                      'Please enter your whatsapp number in the format: +237 6XX XXX XXX or +1 123 456 7890',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
+                  Obx(() {
+                    if (!add_controller.isValidWhatsappNumber.value) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
+                        child: const Text(
+                          'Please enter your whatsapp number in the format: +237 6XX XXX XXX or +1 123 456 7890',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return Container();
+                    }
+                  }),
 
                   Divider(
                     color: appcolor().greyColor,
@@ -999,21 +1013,23 @@ class _add_business_viewState extends State<add_business_view> {
                   ),
 
                   // show invalid email error
-                  focusInEmailField ? Obx(
-                    () => add_controller.emailValid.value
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 5),
-                            child: const Text(
-                              'Invalid email address',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                  ): Container(),
+                  focusInEmailField
+                      ? Obx(
+                          () => add_controller.emailValid.value
+                              ? Container()
+                              : Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 5),
+                                  child: const Text(
+                                    'Invalid email address',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                        )
+                      : Container(),
 
                   // shop head
                   // Container(

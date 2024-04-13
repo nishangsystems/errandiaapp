@@ -190,7 +190,7 @@ bool hasActiveSubscription() {
   String? subscription = ErrandiaApp.prefs.getString('subscription');
   print("subscription: $subscription");
 
-  if (subscription != null) {
+  if (subscription != null && subscription.toString() != "[]") {
     var subs = jsonDecode(subscription);
 
     if (subs['status'] == 'SUCCESS') {
@@ -202,3 +202,5 @@ bool hasActiveSubscription() {
     return false;
   }
 }
+
+const String phonePattern = r'^\+?[0-9]{6,14}$';
