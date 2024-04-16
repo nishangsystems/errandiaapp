@@ -134,27 +134,24 @@ class _NewSubscriptionState extends State<NewSubscription> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 2,
-          backgroundColor: Colors.white,
-          title: Text(
+          backgroundColor: Colors.purple,
+          title: const Text(
             'New Subscription',
-            style: TextStyle(color: appcolor().mediumGreyColor),
           ),
+          centerTitle: true,
+          titleTextStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color:Colors.white,
+              fontSize: 20),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios),
             onPressed: () {
               Get.back();
             },
           ),
-          iconTheme: IconThemeData(
-            color: appcolor().mediumGreyColor,
+          iconTheme: const IconThemeData(
+            color: Colors.white,
           ),
-          actions: [
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.settings,
-                ))
-          ],
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -422,7 +419,7 @@ class _NewSubscriptionState extends State<NewSubscription> {
                 child: Container(
                   height: Get.height * 0.07,
                   decoration: BoxDecoration(
-                    color: appcolor().mainColor,
+                    color: Colors.purple,
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(

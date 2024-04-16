@@ -1,9 +1,11 @@
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
+import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/global/Widgets/account_suspended_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
+import 'package:errandia/app/modules/global/Widgets/pill_widget.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/manage_review/view/manage_review_view.dart';
@@ -14,7 +16,10 @@ import 'package:errandia/app/modules/services/view/manage_service_view.dart';
 import 'package:errandia/app/modules/sms_plan/view/sms_plan_view.dart';
 import 'package:errandia/app/modules/subscribers/view/subscriber_view.dart';
 import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
+import 'package:errandia/utils/helper.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
@@ -27,8 +32,16 @@ home_controller homeController = Get.put(home_controller());
 business_controller businessController = Get.put(business_controller());
 
 
-class dashboard_view extends StatelessWidget {
+class dashboard_view extends StatefulWidget {
   const dashboard_view({super.key});
+
+  @override
+  dashboard_viewState createState() => dashboard_viewState();
+}
+
+class dashboard_viewState extends State<dashboard_view> {
+
+  final isDialOpen = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -40,24 +53,6 @@ class dashboard_view extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: const Color(0xfffafafa),
-        floatingActionButton: InkWell(
-          onTap: () {
-            custombottomsheet(context);
-          },
-          child: Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: appcolor().skyblueColor,
-            ),
-            child: Icon(
-              Icons.add,
-              size: 30,
-              color: appcolor().mainColor,
-            ),
-          ),
-        ),
         appBar: appbar(),
         endDrawer: CustomEndDrawer(
           onBusinessCreated: () {
@@ -85,19 +80,21 @@ class dashboard_view extends StatelessWidget {
                       fontWeight: FontWeight.w600),
                 ),
               ),
+              const Divider(),
               SizedBox(
                 height: Get.height * 0.23,
                 child: GridView.count(
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisSpacing: 1,
                   mainAxisSpacing: 5,
-                  childAspectRatio: 1 / 1.3,
+                  childAspectRatio: 1 / 1,
                   crossAxisCount: 2,
                   children: [
                     dashboard_widget(
                       Imagepath: 'assets/images/sidebar_icon/icon-company.png',
                       title: 'Manage Businesses',
                       belowText: '0 Businesses',
+                      color: appcolor().mainColor,
                       callback: () {
                         // Get.offAll(Home_view());
                         Get.to(() => manage_business_view());
@@ -108,6 +105,7 @@ class dashboard_view extends StatelessWidget {
                           'assets/images/sidebar_icon/icon-manage-products.png',
                       title: 'Manage Products',
                       belowText: '0 Products',
+                      color: Colors.green,
                       callback: () {
                         // Get.back();
                         Get.to(() => manage_product_view());
@@ -143,6 +141,8 @@ class dashboard_view extends StatelessWidget {
                   ],
                 ),
               ),
+
+              const SizedBox(height: 5),
               // const Divider(),
               // SizedBox(
               //   height: Get.height * 0.2,
@@ -166,19 +166,20 @@ class dashboard_view extends StatelessWidget {
               //     ],
               //   ),
               // ),
-              const Divider(),
+              // const Divider(),
               SizedBox(
                 height: Get.height * 0.23,
                 child: GridView.count(
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisSpacing: 1,
-                  childAspectRatio: 1 / 1.3,
+                  childAspectRatio: 1 / 1,
                   crossAxisCount: 2,
                   children: [
                     dashboard_widget(
                       Imagepath: 'assets/images/sidebar_icon/services.png',
-                      title: 'Manage Services',
+                      title: 'Manage \nServices',
                       belowText: '0 Services',
+                      color: Colors.orange,
                       callback: () {
                         // Get.back();
                         Get.to(() => manage_service_view());
@@ -189,8 +190,9 @@ class dashboard_view extends StatelessWidget {
                       'assets/images/sidebar_icon/icon-profile-errands.png',
                       title: 'Errands',
                       belowText: '0 Errands',
+                      color: Colors.blue[700],
                       callback: () {
-                        Get.to(() => errand_view());
+                        Get.to(() => const errand_view());
                       },
                     ),
 
@@ -206,13 +208,14 @@ class dashboard_view extends StatelessWidget {
                 ),
               ),
 
-              const Divider(),
+              const SizedBox(height: 5),
+              // const Divider(),
               SizedBox(
                 height: Get.height * 0.23,
                 child: GridView.count(
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisSpacing: 1,
-                  childAspectRatio: 1 / 1.3,
+                  childAspectRatio: 1 / 1,
                   crossAxisCount: 2,
                   children: [
                     dashboard_widget(
@@ -220,19 +223,58 @@ class dashboard_view extends StatelessWidget {
                         'assets/images/sidebar_icon/icon-dashboard-subscription-plan.png',
                         title: 'Subscription',
                         belowText: 'Ongoing',
+                        color: Colors.purple,
                         callback: () {
-                          Get.to(()=> subscription_view());
+                          Get.to(() => const subscription_view());
                         }),
                     dashboard_widget(
                         Imagepath:
                         'assets/images/delete_account.png',
                         title: 'Delete Account',
                         belowText: '0 complete',
+                        color: Colors.red,
                         callback: () {}
                     ),
                   ],
                 ),
               ),
+
+              const SizedBox(height: 5),
+
+              // a text saying to contact support if there is any issue
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    text: 'If you have any issues, please ',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                    ),
+                    children: [
+                      const TextSpan(
+                        text: 'contact support at ',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      TextSpan(
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                             launchEmail('admin@errandia.com');
+                            },
+                        text: 'admin@errandia.com',
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ).paddingSymmetric(vertical: 10),
             ],
           ),
         ).paddingSymmetric(horizontal: 10),
@@ -247,18 +289,23 @@ Widget dashboard_widget({
   required String Imagepath,
   required String title,
   required String belowText,
+  required Color? color,
   required Callback callback,
 }) {
   return InkWell(
     onTap: callback,
     child: Card(
+      elevation: 4,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      color: color,
+      shadowColor: Colors.white38,
+      surfaceTintColor: Colors.white,
+      semanticContainer: true,
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: Colors.white,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
         // height: 100,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -270,7 +317,7 @@ Widget dashboard_widget({
                 image: AssetImage(
                   Imagepath,
                 ),
-                color: appcolor().mediumGreyColor,
+                color: Colors.white,
                 fit: BoxFit.fill,
               ),
             ),
@@ -279,9 +326,9 @@ Widget dashboard_widget({
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 16,
-                      color: appcolor().mainColor,
+                      color: Colors.white,
                       fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
@@ -295,7 +342,7 @@ Widget dashboard_widget({
                 //   textAlign: TextAlign.center,
                 // ),
               ],
-            ).paddingOnly(bottom: 30),
+            ),
           ],
         ),
       ),

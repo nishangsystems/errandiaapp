@@ -287,7 +287,7 @@ class _manage_product_viewState extends State<manage_product_view>
             onPressed: () {
               Get.to(() => add_product_view());
             },
-            backgroundColor: appcolor().mainColor,
+            backgroundColor: Colors.green,
             child: const Icon(
               Icons.add,
               color: Colors.white,
@@ -307,7 +307,7 @@ class _manage_product_viewState extends State<manage_product_view>
             },
           ),
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.green,
             elevation: 2,
             leading: IconButton(
               icon: const Icon(
@@ -323,10 +323,10 @@ class _manage_product_viewState extends State<manage_product_view>
             title: const Text(
               'Manage Products',
               style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
             ),
-            iconTheme: IconThemeData(
-              color: appcolor().mediumGreyColor,
+            iconTheme: const IconThemeData(
+              color: Colors.white,
               size: 30,
             ),
           ),

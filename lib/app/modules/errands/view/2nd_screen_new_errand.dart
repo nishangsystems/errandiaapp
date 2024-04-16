@@ -293,27 +293,23 @@ class _nd_screenState extends State<nd_screen> {
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blue[700],
         titleSpacing: 8,
-        title: Text(
-          'New Errand'.tr,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xff113d6b),
-          ),
+        title: const Text(
+          'New Errand'
         ),
-        titleTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: appcolor().mediumGreyColor,
-            fontSize: 18),
+        titleTextStyle: const TextStyle(
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+            fontSize: 20),
         automaticallyImplyLeading: false,
         leading: IconButton(
           padding: EdgeInsets.zero,
           onPressed: () {
             Get.back();
           },
-          icon: Icon(Icons.arrow_back_ios),
-          color: Color(0xff113d6b),
+          icon: const Icon(Icons.arrow_back_ios),
+          color: Colors.white,
         ),
         // actions: [
         //   TextButton(
@@ -330,7 +326,7 @@ class _nd_screenState extends State<nd_screen> {
             child: Wrap(
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 15,
                     vertical: 15,
                   ),

@@ -277,12 +277,12 @@ class EditBusinessViewState extends State<EditBusinessView> {
       child: Scaffold(
           appBar: AppBar(
             elevation: 0,
-            backgroundColor: Colors.white,
+            backgroundColor: appcolor().mainColor,
             titleSpacing: 8,
             title: Text(capitalizeAll(businessTitle!)),
-            titleTextStyle: TextStyle(
+            titleTextStyle: const TextStyle(
                 fontWeight: FontWeight.w500,
-                color: appcolor().mediumGreyColor,
+                color: Colors.white,
                 fontSize: 20),
             automaticallyImplyLeading: false,
             leading: IconButton(
@@ -291,23 +291,23 @@ class EditBusinessViewState extends State<EditBusinessView> {
                 Get.back(result: updatedData.isNotEmpty ? updatedData : null);
               },
               icon: const Icon(Icons.arrow_back_ios),
-              color: appcolor().mediumGreyColor,
+              color: Colors.white,
             ),
             actions: [
               TextButton(
                   onPressed: () {
                     updateBusiness(context);
                   },
-                  child: Text(
+                  child: const Text(
                     'UPDATE',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: appcolor().mainColor,
+                      fontSize: 16,
+                      color: Colors.white,
                       letterSpacing: 1.2,
                       shadows: [
                         Shadow(
-                          color: appcolor().mainColor,
+                          color: Colors.white38,
                           blurRadius: 2,
                         ),
                       ],

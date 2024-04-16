@@ -253,12 +253,12 @@ class _add_business_viewState extends State<add_business_view> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: appcolor().mainColor,
           titleSpacing: 8,
           title: const Text('Add Business'),
-          titleTextStyle: TextStyle(
+          titleTextStyle: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: appcolor().mediumGreyColor,
+              color: Colors.white,
               fontSize: 18),
           automaticallyImplyLeading: false,
           leading: IconButton(
@@ -267,23 +267,23 @@ class _add_business_viewState extends State<add_business_view> {
               Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios),
-            color: appcolor().mediumGreyColor,
+            color: Colors.white,
           ),
           actions: [
             TextButton(
                 onPressed: () {
                   createBusiness(context);
                 },
-                child: Text(
+                child: const Text(
                   'Publish',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                    color: appcolor().mainColor,
+                    fontSize: 16,
+                    color: Colors.white,
                     letterSpacing: 1.2,
                     shadows: [
                       Shadow(
-                        color: appcolor().mainColor,
+                        color: Colors.white38,
                         blurRadius: 2,
                       ),
                     ],

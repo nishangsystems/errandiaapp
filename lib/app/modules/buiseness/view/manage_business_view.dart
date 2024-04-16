@@ -364,7 +364,7 @@ class _manage_business_viewState extends State<manage_business_view>
             },
           ),
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: appcolor().mainColor,
             elevation: 2,
             leading: IconButton(
               icon: const Icon(
@@ -380,10 +380,10 @@ class _manage_business_viewState extends State<manage_business_view>
             title: const Text(
               'Manage Business',
               style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
             ),
-            iconTheme: IconThemeData(
-              color: appcolor().mediumGreyColor,
+            iconTheme: const IconThemeData(
+              color: Colors.white,
               size: 30,
             ),
           ),

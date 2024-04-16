@@ -1251,10 +1251,10 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
             onPressed: () {
               Get.to(() => add_service_view());
             },
-            backgroundColor: appcolor().mainColor,
+            backgroundColor: Colors.orange,
             child: const Icon(
               Icons.add,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
           endDrawer: CustomEndDrawer(
@@ -1271,7 +1271,7 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
             },
           ),
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.orange,
             elevation: 2,
             leading: IconButton(
               icon: const  Icon(
@@ -1289,8 +1289,8 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
               style:
                   TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
             ),
-            iconTheme: IconThemeData(
-              color: appcolor().mediumGreyColor,
+            iconTheme: const IconThemeData(
+              color: Colors.black,
               size: 30,
             ),
           ),

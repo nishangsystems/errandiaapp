@@ -11,6 +11,7 @@ import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/services/controller/manage_service_controller.dart';
+import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -945,6 +946,46 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                   )
                                 ),
                               ),
+
+                              if (!hasActiveSubscription())
+                                // a button to subscribe
+                                InkWell(
+                                  onTap: () {
+                                    Get.to(() => const subscription_view(),
+                                        transition: Transition.rightToLeft,
+                                        duration: const Duration(milliseconds: 500));
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.redAccent,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.payment,
+                                          color: appcolor().redColor,
+                                          size: 14,
+                                        ),
+                                        SizedBox(
+                                          width: Get.width * 0.01,
+                                        ),
+                                        Text(
+                                          'Subscribe',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: appcolor().redColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ]
+                                    )
+                                  ),
+                                ),
 
                               // posted when
                               const Spacer(),

@@ -1,15 +1,19 @@
 import 'dart:convert';
 
 import 'package:errandia/app/APi/errands.dart';
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/errands/view/edit_errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_results.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
+import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/controller/manage_service_controller.dart';
+import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +50,8 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   late PopupBox popup;
+  late business_controller businessController;
+  late profile_controller profileController;
 
 
   @override
@@ -58,6 +64,8 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
     errandController = Get.put(errand_controller());
     homeController = Get.put(home_controller());
     tabController = Get.put(errand_tab_controller());
+    businessController = Get.put(business_controller());
+    profileController = Get.put(profile_controller());
 
     homeController.loadIsLoggedIn();
 
@@ -948,6 +956,46 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                   ),
                                 ),
 
+                              if (!hasActiveSubscription())
+                              // a button to subscribe
+                                InkWell(
+                                  onTap: () {
+                                    Get.to(() => const subscription_view(),
+                                        transition: Transition.rightToLeft,
+                                        duration: const Duration(milliseconds: 500));
+                                  },
+                                  child: Container(
+                                      padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: Colors.redAccent,
+                                        ),
+                                      ),
+                                      child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.payment,
+                                              color: appcolor().redColor,
+                                              size: 14,
+                                            ),
+                                            SizedBox(
+                                              width: Get.width * 0.01,
+                                            ),
+                                            Text(
+                                              'Subscribe',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: appcolor().redColor,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ]
+                                      )
+                                  ),
+                                ),
+
                               // posted when
                               const Spacer(),
                               Text(
@@ -1034,7 +1082,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
               onPressed: () async {
                 Get.to(() => const New_Errand());
               },
-              backgroundColor: appcolor().mainColor,
+              backgroundColor: Colors.blue[700],
               child: Icon(
                 Icons.add,
                 color: appcolor().skyblueColor,
@@ -1044,44 +1092,21 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
             return SizedBox.shrink();
           }
         }),
-        endDrawer: Drawer(
-          width: Get.width * 0.7,
-          child: SafeArea(
-            child: Column(
-              children: [
-                blockButton(
-                  title: TextFormField(
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      hintText: 'Search Product',
-                    ),
-                  ),
-                  ontap: () {},
-                  color: Colors.white,
-                ).paddingOnly(
-                  bottom: 20,
-                ),
-                blockButton(
-                  title: const Text(
-                    'Search',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                    ),
-                  ),
-                  ontap: () {},
-                  color: appcolor().mainColor,
-                )
-              ],
-            ).paddingSymmetric(horizontal: 10, vertical: 50),
-          ),
+        endDrawer: CustomEndDrawer(
+          onBusinessCreated: () {
+            homeController.closeDrawer();
+            homeController.featuredBusinessData.clear();
+            homeController.fetchFeaturedBusinessesData();
+            businessController.itemList.clear();
+            businessController.loadBusinesses();
+            homeController.recentlyPostedItemsData.clear();
+            homeController.fetchRecentlyPostedItemsData();
+            profileController.itemList.clear();
+            profileController.loadMyBusinesses();
+          },
         ),
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.blue[700],
           elevation: 2,
           leading: IconButton(
             icon: const Icon(
@@ -1096,17 +1121,14 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
           // automaticallyImplyLeading: false,
           centerTitle: true,
           title: const Text(
-            'Errands',
+            'Manage Errands',
             style:
-                TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
+                TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
           ),
-          iconTheme: IconThemeData(
-            color: appcolor().mediumGreyColor,
+          iconTheme: const IconThemeData(
+            color: Colors.white,
             size: 30,
           ),
-          actions: [
-            Container(),
-          ],
         ),
         body: SafeArea(
           child: Builder(

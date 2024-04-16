@@ -478,8 +478,8 @@ class _Profile_viewState extends State<Profile_view>
           height: Get.height * 0.323,
           color: appcolor().mainColor,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
+            // crossAxisAlignment: CrossAxisAlignment.center,
+            // mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // profile picture container
               Row(
@@ -515,107 +515,61 @@ class _Profile_viewState extends State<Profile_view>
                     ),
                   ).paddingSymmetric(horizontal: 5, vertical: 0),
                 ],
-              ),
-              Stack(
-                children: [
-                  Align(
-                    alignment: AlignmentDirectional.center,
-                    child: Container(
-                      // height: Get.height * 0.13,
-                      width: Get.width * 0.22,
-                      // color: Colors.redAccent,
-                      decoration: BoxDecoration(
-                        color: Colors.blueGrey[100],
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 2,
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(50),
-                        child: userData['photo'] != null
-                            ? Image.network(userData['photo'],
-                                fit: BoxFit.cover, errorBuilder:
-                                    (BuildContext context, Object exception,
-                                        StackTrace? stackTrace) {
-                                return Center(
-                                    child: Text(
-                                  userData["name"] != null
-                                      ? getFirstLetter(userData['name'])
-                                      : "",
-                                  style: const TextStyle(
-                                    color: Color(0xffff0000),
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ));
-                              })
-                            : Center(
-                                child: Text(
-                                userData["name"] != null
-                                    ? getFirstLetter(userData['name'])
-                                    : "",
-                                style: const TextStyle(
-                                  color: Color(0xffff0000),
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )),
-                      ),
-                    ),
-                  ),
+              ).marginZero,
 
-                  // Image.network(
-                  //   getImagePath(userData['photo'] ?? ""),
-                  //   height: Get.height * 0.13,
-                  //   width: Get.width * 0.27,
-                  //   fit: BoxFit.cover,
-                  //   key: UniqueKey(),
-                  // ) : Center(
-                  //     child: Text(
-                  //       getFirstLetter(userData['name']),
-                  //       style: const TextStyle(
-                  //         color: Color(0xffff0000),
-                  //         fontSize: 40,
-                  //         fontWeight: FontWeight.bold,
-                  //       ),
-                  //     )
-                  // ),
-                  // Align(
-                  //   alignment: AlignmentDirectional.topEnd,
-                  //   child: SizedBox(
-                  //     width: Get.width * 0.3,
-                  //     height: Get.height * 0.13,
-                  //     // color: Colors.redAccent,
-                  //   ),
-                  // ),
-                  // Positioned(
-                  //   top: -8.0,
-                  //   right: 12.0,
-                  //   child: Padding(
-                  //     padding: const EdgeInsets.all(8.0),
-                  //     child: InkWell(
-                  //       onTap: () {
-                  //         if (kDebugMode) {
-                  //           print("edit profile");
-                  //         }
-                  //         Get.to(() => const edit_profile_view())?.then((_) {
-                  //           getUser();
-                  //         });
-                  //       },
-                  //       customBorder: const CircleBorder(),
-                  //       splashColor: Colors.red,
-                  //       child: const Icon(
-                  //         Icons.edit,
-                  //         color: Colors.white,
-                  //         size: 20,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                ],
-              ),
+              Container(
+                // height: Get.height * 0.13,
+                width: Get.width * 0.24,
+                // color: Colors.redAccent,
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[100],
+                  borderRadius: BorderRadius.circular(50),
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: userData['photo'] != null
+                      ? Image.network(userData['photo'],
+                      fit: BoxFit.cover, errorBuilder:
+                          (BuildContext context, Object exception,
+                          StackTrace? stackTrace) {
+                        return Center(
+                            child: Text(
+                              userData["name"] != null
+                                  ? getFirstLetter(userData['name'])
+                                  : "",
+                              style: const TextStyle(
+                                color: Color(0xffff0000),
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ));
+                      })
+                      : Center(
+                      child: Text(
+                        userData["name"] != null
+                            ? getFirstLetter(userData['name'])
+                            : "",
+                        style: const TextStyle(
+                          color: Color(0xffff0000),
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )),
+                ),
+              ).marginOnly(top: 0),
+              // Stack(
+              //   children: [
+              //     Align(
+              //       alignment: AlignmentDirectional.center,
+              //       child:
+              //     ),
+              //
+              //   ],
+              // ),
 
               // profile name container
               Container(
@@ -727,58 +681,8 @@ class _Profile_viewState extends State<Profile_view>
                   ],
                 ),
               ),
-
-              // profile location
-              // const Text(
-              //   'Buea, South West Region, Cameroon',
-              //   style: TextStyle(
-              //     color: Colors.white,
-              //     fontSize: 13,
-              //   ),
-              // ),
-              // details container
-              // Container(
-              //   padding: const EdgeInsets.symmetric(
-              //     horizontal: 10,
-              //     vertical: 20,
-              //   ),
-              //   margin: const EdgeInsets.only(top: 15, left: 15, right: 15),
-              //   height: Get.height * 0.15,
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(10),
-              //     color: Colors.white,
-              //   ),
-              //   child: Row(
-              //     crossAxisAlignment: CrossAxisAlignment.center,
-              //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //     children: [
-              //       details_container_item_widget(
-              //         'Subscriber',
-              //         'assets/images/sidebar_icon/icon-profile-subscribers.png',
-              //         2,
-              //       ),
-              //       details_container_item_widget(
-              //         'Following',
-              //         'assets/images/sidebar_icon/icon-profile-following.png',
-              //         2,
-              //       ),
-              //       details_container_item_widget(
-              //         'Errands',
-              //         'assets/images/sidebar_icon/icon-profile-errands.png',
-              //         2,
-              //       ),
-              //       details_container_item_widget(
-              //         'Reviews',
-              //         'assets/images/sidebar_icon/icon-reviews.png',
-              //         2,
-              //       ),
-              //     ],
-              //   ),
-              // ),
-
-              //
             ],
-          ).paddingOnly(top: 15),
+          ).paddingOnly(top: 2),
         ),
 
         // tab bar

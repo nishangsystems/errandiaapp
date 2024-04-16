@@ -31,7 +31,7 @@ class PillWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color bgColor = _getBackgroundColor(text); // Get a color based on the text
+    Color bgColor = getBackgroundColor(text); // Get a color based on the text
 
     return Chip(
       labelPadding: const EdgeInsets.all(0),
@@ -62,7 +62,7 @@ class PillWidget extends StatelessWidget {
 
   // A simple function to generate a color based on the string
   // You can replace this logic with your own color-determining logic
-  Color _getBackgroundColor(String text) {
+  static Color getBackgroundColor(String text) {
     final int hash = text.hashCode;
     final Random random = Random(hash);
     return Color.fromRGBO(

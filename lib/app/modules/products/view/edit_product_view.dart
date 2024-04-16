@@ -10,9 +10,6 @@ import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/modal/Shop.dart';
-import 'package:errandia/modal/category.dart';
-import 'package:errandia/modal/subcategory.dart';
-import 'package:errandia/modal/subcatgeory.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -222,11 +219,11 @@ class EditProductViewState extends State<EditProductView> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.green,
           titleSpacing: 8,
           title: Text(productName),
-          titleTextStyle: TextStyle(
-              color: appcolor().mediumGreyColor,
+          titleTextStyle: const TextStyle(
+              color: Colors.white,
               fontWeight: FontWeight.w500,
               fontSize: 20),
           automaticallyImplyLeading: false,
@@ -237,8 +234,8 @@ class EditProductViewState extends State<EditProductView> {
             },
             icon: const Icon(Icons.arrow_back_ios),
           ),
-          iconTheme: IconThemeData(
-            color: appcolor().mediumGreyColor,
+          iconTheme: const IconThemeData(
+            color:Colors.white,
             size: 30,
           ),
           actions: [
@@ -248,7 +245,7 @@ class EditProductViewState extends State<EditProductView> {
                 },
                 child: const Text(
                   'Publish',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
                 ))
           ],
         ),

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -15,14 +14,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../APi/apidomain & api.dart';
 import '../../../AlertDialogBox/alertBoxContent.dart';
 import '../../global/Widgets/blockButton.dart';
-import 'errand_view.dart';
 
 add_product_cotroller product_controller = Get.put(add_product_cotroller());
 
@@ -202,19 +197,19 @@ class _EditErrand2 extends State<EditErrand2> {
         appBar: AppBar(
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.blue[700],
           titleSpacing: 8,
-          title: Text(
-            'Update Errand'.tr,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xff113d6b),
+          title: const Text(
+            'Update Errand',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
             ),
           ),
-          titleTextStyle: TextStyle(
+          titleTextStyle: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: appcolor().mediumGreyColor,
-              fontSize: 18),
+              color: Colors.white,
+              fontSize: 20),
           automaticallyImplyLeading: false,
           leading: IconButton(
             padding: EdgeInsets.zero,
@@ -232,7 +227,7 @@ class _EditErrand2 extends State<EditErrand2> {
               Get.back(result: updatedData);
             },
             icon: const Icon(Icons.arrow_back_ios),
-            color: const Color(0xff113d6b),
+            color: Colors.white,
           ),
           // actions: [
           //   TextButton(

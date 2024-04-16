@@ -1,25 +1,14 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
 import 'package:errandia/app/modules/errands/view/2nd_screen_edit_errand.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
-import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+
 import '../../../../modal/Region.dart';
-import '../../../../modal/Street.dart';
-import '../../../../modal/Town.dart';
-import '../../../APi/apidomain & api.dart';
-import '../../buiseness/controller/add_business_controller.dart';
-import '../../global/Widgets/blockButton.dart';
 import '../controller/newErradiaController.dart';
-import '2nd_screen_new_errand.dart';
-import 'errand_view.dart';
 
 
 imagePickercontroller imageController = Get.put(imagePickercontroller());
@@ -91,26 +80,22 @@ class _EditErrandState extends State<EditErrand> {
         appBar: AppBar(
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.blue[700],
           titleSpacing: 8,
           title: const Text(
             'Edit Errand',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xff113d6b),
-            ),
           ),
-          titleTextStyle: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: appcolor().mediumGreyColor,
-              fontSize: 18),
+          titleTextStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+              fontSize: 20),
           leading: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () {
               Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios),
-            color: const Color(0xff113d6b),
+            color: Colors.white
           ),
           // actions: [
           //   TextButton(
@@ -443,11 +428,11 @@ class _EditErrandState extends State<EditErrand> {
                           width: Get.width * 0.9,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: appcolor().mainColor,
+                            color: Colors.blue[700],
                           ),
                           child: const Center(
                             child: Text(
-                              'Next',
+                              'NEXT',
                               style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
