@@ -125,8 +125,6 @@ class _SeeAllErrandsState extends State<SeeAllErrands>
               // ],
             ),
             body:
-                // SingleChildScrollView(
-                //             child:
                 Container(
                     height: Get.height * 0.9,
                     padding: const EdgeInsets.symmetric(horizontal: 10),

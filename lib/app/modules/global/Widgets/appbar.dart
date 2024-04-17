@@ -41,18 +41,18 @@ AppBar appbar() {
           ),
         ),
         const Spacer(),
-        // Obx(() => homeController.loggedIn.value
-        //     ? IconButton(
-        //         onPressed: () {
-        //           Get.to(() => const NotificationsView());
-        //         },
-        //         icon: const Icon(
-        //           Icons.notifications,
-        //           size: 30,
-        //         ),
-        //         color: appcolor().mediumGreyColor,
-        //       )
-        //     : Container()),
+        Obx(() => homeController.loggedIn.value
+            ? IconButton(
+                onPressed: () {
+                  Get.to(() => const NotificationsView());
+                },
+                icon: const Icon(
+                  Icons.notifications,
+                  size: 30,
+                ),
+                color: appcolor().mediumGreyColor,
+              )
+            : Container()),
         Obx(() => homeController.loggedIn.value
             ? IconButton(
                 onPressed: () {
