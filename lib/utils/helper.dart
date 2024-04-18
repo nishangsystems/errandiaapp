@@ -143,6 +143,12 @@ String formatDate(DateTime date) {
   return format.format(date);
 }
 
+String formatDateString(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('EEE. dd MMM. yyyy').format(dateTime);
+  return formattedDate;
+}
+
 // convert a list to a string separated by comma
 String listToString(List<int?> list) {
   String result = "";

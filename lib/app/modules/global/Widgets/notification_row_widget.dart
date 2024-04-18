@@ -1,94 +1,55 @@
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/modal/Notification.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class NotificationRowWidget extends StatelessWidget {
-  final String title;
-  final String body;
-  final String time;
+  final NotificationItem item;
 
   const NotificationRowWidget({
     Key? key,
-    required this.title,
-    required this.body,
-    required this.time,
+    required this.item
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 0),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            bottom: BorderSide(
-              color: appcolor().mediumGreyColor.withOpacity(0.2),
-              width: 1,
-            ),
-          )),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return ListTile(
+      style: ListTileStyle.list,
+      leading: const CircleAvatar(
+        backgroundColor: Colors.teal, // Color for the icon background
+        radius: 22,
+        backgroundImage: AssetImage('assets/images/notifications_icon.png'),
+      ),
+      title: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundImage: AssetImage(
-                  'assets/images/notifications_icon.png',
-                ),
-              ),
-
-              SizedBox(
-                width: Get.width * 0.03,
-              ),
-              Column(
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'New Subscriber',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-
-                        // const Spacer(),
-                        SizedBox(
-                          width: Get.width * 0.12,
-                        ),
-                        Text(
-                          '2 hours ago',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: appcolor().mediumGreyColor,
-                          ),
-                        ),
-                      ]),
-
-                  SizedBox(
-                    width: Get.width * 0.7,
-                    child: Text(
-                      "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: appcolor().mediumGreyColor,
-                      ),
-                    )
-                  )
-                ],
-              ),
-
-
-            ],
+          Text(
+            item.title,
+            style: TextStyle(
+              color: appcolor().mediumGreyColor,
+              fontWeight: FontWeight.w400,
+              fontSize: 12
+            ),
+          ),
+          const Spacer(),
+          Text(
+            formatDateString(item.date),
+            style: TextStyle(
+              color: appcolor().mediumGreyColor,
+              fontSize: 12,
+            ),
           ),
         ],
+      ).paddingOnly(top: 3),
+      subtitle: Text(
+        item.message,
+        style: TextStyle(color: Colors.black.withOpacity(0.6),
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
