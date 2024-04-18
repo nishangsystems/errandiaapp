@@ -6,6 +6,7 @@ import 'package:errandia/app/APi/firebase_api.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_view_no_bar.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
+import 'package:errandia/app/modules/notifications/notifications_view.dart';
 import 'package:errandia/app/modules/profile/view/profile_view.dart';
 import 'package:errandia/app/modules/splashScreen/splash_screen.dart';
 import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
@@ -84,6 +85,15 @@ void _handleMessage(Map<String, dynamic> data) {
 
   if (data['page'] == 'received_errands') {
     Get.to(() => const errand_view());
+  }
+
+  if (data['page'] == 'notification') {
+    Get.to(() => NotificationDetailView(
+        notifId: data['details']['id'],
+        title: data['details']['title'],
+        date: data['details']['created_at'],
+        message: data['details']['message'])
+    );
   }
 }
 
