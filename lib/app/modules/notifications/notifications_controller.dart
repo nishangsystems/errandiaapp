@@ -54,7 +54,8 @@ class notifications_controller extends GetxController {
       print("response notification detail: $data");
 
       if (data != null && data.isNotEmpty) {
-        notificationDetail.value = data;
+        notificationDetail.value = data['item'];
+        print("notification detail: ${notificationDetail}");
       }
     } catch (e) {
       print("error fetching notification detail: $e");

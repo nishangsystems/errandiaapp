@@ -90,9 +90,7 @@ void _handleMessage(Map<String, dynamic> data) {
   if (data['page'] == 'notification') {
     Get.to(() => NotificationDetailView(
         notifId: data['details']['id'],
-        title: data['details']['title'],
-        date: data['details']['created_at'],
-        message: data['details']['message'])
+        title: data['details']['title'])
     );
   }
 }

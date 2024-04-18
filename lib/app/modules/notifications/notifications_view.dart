@@ -10,10 +10,10 @@ import 'package:get/get.dart';
 class NotificationDetailView extends StatefulWidget {
   final notifId;
   final String title;
-  final String date;
+  final date;
   final message;
 
-  const NotificationDetailView({Key? key, this.notifId, required this.title, required this.date, this.message}) : super(key: key);
+  const NotificationDetailView({Key? key, this.notifId, required this.title, this.date, this.message}) : super(key: key);
 
   @override
   _NotificationDetailViewState createState() => _NotificationDetailViewState();
@@ -49,6 +49,7 @@ class _NotificationDetailViewState extends State<NotificationDetailView> with Wi
 
   @override
   Widget build(BuildContext context) {
+    print("notification detail: ${notifController.notificationDetail}");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -61,7 +62,7 @@ class _NotificationDetailViewState extends State<NotificationDetailView> with Wi
         automaticallyImplyLeading: false,
 
         title: Text(
-          widget.title,
+          notifController.notificationDetail['title'] ?? widget.title,
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w500,
@@ -92,7 +93,7 @@ class _NotificationDetailViewState extends State<NotificationDetailView> with Wi
             ),
             RichText(
               text: TextSpan(
-                text: widget.message,
+                text: notifController.notificationDetail['message'] ?? widget.message,
                 style: TextStyle(
                   color:  appcolor().darkBlueColor,
                   fontSize: 16,
@@ -113,7 +114,7 @@ class _NotificationDetailViewState extends State<NotificationDetailView> with Wi
               ),
             ),
             Text(
-              formatDateString(widget.date),
+              formatDateString(notifController.notificationDetail['created_at'] ?? widget.date),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
