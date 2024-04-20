@@ -130,7 +130,7 @@ class _NotificationsViewState extends State<NotificationsView>
                 separatorBuilder: (BuildContext context, int index) {
                   return const Divider();
                 },
-              ).marginOnly(top: 10);
+              ).marginOnly(top: 10, bottom: 15);
             }
           }),
         ));

@@ -9,6 +9,8 @@ class notifications_controller extends GetxController {
 
   var notificationList = List<dynamic>.empty(growable: true).obs;
 
+  RxBool isDetailLoading = false.obs;
+  RxBool isDetailError = false.obs;
   var notificationDetail = <String, dynamic>{}.obs;
 
   RxInt currentPage = 1.obs;
@@ -47,18 +49,26 @@ class notifications_controller extends GetxController {
     }
   }
 
-  void fetchNotificationDetail(int id) async {
+  Future<void> fetchNotificationDetail(int id) async {
     print("fetching notification detail");
+    isDetailLoading.value = true;
+
     try {
       var data = await NotificationsAPI.getNotificationDetail(id);
       print("response notification detail: $data");
 
       if (data != null && data.isNotEmpty) {
         notificationDetail.value = data['item'];
-        print("notification detail: ${notificationDetail}");
+        isDetailLoading.value = false;
+        isDetailError.value = false;
+      } else {
+        isDetailLoading.value = false;
+        isDetailError.value = true;
       }
     } catch (e) {
       print("error fetching notification detail: $e");
+      isDetailLoading.value = false;
+      isDetailError.value = true;
     }
   }
 
