@@ -518,7 +518,7 @@ class _Profile_viewState extends State<Profile_view>
               ).marginZero,
 
               Container(
-                // height: Get.height * 0.13,
+                height: userData['photo'] == null ? Get.height * 0.11 : null,
                 width: Get.width * 0.24,
                 // color: Colors.redAccent,
                 decoration: BoxDecoration(

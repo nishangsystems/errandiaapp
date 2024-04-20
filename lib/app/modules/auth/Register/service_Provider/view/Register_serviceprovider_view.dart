@@ -150,7 +150,7 @@ class _register_serviceprovider_viewState
     } else if (phoneNo.text.isEmpty) {
       alertDialogBox(context, "Error", "Please enter your phone number");
     } else if (email.text.isEmpty) {
-      alertDialogBox( context, "Error", "Please enter your email");
+      alertDialogBox(context, "Error", "Please enter your email");
     } else {
       var Name = name.text.trim().toString();
       var Phone = phoneNo.text.trim().toString();
@@ -167,19 +167,17 @@ class _register_serviceprovider_viewState
         };
         print("value: $value");
         registration_successful_view home =
-        registration_successful_view(userAction: const {
+            registration_successful_view(userAction: const {
           "name": "register",
         });
-        registration_failed_view failed =
-        registration_failed_view();
+        registration_failed_view failed = registration_failed_view();
 
         setState(() {
           isLoading = true;
         });
         // api().registration('register', value, context,home,failed);
         try {
-          await api()
-              .registration(value, context, home, failed);
+          await api().registration(value, context, home, failed);
         } finally {
           setState(() {
             isLoading = false;
@@ -271,16 +269,16 @@ class _register_serviceprovider_viewState
 
                   // text form field
                   Container(
-                    height: Get.height * 0.07,
+                    height: Get.height * 0.065,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(5),
                       border: Border.all(
                         color: const Color(0xffe0e6ec),
                       ),
                       color: Colors.white,
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10,),
                       child: TextFormField(
                         controller: name,
                         keyboardType: TextInputType.name,
@@ -315,75 +313,60 @@ class _register_serviceprovider_viewState
                   ),
 
                   // phone number text field
-                  Container(
-                    height: Get.height * 0.08,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: const Color(0xffe0e6ec),
+                  IntlPhoneField(
+                    controller: phoneNo,
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.only(top: 0),
+                      fillColor: Colors.white,
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xffe0e6ec),
+                        ),
                       ),
-                      color: Colors.white,
-                    ),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5, left: 10),
-                          child: SizedBox(
-                            width: Get.width * 0.86,
-                            child: IntlPhoneField(
-                              controller: phoneNo,
-                              decoration: const InputDecoration(
-                                  contentPadding: EdgeInsets.only(top: 12),
-                                  border: InputBorder.none,
-                                  counter: SizedBox(),
-                                hintText: 'Phone Number *',
-                                hintStyle: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              initialCountryCode: 'CM',
-                              showDropdownIcon: false,
-                              countries: filter,
-                              dropdownTextStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 17,
-                              ),
-                              validator: (value) {
-                                if (value == null) {
-                                  print(value);
-                                }
-                                return null;
-                              },
-                              onChanged: (phone) {
-                                if (kDebugMode) {
-                                  print("phone: $phone");
-                                }
-                              },
-                            ),
-                          ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xffe0e6ec),
                         ),
-
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 1,
-                            ),
-                            child: TextFormField(
-                              keyboardType: TextInputType.phone,
-                              style: const TextStyle(
-                                fontSize: 18,
-                              ),
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xffe0e6ec),
                         ),
-
-                        // by registering
-                      ],
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xffe0e6ec),
+                        ),
+                      ),
+                      counter: Offstage(),
+                      hintText: 'Phone Number *',
+                      hintStyle: TextStyle(
+                        color: Colors.black,
+                      ),
                     ),
+
+                    keyboardType: TextInputType.phone,
+                    initialCountryCode: 'CM',
+                    showDropdownIcon: false,
+                    countries: filter,
+                    flagsButtonPadding: const EdgeInsets.only(left: 8),
+                    textAlignVertical: TextAlignVertical.center,
+                    dropdownTextStyle: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                    ),
+                    validator: (value) {
+                      if (value == null) {
+                        print(value);
+                      }
+                      return null;
+                    },
+                    onChanged: (phone) {
+                      if (kDebugMode) {
+                        print("phone: $phone");
+                      }
+                    },
                   ),
 
                   SizedBox(
@@ -405,9 +388,9 @@ class _register_serviceprovider_viewState
 
                   // text form field
                   Container(
-                    height: Get.height * 0.07,
+                    height: Get.height * 0.065,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(5),
                       border: Border.all(
                         color: const Color(0xffe0e6ec),
                       ),
@@ -474,7 +457,8 @@ class _register_serviceprovider_viewState
                           fontSize: 17,
                         ),
                         children: [
-                          const TextSpan(text: 'By registering, you agree to the '),
+                          const TextSpan(
+                              text: 'By registering, you agree to the '),
                           TextSpan(
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
@@ -534,7 +518,7 @@ class _register_serviceprovider_viewState
 
                   InkWell(
                     onTap: () async {
-                     registerUser(context);
+                      registerUser(context);
                       // Get.to(Home_view());
                     },
                     child: Container(
