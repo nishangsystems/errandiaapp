@@ -41,6 +41,7 @@ class _manage_business_viewState extends State<manage_business_view>
   late ScrollController scrollController;
   late home_controller homeController;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  late business_controller businessController;
 
   late PopupBox popup;
 
@@ -49,7 +50,10 @@ class _manage_business_viewState extends State<manage_business_view>
     String townName = shop['town'] != null ? shop['town']['name'] : '';
     String regionName = shop['region'] != null ? shop['region']['name'] : '';
 
-    return [street, townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
+    return [street, townName, regionName]
+        .where((s) => s.isNotEmpty)
+        .join(", ")
+        .trim();
   }
 
   @override
@@ -59,6 +63,7 @@ class _manage_business_viewState extends State<manage_business_view>
     profileController = Get.put(profile_controller());
     homeController = Get.put(home_controller());
     mController.tabController = TabController(length: 3, vsync: this);
+    businessController = Get.put(business_controller());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       profileController.loadMyBusinesses();
@@ -91,215 +96,232 @@ class _manage_business_viewState extends State<manage_business_view>
     Widget allBusiness() {
       return Obx(() {
         if (profileController.isLoading.isTrue) {
-          return buildLoadingWidget();
+          return Center(child: buildLoadingWidget());
         } else if (profileController.isError.isTrue) {
-          return buildErrorWidget(
-            message: 'An error occurred',
-            callback: () {
-              profileController.reloadMyBusinesses();
-            },
+          return Center(
+            child: buildErrorWidget(
+              message: 'An error occurred',
+              callback: () {
+                profileController.reloadMyBusinesses();
+              },
+            )
           );
         } else if (profileController.itemList.isEmpty) {
-          return SizedBox(
-            height: Get.height * 0.5,
-            child: Center(
-              child: Text(
-                'No Business found',
-                style: TextStyle(
-                  color: appcolor().mediumGreyColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
+          return Center(
+            child: Text(
+              'No Business found',
+              style: TextStyle(
+                color: appcolor().mediumGreyColor,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
             ),
           );
         } else {
-          return ListView.builder(
-            key: const PageStorageKey('allMyBusinesses'),
-            controller: scrollController,
-            itemCount: profileController.itemList.length,
-            itemBuilder: (context, index) {
-              var data = profileController.itemList[index];
-              if (kDebugMode) {
-                print("manage business : $data");
-              }
-              return GestureDetector(
-                onTap: () {
-                  Get.to(() => errandia_business_view(businessData: data),
-                    transition: Transition.rightToLeft,
-                    duration: const Duration(milliseconds: 500),
-                  );
-                },
-                child: BusinessItem(
-                  name: data['name'],
-                  address: _formatAddress(data),
-                  image: data['image'],
-                  onTap: () {
-                    Get.bottomSheet(
-                      // backgroundColor: Colors.white,
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        color: Colors.white,
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            const Center(
-                              child: Icon(
-                                Icons.horizontal_rule,
-                                size: 25,
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  key: const PageStorageKey('allMyBusinesses'),
+                  controller: scrollController,
+                  itemCount: profileController.itemList.length,
+                  itemBuilder: (context, index) {
+                    var data = profileController.itemList[index];
+                    if (kDebugMode) {
+                      print("manage business : $data");
+                    }
+                    return GestureDetector(
+                      onTap: () {
+                        Get.to(
+                          () => errandia_business_view(businessData: data),
+                          transition: Transition.rightToLeft,
+                          duration: const Duration(milliseconds: 500),
+                        );
+                      },
+                      child: BusinessItem(
+                        name: capitalizeAll(data['name']),
+                        address: _formatAddress(data),
+                        image: data['image'],
+                        onTap: () {
+                          Get.bottomSheet(
+                            // backgroundColor: Colors.white,
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              color: Colors.white,
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  const Center(
+                                    child: Icon(
+                                      Icons.horizontal_rule,
+                                      size: 25,
+                                    ),
+                                  ),
+                                  // Text(index.toString()),
+                                  bottomSheetWidgetitem(
+                                    title: 'Edit Business',
+                                    imagepath:
+                                        'assets/images/sidebar_icon/icon-edit.png',
+                                    callback: () async {
+                                      print('tapped');
+                                      Get.back();
+                                      Get.to(() => EditBusinessView(
+                                            data: data,
+                                          ));
+                                    },
+                                  ),
+                                  bottomSheetWidgetitem(
+                                    title: 'Add New Product',
+                                    imagepath:
+                                        'assets/images/sidebar_icon/add_products.png',
+                                    callback: () async {
+                                      print('add new product');
+                                      Get.back();
+                                      Get.to(() => add_product_view());
+                                    },
+                                  ),
+                                  bottomSheetWidgetitem(
+                                    title: 'Add New Service',
+                                    imagepath:
+                                        'assets/images/sidebar_icon/services.png',
+                                    callback: () async {
+                                      print('add new service');
+                                      Get.back();
+                                      Get.to(() => add_service_view());
+                                    },
+                                  ),
+                                  // bottomSheetWidgetitem(
+                                  //   title: 'Suspend Business',
+                                  //   imagepath:
+                                  //       'assets/images/sidebar_icon/icon-suspend.png',
+                                  //   callback: () {
+                                  //     Get.back();
+                                  //     showDialog(
+                                  //       context: context,
+                                  //       builder: (context) {
+                                  //         return businessDialog(
+                                  //             BusinessAction.suspend);
+                                  //       },
+                                  //     );
+                                  //   },
+                                  // ),
+                                  // bottomSheetWidgetitem(
+                                  //   title: 'Update Location',
+                                  //   imagepath:
+                                  //       'assets/images/sidebar_icon/icon-location.png',
+                                  //   callback: () {},
+                                  // ),
+                                  bottomSheetWidgetitem(
+                                    title: 'Move to trash',
+                                    imagepath:
+                                        'assets/images/sidebar_icon/icon-trash.png',
+                                    callback: () {
+                                      Get.back();
+
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext dialogContext) {
+                                          // Use dialogContext
+                                          var response;
+                                          return CustomAlertDialog(
+                                              title: "Delete Business",
+                                              message:
+                                                  "Are you sure you want to delete this business?",
+                                              dialogType: MyDialogType.error,
+                                              onConfirm: () {
+                                                // delete product
+                                                print(
+                                                    "delete business: ${data['slug']}");
+                                                BusinessAPI.deleteBusiness(
+                                                        data['slug'])
+                                                    .then((response_) {
+                                                  if (response_ != null) {
+                                                    response =
+                                                        jsonDecode(response_);
+                                                    print(
+                                                        "delete business response: $response");
+
+                                                    if (mounted) {
+                                                      // Check if the widget is still in the tree
+                                                      if (response["status"] ==
+                                                          'success') {
+                                                        profileController
+                                                            .reloadMyProducts();
+                                                        profileController
+                                                            .reloadMyServices();
+                                                        profileController
+                                                            .reloadMyBusinesses();
+
+                                                        Navigator.of(
+                                                                dialogContext)
+                                                            .pop(); // Close the dialog
+
+                                                        // Show success popup
+                                                        popup = PopupBox(
+                                                          title: 'Success',
+                                                          description:
+                                                              response['data']
+                                                                  ['message'],
+                                                          type:
+                                                              PopupType.success,
+                                                        );
+                                                      } else {
+                                                        Navigator.of(
+                                                                dialogContext)
+                                                            .pop(); // Close the dialog
+
+                                                        // Show error popup
+                                                        popup = PopupBox(
+                                                          title: 'Error',
+                                                          description:
+                                                              response['data']
+                                                                  ['data'],
+                                                          type: PopupType.error,
+                                                        );
+                                                      }
+
+                                                      popup.showPopup(
+                                                          context); // Show the popup
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                              onCancel: () {
+                                                // cancel delete
+                                                print("cancel delete");
+                                                Navigator.of(dialogContext)
+                                                    .pop(); // Close the dialog
+                                              });
+                                        },
+                                      ).then((_) {
+                                        if (mounted) {
+                                          try {
+                                            popup.dismissPopup(navigatorKey
+                                                .currentContext!); // Dismiss the popup
+                                          } catch (e) {
+                                            print("error dismissing popup: $e");
+                                          }
+                                          profileController
+                                              .reloadMyBusinesses();
+                                          Get.back();
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
-                            // Text(index.toString()),
-                            bottomSheetWidgetitem(
-                              title: 'Edit Business',
-                              imagepath:
-                              'assets/images/sidebar_icon/icon-edit.png',
-                              callback: () async {
-                                print('tapped');
-                                Get.back();
-                                Get.to(() => EditBusinessView(
-                                  data: data,
-                                ));
-                              },
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Add New Product',
-                              imagepath:
-                              'assets/images/sidebar_icon/add_products.png',
-                              callback: () async {
-                                print('add new product');
-                                Get.back();
-                                Get.to(() => add_product_view());
-                              },
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Add New Service',
-                              imagepath:
-                              'assets/images/sidebar_icon/services.png',
-                              callback: () async {
-                                print('add new service');
-                                Get.back();
-                                Get.to(() => add_service_view());
-                              },
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Suspend Business',
-                              imagepath:
-                              'assets/images/sidebar_icon/icon-suspend.png',
-                              callback: () {
-                                Get.back();
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return businessDialog(BusinessAction.suspend);
-                                  },
-                                );
-                              },
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Update Location',
-                              imagepath:
-                              'assets/images/sidebar_icon/icon-location.png',
-                              callback: () {},
-                            ),
-                            bottomSheetWidgetitem(
-                              title: 'Move to trash',
-                              imagepath:
-                              'assets/images/sidebar_icon/icon-trash.png',
-                              callback: () {
-                                Get.back();
 
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext dialogContext) {
-                                    // Use dialogContext
-                                    var response;
-                                    return CustomAlertDialog(
-                                        title: "Delete Business",
-                                        message:
-                                        "Are you sure you want to delete this business?",
-                                        dialogType: MyDialogType.error,
-                                        onConfirm: () {
-                                          // delete product
-                                          print(
-                                              "delete business: ${data['slug']}");
-                                          BusinessAPI.deleteBusiness(data['slug'])
-                                              .then((response_) {
-                                            if (response_ != null) {
-                                              response = jsonDecode(response_);
-                                              print(
-                                                  "delete business response: $response");
-
-                                              if (mounted) {
-                                                // Check if the widget is still in the tree
-                                                if (response["status"] ==
-                                                    'success') {
-                                                  profileController
-                                                      .reloadMyProducts();
-                                                  profileController
-                                                      .reloadMyServices();
-                                                  profileController.reloadMyBusinesses();
-
-                                                  Navigator.of(dialogContext)
-                                                      .pop(); // Close the dialog
-
-                                                  // Show success popup
-                                                  popup = PopupBox(
-                                                    title: 'Success',
-                                                    description: response['data']
-                                                    ['message'],
-                                                    type: PopupType.success,
-                                                  );
-                                                } else {
-                                                  Navigator.of(dialogContext)
-                                                      .pop(); // Close the dialog
-
-                                                  // Show error popup
-                                                  popup = PopupBox(
-                                                    title: 'Error',
-                                                    description: response['data']
-                                                    ['data'],
-                                                    type: PopupType.error,
-                                                  );
-                                                }
-
-                                                popup.showPopup(
-                                                    context); // Show the popup
-                                              }
-                                            }
-                                          });
-                                        },
-                                        onCancel: () {
-                                          // cancel delete
-                                          print("cancel delete");
-                                          Navigator.of(dialogContext)
-                                              .pop(); // Close the dialog
-                                        });
-                                  },
-                                ).then((_) {
-                                  if (mounted) {
-                                    try {
-                                      popup.dismissPopup(navigatorKey
-                                          .currentContext!); // Dismiss the popup
-                                    } catch (e) {
-                                      print("error dismissing popup: $e");
-                                    }
-                                    profileController.reloadMyBusinesses();
-                                    Get.back();
-                                  }
-                                });
-                              },
-                            ),
-                          ],
-                        ),
+                            enableDrag: true,
+                          );
+                        },
                       ),
-
-                      enableDrag: true,
                     );
                   },
                 ),
-              );
-            },
+              )
+            ],
           );
         }
       });
@@ -318,122 +340,54 @@ class _manage_business_viewState extends State<manage_business_view>
         return true;
       },
       child: Scaffold(
-        floatingActionButton: InkWell(
-          onTap: () {
-            Get.to(() => add_business_view());
-          },
-          child: Container(
-            width: Get.width * 0.47,
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: appcolor().skyblueColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.add,
-                  color: appcolor().mainColor,
-                  size: 28,
-                ),
-                Spacer(),
-                Text(
-                  'Add Business',
-                  style: TextStyle(fontSize: 16, color: appcolor().mainColor),
-                ),
-              ],
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Get.to(() => add_business_view());
+            },
+            backgroundColor: appcolor().mainColor,
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
             ),
           ),
-        ),
-        endDrawer: CustomEndDrawer(
-          onBusinessCreated: () {
-            homeController.closeDrawer();
-            homeController.featuredBusinessData.clear();
-            homeController.fetchFeaturedBusinessesData();
-            business_controller().itemList.clear();
-            business_controller().loadBusinesses();
-            homeController.recentlyPostedItemsData.clear();
-            homeController.fetchRecentlyPostedItemsData();
-            profileController.itemList.clear();
-            profileController.loadMyBusinesses();
-          },
-        ),
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 2,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              // size: 30,
-            ),
-            onPressed: () {
-              Get.back();
+          endDrawer: CustomEndDrawer(
+            onBusinessCreated: () {
+              homeController.closeDrawer();
+              homeController.featuredBusinessData.clear();
+              homeController.fetchFeaturedBusinessesData();
+              businessController.itemList.clear();
+              businessController.loadBusinesses();
+              homeController.recentlyPostedItemsData.clear();
+              homeController.fetchRecentlyPostedItemsData();
+              profileController.itemList.clear();
+              profileController.loadMyBusinesses();
             },
           ),
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: const Text(
-            'Manage Business',
-            style:
-                TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
-          ),
-          iconTheme: IconThemeData(
-            color: appcolor().mediumGreyColor,
-            size: 30,
-          ),
-        ),
-        body: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: Border.symmetric(
-                  horizontal: BorderSide(
-                    color: appcolor().greyColor,
-                  ),
-                ),
+          appBar: AppBar(
+            backgroundColor: appcolor().mainColor,
+            elevation: 2,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                // size: 30,
               ),
-              height: Get.height * 0.08,
-              child: TabBar(
-                dividerColor: appcolor().bluetextcolor,
-                isScrollable: true,
-                unselectedLabelColor: appcolor().mediumGreyColor,
-                unselectedLabelStyle: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  fontSize: 16,
-                ),
-                indicatorColor: appcolor().mainColor,
-                labelColor: appcolor().bluetextcolor,
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: appcolor().mainColor,
-                  fontSize: 18,
-                ),
-                controller: mController.tabController,
-                tabs: [
-                  Container(
-                    height: Get.height * 0.05,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: const Text('All Businesses'),
-                  ),
-                  SizedBox(
-                    height: Get.height * 0.05,
-                    width: Get.width * 0.26,
-                    child: const Text('Published'),
-                  ),
-                  SizedBox(
-                      height: Get.height * 0.05, child: const Text('Trashed')),
-                ],
-              ),
+              onPressed: () {
+                Get.back();
+              },
             ),
-            Expanded(
-              child: TabBarView(
-                controller: mController.tabController,
-                children: mController.myTabs,
-              ),
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            title: const Text(
+              'Manage Business',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
             ),
-          ],
-        ),
-      ),
+            iconTheme: const IconThemeData(
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
+          body: allBusiness()),
     );
   }
 }

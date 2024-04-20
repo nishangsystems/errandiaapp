@@ -3,6 +3,8 @@ import 'package:errandia/modal/Town.dart';
 import 'package:errandia/modal/category.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../utils/helper.dart';
 class add_business_controller extends GetxController{
 
 
@@ -39,6 +41,19 @@ class add_business_controller extends GetxController{
 
   RxBool isRegionSelected = false.obs;
   RxBool isTownsLoading = false.obs;
+  RxBool isValidWhatsappNumber = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    whatsapp_controller.addListener(updateWhatsappNumberValidity);
+  }
+
+
+  void updateWhatsappNumberValidity() {
+    isValidWhatsappNumber.value =
+        whatsapp_controller.text.isNotEmpty && RegExp(phonePattern).hasMatch(whatsapp_controller.text);
+  }
 
   void add_Manager(String manager)
   {
@@ -118,11 +133,6 @@ class add_business_controller extends GetxController{
   void onClose() {
     // TODO: implement onClose
     super.onClose();
-  }
-  @override
-  void onInit() {
-    // TODO: implement onInit
-    super.onInit();
   }
 
   @override

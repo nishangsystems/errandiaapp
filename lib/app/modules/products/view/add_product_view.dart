@@ -143,13 +143,13 @@ class _add_product_viewState extends State<add_product_view> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.green,
           titleSpacing: 8,
-          title: Text('Add Product'.tr),
-          titleTextStyle: TextStyle(
+          title: const Text('Add Product'),
+          titleTextStyle: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: appcolor().mediumGreyColor,
-              fontSize: 18),
+              color:Colors.white,
+              fontSize: 20),
           automaticallyImplyLeading: false,
           leading: IconButton(
             padding: EdgeInsets.zero,
@@ -158,7 +158,7 @@ class _add_product_viewState extends State<add_product_view> {
               Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios),
-            color: Colors.grey,
+            color: Colors.white,
           ),
           actions: [
             TextButton(
@@ -167,7 +167,7 @@ class _add_product_viewState extends State<add_product_view> {
                 },
                 child: const Text(
                   'Publish',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
                 ))
           ],
         ),

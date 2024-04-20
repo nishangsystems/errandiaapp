@@ -8,6 +8,11 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class profile_controller extends GetxController {
+  final TextEditingController emailController = TextEditingController();
+  TextEditingController fullNameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController whatsappController = TextEditingController();
+
   RxInt tabControllerindex = 0.obs;
   RxBool isFullNameValid = false.obs;
   RxBool isEmailValid = false.obs;
@@ -36,13 +41,21 @@ class profile_controller extends GetxController {
 
   RxMap<String, dynamic> userData = RxMap<String, dynamic>();
 
+  RxBool isValidWhatsappNumber = false.obs;
+
   @override
   void onInit() {
     super.onInit();
+    whatsappController.addListener(updateWhatsappNumberValidity);
     getUser();
     loadMyBusinesses();
     loadMyProducts();
     loadMyServices();
+  }
+
+  void updateWhatsappNumberValidity() {
+    isValidWhatsappNumber.value =
+        whatsappController.text.isNotEmpty && RegExp(phonePattern).hasMatch(whatsappController.text);
   }
 
   Future<void> getUser() async {
@@ -116,6 +129,8 @@ class profile_controller extends GetxController {
       isProductError.value = true;
       isProductLoading.value = false;
       print("error loading products: $e");
+    } finally {
+      update();
     }
   }
 
@@ -151,6 +166,7 @@ class profile_controller extends GetxController {
 
   void reloadMyBusinesses() {
     currentPage.value = 1;
+    isError.value = false;
     itemList.clear();
     loadMyBusinesses();
     update();
@@ -158,6 +174,7 @@ class profile_controller extends GetxController {
 
   void reloadMyProducts() {
     productCurrentPage.value = 1;
+    isProductError.value = false;
     productItemList.clear();
     loadMyProducts();
     update();
@@ -165,6 +182,7 @@ class profile_controller extends GetxController {
 
   void reloadMyServices() {
     serviceCurrentPage.value = 1;
+    isServiceError.value = false;
     serviceItemList.clear();
     loadMyServices();
     update();

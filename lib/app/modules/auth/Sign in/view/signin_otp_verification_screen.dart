@@ -3,6 +3,7 @@ import 'package:errandia/app/modules/auth/Register/registration_successful_view.
 import 'package:errandia/app/modules/auth/Register/service_Provider/view/Register_serviceprovider_view.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -202,7 +203,8 @@ class _signin_otp_verification_screenState
                         TextButton(
                           onPressed: () async {
                             var value = {
-                              "identifier": widget.otpData['identifier']?.toString(),
+                              "identifier":
+                                  widget.otpData['identifier']?.toString(),
                             };
                             signin_otp_verification_screen verifyCodeView =
                                 signin_otp_verification_screen(
@@ -246,13 +248,22 @@ class _signin_otp_verification_screenState
                                     print("otp code: ${otpController?.text}");
                                   }
                                   final SharedPreferences prefs = await _prefs;
-                                  await FirebaseAPI().initialize();
+                                  if (prefs.getString('firebaseToken') ==
+                                      null) {
+                                    print("initializing firebase");
+                                    await FirebaseAPI().initialize();
+                                  }
+
+                                  print(
+                                      "device uuid: ${prefs.getString('deviceUuid')}");
 
                                   var value = {
                                     "code": otpController?.text,
                                     "uuid": await getUuid(),
-                                    "device_uuid": prefs.getString('deviceUuid'),
-                                    "push_token": prefs.getString('firebaseToken'),
+                                    "device_uuid":
+                                        prefs.getString('deviceUuid'),
+                                    "push_token":
+                                        prefs.getString('firebaseToken'),
                                   };
 
                                   if (kDebugMode) {
@@ -268,20 +279,27 @@ class _signin_otp_verification_screenState
 
                                   try {
                                     print("isLoading: $isLoading");
-                                    await api().validatePhoneOtp(
-                                        value,
-                                        context ?? scaffoldKey.currentContext!,
-                                        registration_successful_view(
-                                            userAction: const {
-                                              "name": "login",
-                                            }
-                                        ));
+                                    await api()
+                                        .validatePhoneOtp(
+                                            value,
+                                            context ??
+                                                scaffoldKey.currentContext!,
+                                            registration_successful_view(
+                                                userAction: const {
+                                                  "name": "login",
+                                                }))
+                                        .then((value) async {
+                                      print("value: $value");
+                                      await getActiveSubscription();
+                                    });
                                   } catch (e) {
                                     print("Error: $e");
                                     setState(() {
                                       isLoading = false;
                                     });
-                                    Get.snackbar('Error', 'An error occurred, please try again later',
+                                    Get.snackbar(
+                                      'Error',
+                                      'An error occurred, please try again later',
                                       backgroundColor: Colors.red,
                                       colorText: Colors.white,
                                     );
@@ -329,10 +347,7 @@ class _signin_otp_verification_screenState
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               debugPrint('Register View');
-                              Get.offAll(() => registration_successful_view(
-                                  userAction: const {
-                                    "name": "login",
-                                  }));
+                              Get.off(() => const register_serviceprovider_view());
                             },
                           text: 'Register',
                           style: const TextStyle(

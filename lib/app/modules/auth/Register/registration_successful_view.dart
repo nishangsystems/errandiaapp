@@ -119,7 +119,7 @@ class registration_successful_view extends StatelessWidget {
                   if (userAction['name'] == 'register') {
                     Get.to(const signin_view());
                   } else {
-                    Get.to(() => Home_view());
+                    Get.off(() => Home_view());
                   }
                   //registration_failed_view(
                 },

@@ -1,5 +1,9 @@
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
+import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/subscription/controller/subscription_controller.dart';
 import 'package:errandia/app/modules/subscription/view/new_subscription.dart';
 import 'package:errandia/app/modules/subscription/view/renew_subscription.dart';
@@ -19,12 +23,16 @@ class subscription_viewState extends State<subscription_view>
     with WidgetsBindingObserver {
   subscription_controller controller = Get.put(subscription_controller());
   late ScrollController _scrollController;
+  late business_controller businessController;
+  late profile_controller profileController;
+  late home_controller homeController;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _scrollController = ScrollController();
+    businessController = Get.put(business_controller());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.loadSubscriptions();
@@ -58,37 +66,45 @@ class subscription_viewState extends State<subscription_view>
   }
 
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       floatingActionButton: Obx(() {
-        if (controller.subscriptionList.isEmpty) {
-          return Container();
-        } else {
-          return FloatingActionButton.extended(
-            onPressed: () {
-              Get.to(
-                    () => const NewSubscription(),
-                transition: Transition.fadeIn,
-                duration: const Duration(milliseconds: 500),
-              );
-            },
-            backgroundColor: appcolor().mainColor,
-            icon: Icon(
-              Icons.add,
-              color: appcolor().skyblueColor,
-            ),
-            // Adjust text style directly within the label for better alignment and padding
-            label:Text(
-                controller.subscriptionList.isEmpty ? 'Subscribe Now' : 'New',
-                style: TextStyle(
-                  color: appcolor().skyblueColor,
-                  fontSize: 15,
-                )),
-          );
-        }
+        return FloatingActionButton.extended(
+          onPressed: () {
+            Get.to(
+                  () => const NewSubscription(),
+              transition: Transition.fadeIn,
+              duration: const Duration(milliseconds: 500),
+            );
+          },
+          backgroundColor: Colors.purple,
+          icon: Icon(
+            Icons.add,
+            color: appcolor().skyblueColor,
+          ),
+          // Adjust text style directly within the label for better alignment and padding
+          label: Text(
+              controller.subscriptionList.isEmpty ? 'Subscribe Now' : 'New',
+              style: TextStyle(
+                color: appcolor().skyblueColor,
+                fontSize: 15,
+              )),
+        );
       }),
+      endDrawer: CustomEndDrawer(
+        onBusinessCreated: () {
+          homeController.closeDrawer();
+          homeController.featuredBusinessData.clear();
+          homeController.fetchFeaturedBusinessesData();
+          businessController.itemList.clear();
+          businessController.loadBusinesses();
+          homeController.recentlyPostedItemsData.clear();
+          homeController.fetchRecentlyPostedItemsData();
+          profileController.itemList.clear();
+          profileController.loadMyBusinesses();
+        },
+      ),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.purple,
         elevation: 2,
         leading: IconButton(
           icon: const Icon(
@@ -103,20 +119,12 @@ class subscription_viewState extends State<subscription_view>
         centerTitle: true,
         title: const Text(
           'Manage Subscription',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
         ),
-        iconTheme: IconThemeData(
-          color: appcolor().mediumGreyColor,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
           size: 30,
         ),
-        actions: const [
-          // IconButton(
-          //   onPressed: () {},
-          //   icon: const Icon(
-          //     Icons.settings,
-          //   ),
-          // ),
-        ],
       ),
       body: Column(
         children: [

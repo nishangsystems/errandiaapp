@@ -8,6 +8,7 @@ import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/bottomsheet_item.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
@@ -28,11 +29,7 @@ class edit_profile_view extends StatefulWidget {
 class edit_profile_viewState extends State<edit_profile_view> {
   imagePickercontroller imageController = Get.put(imagePickercontroller());
   profile_controller profileController = Get.put(profile_controller());
-
-  final TextEditingController emailController = TextEditingController();
-  TextEditingController fullNameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController whatsappController = TextEditingController();
+  home_controller homeController = Get.put(home_controller());
 
   final _formKey = GlobalKey<FormState>();
 
@@ -54,14 +51,15 @@ class edit_profile_viewState extends State<edit_profile_view> {
       setState(() {
         userData = jsonDecode(userDataString);
         userData['photo'] =
-        userProfileImg == null || userProfileImg.toString() == ""
-            ? null
-            : getImagePath(userProfileImg);
+            userProfileImg == null || userProfileImg.toString() == ""
+                ? null
+                : getImagePath(userProfileImg);
       });
-      fullNameController.text = userData['name'];
-      emailController.text = userData['email'];
-      phoneController.text = userData['phone'];
-      whatsappController.text = userData['whatsapp_number'] ?? "";
+      profileController.fullNameController.text = userData['name'];
+      profileController.emailController.text = userData['email'];
+      profileController.phoneController.text = userData['phone'];
+      profileController.whatsappController.text =
+          userData['whatsapp_number'] ?? "";
       // var url = userData['photo'].substring(1);
       // // remove any trailing quotes from url
       // url = url.replaceAll('"', '');
@@ -128,53 +126,51 @@ class edit_profile_viewState extends State<edit_profile_view> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-
-                          Container(
-                        height: Get.height * 0.15,
-                        width: Get.width * 0.30,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 0.00,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 15,
-                              offset: Offset(10, 15),
-                            ),
-                          ],
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(25),
-                          ),
+                    Container(
+                      height: Get.height * 0.15,
+                      width: Get.width * 0.30,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 0.00,
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(25),
-                          child: Obx(
-                                () => imageController.image_path.value == ""
-                                    ? (userData['photo'] != null
-                                    ? Image.network(
-                                  userData['photo'],
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Image(
-                                      image: AssetImage('assets/images/profilePlaceholder.png'),
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                )
-                                    : const Image(
-                                  image: AssetImage('assets/images/profilePlaceholder.png'),
-                                  fit: BoxFit.cover,
-                                ))
-                                    : Image.file(
-                                  File(imageController.image_path.value),
-                                  fit: BoxFit.cover,
-                                )
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 15,
+                            offset: Offset(10, 15),
                           ),
+                        ],
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(25),
                         ),
                       ),
-
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Obx(() => imageController.image_path.value == ""
+                            ? (userData['photo'] != null
+                                ? Image.network(
+                                    userData['photo'],
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Image(
+                                        image: AssetImage(
+                                            'assets/images/profilePlaceholder.png'),
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                  )
+                                : const Image(
+                                    image: AssetImage(
+                                        'assets/images/profilePlaceholder.png'),
+                                    fit: BoxFit.cover,
+                                  ))
+                            : Image.file(
+                                File(imageController.image_path.value),
+                                fit: BoxFit.cover,
+                              )),
+                      ),
+                    ),
                     Positioned(
                         bottom: 30,
                         right: Get.width * 0.33,
@@ -207,7 +203,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                                       bottomSheetWidgetitem(
                                         title: 'Edit Image',
                                         imagepath:
-                                        'assets/images/sidebar_icon/icon-edit.png',
+                                            'assets/images/sidebar_icon/icon-edit.png',
                                         callback: () {
                                           Get.back();
                                           showDialog(
@@ -264,7 +260,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
                 child: TextFormField(
-                    controller: fullNameController,
+                    controller: profileController.fullNameController,
                     decoration: InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: const Icon(
@@ -276,68 +272,66 @@ class edit_profile_viewState extends State<edit_profile_view> {
                         ),
                         hintText: 'Full Name ',
                         suffixIcon:
-                        Obx(() => profileController.isFullNameValid.value
-                            ? InkWell(
-                          onTap: () {},
-                          child: IconButton(
-                            onPressed: () {
-                              if (kDebugMode) {
-                                print(
-                                    "edit full name ${fullNameController
-                                        .text}");
-                              }
-                                var value = {
-                                  "field_name": "name",
-                                  "field_value":
-                                  fullNameController.text
-                                };
+                            Obx(() => profileController.isFullNameValid.value
+                                ? InkWell(
+                                    onTap: () {},
+                                    child: IconButton(
+                                      onPressed: () {
+                                        if (kDebugMode) {
+                                          print(
+                                              "edit full name ${profileController.fullNameController.text}");
+                                        }
+                                        var value = {
+                                          "field_name": "name",
+                                          "field_value": profileController
+                                              .fullNameController.text
+                                        };
 
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                print("loading: $isLoading");
-
-                                api()
-                                    .updateProfile(
-                                    value, context, navigator)
-                                    .then((data) {
-                                  print(
-                                      "response: ${data['message']}");
-
-                                  PopupBox popupBox = PopupBox(
-                                    title: 'Success',
-                                    description: '${data['message']}',
-                                    type: PopupType.success,
-                                  );
-
-                                  // 3 seconds delay
-                                  Future.delayed(const Duration(seconds: 3),
-                                          () {
                                         setState(() {
-                                          isLoading = false;
+                                          isLoading = true;
                                         });
-                                      });
+                                        print("loading: $isLoading");
 
-                                  popupBox.showPopup(context);
-                                });
-                            },
-                            icon: const Icon(
-                              Icons.save_sharp,
-                              color: Color(0xff113d6b),
-                            ),
-                          ),
-                        )
-                            : const Icon(
-                          Icons.edit,
-                          color: Colors.black,
-                        ))),
+                                        api()
+                                            .updateProfile(
+                                                value, context, navigator)
+                                            .then((data) {
+                                          print("response: ${data['message']}");
+
+                                          PopupBox popupBox = PopupBox(
+                                            title: 'Success',
+                                            description: '${data['message']}',
+                                            type: PopupType.success,
+                                          );
+
+                                          // 3 seconds delay
+                                          Future.delayed(
+                                              const Duration(seconds: 3), () {
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                          });
+
+                                          popupBox.showPopup(context);
+                                        });
+                                      },
+                                      icon: const Icon(
+                                        Icons.save_sharp,
+                                        color: Color(0xff113d6b),
+                                      ),
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
+                                  ))),
                     onChanged: (value) {
                       if (kDebugMode) {
                         print(
-                            "field length: ${fullNameController.text.length}");
+                            "field length: ${profileController.fullNameController.text.length}");
                       }
                       if (value.length >= 3) {
-                        fullNameController.text = value;
+                        profileController.fullNameController.text = value;
                         setState(() {
                           profileController.isFullNameValid.value = true;
                         });
@@ -357,11 +351,11 @@ class edit_profile_viewState extends State<edit_profile_view> {
               // email
               Container(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                 child: TextFormField(
                     enabled: false,
                     keyboardType: TextInputType.emailAddress,
-                    controller: emailController,
+                    controller: profileController.emailController,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       prefixIcon: Icon(
@@ -379,10 +373,11 @@ class edit_profile_viewState extends State<edit_profile_view> {
                     ),
                     onChanged: (value) {
                       if (kDebugMode) {
-                        print("field length: ${emailController.text.length}");
+                        print(
+                            "field length: ${profileController.emailController.text.length}");
                       }
                       if (profileController.isEmail(value)) {
-                        emailController.text = value;
+                        profileController.emailController.text = value;
                         setState(() {
                           profileController.isEmailValid.value = true;
                         });
@@ -412,12 +407,12 @@ class edit_profile_viewState extends State<edit_profile_view> {
               // whatsapp number
               Container(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                 child: TextFormField(
-                    maxLength: 9,
+                    maxLength: 15,
                     maxLines: 1,
                     keyboardType: TextInputType.phone,
-                    controller: whatsappController,
+                    controller: profileController.whatsappController,
                     decoration: InputDecoration(
                       counter: const Offstage(),
                       border: InputBorder.none,
@@ -428,78 +423,105 @@ class edit_profile_viewState extends State<edit_profile_view> {
                       hintStyle: const TextStyle(
                         color: Colors.black,
                       ),
-                      hintText: 'WhatsApp Number *',
+                      hintText: 'WhatsApp Number',
                       suffixIcon:
-                      Obx(() => profileController.isWhatsappValid.value
-                          ? InkWell(
-                        onTap: () {},
-                        child: IconButton(
-                          onPressed: () {
-                            if (kDebugMode) {
-                              print(
-                                  "edit whatsapp ${whatsappController.text}");
-                            }
-                              var value = {
-                                "field_name": "whatsapp_number",
-                                "field_value": whatsappController.text
-                              };
+                          Obx(() => profileController.isValidWhatsappNumber.value
+                              ? InkWell(
+                                  onTap: () {},
+                                  child: IconButton(
+                                    onPressed: () {
+                                      if (kDebugMode) {
+                                        print(
+                                            "edit whatsapp ${profileController.whatsappController.text}");
+                                      }
+                                      var value = {
+                                        "field_name": "whatsapp_number",
+                                        "field_value": profileController
+                                            .whatsappController.text
+                                      };
 
-                              setState(() {
-                                isLoading = true;
-                              });
-
-                              api()
-                                  .updateProfile(
-                                  value, context, navigator)
-                                  .then((data) {
-                                print(
-                                    "response: ${data['message']}");
-
-                                PopupBox popupBox = PopupBox(
-                                  title: 'Success',
-                                  description: '${data['message']}',
-                                  type: PopupType.success,
-                                );
-
-                                // 3 seconds delay
-                                Future.delayed(const Duration(seconds: 3),
-                                        () {
                                       setState(() {
-                                        isLoading = false;
+                                        isLoading = true;
                                       });
-                                    });
 
-                                popupBox.showPopup(context);
-                              });
-                          },
-                          icon: const Icon(
-                            Icons.save_sharp,
-                            color: Color(0xff113d6b),
-                          ),
-                        ),
-                      )
-                          : const Icon(
-                        Icons.edit,
-                        color: Colors.black,
-                      )),
+                                      api()
+                                          .updateProfile(
+                                              value, context, navigator)
+                                          .then((data) {
+                                        print("response: ${data['message']}");
+
+                                        PopupBox popupBox = PopupBox(
+                                          title: 'Success',
+                                          description: '${data['message']}',
+                                          type: PopupType.success,
+                                        );
+
+                                        // 3 seconds delay
+                                        Future.delayed(
+                                            const Duration(seconds: 3), () {
+                                          setState(() {
+                                            isLoading = false;
+                                          });
+                                        });
+
+                                        popupBox.showPopup(context);
+                                      });
+                                    },
+                                    icon: const Icon(
+                                      Icons.save_sharp,
+                                      color: Color(0xff113d6b),
+                                    ),
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.edit,
+                                  color: Colors.black,
+                                )),
                     ),
+                    validator: (value) {
+                      if (value != null &&
+                          value.isNotEmpty &&
+                          !RegExp(phonePattern).hasMatch(value)) {
+                        return 'Please enter a valid phone number';
+                      }
+                      profileController.isWhatsappValid.value = true;
+                      return null;
+                    },
                     onChanged: (value) {
                       if (kDebugMode) {
                         print(
-                            "field length: ${whatsappController.text.length}");
+                            "field length: ${profileController.whatsappController.text.length}");
                       }
-                      if (value.length == 9) {
-                        whatsappController.text = value;
-                        setState(() {
-                          profileController.isWhatsappValid.value = true;
-                        });
+                      if (value.isNotEmpty &&
+                          !RegExp(phonePattern).hasMatch(value)) {
+                        // profileController.whatsappController.text = value;
+                        profileController.updateWhatsappNumberValidity();
+
+                        profileController.isWhatsappValid.value = true;
                       } else {
-                        setState(() {
-                          profileController.isWhatsappValid.value = false;
-                        });
+                        profileController.updateWhatsappNumberValidity();
+
+                        profileController.isWhatsappValid.value = false;
                       }
                     }),
               ),
+              Obx(() {
+                if (!profileController.isValidWhatsappNumber.value) {
+                  return Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    child: const Text(
+                      'Please enter your whatsapp number in the format: +237 6XX XXX XXX or +1 123 456 7890',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                      ),
+                    ),
+                  );
+                } else {
+                  return Container();
+                }
+              }),
               Divider(
                 color: appcolor().greyColor,
                 thickness: 1,
@@ -508,13 +530,13 @@ class edit_profile_viewState extends State<edit_profile_view> {
               ),
               Container(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                 child: TextFormField(
                     enabled: false,
                     keyboardType: TextInputType.phone,
                     maxLength: 9,
                     maxLines: 1,
-                    controller: phoneController,
+                    controller: profileController.phoneController,
                     decoration: const InputDecoration(
                       counter: Offstage(),
                       border: InputBorder.none,
@@ -533,10 +555,11 @@ class edit_profile_viewState extends State<edit_profile_view> {
                     ),
                     onChanged: (value) {
                       if (kDebugMode) {
-                        print("field length: ${phoneController.text.length}");
+                        print(
+                            "field length: ${profileController.phoneController.text.length}");
                       }
                       if (value.length == 9) {
-                        whatsappController.text = value;
+                        // profileController.whatsappController.text = value;
                         setState(() {
                           profileController.isPhoneValid.value = true;
                         });
@@ -562,24 +585,26 @@ class edit_profile_viewState extends State<edit_profile_view> {
             child: ModalBarrier(dismissible: false, color: Colors.black),
           ),
         if (isLoading)
-           Center(
-            child: !isImageUpload ? const CircularProgressIndicator() :  Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  'Uploading Image...',
-                  style: TextStyle(
-                    color: appcolor().bluetextcolor,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w400,
+          Center(
+            child: !isImageUpload
+                ? const CircularProgressIndicator()
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        'Uploading Image...',
+                        style: TextStyle(
+                          color: appcolor().bluetextcolor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
       ]),
     );
@@ -648,6 +673,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                         // Handle the response as needed
 
                         if (response['image_path'] != '') {
+                          homeController.reloadRecentlyPostedItems();
                           PopupBox popupBox = PopupBox(
                             title: 'Success',
                             description: 'Profile Image Updated',
@@ -734,7 +760,7 @@ class edit_profile_viewState extends State<edit_profile_view> {
                       });
 
                       api().uploadProfileImage(file, context).then(
-                            (response) {
+                        (response) {
                           print("Upload response: $response");
                           // Handle the response as needed
 
@@ -807,4 +833,3 @@ class edit_profile_viewState extends State<edit_profile_view> {
     );
   }
 }
-

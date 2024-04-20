@@ -377,17 +377,19 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                     // mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
-                                        height: Get.height * 0.15,
+                                        width: Get.width * 0.38,
+                                        height: Get.height * 0.18,
                                         color: appcolor().lightgreyColor,
                                         child: FadeInImage.assetNetwork(
-                                          placeholder: 'assets/images/errandia_logo.jpeg',
+                                          placeholder: 'assets/images/errandia_logo.png',
                                           image: getImagePathWithSize(business['image'].toString(), height: 200),
                                           fit: BoxFit.contain,
                                           width: double.infinity,
                                           imageErrorBuilder:  (context, error, stackTrace) {
-                                            return Image.asset('assets/images/errandia_logo.jpeg',
+                                            return Image.asset('assets/images/errandia_logo.png',
                                               fit: BoxFit.fill,
-                                              width: double.infinity,
+                                              // width: double.infinity,
+                                              height: Get.height * 0.16,
                                             );
                                           },
                                         ),
@@ -427,7 +429,7 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                                           fontWeight: FontWeight.w500,
                                           color: appcolor().mainColor,
                                         ),
-                                        maxLines: 2,
+                                        maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       SizedBox(

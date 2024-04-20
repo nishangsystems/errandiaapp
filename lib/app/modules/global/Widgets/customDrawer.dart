@@ -62,7 +62,7 @@ class CustomEndDrawer extends StatelessWidget {
                     text: 'Create Business',
                     imagePath: 'assets/images/sidebar_icon/create_shop.png',
                     callback: () {
-                      homeController.closeDrawer();
+                      Get.back();
                       Get.to(() => add_business_view())?.then((_) {
                         onBusinessCreated();
                         profileController.reloadMyBusinesses();

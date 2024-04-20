@@ -1,8 +1,11 @@
 
 // capitalize string function
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
+import 'package:errandia/app/APi/subscription.dart';
+import 'package:errandia/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -139,3 +142,71 @@ String formatDate(DateTime date) {
   final format = DateFormat('dd-MM-yyyy');
   return format.format(date);
 }
+
+String formatDateString(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('EEE. dd MMM. yyyy').format(dateTime);
+  return formattedDate;
+}
+
+// convert a list to a string separated by comma
+String listToString(List<int?> list) {
+  String result = "";
+  for (int i = 0; i < list.length; i++) {
+    if (result == "") {
+      result = list[i].toString();
+    } else {
+      result = "$result,${list[i]}";
+    }
+  }
+  return result;
+}
+
+// check if location info is available
+bool isLocationAvailable(Map<String, dynamic> value) {
+  return value['region'] != "" && value['region'] != null && value['town'] != "" && value['town'] != null;
+}
+
+Future<void> getActiveSubscription() async {
+  // String? userDataString = ErrandiaApp.prefs.getString('user');
+  //
+  // if (userDataString != null) {
+  //   var userData = jsonDecode(userDataString);
+  //   print("user data on errand detail: $userData");
+  //   return userData['active_subscription'];
+  // }
+  //
+  // return false;
+
+  var response_ = await SubscriptionAPI.getCurrentSubscription();
+  var response = jsonDecode(response_);
+  if (response['status'] != 'error') {
+    var data = response['data'];
+    print("subscription data: $data");
+
+    ErrandiaApp.prefs.setString('subscription', jsonEncode(data['data']['item']));
+  } else {
+    print("error getting subscription data: ${response['data']}");
+    ErrandiaApp.prefs.setString('subscription', jsonEncode({}));
+  }
+
+}
+
+bool hasActiveSubscription() {
+  String? subscription = ErrandiaApp.prefs.getString('subscription');
+  print("subscription: $subscription");
+
+  if (subscription != null && subscription.toString() != "[]") {
+    var subs = jsonDecode(subscription);
+
+    if (subs['status'] == 'SUCCESS') {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
+
+const String phonePattern = r'^\+?[0-9]{6,14}$';

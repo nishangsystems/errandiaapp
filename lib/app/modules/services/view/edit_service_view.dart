@@ -217,11 +217,11 @@ class EditServiceViewState extends State<EditServiceView> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.orange,
           titleSpacing: 8,
           title: Text(productName),
-          titleTextStyle: TextStyle(
-              color: appcolor().mediumGreyColor,
+          titleTextStyle: const TextStyle(
+              color: Colors.black,
               fontWeight: FontWeight.w500,
               fontSize: 20),
           automaticallyImplyLeading: false,
@@ -231,7 +231,7 @@ class EditServiceViewState extends State<EditServiceView> {
               Get.back(result: updatedData.isNotEmpty ? updatedData : null);
             },
             icon: const Icon(Icons.arrow_back_ios),
-            color: appcolor().mediumGreyColor,
+            color: Colors.black,
           ),
           actions: [
             TextButton(
@@ -239,8 +239,10 @@ class EditServiceViewState extends State<EditServiceView> {
                   updateService(context);
                 },
                 child: const Text(
-                  'Update',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  'UPDATE',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16,
+                    color: Colors.black,
+                  ),
                 ))
           ],
         ),

@@ -1,11 +1,14 @@
 import 'dart:convert';
 
 import 'package:errandia/app/APi/product.dart';
+import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
+import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/Widgets/row_item_widget.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/controller/manage_service_controller.dart';
 import 'package:errandia/app/modules/services/view/add_service_view.dart';
@@ -36,6 +39,8 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
   late ScrollController scrollController;
   late PopupBox popup;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  late business_controller businessController;
+  late home_controller homeController;
 
 
   @override
@@ -43,6 +48,8 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     profileController = Get.put(profile_controller());
+    businessController = Get.put(business_controller());
+    homeController = Get.put(home_controller());
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       profileController.loadMyServices();
@@ -79,197 +86,32 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
       return Obx(
               () {
             if (profileController.isServiceLoading.isTrue) {
-              return buildLoadingWidget();
+              return Center(
+                child: buildLoadingWidget(),
+              );
             } else if (profileController.isServiceError.value) {
-              return buildErrorWidget(
-                message: 'An error occurred while fetching services',
-                callback: () {
-                  profileController.reloadMyServices();
-                },
+              return Center(
+                child: buildErrorWidget(
+                  message: 'An error occurred while fetching services',
+                  callback: () {
+                    profileController.reloadMyServices();
+                  },
+                ),
               );
             } else if (profileController.serviceItemList.isEmpty) {
-              return SizedBox(
-                height: Get.height * 0.5,
-                child: Center(
-                  child: Text(
-                    'No Services found',
-                    style: TextStyle(
-                      color: appcolor().mediumGreyColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
+              return Center(
+                child: Text(
+                  'No Services found',
+                  style: TextStyle(
+                    color: appcolor().mediumGreyColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               );
             } else {
               return Column(
                 children: [
-                  filter_sort_container(
-                        () {
-                      Get.to(filter_product_view());
-                    },
-                        () {
-                      Get.bottomSheet(
-                        Container(
-                          color: const Color.fromRGBO(255, 255, 255, 1),
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.start,
-                            children: [
-                              Text(
-                                'Sort List',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22,
-                                  color: appcolor().mainColor,
-                                ),
-                              ),
-                              // z-a
-                              Row(
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(fontSize: 16),
-                                      children: [
-                                        TextSpan(
-                                          text: 'Service Name : ',
-                                          style: TextStyle(
-                                            color: appcolor().mainColor,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: 'Desc Z-A',
-                                          style: TextStyle(
-                                            color: appcolor().mediumGreyColor,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Obx(
-                                        () => Radio(
-                                      value: 'sort descending',
-                                      groupValue: service_controller
-                                          .manage_service_sort_group_value.value,
-                                      onChanged: (val) {
-                                        service_controller.manage_service_sort_group_value
-                                            .value = val.toString();
-                                      },
-                                    ),
-                                  )
-                                ],
-                              ),
-
-                              // a-z
-                              Row(
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      style: TextStyle(fontSize: 16),
-                                      children: [
-                                        TextSpan(
-                                          text: 'Service Name : ',
-                                          style: TextStyle(
-                                            color: appcolor().mainColor,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: 'Asc A-Z',
-                                          style: TextStyle(
-                                            color: appcolor().mediumGreyColor,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Obx(
-                                        () => Radio(
-                                      value: 'sort ascending',
-                                      groupValue: service_controller
-                                          .manage_service_sort_group_value.value,
-                                      onChanged: (val) {
-                                        service_controller.manage_service_sort_group_value
-                                            .value = val.toString();
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              // distance nearest to me
-                              Row(
-                                children: [
-                                  RichText(
-                                      text: TextSpan(
-                                          style: TextStyle(fontSize: 16),
-                                          children: [
-                                            TextSpan(
-                                              text: 'Date',
-                                              style: TextStyle(
-                                                color: appcolor().mainColor,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: 'Last Modified',
-                                            ),
-                                          ])),
-                                  Spacer(),
-                                  Obx(() => Radio(
-                                    value: 'Date Last modified ',
-                                    groupValue: service_controller
-                                        .manage_service_sort_group_value.value,
-                                    onChanged: (val) {
-                                      service_controller.manage_service_sort_group_value
-                                          .value = val.toString();
-                                    },
-                                  ))
-                                ],
-                              ),
-
-                              //recentaly added
-                              Row(
-                                children: [
-                                  Text(
-                                    'Price',
-                                    style: TextStyle(
-                                        color: appcolor().mainColor, fontSize: 16),
-                                  ),
-                                  Icon(
-                                    Icons.arrow_upward,
-                                    size: 25,
-                                    color: appcolor().mediumGreyColor,
-                                  ),
-                                  Spacer(),
-                                  Obx(
-                                        () => Radio(
-                                      value: 'Price',
-                                      groupValue: service_controller
-                                          .manage_service_sort_group_value.value,
-                                      onChanged: (val) {
-                                        service_controller.manage_service_sort_group_value
-                                            .value = val.toString();
-                                        print(val.toString());
-                                      },
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ).paddingSymmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                        ),
-                      );
-                    },
-                        () {
-                      Scaffold.of(ctx).openEndDrawer();
-                    },
-                  ),
-                  SizedBox(
-                    height: Get.height * 0.01,
-                  ),
                   Expanded(
                     child: ListView.builder(
                       key: const PageStorageKey('allMyServices'),
@@ -413,10 +255,6 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                     ),
                   )
                 ],
-              ).paddingOnly(
-                left: 10,
-                right: 10,
-                top: 10,
               );
             }
           }
@@ -1409,93 +1247,31 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
         return true;
       },
       child: Scaffold(
-          floatingActionButton: InkWell(
-            onTap: () {
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
               Get.to(() => add_service_view());
             },
-            child: Container(
-              width: Get.width * 0.47,
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: appcolor().skyblueColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.add,
-                    color: appcolor().mainColor,
-                    size: 28,
-                  ),
-                  const Spacer(),
-                  Text(
-                    'Add Service',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: appcolor().mainColor,
-                    ),
-                  ),
-                ],
-              ),
+            backgroundColor: Colors.orange,
+            child: const Icon(
+              Icons.add,
+              color: Colors.black,
             ),
           ),
-          endDrawer: Drawer(
-            width: Get.width * 0.7,
-            child: SafeArea(
-              child: Column(
-                children: [
-                  blockButton(
-                    title: TextFormField(
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        hintText: 'Search Product',
-                      ),
-                    ),
-                    ontap: () {},
-                    color: Colors.white,
-                  ).paddingOnly(
-                    bottom: 20,
-                  ),
-                  // Container(
-                  //   decoration: BoxDecoration(
-                  //     border: Border.all(
-                  //       color: appcolor().mediumGreyColor,
-                  //     ),
-                  //     borderRadius: BorderRadius.circular(10),
-                  //   ),
-                  //   child: TextFormField(
-                  //     decoration: InputDecoration(
-                  //       border: InputBorder.none,
-                  //       contentPadding: EdgeInsets.symmetric(
-                  //         horizontal: 10,
-                  //         vertical: 5,
-                  //       ),
-                  //       hintText: 'Search Product',
-                  //     ),
-                  //   ),
-                  // ).paddingOnly(bottom: 20,),
-
-                  blockButton(
-                    title: const Text(
-                      'Search',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                      ),
-                    ),
-                    ontap: () {},
-                    color: appcolor().mainColor,
-                  )
-                ],
-              ).paddingSymmetric(horizontal: 10, vertical: 50),
-            ),
+          endDrawer: CustomEndDrawer(
+            onBusinessCreated: () {
+              homeController.closeDrawer();
+              homeController.featuredBusinessData.clear();
+              homeController.fetchFeaturedBusinessesData();
+              businessController.itemList.clear();
+              businessController.loadBusinesses();
+              homeController.recentlyPostedItemsData.clear();
+              homeController.fetchRecentlyPostedItemsData();
+              profileController.itemList.clear();
+              profileController.loadMyBusinesses();
+            },
           ),
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.orange,
             elevation: 2,
             leading: IconButton(
               icon: const  Icon(
@@ -1513,72 +1289,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
               style:
                   TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
             ),
-            iconTheme: IconThemeData(
-              color: appcolor().mediumGreyColor,
+            iconTheme: const IconThemeData(
+              color: Colors.black,
               size: 30,
             ),
-            actions: [
-              Container(),
-            ],
           ),
-          body: SafeArea(
-            child: Builder(
-              builder: (ctx) => Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.symmetric(
-                        horizontal: BorderSide(
-                          color: appcolor().greyColor,
-                        ),
-                      ),
-                    ),
-                    height: Get.height * 0.08,
-                    child: TabBar(
-                      dividerColor: appcolor().bluetextcolor,
-                      isScrollable: true,
-                      unselectedLabelColor: appcolor().mediumGreyColor,
-                      unselectedLabelStyle: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 16,
-                      ),
-                      indicatorColor: appcolor().mainColor,
-                      labelColor: appcolor().bluetextcolor,
-                      labelStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: appcolor().mainColor,
-                        fontSize: 18,
-                      ),
-                      controller: tabController.tabController,
-                      tabs: [
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
-                          child: const Text('All Services'),
-                        ),
-                        SizedBox(
-                          width: Get.width * 0.26,
-                          child: const Text('Published'),
-                        ),
-                        const Text('Drafts'),
-                        const Text('Trashed'),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: TabBarView(
-                      controller: tabController.tabController,
-                      children: [
-                        allServices(ctx),
-                        Published(ctx),
-                        Drafts(ctx),
-                        Trashed(ctx),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )),
+          body: allServices(context),
+      )
     );
   }
 }

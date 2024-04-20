@@ -59,7 +59,7 @@ class _Profile_viewState extends State<Profile_view>
         userData['photo'] =
             userProfileImg == null || userProfileImg.toString() == ""
                 ? null
-                : getImagePath(userProfileImg);
+                : getImagePathWithSize(userProfileImg, width: 200, height: 200);
       });
     }
     print("user profile image: ${userData['photo']}");
@@ -101,6 +101,17 @@ class _Profile_viewState extends State<Profile_view>
     });
   }
 
+  String _formatAddress(Map<String, dynamic> shop) {
+    String street = shop['street'] ?? '';
+    String townName = shop['town'] != null ? shop['town']['name'] : '';
+    String regionName = shop['region'] != null ? shop['region']['name'] : '';
+
+    return [street, townName, regionName]
+        .where((s) => s.isNotEmpty)
+        .join(", ")
+        .trim();
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -139,9 +150,12 @@ class _Profile_viewState extends State<Profile_view>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(message),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                    ),
                     ElevatedButton(
-                      onPressed: onReload,
+                      onPressed: () => onReload(),
                       style: ElevatedButton.styleFrom(
                         primary: appcolor().mainColor,
                       ),
@@ -152,7 +166,7 @@ class _Profile_viewState extends State<Profile_view>
                     ),
                   ],
                 ),
-              ),
+              ).paddingAll(10),
             )
           : buildLoadingWidget();
     }
@@ -166,9 +180,12 @@ class _Profile_viewState extends State<Profile_view>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(message),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                    ),
                     ElevatedButton(
-                      onPressed: onReload,
+                      onPressed: () => onReload(),
                       style: ElevatedButton.styleFrom(
                         primary: appcolor().mainColor,
                       ),
@@ -179,7 +196,7 @@ class _Profile_viewState extends State<Profile_view>
                     ),
                   ],
                 ),
-              ),
+              ).paddingAll(10),
             )
           : buildLoadingWidget();
     }
@@ -193,9 +210,12 @@ class _Profile_viewState extends State<Profile_view>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(message),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                    ),
                     ElevatedButton(
-                      onPressed: onReload,
+                      onPressed: () => onReload(),
                       style: ElevatedButton.styleFrom(
                         primary: appcolor().mainColor,
                       ),
@@ -206,7 +226,7 @@ class _Profile_viewState extends State<Profile_view>
                     ),
                   ],
                 ),
-              ),
+              ).paddingAll(10),
             )
           : buildLoadingWidget();
     }
@@ -274,13 +294,13 @@ class _Profile_viewState extends State<Profile_view>
                       if (kDebugMode) {
                         print("business item clicked: ${businessData['name']}");
                       }
-                      Get.to(
-                          () => errandia_business_view(businessData: businessData));
+                      Get.to(() =>
+                          errandia_business_view(businessData: businessData));
                     },
                     child: errandia_widget(
                       imagePath: businessData['image'],
                       name: businessData['name'],
-                      location: businessData['street'],
+                      location: _formatAddress(businessData ?? {}),
                     ),
                   );
                 }),
@@ -296,9 +316,8 @@ class _Profile_viewState extends State<Profile_view>
             return buildLoadingWidget();
           } else if (profileController.isProductError.value) {
             return _buildMyProductsErrorWidget(
-                'An error occurred while loading your products', () {
-              profileController.reloadMyBusinesses();
-            });
+                'An error occurred while loading your products',
+                profileController.reloadMyProducts);
           } else if (profileController.productItemList.isEmpty) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -315,7 +334,6 @@ class _Profile_viewState extends State<Profile_view>
                     Get.to(() => add_product_view())?.then((_) {
                       profileController.loadMyProducts();
                     });
-
                   },
                   style: ElevatedButton.styleFrom(
                     primary: appcolor().mainColor,
@@ -360,7 +378,9 @@ class _Profile_viewState extends State<Profile_view>
                         cost: item['unit_price'].toString(),
                         imagePath: item['featured_image'],
                         name: item['name'],
-                        location: item['shop'] != null ? item['shop']['street'] : "",
+                        location: item['shop'] != null
+                            ? _formatAddress(item['shop'])
+                            : "",
                       ));
                 },
               ),
@@ -377,9 +397,8 @@ class _Profile_viewState extends State<Profile_view>
             return buildLoadingWidget();
           } else if (profileController.isServiceError.value) {
             return _buildMyServicesErrorWidget(
-                'An error occurred while loading your services', () {
-              profileController.loadMyServices();
-            });
+                'An error occurred while loading your services',
+                profileController.reloadMyServices);
           } else if (profileController.serviceItemList.isEmpty) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -439,7 +458,9 @@ class _Profile_viewState extends State<Profile_view>
                       cost: item['unit_price'].toString(),
                       imagePath: item['featured_image'],
                       name: item['name'],
-                      location: item['shop'] != null ? item['shop']['street'] : "",
+                      location: item['shop'] != null
+                          ? _formatAddress(item['shop'])
+                          : "",
                     ),
                   );
                 },
@@ -454,109 +475,101 @@ class _Profile_viewState extends State<Profile_view>
         body: Column(
       children: [
         Container(
-          // height: Get.height * 0.45,
-          height: 320,
+          height: Get.height * 0.323,
           color: appcolor().mainColor,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+            // crossAxisAlignment: CrossAxisAlignment.center,
+            // mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // profile picture container
-              Stack(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Align(
-                    alignment: AlignmentDirectional.center,
-                    child: Container(
-                      // height: Get.height * 0.13,
-                      width: Get.width * 0.27,
-                      // color: Colors.redAccent,
-                      decoration: BoxDecoration(
-                        color: Colors.blueGrey[100],
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.transparent,
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: userData['photo'] != null
-                            ? Image.network(userData['photo'], fit: BoxFit.contain,
-                                errorBuilder: (BuildContext context,
-                                    Object exception, StackTrace? stackTrace) {
-                                return Center(
-                                    child: Text(
-                                  userData["name"] != null
-                                      ? getFirstLetter(userData['name'])
-                                      : "",
-                                  style: const TextStyle(
-                                    color: Color(0xffff0000),
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ));
-                              })
-                            : Center(
-                                child: Text(
-                                userData["name"] != null
-                                    ? getFirstLetter(userData['name'])
-                                    : "",
-                                style: const TextStyle(
-                                  color: Color(0xffff0000),
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 2,
+                        vertical: 2,
                       ),
                     ),
-                  ),
-
-                  // Image.network(
-                  //   getImagePath(userData['photo'] ?? ""),
-                  //   height: Get.height * 0.13,
-                  //   width: Get.width * 0.27,
-                  //   fit: BoxFit.cover,
-                  //   key: UniqueKey(),
-                  // ) : Center(
-                  //     child: Text(
-                  //       getFirstLetter(userData['name']),
-                  //       style: const TextStyle(
-                  //         color: Color(0xffff0000),
-                  //         fontSize: 40,
-                  //         fontWeight: FontWeight.bold,
-                  //       ),
-                  //     )
-                  // ),
-                  Align(
-                    alignment: AlignmentDirectional.topEnd,
-                    child: SizedBox(
-                      width: Get.width * 0.3,
-                      height: Get.height * 0.13,
-                      // color: Colors.redAccent,
-                    ),
-                  ),
-                  Positioned(
-                    top: -8.0,
-                    right: 12.0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: InkWell(
-                        onTap: () {
-                          if (kDebugMode) {
-                            print("edit profile");
-                          }
-                          Get.to(() => const edit_profile_view())?.then((_) {
-                            getUser();
-                          });
-                        },
-                        customBorder: const CircleBorder(),
-                        splashColor: Colors.red,
-                        child: const Icon(
-                          Icons.edit,
-                          color: Colors.white,
-                          size: 20,
-                        ),
+                    onPressed: () {
+                      if (kDebugMode) {
+                        print("edit profile");
+                      }
+                      Get.to(() => const edit_profile_view())?.then((_) {
+                        getUser();
+                      });
+                    },
+                    child: const Text(
+                      'Edit Profile',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
+                  ).paddingSymmetric(horizontal: 5, vertical: 0),
                 ],
-              ),
+              ).marginZero,
+
+              Container(
+                // height: Get.height * 0.13,
+                width: Get.width * 0.24,
+                // color: Colors.redAccent,
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[100],
+                  borderRadius: BorderRadius.circular(50),
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: userData['photo'] != null
+                      ? Image.network(userData['photo'],
+                      fit: BoxFit.cover, errorBuilder:
+                          (BuildContext context, Object exception,
+                          StackTrace? stackTrace) {
+                        return Center(
+                            child: Text(
+                              userData["name"] != null
+                                  ? getFirstLetter(userData['name'])
+                                  : "",
+                              style: const TextStyle(
+                                color: Color(0xffff0000),
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ));
+                      })
+                      : Center(
+                      child: Text(
+                        userData["name"] != null
+                            ? getFirstLetter(userData['name'])
+                            : "",
+                        style: const TextStyle(
+                          color: Color(0xffff0000),
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )),
+                ),
+              ).marginOnly(top: 0),
+              // Stack(
+              //   children: [
+              //     Align(
+              //       alignment: AlignmentDirectional.center,
+              //       child:
+              //     ),
+              //
+              //   ],
+              // ),
 
               // profile name container
               Container(
@@ -569,63 +582,107 @@ class _Profile_viewState extends State<Profile_view>
                       : "",
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.2,
                   ),
                 ),
               ),
 
-              // profile location
-              // const Text(
-              //   'Buea, South West Region, Cameroon',
-              //   style: TextStyle(
-              //     color: Colors.white,
-              //     fontSize: 13,
-              //   ),
-              // ),
-              // details container
+              Spacer(),
+              // show user email with edit rounded button
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 20,
-                ),
-                margin: const EdgeInsets.only(top: 15, left: 15, right: 15),
-                height: Get.height * 0.15,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
+                margin: const EdgeInsets.only(
+                  top: 5,
+                  left: 15,
+                  right: 3,
+                  bottom: 5,
                 ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    details_container_item_widget(
-                      'Subscriber',
-                      'assets/images/sidebar_icon/icon-profile-subscribers.png',
-                      2,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (userData['email'] != null && userData['email'] != "")
+                        const Icon(
+                          Icons.email,
+                          color: Colors.white,
+                          size: 15,
+                        ),
+
+                        if (userData['email'] == null || userData['email'] == "" && userData['phone'] != null && userData['phone'] != "")
+                          const Icon(
+                            Icons.phone,
+                            color: Colors.white,
+                            size: 15,
+                          ),
+
+                        const SizedBox(
+                          width: 5,
+                        ),
+
+                        if (userData['email'] != null && userData['email'] != "")
+                        Text(
+                          userData['email'] ?? "",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+
+                        if (userData['email'] == null || userData['email'] == "" && userData['phone'] != null && userData['phone'] != "")
+                        Text(
+                          userData['phone'] ?? "",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
                     ),
-                    details_container_item_widget(
-                      'Following',
-                      'assets/images/sidebar_icon/icon-profile-following.png',
-                      2,
-                    ),
-                    details_container_item_widget(
-                      'Errands',
-                      'assets/images/sidebar_icon/icon-profile-errands.png',
-                      2,
-                    ),
-                    details_container_item_widget(
-                      'Reviews',
-                      'assets/images/sidebar_icon/icon-reviews.png',
-                      2,
-                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 2,
+                          vertical: 2,
+                        ),
+                        backgroundColor: Colors.white,
+                        textStyle: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: appcolor().mainColor,
+                        ),
+                        fixedSize: const Size(80, 20),
+                      ),
+                      onPressed: () {
+                        if (kDebugMode) {
+                          print("edit profile");
+                        }
+                        Get.to(() => const edit_profile_view())?.then((_) {
+                          getUser();
+                        });
+                      },
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: appcolor().mainColor
+                        ),
+                      ),
+                    ).paddingSymmetric(horizontal: 5, vertical: 0),
                   ],
                 ),
               ),
-
-              //
             ],
-          ).paddingSymmetric(vertical: 15),
+          ).paddingOnly(top: 2),
         ),
 
         // tab bar

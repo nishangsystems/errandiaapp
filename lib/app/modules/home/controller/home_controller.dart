@@ -11,9 +11,18 @@ class home_controller extends GetxController {
   RxInt index = 0.obs;
   RxBool atbusiness = true.obs;
   RxBool loggedIn = false.obs;
+  var isLoggedIn = false.obs;
+  var currentIndex = 0.obs;
+
 
   var featuredBusinessData = List<dynamic>.empty(growable: true).obs;
   var recentlyPostedItemsData = List<dynamic>.empty(growable: true).obs;
+
+  final RxInt selectedIndex = 0.obs; // Observes the selected navigation index
+  // final RxBool loggedIn = false.obs; // Observes the user's login status
+  // final GlobalKey<ScaffoldState> scaffoldkey = GlobalKey<ScaffoldState>();
+
+  // Add methods for handling navigation, login/logout, and any business logic required
 
   RxBool isRPILoading = false.obs;
   RxBool isFBLLoading = false.obs;
@@ -83,6 +92,7 @@ class home_controller extends GetxController {
   void reloadRecentlyPostedItems() {
     recentlyPostedItemsData.clear();
     isRPILoading.value = true;
+    isRPIError.value = false;
     fetchRecentlyPostedItemsData();
   }
 
@@ -101,6 +111,10 @@ class home_controller extends GetxController {
     scaffoldkey.currentState!.closeEndDrawer();
   }
 
+  void changePage(int index) {
+    currentIndex.value = index;
+  }
+
   void loadIsLoggedIn() async {
     var isLoggedIn = await checkLogin();
     loggedIn.value = isLoggedIn != null && isLoggedIn.isNotEmpty;
@@ -114,4 +128,16 @@ class home_controller extends GetxController {
     print('Is logged in: $isLoggedIn');
     return isLoggedIn;
   }
+
+  Future<bool> isUserLoggedIn() async {
+    // Implement logic to check if user is logged in
+    var sharedPref = await SharedPreferences.getInstance();
+    return sharedPref.getString('token') != null;
+  }
+
+  void checkLoginStatus() async {
+    // Logic to check login status
+    isLoggedIn.value = await isUserLoggedIn();
+  }
+
 }

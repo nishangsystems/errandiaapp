@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/update_business_location.dart';
@@ -14,6 +15,7 @@ import 'package:errandia/app/modules/setting/view/notification_setting_view.dart
 import 'package:errandia/app/modules/setting/view/policies&rules.dart';
 import 'package:errandia/app/modules/setting/view/review_view.dart';
 import 'package:errandia/app/modules/setting/view/update_password_view.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -74,45 +76,10 @@ class setting_view extends StatelessWidget {
               indent: 0,
             ),
 
-            //Business location
-
-            mywidget(() {
-              Get.to(() => update_business_location_view());
-            }, Icons.location_on, 'Business Location'),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            // change password
-
-            mywidget(() {
-              Get.to(() => update_password_view());
-            }, Icons.lock_reset, 'Change Password'),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
             // notification
-
-            mywidget(() {
-              Get.to(() => notification_setting_view());
-            }, Icons.notifications, 'Notification'),
-
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            SizedBox(
-              height: 15,
-            ),
+            // mywidget(() {
+            //   Get.to(() => notification_setting_view());
+            // }, Icons.notifications, 'Notification'),
 
             Divider(
               color: appcolor().greyColor,
@@ -124,7 +91,7 @@ class setting_view extends StatelessWidget {
             //about
             mywidget(() {
               Get.to(() => about_view());
-            }, Icons.person, 'About Errandia'),
+            }, Icons.info_outline_rounded, 'About Errandia'),
             Divider(
               color: appcolor().greyColor,
               thickness: 1,
@@ -133,19 +100,17 @@ class setting_view extends StatelessWidget {
             ),
 
             //help center
-
-            mywidget(() {
-              Get.to(() => helpcenter_view());
-            }, Icons.location_on, 'Help Center'),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
+            // mywidget(() {
+            //   Get.to(() => helpcenter_view());
+            // }, Icons.location_on, 'Help Center'),
+            // Divider(
+            //   color: appcolor().greyColor,
+            //   thickness: 1,
+            //   height: 1,
+            //   indent: 0,
+            // ),
 
             // review
-
             mywidget(() {
               Get.to(() => review_view());
             }, Icons.lock_reset, 'Review Errandia'),
@@ -157,9 +122,21 @@ class setting_view extends StatelessWidget {
             ),
 
             // invite
+            // mywidget(() {
+            //   Get.to(() => invite_friends_view());
+            // }, Icons.notifications, 'Invite Friends'),
+            //
+            // Divider(
+            //   color: appcolor().greyColor,
+            //   thickness: 1,
+            //   height: 1,
+            //   indent: 0,
+            // ),
+
+            // policies
             mywidget(() {
-              Get.to(() => invite_friends_view());
-            }, Icons.notifications, 'Invite Friends'),
+              mlaunchUrl(apiDomain().policyUrl);
+            }, Icons.policy_outlined, 'Policies & Rules'),
 
             Divider(
               color: appcolor().greyColor,
@@ -168,10 +145,9 @@ class setting_view extends StatelessWidget {
               indent: 0,
             ),
 
-            // policies
             mywidget(() {
-              Get.to(() => policies_view());
-            }, Icons.notifications, 'Policies & Rules'),
+              mlaunchUrl(apiDomain().termsUrl);
+            }, Icons.security, 'Terms & Conditions'),
 
             Divider(
               color: appcolor().greyColor,
@@ -181,58 +157,58 @@ class setting_view extends StatelessWidget {
             ),
 
             // language
-            Container(
-              height: Get.height * 0.075,
-
-              // margin: EdgeInsets.symmetric(horizontal: 2, vertical: 5),
-              decoration: BoxDecoration(
-                  // color: Colors.white,
-                  ),
-              child: InkWell(
-                onTap: () {
-                  Get.bottomSheet(changeLanguage());
-                },
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Icon(
-                      FontAwesomeIcons.earth,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      'Language'.tr,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Spacer(),
-                    Obx(
-                      () => Text(
-                        '${controller.language.value}',
-                        style: TextStyle(
-                          color: appcolor().blueColor,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
+            // Container(
+            //   height: Get.height * 0.075,
+            //
+            //   // margin: EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+            //   decoration: BoxDecoration(
+            //       // color: Colors.white,
+            //       ),
+            //   child: InkWell(
+            //     onTap: () {
+            //       Get.bottomSheet(changeLanguage());
+            //     },
+            //     child: Row(
+            //       children: [
+            //         SizedBox(
+            //           width: 10,
+            //         ),
+            //         Icon(
+            //           FontAwesomeIcons.earth,
+            //         ),
+            //         SizedBox(
+            //           width: 10,
+            //         ),
+            //         Text(
+            //           'Language'.tr,
+            //           style: TextStyle(
+            //             fontSize: 16,
+            //             fontWeight: FontWeight.w400,
+            //           ),
+            //         ),
+            //         Spacer(),
+            //         Obx(
+            //           () => Text(
+            //             '${controller.language.value}',
+            //             style: TextStyle(
+            //               color: appcolor().blueColor,
+            //               fontSize: 16,
+            //             ),
+            //           ),
+            //         ),
+            //         SizedBox(
+            //           width: 20,
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
+            // Divider(
+            //   color: appcolor().greyColor,
+            //   thickness: 1,
+            //   height: 1,
+            //   indent: 0,
+            // ),
           ],
         ),
       ),
@@ -242,14 +218,14 @@ class setting_view extends StatelessWidget {
   Widget changeLanguage() {
     return Container(
       // height: Get.height * 0.3,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
       ),
       child: Wrap(
         crossAxisAlignment: WrapCrossAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               vertical: 15,
             ),
             child: Text(

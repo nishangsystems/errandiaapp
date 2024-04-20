@@ -6,6 +6,7 @@ import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/modal/category.dart';
 import 'package:errandia/utils/helper.dart';
@@ -36,6 +37,7 @@ class _add_business_viewState extends State<add_business_view> {
   final imagePickercontroller imageController =
       Get.put(imagePickercontroller());
   final profile_controller profileController = Get.put(profile_controller());
+  final home_controller homeController = Get.put(home_controller());
 
   var country;
 
@@ -67,7 +69,6 @@ class _add_business_viewState extends State<add_business_view> {
         }
       });
     });
-
   }
 
   void createBusiness(BuildContext context) {
@@ -193,51 +194,50 @@ class _add_business_viewState extends State<add_business_view> {
       //         popup.showPopup(context),
       //       });
       // } else {
-        print("image path: ${imageController.image_path.toString()}");
-        BusinessAPI.createBusinessWithImageLogo(
-                value, context, imageController.image_path.toString())
-            .then((response_) => {
-                  response = jsonDecode(response_),
-                  print("added business: $response"),
-                  if (response['status'] == 'success')
-                    {
-                      popup = PopupBox(
-                        title: 'Success',
-                        description: response['data']['message'],
-                        type: PopupType.success,
-                      ),
-                      add_controller.resetFields(),
-                      setState(() {
-                        regionCode = null;
-                        town = null;
-                        category = null;
-                        selectedFilters_.clear();
-
-                      }),
-                      imageController.reset(),
-                      // home_controller()
-
-                      //     .featuredBusinessData
-                      //     .clear(),
-                      // home_controller()
-                      //     .fetchFeaturedBusinessesData(),
-                      profileController.reloadMyBusinesses(),
-                    }
-                  else
-                    {
-                      popup = PopupBox(
-                        title: 'Error',
-                        description: response['data']['data']['error'],
-                        type: PopupType.error,
-                      )
-                    },
-                  Future.delayed(const Duration(seconds: 3), () {
+      print("image path: ${imageController.image_path.toString()}");
+      BusinessAPI.createBusinessWithImageLogo(
+              value, context, imageController.image_path.toString())
+          .then((response_) => {
+                response = jsonDecode(response_),
+                print("added business: $response"),
+                if (response['status'] == 'success')
+                  {
+                    popup = PopupBox(
+                      title: 'Success',
+                      description: response['data']['message'],
+                      type: PopupType.success,
+                    ),
+                    add_controller.resetFields(),
                     setState(() {
-                      isLoading = false;
-                    });
-                  }),
-                  popup.showPopup(context),
-                });
+                      regionCode = null;
+                      town = null;
+                      category = null;
+                      selectedFilters_.clear();
+                    }),
+                    imageController.reset(),
+                    // home_controller()
+
+                    //     .featuredBusinessData
+                    //     .clear(),
+                    homeController.reloadRecentlyPostedItems(),
+                    homeController.reloadFeaturedBusinessesData(),
+                    profileController.reloadMyBusinesses(),
+                  }
+                else
+                  {
+                    popup = PopupBox(
+                      title: 'Error',
+                      description: response['data']['data']['error'],
+                      type: PopupType.error,
+                    )
+                  },
+                Future.delayed(const Duration(seconds: 3), () {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }),
+                popup.showPopup(context),
+              });
       // }
     }
   }
@@ -253,12 +253,12 @@ class _add_business_viewState extends State<add_business_view> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: appcolor().mainColor,
           titleSpacing: 8,
           title: const Text('Add Business'),
-          titleTextStyle: TextStyle(
+          titleTextStyle: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: appcolor().mediumGreyColor,
+              color: Colors.white,
               fontSize: 18),
           automaticallyImplyLeading: false,
           leading: IconButton(
@@ -267,22 +267,23 @@ class _add_business_viewState extends State<add_business_view> {
               Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios),
-            color: appcolor().mediumGreyColor,
+            color: Colors.white,
           ),
           actions: [
             TextButton(
                 onPressed: () {
                   createBusiness(context);
                 },
-                child: Text(
+                child: const Text(
                   'Publish',
-
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18,
-                    color: appcolor().mainColor,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Colors.white,
                     letterSpacing: 1.2,
                     shadows: [
                       Shadow(
-                        color: appcolor().mainColor,
+                        color: Colors.white38,
                         blurRadius: 2,
                       ),
                     ],
@@ -615,7 +616,7 @@ class _add_business_viewState extends State<add_business_view> {
                                 child: const Row(
                                   children: [
                                     Icon(Icons.image),
-                                    Text('  Upload Company Logo (optional)'),
+                                    Text('  Upload Company Logo *'),
                                     Spacer(),
                                     Icon(
                                       Icons.edit,
@@ -774,14 +775,15 @@ class _add_business_viewState extends State<add_business_view> {
                       children: [
                         // intl phone field
                         Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 0, left: 10),
+                          padding: const EdgeInsets.only(
+                              top: 5, bottom: 0, left: 10),
                           child: SizedBox(
                             width: Get.width * 0.86,
                             child: IntlPhoneField(
                               controller: add_controller.phone_controller,
                               decoration: const InputDecoration(
-                                  contentPadding: EdgeInsets.only(top: 12),
-                                  border: InputBorder.none,
+                                contentPadding: EdgeInsets.only(top: 12),
+                                border: InputBorder.none,
                                 counter: SizedBox(),
                                 hintText: 'Phone Number *',
                                 hintStyle: TextStyle(
@@ -903,11 +905,27 @@ class _add_business_viewState extends State<add_business_view> {
                   // whatsapp number
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                     child: TextFormField(
                       controller: add_controller.whatsapp_controller,
                       keyboardType: TextInputType.phone,
-                      maxLength: 25,
+                      maxLength: 15,
+                      validator: (value) {
+                        if (value != null &&
+                            value.isNotEmpty &&
+                            !RegExp(phonePattern).hasMatch(value)) {
+                          return 'Please enter a valid phone number';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        if (value.isNotEmpty &&
+                            !RegExp(phonePattern).hasMatch(value)) {
+                          add_controller.updateWhatsappNumberValidity();
+                        } else {
+                          add_controller.updateWhatsappNumberValidity();
+                        }
+                      },
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
@@ -917,7 +935,7 @@ class _add_business_viewState extends State<add_business_view> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Whatsapp Number (optional)',
+                        hintText: 'WhatsApp Number (optional)',
                         counterText: '',
                         suffixIcon: Icon(
                           color: Colors.black,
@@ -926,6 +944,24 @@ class _add_business_viewState extends State<add_business_view> {
                       ),
                     ),
                   ),
+                  // a text hinting the user the correct format for a whatsapp number
+                  Obx(() {
+                    if (!add_controller.isValidWhatsappNumber.value) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
+                        child: const Text(
+                          'Please enter your whatsapp number in the format: +237 6XX XXX XXX or +1 123 456 7890',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return Container();
+                    }
+                  }),
 
                   Divider(
                     color: appcolor().greyColor,
@@ -977,21 +1013,23 @@ class _add_business_viewState extends State<add_business_view> {
                   ),
 
                   // show invalid email error
-                  focusInEmailField ? Obx(
-                    () => add_controller.emailValid.value
-                        ? Container()
-                        : Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 5),
-                            child: const Text(
-                              'Invalid email address',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                  ): Container(),
+                  focusInEmailField
+                      ? Obx(
+                          () => add_controller.emailValid.value
+                              ? Container()
+                              : Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 5),
+                                  child: const Text(
+                                    'Invalid email address',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                        )
+                      : Container(),
 
                   // shop head
                   // Container(

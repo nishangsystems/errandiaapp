@@ -5,6 +5,7 @@ import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/Widgets/snackBar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,8 @@ class apiDomain {
   final domain = 'https://errandia.com/api';
   final imageDomain =
       'https://cznbemgsca.cloudimg.io/https://errandia.com';
+  final policyUrl = "https://errandia.com/policies/privacy-policy";
+  final termsUrl = "https://errandia.com/policies/terms-condition";
 }
 
 class api {
@@ -74,8 +77,9 @@ class api {
       }
       prefs.setString('uuid', data_['uuid']);
 
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => navigator));
+      // Navigator.pushReplacement(
+      //     context, MaterialPageRoute(builder: (context) => navigator));
+      Get.to(navigator);
     } else {
       var da = jsonDecode(response.body);
       if (navigator1 == null) {

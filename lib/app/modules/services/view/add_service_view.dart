@@ -151,16 +151,13 @@ class _add_service_viewState extends State<add_service_view> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.orange,
           titleSpacing: 8,
-          title: Text('Add Service'.tr, style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xff113d6b),
-          ),),
-          titleTextStyle: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: appcolor().mediumGreyColor,
-              fontSize: 18),
+          title: const Text('Add Service'),
+          titleTextStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+              fontSize: 20),
           automaticallyImplyLeading: false,
           leading: IconButton(
             padding: EdgeInsets.zero,
@@ -169,7 +166,7 @@ class _add_service_viewState extends State<add_service_view> {
               Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios),
-            color: const Color(0xff113d6b),
+            color: Colors.black,
           ),
           actions: [
             TextButton(
@@ -178,7 +175,7 @@ class _add_service_viewState extends State<add_service_view> {
                 },
                 child: const Text(
                   'Publish',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.black),
                 ))
           ],
         ),

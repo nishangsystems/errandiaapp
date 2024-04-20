@@ -1,4 +1,4 @@
-import 'package:errandia/app/modules/global/Widgets/notifications_view.dart';
+import 'package:errandia/app/modules/notifications/notifications_list_view.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
 import 'package:errandia/app/modules/setting/view/notification_setting_view.dart';
@@ -36,7 +36,7 @@ AppBar appbar() {
             Get.offAll(() => Home_view());
           },
           child: Image(
-            image: AssetImage('assets/images/icon-errandia-logo-about.png'),
+            image: const AssetImage('assets/images/icon-errandia-logo-about.png'),
             width: Get.width * 0.3,
           ),
         ),

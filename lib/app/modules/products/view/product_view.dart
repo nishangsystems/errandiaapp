@@ -8,17 +8,11 @@ import 'package:errandia/app/modules/global/Widgets/errandia_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/products/controller/product_controller.dart';
 import 'package:errandia/app/modules/products/view/edit_product_view.dart';
-import 'package:errandia/app/modules/products/view/products_send_enquiry.dart';
-import 'package:errandia/app/modules/recently_posted_item.dart/view/recently_posted_list.dart';
-import 'package:errandia/app/modules/reviews/views/add_review.dart';
-import 'package:errandia/app/modules/reviews/views/review_view.dart';
 import 'package:errandia/app/modules/services/view/service_details_view.dart';
-import 'package:errandia/common/random_ui/ui_23.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
@@ -257,37 +251,41 @@ class _Product_viewState extends State<Product_view>
                         width: 10,
                       )
                     : Container(),
-                widget.item['shop']['whatsapp'] != "" && widget.item['shop']['whatsapp'] != "whatsapp" ? SizedBox(
-                  width: Get.width * 0.4,
-                  height: 50,
-                  child: blockButton(
-                    title: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.whatsapp,
-                            color: Colors.white,
+                widget.item['shop']['whatsapp'] != "" &&
+                        widget.item['shop']['whatsapp'] != "whatsapp"
+                    ? SizedBox(
+                        width: Get.width * 0.4,
+                        height: 50,
+                        child: blockButton(
+                          title: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  FontAwesomeIcons.whatsapp,
+                                  color: Colors.white,
+                                ),
+                                Text(
+                                  '  Chat on Whatsapp',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 9),
+                                ),
+                              ],
+                            ),
                           ),
-                          Text(
-                            '  Chat on Whatsapp',
-                            style: TextStyle(color: Colors.white, fontSize: 9),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ontap: () async {
-                      print("whatsapp number: ${widget.item['shop']['whatsapp']}");
-                      launchWhatsapp(widget.item['shop']['whatsapp']);
-                    },
-                    color: appcolor().mainColor,
-                  ),
-                ): Container(),
-
-                if (widget.item['shop']['whatsapp'] != "" || widget.item['shop']['whatsapp'] != "whatsapp")
+                          ontap: () async {
+                            print(
+                                "whatsapp number: ${widget.item['shop']['whatsapp']}");
+                            launchWhatsapp(widget.item['shop']['whatsapp']);
+                          },
+                          color: appcolor().mainColor,
+                        ),
+                      )
+                    : Container(),
+                if (widget.item['shop']['whatsapp'] != "" ||
+                    widget.item['shop']['whatsapp'] != "whatsapp")
                   const Spacer(),
-
                 widget.item['shop'] != null ||
                         widget.item['shop'].toString() != 'null'
                     ? SizedBox(
@@ -299,11 +297,8 @@ class _Product_viewState extends State<Product_view>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.call,
-                                  color: appcolor().mainColor,
-                                  size: 20
-                                ),
+                                Icon(Icons.call,
+                                    color: appcolor().mainColor, size: 20),
                                 const SizedBox(
                                   width: 5,
                                 ),
@@ -503,7 +498,7 @@ class _Product_viewState extends State<Product_view>
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Image.asset(
-                                      'assets/images/errandia_logo.jpeg',
+                                      'assets/images/errandia_logo.png',
                                       fit: BoxFit.cover,
                                     );
                                   },
@@ -686,7 +681,7 @@ class _Product_viewState extends State<Product_view>
               //                         Object exception,
               //                         StackTrace? stackTrace) {
               //                       return Image.asset(
-              //                         'assets/images/errandia_logo.jpeg',
+              //                         'assets/images/errandia_logo.png',
               //                         fit: BoxFit.cover,
               //                         height: Get.height * 0.17,
               //                         width: Get.width * 0.4,
@@ -842,7 +837,9 @@ class _Product_viewState extends State<Product_view>
                                 print("product item clicked: ${item['name']}");
                               }
                               // replace current view
-                              Get.offNamed('/product_view', arguments: item,
+                              Get.offNamed(
+                                '/product_view',
+                                arguments: item,
                                 preventDuplicates: false,
                               );
                               // Get.to(() => Product_view(
@@ -926,9 +923,9 @@ class _Product_viewState extends State<Product_view>
                 }
               }),
 
-              SizedBox(
-                height: Get.height * 0.1,
-              )
+              // SizedBox(
+              //   height: Get.height * 0.1,
+              // )
             ],
           ),
         ),
@@ -969,7 +966,7 @@ Widget image_select_widget(BuildContext context, final item) {
       //             errorBuilder: (BuildContext context, Object exception,
       //                 StackTrace? stackTrace) {
       //               return Image.asset(
-      //                 'assets/images/errandia_logo.jpeg',
+      //                 'assets/images/errandia_logo.png',
       //                 fit: BoxFit.fill,
       //               );
       //             }
@@ -988,7 +985,7 @@ Widget image_select_widget(BuildContext context, final item) {
       //         fit: BoxFit.cover, errorBuilder: (BuildContext context,
       //             Object exception, StackTrace? stackTrace) {
       //       return Image.asset(
-      //         'assets/images/errandia_logo.jpeg',
+      //         'assets/images/errandia_logo.png',
       //         fit: BoxFit.fill,
       //         height: Get.height * 0.17,
       //         width: Get.width * 0.4,
@@ -997,7 +994,7 @@ Widget image_select_widget(BuildContext context, final item) {
       //   ),
       // ),
       SizedBox(
-        height: Get.height * 0.3,
+        height: Get.height * 0.33,
         width: Get.width,
         child: FlutterCarousel.builder(
           itemCount: item['images'].length + 1,
@@ -1006,11 +1003,14 @@ Widget image_select_widget(BuildContext context, final item) {
             String imageUrl;
             if (itemIndex == 0) {
               // First item is the featured image
-              imageUrl = getImagePath(item['featured_image'].toString());
+              imageUrl = getImagePathWithSize(item['featured_image'].toString(),
+                  width: 720, height: 500);
             } else {
               // Subsequent items are the other images
-              imageUrl =
-                  getImagePath(item['images'][itemIndex - 1]['url'].toString());
+              imageUrl = getImagePathWithSize(
+                  item['images'][itemIndex - 1]['url'].toString(),
+                  width: 720,
+                  height: 500);
             }
 
             return Container(
@@ -1020,13 +1020,13 @@ Widget image_select_widget(BuildContext context, final item) {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(0),
                 child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/images/errandia_logo.jpeg',
+                    placeholder: 'assets/images/errandia_logo_1.jpeg',
                     image: imageUrl,
                     fit: BoxFit.contain,
                     width: double.infinity,
                     imageErrorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/images/errandia_logo.jpeg',
+                        'assets/images/errandia_logo_1.jpeg',
                         fit: BoxFit.contain,
                         width: double.infinity,
                       );
@@ -1068,23 +1068,24 @@ Widget image_select_widget(BuildContext context, final item) {
                     // child: Center(child: Image.network(image['url'].toString())),
                     child: Center(
                         child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/images/errandia_logo.jpeg',
-                            image: getImagePath(image['url'].toString()),
+                            placeholder: 'assets/images/errandia_logo.png',
+                            image: getImagePathWithSize(image['url'].toString(), width: 200, height: 200),
                             fit: BoxFit.cover,
                             width: double.infinity,
                             imageErrorBuilder: (context, error, stackTrace) {
                               return Image.asset(
-                                'assets/images/errandia_logo.jpeg',
-                                fit: BoxFit.cover,
+                                'assets/images/errandia_logo.png',
+                                fit: BoxFit.fill,
                                 width: double.infinity,
                               );
-                            })
-                    ),
+                            })),
                   );
                 },
               ),
             )
-          : Container(),
+          : SizedBox(
+              height: Get.height * 0.015,
+            ),
     ],
   );
 }
