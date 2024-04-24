@@ -1,13 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-import 'dart:async';
 
-import 'package:errandia/app/APi/firebase_api.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
-import 'package:errandia/app/modules/errands/view/errand_view_no_bar.dart';
-import 'package:errandia/app/modules/home/view/home_view.dart';
 import 'package:errandia/app/modules/notifications/notifications_view.dart';
-import 'package:errandia/app/modules/profile/view/profile_view.dart';
 import 'package:errandia/app/modules/splashScreen/splash_screen.dart';
 import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
 import 'package:errandia/common/initialize_device.dart';
@@ -18,9 +14,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late FirebaseMessaging messaging;
@@ -28,7 +24,8 @@ late SharedPreferences _prefs;
 AndroidNotificationChannel? channel;
 FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
   channel!.id,
   channel!.name,
   icon: '@mipmap/ic_launcher',
@@ -88,10 +85,11 @@ void _handleMessage(Map<String, dynamic> data) {
   }
 
   if (data['page'] == 'notification') {
+    print("notification rx: $data");
+    print("notification id: ${data['id']}");
     Get.to(() => NotificationDetailView(
-        notifId: data['details']['id'],
-        title: data['details']['title'])
-    );
+        notifId: int.parse(data['id']),
+        title: data['title'] ?? "Notification"));
   }
 }
 
@@ -145,8 +143,7 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   channel = const AndroidNotificationChannel(
-      'errandia_channel_id',
-      'Errandia Channel',
+      'errandia_channel_id', 'Errandia Channel',
       sound: RawResourceAndroidNotificationSound('alert'),
       importance: Importance.high,
       enableLights: true,
@@ -156,8 +153,7 @@ Future<void> main() async {
 
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  const android =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
+  const android = AndroidInitializationSettings('@mipmap/ic_launcher');
   const iOS = DarwinInitializationSettings();
   const initSettings = InitializationSettings(android: android, iOS: iOS);
 
@@ -165,8 +161,7 @@ Future<void> main() async {
       onDidReceiveNotificationResponse: notificationTapBackground,
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
 
-  await messaging
-      .setForegroundNotificationPresentationOptions(
+  await messaging.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
     sound: true,
@@ -174,7 +169,8 @@ Future<void> main() async {
 
   FirebaseMessaging.onMessage.listen(_showNotifications);
 
-  FirebaseMessaging.onMessageOpenedApp.listen((message) => _handleMessage(message.data));
+  FirebaseMessaging.onMessageOpenedApp
+      .listen((message) => _handleMessage(message.data));
 
   runApp(const ErrandiaApp());
 }
@@ -194,7 +190,8 @@ class ErrandiaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     precacheImage(const AssetImage('assets/images/errandia_logo.png'), context);
-    precacheImage(const AssetImage('assets/images/errandia_logo_1.jpeg'), context);
+    precacheImage(
+        const AssetImage('assets/images/errandia_logo_1.jpeg'), context);
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -215,7 +212,6 @@ class ErrandiaApp extends StatelessWidget {
         primaryTextTheme: TextTheme(),
       ),
       home: splash_screen(),
-
     );
   }
 }

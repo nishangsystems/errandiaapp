@@ -298,18 +298,16 @@ class edit_profile_viewState extends State<edit_profile_view> {
                                             .then((data) {
                                           print("response: ${data['message']}");
 
+                                          profileController.getUser();
+
                                           PopupBox popupBox = PopupBox(
                                             title: 'Success',
                                             description: '${data['message']}',
                                             type: PopupType.success,
                                           );
 
-                                          // 3 seconds delay
-                                          Future.delayed(
-                                              const Duration(seconds: 3), () {
-                                            setState(() {
-                                              isLoading = false;
-                                            });
+                                          setState(() {
+                                            isLoading = false;
                                           });
 
                                           popupBox.showPopup(context);

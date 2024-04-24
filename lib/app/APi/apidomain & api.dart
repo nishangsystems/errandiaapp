@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:errandia/auth_services/firebase_auth_services.dart';
 
 class apiDomain {
   final domain = 'https://errandia.com/api';
@@ -370,6 +371,44 @@ class api {
     } else {
       var da = jsonDecode(response.body);
       return da;
+    }
+  }
+
+  // delete user account
+  Future deleteUserAccount(context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    final response = await http.delete(Uri.parse('${apiDomain().domain}/user'),
+        headers: ({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    if (kDebugMode) {
+      print("delete user account response: ${response.body}");
+    }
+    if (response.statusCode == 400) {
+      if (kDebugMode) {
+        print("status code: ${response.statusCode}");
+      }
+      var da = jsonDecode(response.body);
+      await alertDialogBox(context, 'Alert', '${da['message']}');
+    }
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      var data_ = data['data'];
+      if (kDebugMode) {
+        print("account being deleted: ${data_}");
+      }
+
+      prefs.remove("user");
+
+    return data_;
+
+    } else {
+      var da = jsonDecode(response.body);
+      await alertDialogBox(context, 'Alert', '${da['data']['message']}');
     }
   }
 }

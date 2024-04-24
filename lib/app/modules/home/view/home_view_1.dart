@@ -156,6 +156,18 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      profileController.getUser();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey =
         GlobalKey<ScaffoldState>(); // ADD THIS LINE

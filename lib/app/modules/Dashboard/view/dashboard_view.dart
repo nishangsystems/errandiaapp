@@ -1,7 +1,9 @@
+import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/errands/view/New_Errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
+import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/account_suspended_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
@@ -16,12 +18,15 @@ import 'package:errandia/app/modules/services/view/manage_service_view.dart';
 import 'package:errandia/app/modules/sms_plan/view/sms_plan_view.dart';
 import 'package:errandia/app/modules/subscribers/view/subscriber_view.dart';
 import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
+import 'package:errandia/auth_services/firebase_auth_services.dart';
+import 'package:errandia/main.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../buiseness/view/manage_business_view.dart';
 import '../../global/Widgets/bottomsheet_item.dart';
@@ -42,6 +47,46 @@ class dashboard_view extends StatefulWidget {
 class dashboard_viewState extends State<dashboard_view> {
 
   final isDialOpen = ValueNotifier(false);
+
+  void deleteAccount(BuildContext context) {
+    // show dialog to confirm account delete
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        var response;
+        return CustomAlertDialog(
+          title: 'Delete Account',
+          message: 'Are you sure you want to delete your account?',
+          dialogType: MyDialogType.error,
+          onConfirm: () async {
+            // delete account
+            print("deleting user account");
+            await api().deleteUserAccount(context).then((_) {
+              Get.back();
+            });
+          },
+          onCancel: () {
+            Get.back();
+          },
+        );
+      },
+    ).then((_) async {
+      // if account is deleted, log out user
+      print("trying to logout");
+      if (ErrandiaApp.prefs.getString('user') == null) {
+        await ErrandiaApp.prefs.clear().then((_) {
+          Get.snackbar(
+            'Account Deleted',
+            'Your account has been deleted successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.cyan[900],
+            colorText: Colors.white,
+          );
+          AuthService.logout();
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +278,9 @@ class dashboard_viewState extends State<dashboard_view> {
                         title: 'Delete Account',
                         belowText: '0 complete',
                         color: Colors.red,
-                        callback: () {}
+                        callback: () {
+                          deleteAccount(context);
+                        }
                     ),
                   ],
                 ),

@@ -6,6 +6,7 @@ import 'package:errandia/utils/helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 
 class NotificationDetailView extends StatefulWidget {
   final notifId;
@@ -62,7 +63,7 @@ class _NotificationDetailViewState extends State<NotificationDetailView> with Wi
         automaticallyImplyLeading: false,
 
         title: Text(
-          notifController.notificationDetail['title'] ?? widget.title,
+          capitalizeAll(notifController.notificationDetail['title'] ?? widget.title),
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w500,
@@ -78,52 +79,72 @@ class _NotificationDetailViewState extends State<NotificationDetailView> with Wi
         ),
         centerTitle: true,
       ),
-      body: Container(
-        padding: const EdgeInsets.only(top: 15, left: 20, right: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Message:',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: appcolor().mediumGreyColor,
-              ),
-            ),
-            RichText(
-              text: TextSpan(
-                text: notifController.notificationDetail['message'] ?? widget.message,
-                style: TextStyle(
-                  color:  appcolor().darkBlueColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
+      body: Obx(
+          () {
+            if (notifController.isDetailLoading.isTrue) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (notifController.isDetailError.isTrue) {
+              return buildErrorWidget(
+                actionText: "Please try hitting the retry button",
+                  message: 'Error fetching notification detail',
+                  callback: () {
+                    notifController.fetchNotificationDetail(widget.notifId);
+                  }
+              );
+            } else {
+              return SingleChildScrollView(
+                child: Container(
+                    padding: const EdgeInsets.only(top: 15, left: 20, right: 20),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Message:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: appcolor().mediumGreyColor,
+                            ),
+                          ),
+                          RichText(
+                            text: TextSpan(
+                              text: notifController.notificationDetail['message'] ?? widget.message,
+                              style: TextStyle(
+                                color:  appcolor().darkBlueColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 15),
+
+                          // published on
+                          Text(
+                            'Publish Date:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: appcolor().mediumGreyColor,
+                            ),
+                          ),
+                          Text(
+                            formatDateString(notifController.notificationDetail['created_at'] ?? widget.date),
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: appcolor().darkBlueColor
+                            ),
+                          ),
+                        ]
+                    )
                 ),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            // published on
-            Text(
-              'Publish Date:',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: appcolor().mediumGreyColor,
-              ),
-            ),
-            Text(
-              formatDateString(notifController.notificationDetail['created_at'] ?? widget.date),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: appcolor().darkBlueColor
-              ),
-            ),
-          ]
-        )
-      ),
+              );
+            }
+          }
+      )
     );
   }
 }

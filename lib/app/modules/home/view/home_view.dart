@@ -154,7 +154,7 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
                       ),
                       backgroundColor: Colors.white,
                       elevation: 4,
-                      label: 'Add Errand',
+                      label: 'Run Errand',
                       labelStyle: const TextStyle(color: Colors.black),
                       onTap: () {
                         Get.to(() => const New_Errand(),
