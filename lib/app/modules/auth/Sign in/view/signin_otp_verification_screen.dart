@@ -3,6 +3,7 @@ import 'package:errandia/app/modules/auth/Register/registration_successful_view.
 import 'package:errandia/app/modules/auth/Register/service_Provider/view/Register_serviceprovider_view.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/view/home_view.dart';
+import 'package:errandia/common/initialize_device.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -254,6 +255,11 @@ class _signin_otp_verification_screenState
                                     await FirebaseAPI().initialize();
                                   }
 
+                                  if (prefs.getString('deviceUuid') == null) {
+                                    print("initializing device uuid");
+                                    await InitializeDevice().initialize();
+                                  }
+
                                   print(
                                       "device uuid: ${prefs.getString('deviceUuid')}");
 
@@ -266,9 +272,9 @@ class _signin_otp_verification_screenState
                                         prefs.getString('firebaseToken'),
                                   };
 
-                                  if (kDebugMode) {
+                                  // if (kDebugMode) {
                                     print("otp value: $value");
-                                  }
+                                  // }
 
                                   // Home_view home = Home_view();
                                   setState(() {

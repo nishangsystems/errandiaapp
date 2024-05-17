@@ -172,6 +172,8 @@ Future<void> main() async {
   FirebaseMessaging.onMessageOpenedApp
       .listen((message) => _handleMessage(message.data));
 
+  await clearPreferencesOnFirstRun();
+
   runApp(const ErrandiaApp());
 }
 

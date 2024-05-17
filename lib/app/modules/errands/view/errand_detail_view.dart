@@ -126,7 +126,17 @@ class _errand_detail_viewState extends State<errand_detail_view> {
     return photos.isEmpty;
   }
 
+  // check if this errand belongs to the logged in user
+  bool isMyErrand() {
+    String? currentUser = ErrandiaApp.prefs.getString('user');
 
+    if (currentUser != null) {
+      var user = jsonDecode(currentUser);
+      return user['id'] == widget.data['user']['id'];
+    }
+
+    return false;
+  }
 
   // bool hasActiveSubscription() {
   //   print("has active subscription: ${widget.data['user']['active_subscription']}");
@@ -293,7 +303,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
           size: 30,
         ),
         actions: [
-          if (!widget.received && homeController.loggedIn.value && hasActiveSubscription())
+          if (!widget.received && homeController.loggedIn.value && hasActiveSubscription() && isMyErrand())
             IconButton(
               onPressed: () {
                 // rerun an errand

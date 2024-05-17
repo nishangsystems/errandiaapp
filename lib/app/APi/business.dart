@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/modules/global/Widgets/snackBar.dart';
+import 'package:errandia/utils/helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +84,8 @@ class BusinessAPI {
       if (kDebugMode) {
         print("Business data: $responseData");
       }
-      return jsonEncode({'status': 'success', 'data': responseData});
+      await getActiveSubscription();
+    return jsonEncode({'status': 'success', 'data': responseData});
     } else {
       if (kDebugMode) {
         print("Error response: $responseBody");

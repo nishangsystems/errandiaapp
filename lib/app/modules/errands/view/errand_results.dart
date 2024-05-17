@@ -24,7 +24,7 @@ class _ErrandResultsState extends State<ErrandResults>
   late errand_controller errandController;
   late ScrollController _scrollController;
 
-  late var items;
+  late var items = [];
 
   @override
   void initState() { 
@@ -41,7 +41,7 @@ class _ErrandResultsState extends State<ErrandResults>
       } else {
         errandController.fetchErrandResults(widget.errandId);
         setState(() {
-          items = null;
+          items = [];
         });
       }
     });
@@ -56,7 +56,7 @@ class _ErrandResultsState extends State<ErrandResults>
         } else {
           errandController.fetchErrandResults(widget.errandId);
           setState(() {
-            items = null;
+            items = [];
           });
         }
       }
@@ -67,7 +67,7 @@ class _ErrandResultsState extends State<ErrandResults>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     setState(() {
-      items = null;
+      items = [];
     });
     super.dispose();
   }
@@ -76,7 +76,7 @@ class _ErrandResultsState extends State<ErrandResults>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       setState(() {
-        items = null;
+        items = [];
       });
       errandController.reloadErrandResults(widget.errandId);
     }
@@ -118,7 +118,8 @@ class _ErrandResultsState extends State<ErrandResults>
           ),
           body: SingleChildScrollView(
             child: Column(children: [
-              if (items == null)
+              // check if items is null or has not yet been initialized
+              if (items == null || widget.data == null)
               Obx(() {
                 if (errandController.isResultsLoading.value) {
                   return SizedBox(

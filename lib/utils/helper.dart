@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 
@@ -210,3 +211,13 @@ bool hasActiveSubscription() {
 }
 
 const String phonePattern = r'^\+?[0-9]{6,14}$';
+
+Future<void> clearPreferencesOnFirstRun() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool? isFirstRun = prefs.getBool('isFirstRun');
+
+  if (isFirstRun == null || isFirstRun == true) {
+    await prefs.clear();
+    await prefs.setBool('isFirstRun', false);
+  }
+}
