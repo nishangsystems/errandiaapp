@@ -152,7 +152,7 @@ class imagePickercontroller extends GetxController {
   }
 
 
-  Future<void> getmultipleImage() async {
+  Future getmultipleImage() async {
     final ImagePicker _picker = ImagePicker();
     final selectedImages = await _picker.pickMultiImage(
       imageQuality: 100,
@@ -162,7 +162,7 @@ print("selectedImages: $selectedImages");
       for (int i = 0; i < selectedImages.length; i++) {
         imageList.add(selectedImages[i]);
         imagePaths.add(selectedImages[i].path);
-        uploadStatusList[i] = UploadStatus.pending;
+        uploadStatusList.add(UploadStatus.pending);
         refresh();
       }
       print("imageList: $imageList");

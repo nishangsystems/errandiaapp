@@ -1,8 +1,18 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:errandia/app/APi/errands.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
 import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
+import 'package:errandia/app/modules/errands/view/errand_results.dart';
+import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
+import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
+import 'package:errandia/app/modules/home/controller/home_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
@@ -10,9 +20,6 @@ import '../../../../modal/Region.dart';
 import '../../../../modal/Street.dart';
 import '../controller/newErradiaController.dart';
 import '2nd_screen_new_errand.dart';
-
-
-imagePickercontroller imageController = Get.put(imagePickercontroller());
 
 class New_Errand extends StatefulWidget {
   const New_Errand({super.key});
@@ -24,19 +31,335 @@ class New_Errand extends StatefulWidget {
 class _NewErrandState extends State<New_Errand> {
   late errand_controller errandController;
   late new_errandia_controller newErrandController;
+  late imagePickercontroller imageController;
+  late home_controller homeController;
+  late ScrollController _scrollController;
 
   var value;
-  var streetvalue;
   var town_;
+  bool isLoading = false;
+  late PopupBox popup;
+  List<int?> selectedFilters = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    // street();
     errandController = Get.put(errand_controller());
     newErrandController = Get.put(new_errandia_controller());
+    imageController = Get.put(imagePickercontroller());
+    homeController = Get.put(home_controller());
+    _scrollController = ScrollController();
+  }
 
+  void runErrand(Map<String, dynamic> data) async {
+    await ErrandsAPI.runErrand(data['data']['item']['id'].toString())
+        .then((response_) {
+      if (response_ != null) {
+        var response = jsonDecode(response_);
+        print("rerun errand response: $response");
+
+        // Check if the widget is still in the tree
+        if (response["status"] == 'success') {
+          errandController.reloadMyErrands();
+          homeController.reloadRecentlyPostedItems();
+
+          // Navigator.of(dialogContext).pop(); // Close the dialog
+          getErrandResultsInBackground(
+              data['data']['item']['id'].toString(), response['data']);
+          // Show success popup
+          Get.snackbar("Info", response['message'],
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 5),
+              margin: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ));
+        } else {
+          // Navigator.of(dialogContext).pop(); // Close the dialog
+          Get.back();
+          Get.back();
+          Get.snackbar("Error", response['message'],
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 5),
+              margin: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ));
+          print("rerun errand error: ${response}");
+        }
+
+        // popup.showPopup(context); // Show the popup
+      }
+    });
+  }
+
+  void runErrandInBackground(Map<String, dynamic> response) async {
+    const config = FlutterBackgroundAndroidConfig(
+      notificationTitle: 'Errandia',
+      notificationText: 'Your errand is running in the background',
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon: AndroidResource(
+        name: 'ic_launcher',
+        defType: 'mipmap',
+      ),
+      enableWifiLock: true,
+      showBadge: true,
+    );
+
+    var hasPermissions = await FlutterBackground.hasPermissions;
+
+    if (!hasPermissions) {
+      var requestPermissions;
+      // await FlutterBackground.requestPermissions;
+      print("PERMISSIONS NOT PROVIDED");
+    }
+
+    hasPermissions = await FlutterBackground.initialize(androidConfig: config);
+
+    if (hasPermissions) {
+      if (hasPermissions) {
+        final backgroundExecution =
+            await FlutterBackground.enableBackgroundExecution();
+
+        if (backgroundExecution) {
+          runErrand(response);
+        }
+      }
+    }
+  }
+
+  // open errand results page after 5 seconds in the background
+  void getErrandResultsInBackground(
+      String errandId, Map<String, dynamic> data) async {
+    const config = FlutterBackgroundAndroidConfig(
+      notificationTitle: 'Errandia',
+      notificationText: 'Your errand is running in the background',
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon: AndroidResource(
+        name: 'ic_launcher',
+        defType: 'mipmap',
+      ),
+      enableWifiLock: true,
+      showBadge: true,
+    );
+
+    var hasPermissions = await FlutterBackground.hasPermissions;
+
+    if (!hasPermissions) {
+      var requestPermissions;
+      // await FlutterBackground.requestPermissions;
+      print("PERMISSIONS NOT PROVIDED");
+    }
+
+    hasPermissions = await FlutterBackground.initialize(androidConfig: config);
+
+    if (hasPermissions) {
+      if (hasPermissions) {
+        final backgroundExecution =
+            await FlutterBackground.enableBackgroundExecution();
+
+        if (backgroundExecution) {
+          Future.delayed(const Duration(seconds: 5), () {
+            Get.to(() => ErrandResults(data: data, errandId: errandId));
+          });
+        }
+      }
+    }
+  }
+
+  void createErrand() async {
+    setState(() {
+      isLoading = true;
+    });
+    var value = {
+      'title': newErrandController.titleController.text,
+      'description': newErrandController.descriptionController.text,
+      'region_id': newErrandController.regionCode.value,
+      'town_id': newErrandController.town.value,
+    };
+
+    print("value: $value");
+    // API call to create errand
+    await ErrandsAPI.createErrand(value, imageController.imageList)
+        .then((response_) async {
+      print("reponse: $response_");
+      var response = jsonDecode(response_);
+      if (response['status'] == 'success') {
+        if (kDebugMode) {
+          print("Errand created successfully");
+        }
+        errandController.reloadMyErrands();
+        homeController.reloadRecentlyPostedItems();
+        setState(() {
+          isLoading = false;
+          imageController.imageList.clear();
+          imageController.imagePaths.clear();
+          selectedFilters.clear();
+        });
+
+        runErrandInBackground(response);
+
+        popup = PopupBox(
+          title: 'Success',
+          description: response['message'],
+          type: PopupType.success,
+          callback: () {
+            // Navigator.of(context).pushAndRemoveUntil(
+            //   MaterialPageRoute(
+            //     builder: (context) => errand_view(),
+            //   ),
+            //   (route) => false,
+            // );
+            Get.back();
+            Get.back();
+            // print("response: $response");
+          },
+        );
+        popup.showPopup(context);
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        alertDialogBox(context, "Error", response['message']);
+      }
+    }).catchError((error) {
+      if (kDebugMode) {
+        print("Error creating errand: $error");
+      }
+      setState(() {
+        isLoading = false;
+      });
+      alertDialogBox(context, "Error", "Failed to create errand");
+    });
+
+    // Reset form after successful creation
+    newErrandController.titleController.clear();
+    newErrandController.descriptionController.clear();
+    newErrandController.regionCode.value = '';
+    newErrandController.town.value = '';
+    imageController.imageList.clear();
+
+    // Navigate to results page if needed
+    Get.to(() => const ErrandResults(data: null, errandId: ''));
+  }
+
+  void uploadImages(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 20,
+          ),
+          scrollable: true,
+          content: Container(
+            // height: Get.height * 0.7,
+            width: Get.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Select Images',
+                  style: TextStyle(
+                    color: appcolor().mainColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  height: Get.height * 0.05,
+                ),
+                Column(
+                  children: [
+                    blockButton(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.image,
+                            color: appcolor().mainColor,
+                            size: 22,
+                          ),
+                          Text(
+                            '  Image Gallery',
+                            style: TextStyle(color: appcolor().mainColor),
+                          ),
+                        ],
+                      ),
+                      ontap: () async {
+                        Get.back();
+                        await imageController.getmultipleImage().then((_) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (_scrollController.hasClients) {
+                              _scrollController.animateTo(
+                                _scrollController.position.maxScrollExtent,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeOut,
+                              );
+                            }
+                          });
+                        });
+                      },
+                      color: appcolor().greyColor,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.015,
+                    ),
+                    blockButton(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.camera,
+                            color: appcolor().mainColor,
+                            size: 22,
+                          ),
+                          Text(
+                            '  Take Photo',
+                            style: TextStyle(
+                              color: appcolor().mainColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      ontap: () async {
+                        Get.back();
+                        await imageController
+                            .getMultipleimagefromCamera()
+                            .then((_) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (_scrollController.hasClients) {
+                              _scrollController.animateTo(
+                                _scrollController.position.maxScrollExtent,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeOut,
+                              );
+                            }
+                          });
+                        });
+                      },
+                      color: const Color(0xfffafafa),
+                    ),
+                  ],
+                )
+              ],
+            ).paddingSymmetric(
+              horizontal: 10,
+              vertical: 10,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -51,9 +374,7 @@ class _NewErrandState extends State<New_Errand> {
           'New Errand',
         ),
         titleTextStyle: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-            fontSize: 20),
+            fontWeight: FontWeight.w500, color: Colors.white, fontSize: 20),
         leading: IconButton(
           padding: EdgeInsets.zero,
           onPressed: () {
@@ -62,358 +383,374 @@ class _NewErrandState extends State<New_Errand> {
           icon: const Icon(Icons.arrow_back_ios),
           color: Colors.white,
         ),
-        // actions: [
-        //   TextButton(
-        //       onPressed: () {},
-        //       child: Text(
-        //         'Publish',
-        //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        //       ))
-        // ],
       ),
       body: SingleChildScrollView(
-        child: Wrap(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 15,
-                vertical: 15,
-              ),
-              child: Text(
-                '1- Enter Search Details'.tr,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: Text(
+                  'Kindly provide details of this errand and we\'ll run it for you.',
+                  style: TextStyle(fontSize: 14),
+                  textAlign: TextAlign.center,
                 ),
               ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
+              const SizedBox(height: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Item'),
+                  const SizedBox(height: 5),
+                  TextField(
+                    controller: newErrandController.titleController,
+                    style: const TextStyle(color: Colors.black, fontSize: 16),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 12),
+                      isDense: true,
+                      hintText: 'E.g. Laptop charger, smart screen TV',
 
-            // company name
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: TextFormField(
-                keyboardType: TextInputType.name,
-                textCapitalization: TextCapitalization.sentences,
-                controller: newErrandController.titleController,
-                onChanged: (value) {
-                  newErrandController.update();
-                },
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    FontAwesomeIcons.buildingUser,
-                    color: Colors.black,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Product/Service Name *',
-                  suffixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: Text(
-                'e.g laptop,charger',
-                style: TextStyle(fontSize: 10),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 15,
-                vertical: 15,
-              ),
-              child: Text(
-                'Specify Search Location'.tr,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-
-            // regions
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.only(left: 15, right: 0),
-                child: const Icon(
-                  FontAwesomeIcons.earthAmericas,
-                  color: Colors.black,
-                ),
-              ),
-              trailing: Container(
-                padding: const EdgeInsets.only(left: 0, right: 15),
-                child: const Icon(
-                  Icons.arrow_forward_ios_outlined,
-                  color: Colors.black,
-                ),
-              ),
-              contentPadding: EdgeInsets.zero,
-              title: DropdownButtonFormField(
-                iconSize: 0.0,
-                padding: const EdgeInsets.only(bottom: 8),
-                isDense: true,
-                isExpanded: true,
-                decoration: const InputDecoration.collapsed(
-                  hintText: 'Region',
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-                value: value,
-                onChanged: (value) async {
-                  // setState(() {
-                  //
-                  // });
-                  newErrandController.regionCode.value = value as String;
-                  newErrandController.town.value = '';
-                  print("regionCode: ${newErrandController.regionCode.value}");
-                  errandController.loadTownsData(int.parse(newErrandController.regionCode.value));
-                  newErrandController.update();
-                },
-                items: Regions.Items.map((e) => DropdownMenuItem(
-                  value: e.id.toString(),
-                  child: Text(
-                    e.name.toString(),
-                    style: const TextStyle(
-                        fontSize: 15, color: Colors.black),
-                  ),
-                )).toList(),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 4,
-              indent: 0,
-            ),
-
-            //  towns
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.only(left: 15, right: 0),
-                child: Icon(FontAwesomeIcons.city,
-                    color:
-                    newErrandController.regionCode.value == '' ? Colors.grey : Colors.black),
-              ),
-              trailing: Container(
-                padding: const EdgeInsets.only(left: 0, right: 15),
-                child: Icon(Icons.arrow_forward_ios_outlined,
-                    color:
-                    newErrandController.regionCode.value == '' ? Colors.grey : Colors.black),
-              ),
-              contentPadding: EdgeInsets.zero,
-              title: Obx(() {
-                if (errandController.isTownsLoading.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  return DropdownButtonFormField(
-                    iconSize: 0.0,
-                    isDense: true,
-                    isExpanded: true,
-                    padding: const EdgeInsets.only(bottom: 8),
-                    decoration: InputDecoration.collapsed(
-                      hintText: 'Town',
-                      hintStyle: TextStyle(
-                          color: newErrandController.regionCode.value == ''
-                              ? Colors.grey
-                              : Colors.black),
+                      // rounded border
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: appcolor().greyColor),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: Colors.black87.withOpacity(0.5)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: Colors.black87.withOpacity(0.5)),
+                      ),
                     ),
-                    value: town_,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Description'),
+                  const SizedBox(height: 5),
+                  TextField(
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
+                    minLines: 3,
+                    maxLines: null,
+                    controller: newErrandController.descriptionController,
+                    style: const TextStyle(color: Colors.black, fontSize: 16),
                     onChanged: (value) {
-                      setState(() {
-                      });
-                      newErrandController.town.value = value.toString();
-                      print("townId: ${newErrandController.town.value}");
                       newErrandController.update();
                     },
-                    items: errandController.townList.map((e) {
-                      return DropdownMenuItem(
-                        value: e['id'],
-                        child: Text(
-                          e['name'].toString(),
-                          style: const TextStyle(
-                              fontSize: 15, color: Colors.black),
+                    decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 12),
+                        isDense: true,
+                        hintText:
+                            'E.g. I am looking for a 15 inch smart screen TV with remote, preferably second hand.',
+                        // rounded border
+                        hintMaxLines: 3,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: appcolor().greyColor),
                         ),
-                      );
-                    }).toList(),
-                  );
-                }
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                              color: Colors.black87.withOpacity(0.5)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                              color: Colors.black87.withOpacity(0.5)),
+                        )
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Region'),
+                  const SizedBox(height: 5),
+                  Container(
+                    height: 46,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.transparent,
+                    ),
+                    child: DropdownButtonFormField(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'Select a preferred region for the errand',
+                        focusColor: appcolor().mainColor,
+                        hintStyle: TextStyle(
+                          color: Colors.black87.withOpacity(0.5),
+                          fontSize: 14,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      value: value,
+                      onChanged: (value) async {
+                        newErrandController.regionCode.value = value as String;
+                        newErrandController.town.value = '';
+                        print(
+                            "regionCode: ${newErrandController.regionCode.value}");
+                        errandController.loadTownsData(
+                            int.parse(newErrandController.regionCode.value));
+                        newErrandController.update();
+                      },
+                      items: Regions.Items.map((e) => DropdownMenuItem(
+                            value: e.id.toString(),
+                            child: Text(
+                              e.name.toString(),
+                              style: const TextStyle(
+                                  fontSize: 15, color: Colors.black),
+                            ),
+                          )).toList(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Obx(() {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Town (optional)'),
+                    const SizedBox(height: 5),
+                    Container(
+                      height: 46,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.transparent,
+                      ),
+                      child: Obx(() {
+                        if (errandController.isTownsLoading.value) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else {
+                          return DropdownButtonFormField(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            decoration: InputDecoration.collapsed(
+                              hintText:
+                                  'Select a preferred town for the errand',
+                              focusColor: appcolor().mainColor,
+                              hintStyle: TextStyle(
+                                color: Colors.black87.withOpacity(0.5),
+                                fontSize: 14,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            value: town_,
+                            onChanged: (value) {
+                              newErrandController.town.value = value.toString();
+                              print(
+                                  "townId: ${newErrandController.town.value}");
+                              newErrandController.update();
+                            },
+                            items: errandController.townList.map((e) {
+                              return DropdownMenuItem(
+                                value: e['id'],
+                                child: Text(
+                                  e['name'].toString(),
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Colors.black),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        }
+                      }),
+                    )
+                  ],
+                );
               }),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 4,
-              indent: 0,
-            ),
-            // ListTile(
-            //   leading: const Icon(
-            //     FontAwesomeIcons.locationCrosshairs,
-            //   ),
-            //   trailing: const Icon(
-            //     Icons.arrow_forward_ios_outlined,
-            //   ),
-            //   title: Padding(
-            //     padding: const EdgeInsets.only(right: 10, bottom: 10),
-            //     child: DropdownButtonFormField(
-            //       iconSize: 0.0,
-            //       decoration: const InputDecoration.collapsed(
-            //         hintText: 'Street',
-            //       ),
-            //       value: value,
-            //       onChanged: (value) {
-            //         setState(() {
-            //           streetvalue = value as int;
-            //         });
-            //       },
-            //       items: Street.Items.map((e) => DropdownMenuItem(
-            //             value: e.id,
-            //             child: Text(
-            //               e.name.toString(),
-            //               style: const TextStyle(fontSize: 11),
-            //             ),
-            //           )).toList(),
-            //     ),
-            //   ),
-            // ),
-
-            // Divider(
-            //   color: appcolor().greyColor,
-            //   thickness: 1,
-            //   height: 4,
-            //   indent: 0,
-            // ),
-            //  info
-            Container(
-              height: Get.height * 0.2,
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-              child: TextFormField(
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.newline,
-                controller: newErrandController.descriptionController,
-                maxLines: null,
-                onChanged: (value) {
-                  newErrandController.update();
-                },
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    color: Colors.black,
-                    FontAwesomeIcons.info,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  hintText: 'Description *',
-                  suffixIcon: Icon(
-                    color: Colors.black,
-                    Icons.edit,
+              const SizedBox(height: 10),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('Sample Images (optional)'),
+                const SizedBox(height: 5),
+                Obx(() => Container(
+                    height: imageController.imageList.isEmpty ? null : null,
+                    child: imageController.imageList.isEmpty
+                        ? InkWell(
+                            onTap: () {
+                              uploadImages(context);
+                            },
+                            child: Container(
+                              height: 150,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(10),
+                                color: appcolor().greyColor.withOpacity(0.4),
+                              ),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          FontAwesomeIcons.images,
+                                          size: 60,
+                                          color: appcolor().mediumGreyColor,
+                                        ),
+                                        Text(
+                                          '     Browse Images',
+                                          style: TextStyle(
+                                            color: appcolor().bluetextcolor,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: Get.width * 0.7,
+                                    child: Text(
+                                      'You can upload as many variations of the product or service',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: appcolor().mediumGreyColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Obx(() {
+                            return imageController.imageList.isNotEmpty
+                                ? Container(
+                                    height: 120,
+                                    child: ListView.builder(
+                                      controller: _scrollController,
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount:
+                                          imageController.imageList.length,
+                                      itemBuilder: (context, index) {
+                                        return Stack(
+                                          children: [
+                                            Container(
+                                              margin: const EdgeInsets.all(5),
+                                              width: 100,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.grey),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Image.file(
+                                                File(imageController
+                                                    .imageList[index].path),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: 0,
+                                              right: 0,
+                                              child: IconButton(
+                                                icon: const Icon(
+                                                    Icons.remove_circle,
+                                                    color: Colors.red),
+                                                onPressed: () {
+                                                  imageController
+                                                      .removeat(index);
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  )
+                                : const SizedBox.shrink();
+                          }))),
+                // Add more images
+                Obx(
+                  () => Container(
+                    child: imageController.imageList.isEmpty
+                        ? null
+                        : InkWell(
+                            onTap: () {
+                              uploadImages(context);
+                            },
+                            child: Container(
+                              // margin: const EdgeInsets.symmetric(horizontal: 15),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(10),
+                                color: appcolor().greyColor.withOpacity(0.4),
+                              ),
+                              height: Get.height * 0.08,
+                              child: const Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.image,
+                                  ),
+                                  Text(
+                                    '   Add more images',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                   ),
                 ),
-              ),
-            ),
-            Divider(
-              color: appcolor().greyColor,
-              thickness: 1,
-              height: 1,
-              indent: 0,
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            InkWell(
-              onTap: () {
-                if (newErrandController.titleController.text.isEmpty) {
-                  alertDialogBox(context, 'Alert', 'Product/Service Name is Required');
-                } else if (newErrandController.descriptionController.text.isEmpty) {
-                  alertDialogBox(context, 'Alert', 'Description is Required');
-                } else {
-                  Get.to(() => nd_screen(
-                    title: newErrandController.titleController.text.toString(),
-                    description: newErrandController.descriptionController.text.toString(),
-                    region: newErrandController.regionCode,
-                    street: street,
-                    town: newErrandController.town,
-                  ), transition: Transition.rightToLeft, duration: const Duration(milliseconds: 500));
-                }
-                // newErrandController.title..clear();
-                // newErrandController.description.clear();
-              },
-              child: Obx(() {
-                if (newErrandController.isFormFilled) {
-                  return Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                      child: Container(
-                        height: Get.height * 0.09,
-                        width: Get.width * 0.9,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.blue[700],
+              ]),
+              const SizedBox(height: 30),
+              Obx(() {
+                return InkWell(
+                  onTap: newErrandController.isFormFilled
+                      ? () {
+                          createErrand();
+                        }
+                      : null,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: newErrandController.isFormFilled
+                          ? Colors.blue[700]
+                          : const Color(0xffe0e6ec),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'RUN ERRAND',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: newErrandController.isFormFilled
+                              ? Colors.white
+                              : Colors.blueGrey,
                         ),
-                        child: const Center(
-                          child: Text(
-                            'NEXT',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white),
-                          ),
-                        ),
-                      )
-                  );
-                } else {
-                  return Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                      child: Container(
-                        height: Get.height * 0.09,
-                        width: Get.width * 0.9,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: const Color(0xffe0e6ec),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Next',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.blueGrey),
-                          ),
-                        ),
-                      )
-                  );
-                }
+                      ),
+                    ),
+                  ),
+                );
               }),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
