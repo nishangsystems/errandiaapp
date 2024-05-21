@@ -38,6 +38,7 @@ class _NewErrandState extends State<New_Errand> {
   var value;
   var town_;
   bool isLoading = false;
+  bool displayTownInfo = false;
   late PopupBox popup;
   List<int?> selectedFilters = [];
 
@@ -49,6 +50,8 @@ class _NewErrandState extends State<New_Errand> {
     imageController = Get.put(imagePickercontroller());
     homeController = Get.put(home_controller());
     _scrollController = ScrollController();
+
+    errandController.townList.clear();
   }
 
   void runErrand(Map<String, dynamic> data) async {
@@ -201,25 +204,35 @@ class _NewErrandState extends State<New_Errand> {
           selectedFilters.clear();
         });
 
+        Get.snackbar("Info", response['message'],
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 5),
+            margin: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 15,
+            ));
+
         runErrandInBackground(response);
 
-        popup = PopupBox(
-          title: 'Success',
-          description: response['message'],
-          type: PopupType.success,
-          callback: () {
-            // Navigator.of(context).pushAndRemoveUntil(
-            //   MaterialPageRoute(
-            //     builder: (context) => errand_view(),
-            //   ),
-            //   (route) => false,
-            // );
-            Get.back();
-            Get.back();
-            // print("response: $response");
-          },
-        );
-        popup.showPopup(context);
+        // popup = PopupBox(
+        //   title: 'Success',
+        //   description: response['message'],
+        //   type: PopupType.success,
+        //   callback: () {
+        //     // Navigator.of(context).pushAndRemoveUntil(
+        //     //   MaterialPageRoute(
+        //     //     builder: (context) => errand_view(),
+        //     //   ),
+        //     //   (route) => false,
+        //     // );
+        //     Get.back();
+        //     Get.back();
+        //     // print("response: $response");
+        //   },
+        // );
+        // popup.showPopup(context);
       } else {
         setState(() {
           isLoading = false;
@@ -419,13 +432,13 @@ class _NewErrandState extends State<New_Errand> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                            color: Colors.black87.withOpacity(0.5)),
+                        borderSide:
+                            BorderSide(color: Colors.black87.withOpacity(0.5)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                            color: Colors.black87.withOpacity(0.5)),
+                        borderSide:
+                            BorderSide(color: Colors.black87.withOpacity(0.5)),
                       ),
                     ),
                   ),
@@ -468,8 +481,7 @@ class _NewErrandState extends State<New_Errand> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
                               color: Colors.black87.withOpacity(0.5)),
-                        )
-                    ),
+                        )),
                   ),
                 ],
               ),
@@ -486,96 +498,140 @@ class _NewErrandState extends State<New_Errand> {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.transparent,
                     ),
-                    child: DropdownButtonFormField(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10),
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'Select a preferred region for the errand',
-                        focusColor: appcolor().mainColor,
-                        hintStyle: TextStyle(
-                          color: Colors.black87.withOpacity(0.5),
-                          fontSize: 14,
-                          overflow: TextOverflow.ellipsis,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Obx(() {
+                      return DropdownButton<dynamic>(
+                        value:  newErrandController.regionCode.value.isNotEmpty
+                            ? newErrandController.regionCode.value
+                            : null,
+                        onChanged: (value) {
+                          newErrandController.regionCode.value = value as String;
+                          newErrandController.town.value = '';
+                          print(
+                              "regionCode: ${newErrandController.regionCode.value}");
+                          errandController.loadTownsData(
+                              int.parse(newErrandController.regionCode.value));
+                          setState(() {
+                            displayTownInfo = false;
+                          });
+                          newErrandController.update();
+                        },
+                        underline: const SizedBox(),
+                        isExpanded: true,
+                        hint: Text(
+                          'Select a preferred region for the errand',
+                          style: TextStyle(
+                              color: Colors.black87.withOpacity(0.5),
+                              fontSize: 15),
                         ),
-                      ),
-                      value: value,
-                      onChanged: (value) async {
-                        newErrandController.regionCode.value = value as String;
-                        newErrandController.town.value = '';
-                        print(
-                            "regionCode: ${newErrandController.regionCode.value}");
-                        errandController.loadTownsData(
-                            int.parse(newErrandController.regionCode.value));
-                        newErrandController.update();
-                      },
-                      items: Regions.Items.map((e) => DropdownMenuItem(
-                            value: e.id.toString(),
-                            child: Text(
-                              e.name.toString(),
-                              style: const TextStyle(
-                                  fontSize: 15, color: Colors.black),
-                            ),
-                          )).toList(),
-                    ),
-                  ),
+                        style: const TextStyle(color: Colors.black),
+                        dropdownColor: Colors.white,
+                        icon: Icon(Icons.keyboard_arrow_down,
+                            color: Colors.black87.withOpacity(0.5)),
+                        items: Regions.Items.map((e) => DropdownMenuItem(
+                          value: e.id.toString(),
+                          child: Text(
+                            e.name.toString(),
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.black),
+                          ),
+                        )).toList(),
+                      );
+                    }),
+                  )
                 ],
               ),
               const SizedBox(height: 10),
-              Obx(() {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Town (optional)'),
-                    const SizedBox(height: 5),
-                    Container(
-                      height: 46,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.transparent,
-                      ),
-                      child: Obx(() {
-                        if (errandController.isTownsLoading.value) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else {
-                          return DropdownButtonFormField(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                            decoration: InputDecoration.collapsed(
-                              hintText:
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Town (optional)'),
+                  const SizedBox(height: 5),
+                  Container(
+                    height: 46,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.transparent,
+                    ),
+                    child: Obx(() {
+                      if (errandController.isTownsLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
+                        return GestureDetector(
+                          onTap: () {
+                            if (newErrandController.regionCode.value.isEmpty) {
+                              setState(() {
+                                displayTownInfo = true;
+                              });
+                            } else {
+                              setState(() {
+                                displayTownInfo = false;
+                              });
+                            }
+                          },
+                          child: AbsorbPointer(
+                            absorbing: newErrandController.regionCode.value.isEmpty,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: DropdownButton<String>(
+                                value: newErrandController.town.value.isNotEmpty
+                                    ? newErrandController.town.value
+                                    : null,
+                                onChanged: (value) async {
+                                  newErrandController.town.value = value!;
+                                  print("townId: ${newErrandController.town.value}");
+                                  newErrandController.update();
+                                },
+                                underline: const SizedBox(),
+                                isExpanded: true,
+                                style: const TextStyle(color: Colors.black),
+                                hint: Text(
                                   'Select a preferred town for the errand',
-                              focusColor: appcolor().mainColor,
-                              hintStyle: TextStyle(
-                                color: Colors.black87.withOpacity(0.5),
-                                fontSize: 14,
-                                overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.black87.withOpacity(0.5),
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                icon: Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Colors.black87.withOpacity(0.5),
+                                ),
+                                items: errandController.townList.map((e) {
+                                  return DropdownMenuItem<String>(
+                                    value: e['id'].toString(),
+                                    child: Text(
+                                      e['name'].toString(),
+                                      style: const TextStyle(fontSize: 15, color: Colors.black),
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                             ),
-                            value: town_,
-                            onChanged: (value) {
-                              newErrandController.town.value = value.toString();
-                              print(
-                                  "townId: ${newErrandController.town.value}");
-                              newErrandController.update();
-                            },
-                            items: errandController.townList.map((e) {
-                              return DropdownMenuItem(
-                                value: e['id'],
-                                child: Text(
-                                  e['name'].toString(),
-                                  style: const TextStyle(
-                                      fontSize: 15, color: Colors.black),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        }
-                      }),
+                          ),
+                        );
+                      }
+                    }),
+                  )
+                ],
+              ),
+              // Display error message if region is not selected
+              displayTownInfo
+                  ? const Padding(
+                      padding: EdgeInsets.only(top: 3),
+                      child: Text(
+                        'Please select a region first',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
                     )
-                  ],
-                );
-              }),
+                  : const SizedBox.shrink(),
               const SizedBox(height: 10),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Text('Sample Images (optional)'),

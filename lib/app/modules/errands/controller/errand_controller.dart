@@ -42,6 +42,7 @@ class errand_controller extends GetxController{
   void onInit() {
     super.onInit();
     fetchErrands();
+    townList.clear();
   }
 
   void fetchErrands() async {

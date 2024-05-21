@@ -33,9 +33,7 @@ class new_errandia_controller extends GetxController{
   bool get isFormFilled =>
       _title.isNotEmpty &&
           _description.isNotEmpty &&
-          regionCode.isNotEmpty &&
-          town.isNotEmpty;
-
+          regionCode.isNotEmpty;
 
   @override
   void onClose() {
