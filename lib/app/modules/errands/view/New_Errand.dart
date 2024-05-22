@@ -54,7 +54,8 @@ class _NewErrandState extends State<New_Errand> {
     errandController.townList.clear();
   }
 
-  void runErrand(Map<String, dynamic> data) async {
+  void runErrand(Map<dynamic, dynamic> data) async {
+    print("response errand data: $data");
     await ErrandsAPI.runErrand(data['data']['item']['id'].toString())
         .then((response_) {
       if (response_ != null) {
@@ -66,9 +67,9 @@ class _NewErrandState extends State<New_Errand> {
           errandController.reloadMyErrands();
           homeController.reloadRecentlyPostedItems();
 
+          print("run errand data $response");
           // Navigator.of(dialogContext).pop(); // Close the dialog
-          getErrandResultsInBackground(
-              data['data']['item']['id'].toString(), response['data']);
+
           // Show success popup
           Get.snackbar("Info", response['message'],
               snackPosition: SnackPosition.BOTTOM,
@@ -79,6 +80,10 @@ class _NewErrandState extends State<New_Errand> {
                 horizontal: 20,
                 vertical: 15,
               ));
+          print("errand Id: ${ data['data']['item']['id'].toString()}");
+          getErrandResultsInBackground(
+              data['data']['item']['id'].toString(), response['data']);
+
         } else {
           // Navigator.of(dialogContext).pop(); // Close the dialog
           Get.back();
@@ -100,7 +105,7 @@ class _NewErrandState extends State<New_Errand> {
     });
   }
 
-  void runErrandInBackground(Map<String, dynamic> response) async {
+  void runErrandInBackground(Map<dynamic, dynamic> response) async {
     const config = FlutterBackgroundAndroidConfig(
       notificationTitle: 'Errandia',
       notificationText: 'Your errand is running in the background',
@@ -137,7 +142,8 @@ class _NewErrandState extends State<New_Errand> {
 
   // open errand results page after 5 seconds in the background
   void getErrandResultsInBackground(
-      String errandId, Map<String, dynamic> data) async {
+      String errandId, Map<dynamic, dynamic> data) async {
+    print("errandId: $errandId");
     const config = FlutterBackgroundAndroidConfig(
       notificationTitle: 'Errandia',
       notificationText: 'Your errand is running in the background',
@@ -166,7 +172,10 @@ class _NewErrandState extends State<New_Errand> {
             await FlutterBackground.enableBackgroundExecution();
 
         if (backgroundExecution) {
-          Future.delayed(const Duration(seconds: 5), () {
+          print("still errandId: $errandId");
+          Future.delayed(const Duration(seconds: 10), () {
+            print("Navigating to ErrandResults with errandId: $errandId and data: $data");
+
             Get.to(() => ErrandResults(data: data, errandId: errandId));
           });
         }
@@ -255,9 +264,6 @@ class _NewErrandState extends State<New_Errand> {
     newErrandController.regionCode.value = '';
     newErrandController.town.value = '';
     imageController.imageList.clear();
-
-    // Navigate to results page if needed
-    Get.to(() => const ErrandResults(data: null, errandId: ''));
   }
 
   void uploadImages(BuildContext context) {
