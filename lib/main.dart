@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
 import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/notifications/notifications_view.dart';
 import 'package:errandia/app/modules/splashScreen/splash_screen.dart';
@@ -81,7 +82,10 @@ void _handleMessage(Map<String, dynamic> data) {
   }
 
   if (data['page'] == 'received_errands') {
-    Get.to(() => const errand_view());
+    Get.to(() => const errand_view())?.then((_) {
+      final tabController = Get.find<errand_tab_controller>();
+      tabController.tab_controller.animateTo(1); // Set index to Received Errands tab
+    });
   }
 
   if (data['page'] == 'notification') {
