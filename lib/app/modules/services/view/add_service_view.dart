@@ -8,6 +8,7 @@ import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
+import 'package:errandia/common/CategorySearchDialog.dart';
 import 'package:errandia/modal/Shop.dart';
 import 'package:errandia/modal/subcategory.dart';
 import 'package:errandia/utils/helper.dart';
@@ -48,6 +49,22 @@ class _add_service_viewState extends State<add_service_view> {
     imageController = Get.put(imagePickercontroller());
     product_controller.loadShops();
     product_controller.loadCategories();
+  }
+
+  void showCategorySelectionPopup() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CategorySearchDialog(
+          categoryList: product_controller.categoryList,
+          onCategorySelected: (selectedCategory) {
+            setState(() {
+              category = selectedCategory['id'];
+            });
+          },
+        );
+      },
+    );
   }
 
   void createService(BuildContext context) {
@@ -343,35 +360,26 @@ class _add_service_viewState extends State<add_service_view> {
                               ),
                             );
                           } else {
-                            return DropdownButtonFormField<dynamic>(
-                              value: category,
-                              iconSize: 0.0,
-                              isDense: true,
-                              isExpanded: true,
-                              padding: const EdgeInsets.only(bottom: 8),
-                              decoration: const InputDecoration.collapsed(
-                                hintText: 'Select a Category *',
-                                hintStyle: TextStyle(
-                                  color: Colors.black,
+                            return InkWell(
+                              onTap: showCategorySelectionPopup,
+                              child: InputDecorator(
+                                decoration: const InputDecoration.collapsed(
+                                  hintText: 'Select a Category *',
+                                  hintStyle: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                child: Text(
+                                  category == null
+                                      ? 'Select a Category *'
+                                      : product_controller.categoryList
+                                      .firstWhere((element) => element['id'] == category)['name'],
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
-                              onChanged: (dynamic newValue) {
-                                setState(() {
-                                  category = newValue as int;
-                                });
-                                print("selected category: $category");
-                              },
-                              items: product_controller.categoryList.map<DropdownMenuItem<dynamic>>((dynamic category) {
-                                return DropdownMenuItem<dynamic>(
-                                  value: category['id'],
-                                  child: Text(capitalizeAll(category['name']),
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
                             );
                           }
                         }

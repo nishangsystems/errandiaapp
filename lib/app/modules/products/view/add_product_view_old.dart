@@ -8,11 +8,8 @@ import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
-import 'package:errandia/common/CategorySearchDialog.dart';
 import 'package:errandia/modal/Shop.dart';
-import 'package:errandia/modal/category.dart';
 import 'package:errandia/modal/subcategory.dart';
-import 'package:errandia/modal/subcatgeory.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,91 +17,24 @@ import 'package:get/get.dart';
 
 import '../../global/Widgets/blockButton.dart';
 
-class EditServiceView extends StatefulWidget {
-  final Map<String, dynamic>? data;
-
-  const EditServiceView({super.key, required this.data});
+class add_product_view extends StatefulWidget {
 
   @override
-  State<EditServiceView> createState() => EditServiceViewState();
+  State<add_product_view> createState() => _add_product_viewState();
 }
 
-class EditServiceViewState extends State<EditServiceView> {
+class _add_product_viewState extends State<add_product_view> {
   late add_product_cotroller product_controller;
-  late profile_controller profileController;
   late imagePickercontroller imageController;
-  late imagePickercontroller imageController2;
-  late ScrollController _scrollController;
+  late profile_controller profileController;
 
   List<String> selectedFilters = [];
   List<int> selectedFilters_ = [];
   bool isLoading = false;
-  bool isLoadingData = false;
   Shop? selectedShop;
   var category;
-  String productName = '';
 
-  Map<String, dynamic> updatedData = {};
-
-  late Map<String, dynamic> _localServiceData;
-
-  @override
-  void initState() {
-    super.initState();
-    product_controller = Get.put(add_product_cotroller());
-    imageController = Get.put(imagePickercontroller());
-    imageController2 = Get.put(imagePickercontroller());
-    profileController = Get.put(profile_controller());
-    _scrollController = ScrollController();
-    _localServiceData = widget.data!;
-
-    setState(() {
-      isLoadingData = true;
-      productName = capitalizeAll(_localServiceData['name']) ?? 'Edit Service';
-    });
-
-    product_controller.loadCategories();
-    product_controller.loadShops().then((_) {
-      product_controller.product_name_controller.text = _localServiceData['name'] ?? '';
-      product_controller.shop_Id_controller.text = _localServiceData['shop']['id'].toString();
-      product_controller.unit_price_controller.text = _localServiceData['unit_price'].toString();
-      product_controller.product_desc_controller.text = _localServiceData['description'] ?? '';
-      product_controller.product_tags_controller.text = _localServiceData['tags'] ?? '';
-      product_controller.category_controller.text = _localServiceData['category']['name'];
-      product_controller.quantity_controller.text = _localServiceData['quantity'].toString();
-
-      imageController.image_path.value = _localServiceData['featured_image'] ?? '';
-
-      Shop? shop = product_controller.shopList.firstWhereOrNull(
-              (s) => s.id == _localServiceData['shop']['id'] as int
-      );
-
-      print("shop to edit: ${_localServiceData['shop']['id']}");
-      setState(() {
-        selectedShop = shop;
-        category = _localServiceData['category']['id'] as int;
-        isLoadingData = false;
-      });
-    });
-  }
-
-  void showCategorySelectionPopup() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return CategorySearchDialog(
-          categoryList: product_controller.categoryList,
-          onCategorySelected: (selectedCategory) {
-            setState(() {
-              category = selectedCategory['id'];
-            });
-          },
-        );
-      },
-    );
-  }
-
-  void updateService(BuildContext context) {
+  void createProduct(BuildContext context) {
     var name = product_controller.product_name_controller.text.toString();
     var shopId = selectedShop?.id.toString();
     var unitPrice = product_controller.unit_price_controller.text;
@@ -122,6 +52,8 @@ class EditServiceViewState extends State<EditServiceView> {
       alertDialogBox(context, "Error", "Product description is required");
     } else if (category == null) {
       alertDialogBox(context, "Error", "Category is required");
+    } else if (imageController.image_path.isEmpty) {
+      alertDialogBox(context, "Error", "Product Cover image is required");
     } else {
       var value = {
         "name": name,
@@ -130,7 +62,7 @@ class EditServiceViewState extends State<EditServiceView> {
         "description": productDescription,
         "tags": tags ?? "",
         "category_id": category.toString(),
-        "quantity": qty,
+        "quantity": qty ?? 0,
       };
 
       setState(() {
@@ -142,68 +74,36 @@ class EditServiceViewState extends State<EditServiceView> {
 
       try {
         print("product data: $value");
+        ProductAPI.createProductOrService(value, context, imageController.image_path.value).then((response_) {
+          response = jsonDecode(response_);
+          print("product response: $response");
+          if (response['status'] == "success") {
+            popup = PopupBox(
+              title: "Success",
+              description: response['data']['message'],
+              type: PopupType.success,
+            );
+            product_controller.resetFields();
+            setState(() {
+              isLoading = false;
+              category = null;
+              selectedShop = null;
+            });
+            imageController.reset();
+            profileController.reloadMyProducts();
+          } else {
+            popup = PopupBox(
+              title: "Error",
+              description: response['data']['data']['error'],
+             type: PopupType.error,
+            );
+            setState(() {
+              isLoading = false;
+            });
+          }
+          popup.showPopup(context);
+        });
 
-        if (imageController.image_path.toString() == '') {
-          ProductAPI.updateProductOrService(value, context, _localServiceData['slug']).then((response_) {
-            response = jsonDecode(response_);
-            print("product response: $response");
-            if (response['status'] == "success") {
-              popup = PopupBox(
-                title: "Success",
-                description: response['data']['message'],
-                type: PopupType.success,
-              );
-              var data = response['data']['data']['item'];
-              print("updated data: $data");
-              setState(() {
-                updatedData.addAll(data);
-                productName = capitalizeAll(updatedData['name']);
-                isLoading = false;
-              });
-              profileController.reloadMyServices();
-            } else {
-              popup = PopupBox(
-                title: "Error",
-                description: response['data']['data']['error'],
-                type: PopupType.error,
-              );
-              setState(() {
-                isLoading = false;
-              });
-            }
-            popup.showPopup(context);
-          });
-        } else {
-          ProductAPI.updateProductOrServiceWithImage(value, context, imageController.image_path.toString(), _localServiceData?['slug']).then((response_) {
-            response = jsonDecode(response_);
-            print("product response img: $response");
-            if (response['status'] == "success") {
-              popup = PopupBox(
-                title: "Success",
-                description: response['data']['message'],
-                type: PopupType.success,
-              );
-              var data = response['data']['data']['item'];
-              print("updated data: $data");
-              setState(() {
-                updatedData.addAll(data);
-                productName = capitalizeAll(updatedData['name']);
-                isLoading = false;
-              });
-              profileController.reloadMyServices();
-            } else {
-              popup = PopupBox(
-                title: "Error",
-                description: response['data']['data']['error'],
-                type: PopupType.error,
-              );
-              setState(() {
-                isLoading = false;
-              });
-            }
-            popup.showPopup(context);
-          });
-        }
 
       } catch (e) {
         print("error creating product: $e");
@@ -223,43 +123,51 @@ class EditServiceViewState extends State<EditServiceView> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    print('Edit Service: $_localServiceData');
+  void initState() {
+    super.initState();
+    product_controller = Get.put(add_product_cotroller());
+    profileController = Get.put(profile_controller());
+    imageController = Get.put(imagePickercontroller());
+    product_controller.loadShops();
+    product_controller.loadCategories();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Get.back(result: updatedData.isNotEmpty ? updatedData : null);
-        return updatedData.isNotEmpty;
+        Get.back();
+        profileController.reloadMyProducts();
+        return true;
       },
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.orange,
+          backgroundColor: Colors.green,
           titleSpacing: 8,
-          title: Text(productName),
+          title: const Text('Add Product'),
           titleTextStyle: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.bold,
+              color:Colors.white,
               fontSize: 20),
           automaticallyImplyLeading: false,
           leading: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () {
-              Get.back(result: updatedData.isNotEmpty ? updatedData : null);
+              profileController.reloadMyProducts();
+              Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios),
-            color: Colors.black,
+            color: Colors.white,
           ),
           actions: [
             TextButton(
                 onPressed: () {
-                  updateService(context);
+                  createProduct(context);
                 },
                 child: const Text(
-                  'UPDATE',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16,
-                    color: Colors.black,
-                  ),
+                  'Publish',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
                 ))
           ],
         ),
@@ -268,12 +176,31 @@ class EditServiceViewState extends State<EditServiceView> {
             SingleChildScrollView(
               child: Wrap(
                 children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 15,
+                    ),
+                    child: const Text(
+                      'New Product Detail',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
                   // company name
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                     child: TextFormField(
                       controller: product_controller.product_name_controller,
-                      autofocus: true,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
@@ -283,7 +210,7 @@ class EditServiceViewState extends State<EditServiceView> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Service Name *',
+                        hintText: 'Product Name *',
                         suffixIcon: Icon(
                           Icons.edit,
                           color: Colors.black,
@@ -298,7 +225,6 @@ class EditServiceViewState extends State<EditServiceView> {
                     indent: 0,
                   ),
 
-                  // service shops
                   ListTile(
                     leading: Container(
                         padding: const EdgeInsets.only(left: 12, right: 0),
@@ -319,6 +245,13 @@ class EditServiceViewState extends State<EditServiceView> {
                           () {
                             if (product_controller.isLoadingShops.value) {
                               return Text('Loading Shops...',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[600],
+                                ),
+                              );
+                            } else if (product_controller.shopList.isEmpty) {
+                              return Text('No Shops found',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.grey[600],
@@ -356,7 +289,7 @@ class EditServiceViewState extends State<EditServiceView> {
                                 }).toList(),
                               );
                             }
-                          }
+                          },
                     ),
                   ),
 
@@ -366,8 +299,7 @@ class EditServiceViewState extends State<EditServiceView> {
                     height: 1,
                     indent: 0,
                   ),
-
-                  // Service categories
+                  // Product categories
                   ListTile(
                     leading: Container(
                       padding: const EdgeInsets.only(left: 12, right: 0),
@@ -385,7 +317,7 @@ class EditServiceViewState extends State<EditServiceView> {
                     ),
                     contentPadding: EdgeInsets.zero,
                     title: Obx(
-                            () {
+                        () {
                           if (product_controller.isLoadingCategories.value) {
                             return Text('Loading Categories...',
                               style: TextStyle(
@@ -401,32 +333,40 @@ class EditServiceViewState extends State<EditServiceView> {
                               ),
                             );
                           } else {
-                            return InkWell(
-                              onTap: showCategorySelectionPopup,
-                              child: InputDecorator(
-                                decoration: const InputDecoration.collapsed(
-                                  hintText: 'Select a Category *',
-                                  hintStyle: TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                child: Text(
-                                  category == null
-                                      ? 'Select a Category *'
-                                      : product_controller.categoryList
-                                      .firstWhere((element) => element['id'] == category)['name'],
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.black,
-                                  ),
+                            return DropdownButtonFormField<dynamic>(
+                              value: category,
+                              iconSize: 0.0,
+                              isDense: true,
+                              isExpanded: true,
+                              padding: const EdgeInsets.only(bottom: 8),
+                              decoration: const InputDecoration.collapsed(
+                                hintText: 'Select a Category *',
+                                hintStyle: TextStyle(
+                                  color: Colors.black,
                                 ),
                               ),
+                              onChanged: (dynamic newValue) {
+                                setState(() {
+                                  category = newValue as int;
+                                });
+                                print("selected category: $category");
+                              },
+                              items: product_controller.categoryList.map<DropdownMenuItem<dynamic>>((dynamic category) {
+                                return DropdownMenuItem<dynamic>(
+                                  value: category['id'],
+                                  child: Text(capitalizeAll(category['name']),
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             );
                           }
                         }
                     ),
                   ),
-
                   Divider(
                     color: appcolor().greyColor,
                     thickness: 1,
@@ -439,6 +379,7 @@ class EditServiceViewState extends State<EditServiceView> {
                     padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                     child: TextFormField(
                       controller: product_controller.unit_price_controller,
+                      keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
@@ -453,6 +394,37 @@ class EditServiceViewState extends State<EditServiceView> {
                         suffixIcon: Icon(
                           Icons.edit,
                           color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // product quantity
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    child: TextFormField(
+                      controller: product_controller.quantity_controller,
+                      keyboardType: TextInputType.number,
+
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          color: Colors.black,
+                          FontAwesomeIcons.cubes,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.black,
+                        ),
+                        hintText: 'Quantity (optional)',
+                        suffixIcon: Icon(
+                          color: Colors.black,
+                          Icons.edit,
                         ),
                       ),
                     ),
@@ -482,7 +454,7 @@ class EditServiceViewState extends State<EditServiceView> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Service Description *',
+                        hintText: 'Product Description *',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
@@ -675,32 +647,13 @@ class EditServiceViewState extends State<EditServiceView> {
                               children: [
                                 Obx(
                                         () {
-                                      return imageController.image_path.isEmpty ? Container()
-                                          : imageController.image_path.contains("uploads/")
-                                          ? Image.network(
-                                        getImagePath(
-                                          imageController.image_path.toString(),
-                                        ),
+                                      return imageController.image_path.isEmpty
+                                          ? Container() : Image(
+                                        image: FileImage(File(imageController.image_path.toString())),
+                                        fit: BoxFit.fill,
                                         height: Get.height * 0.32,
                                         width: Get.width * 0.9,
-                                        fit: BoxFit.fill,
-                                        errorBuilder: (BuildContext context,
-                                            Object exception,
-                                            StackTrace? stackTrace) {
-                                          return Container();
-                                        },
-                                      ).paddingSymmetric(horizontal: 30) : imageController.image_path.contains("default") ?
-                                      Container()
-                                          : Image(
-                                        image: FileImage(
-                                          File(
-                                            imageController.image_path.toString(),
-                                          ),
-                                        ),
-                                        height: Get.height * 0.32,
-                                        width: Get.width * 0.9,
-                                        fit: BoxFit.fill,
-                                      ).paddingSymmetric(horizontal: 30);
+                                      ).paddingSymmetric(horizontal: 40);
                                     }
                                 ),
                                 SizedBox(
@@ -761,7 +714,14 @@ class EditServiceViewState extends State<EditServiceView> {
                     indent: 0,
                   ),
 
-                  // service tags
+                  Divider(
+                    color: appcolor().greyColor,
+                    thickness: 1,
+                    height: 1,
+                    indent: 0,
+                  ),
+
+                  // product tags
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                     child: TextFormField(
@@ -775,7 +735,7 @@ class EditServiceViewState extends State<EditServiceView> {
                         hintStyle: TextStyle(
                           color: Colors.black,
                         ),
-                        hintText: 'Service Tags (optional)',
+                        hintText: 'Product Tags (optional)',
                         suffixIcon: Icon(
                           color: Colors.black,
                           Icons.edit,
@@ -791,7 +751,7 @@ class EditServiceViewState extends State<EditServiceView> {
                   ),
 
                   const Text(
-                    'Enter words related to service separated by comma',
+                    'Enter words related to product separated by comma',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.grey,
@@ -806,21 +766,6 @@ class EditServiceViewState extends State<EditServiceView> {
                 ],
               ),
             ),
-
-            if (isLoadingData)
-              const Opacity(
-                opacity: 0.6,
-                child: ModalBarrier(
-                  dismissible: false,
-                  color: Colors.black87,
-                ),
-              ),
-
-            if (isLoadingData)
-              Center(
-                child: buildLoadingWidget(),
-              ),
-
             if (isLoading)
               const Opacity(
                 opacity: 0.6,
@@ -839,7 +784,7 @@ class EditServiceViewState extends State<EditServiceView> {
                       height: 20,
                     ),
                     Text(
-                      'We\'re updating your service details,',
+                      'We\'re creating your product,',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 15,

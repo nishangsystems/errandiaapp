@@ -8,17 +8,18 @@ import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
+import 'package:errandia/common/CategorySearchDialog.dart';
 import 'package:errandia/modal/Shop.dart';
 import 'package:errandia/modal/subcategory.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 import '../../global/Widgets/blockButton.dart';
 
 class add_product_view extends StatefulWidget {
-
   @override
   State<add_product_view> createState() => _add_product_viewState();
 }
@@ -38,11 +39,12 @@ class _add_product_viewState extends State<add_product_view> {
     var name = product_controller.product_name_controller.text.toString();
     var shopId = selectedShop?.id.toString();
     var unitPrice = product_controller.unit_price_controller.text;
-    var productDescription = product_controller.product_desc_controller.text.toString();
+    var productDescription =
+        product_controller.product_desc_controller.text.toString();
     var tags = product_controller.product_tags_controller.text.toString();
     var qty = product_controller.quantity_controller.text.toString();
 
-    if(name == '') {
+    if (name == '') {
       alertDialogBox(context, "Error", "Product name is required");
     } else if (shopId == null) {
       alertDialogBox(context, "Error", "Shop is required");
@@ -74,7 +76,9 @@ class _add_product_viewState extends State<add_product_view> {
 
       try {
         print("product data: $value");
-        ProductAPI.createProductOrService(value, context, imageController.image_path.value).then((response_) {
+        ProductAPI.createProductOrService(
+                value, context, imageController.image_path.value)
+            .then((response_) {
           response = jsonDecode(response_);
           print("product response: $response");
           if (response['status'] == "success") {
@@ -95,7 +99,7 @@ class _add_product_viewState extends State<add_product_view> {
             popup = PopupBox(
               title: "Error",
               description: response['data']['data']['error'],
-             type: PopupType.error,
+              type: PopupType.error,
             );
             setState(() {
               isLoading = false;
@@ -103,8 +107,6 @@ class _add_product_viewState extends State<add_product_view> {
           }
           popup.showPopup(context);
         });
-
-
       } catch (e) {
         print("error creating product: $e");
         popup = PopupBox(
@@ -117,8 +119,6 @@ class _add_product_viewState extends State<add_product_view> {
         });
         popup.showPopup(context);
       }
-
-
     }
   }
 
@@ -130,6 +130,22 @@ class _add_product_viewState extends State<add_product_view> {
     imageController = Get.put(imagePickercontroller());
     product_controller.loadShops();
     product_controller.loadCategories();
+  }
+
+  void showCategorySelectionPopup() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CategorySearchDialog(
+          categoryList: product_controller.categoryList,
+          onCategorySelected: (selectedCategory) {
+            setState(() {
+              category = selectedCategory['id'];
+            });
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -147,9 +163,7 @@ class _add_product_viewState extends State<add_product_view> {
           titleSpacing: 8,
           title: const Text('Add Product'),
           titleTextStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color:Colors.white,
-              fontSize: 20),
+              fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20),
           automaticallyImplyLeading: false,
           leading: IconButton(
             padding: EdgeInsets.zero,
@@ -167,643 +181,658 @@ class _add_product_viewState extends State<add_product_view> {
                 },
                 child: const Text(
                   'Publish',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Colors.white),
                 ))
           ],
         ),
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Wrap(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 15,
-                      vertical: 15,
-                    ),
-                    child: const Text(
-                      'New Product Detail',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
+        body: Stack(children: [
+          SingleChildScrollView(
+            child: Wrap(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 15,
+                  ),
+                  child: const Text(
+                    'New Product Detail',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
+                ),
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
 
-                  // company name
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                    child: TextFormField(
-                      controller: product_controller.product_name_controller,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          FontAwesomeIcons.buildingUser,
-                          color: Colors.black,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Product Name *',
-                        suffixIcon: Icon(
-                          Icons.edit,
-                          color: Colors.black,
-                        ),
+                // company name
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                  child: TextFormField(
+                    controller: product_controller.product_name_controller,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: Icon(
+                        FontAwesomeIcons.buildingUser,
+                        color: Colors.black,
                       ),
-                    ),
-                  ),
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
-
-                  ListTile(
-                    leading: Container(
-                        padding: const EdgeInsets.only(left: 12, right: 0),
-                        child: const Icon(
-                          FontAwesomeIcons.store,
-                          color: Colors.black,
-                        )
-                    ),
-                    trailing: Container(
-                      padding: const EdgeInsets.only(left: 0, right: 12),
-                      child: const Icon(
-                        Icons.arrow_forward_ios_outlined,
+                      hintStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                      hintText: 'Product Name *',
+                      suffixIcon: Icon(
+                        Icons.edit,
                         color: Colors.black,
                       ),
                     ),
-                    contentPadding: EdgeInsets.zero,
-                    title: Obx(
-                          () {
-                            if (product_controller.isLoadingShops.value) {
-                              return Text('Loading Shops...',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                ),
-                              );
-                            } else if (product_controller.shopList.isEmpty) {
-                              return Text('No Shops found',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                ),
-                              );
-                            } else {
-                              return DropdownButtonFormField<Shop>(
-                                value: selectedShop,
-                                iconSize: 0.0,
-                                isDense: true,
-                                isExpanded: true,
-                                padding: const EdgeInsets.only(bottom: 8),
-                                decoration: const InputDecoration.collapsed(
-                                  hintText: 'Select a Shop *',
-                                  hintStyle: TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                onChanged: (Shop? newValue) {
-                                  setState(() {
-                                    selectedShop = newValue;
-                                  });
-                                  print("selected shop: ${selectedShop?.name}");
-                                },
-                                items: product_controller.shopList.map<DropdownMenuItem<Shop>>((Shop shop) {
-                                  return DropdownMenuItem<Shop>(
-                                    value: shop,
-                                    child: Text(capitalizeAll(shop.name),
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              );
-                            }
-                          },
-                    ),
                   ),
+                ),
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
 
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
-                  // Product categories
-                  ListTile(
-                    leading: Container(
+                ListTile(
+                  leading: Container(
                       padding: const EdgeInsets.only(left: 12, right: 0),
                       child: const Icon(
-                        Icons.category,
+                        FontAwesomeIcons.store,
                         color: Colors.black,
-                      ),
+                      )),
+                  trailing: Container(
+                    padding: const EdgeInsets.only(left: 0, right: 12),
+                    child: const Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      color: Colors.black,
                     ),
-                    trailing: Container(
-                      padding: const EdgeInsets.only(left: 0, right: 12),
-                      child: const Icon(
-                        Icons.arrow_forward_ios_outlined,
-                        color: Colors.black,
-                      ),
-                    ),
-                    contentPadding: EdgeInsets.zero,
-                    title: Obx(
-                        () {
-                          if (product_controller.isLoadingCategories.value) {
-                            return Text('Loading Categories...',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey[600],
+                  ),
+                  contentPadding: EdgeInsets.zero,
+                  title: Obx(
+                    () {
+                      if (product_controller.isLoadingShops.value) {
+                        return Text(
+                          'Loading Shops...',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                          ),
+                        );
+                      } else if (product_controller.shopList.isEmpty) {
+                        return Text(
+                          'No Shops found',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                          ),
+                        );
+                      } else {
+                        return DropdownButtonFormField<Shop>(
+                          value: selectedShop,
+                          iconSize: 0.0,
+                          isDense: true,
+                          isExpanded: true,
+                          padding: const EdgeInsets.only(bottom: 8),
+                          decoration: const InputDecoration.collapsed(
+                            hintText: 'Select a Shop *',
+                            hintStyle: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                          onChanged: (Shop? newValue) {
+                            setState(() {
+                              selectedShop = newValue;
+                            });
+                            print("selected shop: ${selectedShop?.name}");
+                          },
+                          items: product_controller.shopList
+                              .map<DropdownMenuItem<Shop>>((Shop shop) {
+                            return DropdownMenuItem<Shop>(
+                              value: shop,
+                              child: Text(
+                                capitalizeAll(shop.name),
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
                               ),
                             );
-                          } else if (product_controller.categoryList.isEmpty) {
-                            return Text('No Categories found',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey[600],
-                              ),
-                            );
-                          } else {
-                            return DropdownButtonFormField<dynamic>(
-                              value: category,
-                              iconSize: 0.0,
-                              isDense: true,
-                              isExpanded: true,
-                              padding: const EdgeInsets.only(bottom: 8),
+                          }).toList(),
+                        );
+                      }
+                    },
+                  ),
+                ),
+
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
+                // Product categories
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.only(left: 12, right: 0),
+                    child: const Icon(
+                      Icons.category,
+                      color: Colors.black,
+                    ),
+                  ),
+                  trailing: Container(
+                    padding: const EdgeInsets.only(left: 0, right: 12),
+                    child: const Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      color: Colors.black,
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.zero,
+                  title: Obx(
+                          () {
+                        if (product_controller.isLoadingCategories.value) {
+                          return Text('Loading Categories...',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                          );
+                        } else if (product_controller.categoryList.isEmpty) {
+                          return Text('No Categories found',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                          );
+                        } else {
+                          return InkWell(
+                            onTap: showCategorySelectionPopup,
+                            child: InputDecorator(
                               decoration: const InputDecoration.collapsed(
                                 hintText: 'Select a Category *',
                                 hintStyle: TextStyle(
                                   color: Colors.black,
                                 ),
                               ),
-                              onChanged: (dynamic newValue) {
-                                setState(() {
-                                  category = newValue as int;
-                                });
-                                print("selected category: $category");
-                              },
-                              items: product_controller.categoryList.map<DropdownMenuItem<dynamic>>((dynamic category) {
-                                return DropdownMenuItem<dynamic>(
-                                  value: category['id'],
-                                  child: Text(capitalizeAll(category['name']),
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            );
-                          }
+                              child: Text(
+                                category == null
+                                    ? 'Select a Category *'
+                                    : product_controller.categoryList
+                                    .firstWhere((element) => element['id'] == category)['name'],
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          );
                         }
-                    ),
+                      }
                   ),
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
+                ),
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
 
-                  // unit price
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                    child: TextFormField(
-                      controller: product_controller.unit_price_controller,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          color: Colors.black,
-                          FontAwesomeIcons.dollarSign,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Unit Price *',
-                        suffix: Text('XAF'),
-                        suffixIcon: Icon(
-                          Icons.edit,
-                          color: Colors.black,
-                        ),
+                // unit price
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                  child: TextFormField(
+                    controller: product_controller.unit_price_controller,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: Icon(
+                        color: Colors.black,
+                        FontAwesomeIcons.dollarSign,
+                      ),
+                      hintStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                      hintText: 'Unit Price *',
+                      suffix: Text('XAF'),
+                      suffixIcon: Icon(
+                        Icons.edit,
+                        color: Colors.black,
                       ),
                     ),
                   ),
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
+                ),
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
 
-                  // product quantity
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                    child: TextFormField(
-                      controller: product_controller.quantity_controller,
-                      keyboardType: TextInputType.number,
-
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          color: Colors.black,
-                          FontAwesomeIcons.cubes,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Quantity (optional)',
-                        suffixIcon: Icon(
-                          color: Colors.black,
-                          Icons.edit,
-                        ),
+                // product quantity
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                  child: TextFormField(
+                    controller: product_controller.quantity_controller,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: Icon(
+                        color: Colors.black,
+                        FontAwesomeIcons.cubes,
+                      ),
+                      hintStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                      hintText: 'Quantity (optional)',
+                      suffixIcon: Icon(
+                        color: Colors.black,
+                        Icons.edit,
                       ),
                     ),
                   ),
+                ),
 
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
 
-                  // Business info
-                  Container(
-                    height: Get.height * 0.2,
-                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                    child: TextFormField(
-                      controller: product_controller.product_desc_controller,
-                      minLines: 1,
-                      maxLines: 4,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          color: Colors.black,
-                          FontAwesomeIcons.info,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Product Description *',
-                        suffixIcon: Icon(
-                          color: Colors.black,
-                          Icons.edit,
-                        ),
+                // Business info
+                Container(
+                  height: Get.height * 0.2,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                  child: TextFormField(
+                    controller: product_controller.product_desc_controller,
+                    minLines: 1,
+                    maxLines: 4,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: Icon(
+                        color: Colors.black,
+                        FontAwesomeIcons.info,
+                      ),
+                      hintStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                      hintText: 'Product Description *',
+                      suffixIcon: Icon(
+                        color: Colors.black,
+                        Icons.edit,
                       ),
                     ),
                   ),
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
+                ),
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
 
-                  // cover image
-                  Obx(
-                        () => Container(
-                      height: imageController.image_path.isEmpty
-                          ? null
-                          : Get.height * 0.40,
-                      child: imageController.image_path.isEmpty
-                          ? InkWell(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                insetPadding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 20,
-                                ),
-                                scrollable: true,
-                                content: SizedBox(
-                                  // height: Get.height * 0.7,
-                                  width: Get.width,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Cover Image',
-                                        style: TextStyle(
-                                          color: appcolor().mainColor,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: Get.height * 0.05,
-                                      ),
-                                      Column(
+                // cover image
+                Obx(
+                  () => Container(
+                    height: imageController.image_path.isEmpty
+                        ? null
+                        : Get.height * 0.40,
+                    child: imageController.image_path.isEmpty
+                        ? InkWell(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    insetPadding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 20,
+                                    ),
+                                    scrollable: true,
+                                    content: SizedBox(
+                                      // height: Get.height * 0.7,
+                                      width: Get.width,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          blockButton(
-                                            title: Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FontAwesomeIcons.image,
-                                                  color: appcolor().mainColor,
-                                                  size: 22,
-                                                ),
-                                                Text(
-                                                  '  Image Gallery',
-                                                  style: TextStyle(
-                                                      color:
-                                                      appcolor().mainColor),
-                                                ),
-                                              ],
+                                          Text(
+                                            'Cover Image',
+                                            style: TextStyle(
+                                              color: appcolor().mainColor,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                            ontap: () {
-                                              imageController.getImageFromGallery();
-                                              Get.back();
-                                            },
-                                            color: appcolor().greyColor,
                                           ),
                                           SizedBox(
-                                            height: Get.height * 0.015,
+                                            height: Get.height * 0.05,
                                           ),
-                                          blockButton(
-                                            title: Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FontAwesomeIcons.camera,
-                                                  color: appcolor().mainColor,
-                                                  size: 22,
+                                          Column(
+                                            children: [
+                                              blockButton(
+                                                title: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      FontAwesomeIcons.image,
+                                                      color:
+                                                          appcolor().mainColor,
+                                                      size: 22,
+                                                    ),
+                                                    Text(
+                                                      '  Image Gallery',
+                                                      style: TextStyle(
+                                                          color: appcolor()
+                                                              .mainColor),
+                                                    ),
+                                                  ],
                                                 ),
-                                                Text(
-                                                  '  Take Photo',
-                                                  style: TextStyle(
-                                                    color: appcolor().mainColor,
-                                                  ),
+                                                ontap: () {
+                                                  imageController
+                                                      .getImageFromGallery();
+                                                  Get.back();
+                                                },
+                                                color: appcolor().greyColor,
+                                              ),
+                                              SizedBox(
+                                                height: Get.height * 0.015,
+                                              ),
+                                              blockButton(
+                                                title: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      FontAwesomeIcons.camera,
+                                                      color:
+                                                          appcolor().mainColor,
+                                                      size: 22,
+                                                    ),
+                                                    Text(
+                                                      '  Take Photo',
+                                                      style: TextStyle(
+                                                        color: appcolor()
+                                                            .mainColor,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
-                                            ),
-                                            ontap: () async {
-                                              Get.back();
+                                                ontap: () async {
+                                                  Get.back();
 
-                                              var path = await imageController
-                                                  .getimagefromCamera();
+                                                  var path =
+                                                      await imageController
+                                                          .getimagefromCamera();
 
-                                              print("image path: $path");
+                                                  print("image path: $path");
 
-                                              if (path != null) {
-                                                File? file = File(path);
+                                                  if (path != null) {
+                                                    File? file = File(path);
 
-                                                print("original file size: ${file.lengthSync()}");
+                                                    print(
+                                                        "original file size: ${file.lengthSync()}");
 
-                                                try {
-                                                  file = (await compressFile(file: file));
-                                                  print("Compressed file size: ${file.lengthSync()}");
-                                                } catch (e) {
-                                                  print("Error compressing file: $e");
-                                                }
-                                                imageController.image_path.value = file!.path;
+                                                    try {
+                                                      file =
+                                                          (await compressFile(
+                                                              file: file));
+                                                      print(
+                                                          "Compressed file size: ${file.lengthSync()}");
+                                                    } catch (e) {
+                                                      print(
+                                                          "Error compressing file: $e");
+                                                    }
+                                                    imageController.image_path
+                                                        .value = file!.path;
 
-                                                imageController.update();
+                                                    imageController.update();
 
-                                                print("compressed file path: ${file.path}");
-
-                                              }
-                                            },
-                                            color: const Color(0xfffafafa),
-                                          ),
+                                                    print(
+                                                        "compressed file path: ${file.path}");
+                                                  }
+                                                },
+                                                color: const Color(0xfffafafa),
+                                              ),
+                                            ],
+                                          )
                                         ],
-                                      )
-                                    ],
-                                  ).paddingSymmetric(
-                                    horizontal: 10,
-                                    vertical: 10,
-                                  ),
-                                ),
+                                      ).paddingSymmetric(
+                                        horizontal: 10,
+                                        vertical: 10,
+                                      ),
+                                    ),
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 20),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.image),
-                              Text('  Cover Image'),
-                              Spacer(),
-                              Icon(
-                                Icons.edit,
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                          : SizedBox(
-                        height: Get.height * 0.38,
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.image),
-                                const Text(
-                                  '   Cover Image *',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const Spacer(),
-                                InkWell(
-                                  onTap: () {},
-                                  child: const Icon(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 20),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.image),
+                                  Text('  Cover Image'),
+                                  Spacer(),
+                                  Icon(
                                     Icons.edit,
-                                  ),
-                                )
-                              ],
-                            ).paddingSymmetric(
-                              vertical: 15,
-                              horizontal: 15,
+                                  )
+                                ],
+                              ),
                             ),
-                            Divider(
-                              color: appcolor().greyColor,
-                              thickness: 1,
-                              height: 1,
-                              indent: 0,
-                            ),
-                            Stack(
+                          )
+                        : SizedBox(
+                            height: Get.height * 0.38,
+                            child: Column(
                               children: [
-                                Obx(
-                                        () {
-                                      return imageController.image_path.isEmpty
-                                          ? Container() : Image(
-                                        image: FileImage(File(imageController.image_path.toString())),
-                                        fit: BoxFit.fill,
-                                        height: Get.height * 0.32,
-                                        width: Get.width * 0.9,
-                                      ).paddingSymmetric(horizontal: 40);
-                                    }
+                                Row(
+                                  children: [
+                                    const Icon(Icons.image),
+                                    const Text(
+                                      '   Cover Image *',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    InkWell(
+                                      onTap: () {},
+                                      child: const Icon(
+                                        Icons.edit,
+                                      ),
+                                    )
+                                  ],
+                                ).paddingSymmetric(
+                                  vertical: 15,
+                                  horizontal: 15,
                                 ),
-                                SizedBox(
-                                  height: Get.height * 0.32,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          imageController.getImageFromGallery();
-                                        },
-                                        child: Container(
-                                          height: 35,
-                                          width: 60,
-                                          color: Colors.lightGreen,
-                                          child: const Center(
-                                            child: Text(
-                                              'Edit',
-                                              style: TextStyle(
-                                                color: Colors.white,
+                                Divider(
+                                  color: appcolor().greyColor,
+                                  thickness: 1,
+                                  height: 1,
+                                  indent: 0,
+                                ),
+                                Stack(
+                                  children: [
+                                    Obx(() {
+                                      return imageController.image_path.isEmpty
+                                          ? Container()
+                                          : Image(
+                                              image: FileImage(File(
+                                                  imageController.image_path
+                                                      .toString())),
+                                              fit: BoxFit.fill,
+                                              height: Get.height * 0.32,
+                                              width: Get.width * 0.9,
+                                            ).paddingSymmetric(horizontal: 40);
+                                    }),
+                                    SizedBox(
+                                      height: Get.height * 0.32,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              imageController
+                                                  .getImageFromGallery();
+                                            },
+                                            child: Container(
+                                              height: 35,
+                                              width: 60,
+                                              color: Colors.lightGreen,
+                                              child: const Center(
+                                                child: Text(
+                                                  'Edit',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                      InkWell(
-                                        onTap: () {
-                                          imageController.reset();
-                                        },
-                                        child: Container(
-                                          height: 35,
-                                          width: 60,
-                                          color: appcolor().greyColor,
-                                          child: const Center(
-                                            child: Text(
-                                              'Remove',
-                                              style: TextStyle(),
+                                          InkWell(
+                                            onTap: () {
+                                              imageController.reset();
+                                            },
+                                            child: Container(
+                                              height: 35,
+                                              width: 60,
+                                              color: appcolor().greyColor,
+                                              child: const Center(
+                                                child: Text(
+                                                  'Remove',
+                                                  style: TextStyle(),
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                )
+                                    )
+                                  ],
+                                ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                  ),
+                ),
+
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
+
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
+
+                // product tags
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                  child: TextFormField(
+                    controller: product_controller.product_tags_controller,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: Icon(
+                        FontAwesomeIcons.tags,
+                        color: Color.fromARGB(255, 108, 105, 105),
+                      ),
+                      hintStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                      hintText: 'Product Tags (optional)',
+                      suffixIcon: Icon(
+                        color: Colors.black,
+                        Icons.edit,
                       ),
                     ),
                   ),
+                ),
+                Divider(
+                  color: appcolor().greyColor,
+                  thickness: 1,
+                  height: 1,
+                  indent: 0,
+                ),
 
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
+                const Text(
+                  'Enter words related to product separated by comma',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey,
                   ),
-
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
-
-                  // product tags
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                    child: TextFormField(
-                      controller: product_controller.product_tags_controller,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          FontAwesomeIcons.tags,
-                          color: Color.fromARGB(255, 108, 105, 105),
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Product Tags (optional)',
-                        suffixIcon: Icon(
-                          color: Colors.black,
-                          Icons.edit,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Divider(
-                    color: appcolor().greyColor,
-                    thickness: 1,
-                    height: 1,
-                    indent: 0,
-                  ),
-
-                  const Text(
-                    'Enter words related to product separated by comma',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ).paddingSymmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
+                ).paddingSymmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                SizedBox(
+                  height: Get.height * 0.1,
+                ),
+              ],
+            ),
+          ),
+          if (isLoading)
+            const Opacity(
+              opacity: 0.6,
+              child: ModalBarrier(
+                dismissible: false,
+                color: Colors.black87,
+              ),
+            ),
+          if (isLoading)
+            const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
                   SizedBox(
-                    height: Get.height * 0.1,
+                    height: 20,
+                  ),
+                  Text(
+                    'We\'re creating your product,',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Text(
+                    'Please wait...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ],
               ),
             ),
-            if (isLoading)
-              const Opacity(
-                opacity: 0.6,
-                child: ModalBarrier(
-                  dismissible: false,
-                  color: Colors.black87,
-                ),
-              ),
-            if (isLoading)
-              const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      'We\'re creating your product,',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Text(
-                      'Please wait...',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-          ]
-        ),
+        ]),
       ),
     );
   }
