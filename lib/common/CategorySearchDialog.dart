@@ -8,11 +8,42 @@ import 'package:get/get.dart';
 add_product_cotroller product_controller = Get.put(add_product_cotroller());
 
 // Custom Category Search Widget
-class CategorySearchDialog extends StatelessWidget {
+class CategorySearchDialog extends StatefulWidget {
   final List<dynamic> categoryList;
   final Function(dynamic) onCategorySelected;
 
   CategorySearchDialog({super.key, required this.categoryList, required this.onCategorySelected});
+
+  @override
+  _CategorySearchDialogState createState() => _CategorySearchDialogState();
+}
+
+class _CategorySearchDialogState extends State<CategorySearchDialog> {
+  TextEditingController _searchController = TextEditingController();
+  List<dynamic> _filteredCategories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredCategories = widget.categoryList;
+    _searchController.addListener(_filterCategories);
+  }
+
+  void _filterCategories() {
+    setState(() {
+      _filteredCategories = widget.categoryList.where((category) {
+        final lowerPattern = _searchController.text.toLowerCase();
+        return category['name'].toLowerCase().contains(lowerPattern) ||
+            category['description'].toLowerCase().contains(lowerPattern);
+      }).toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,93 +52,68 @@ class CategorySearchDialog extends StatelessWidget {
       content: SizedBox(
         height: MediaQuery.of(context).size.height * 0.5, // 50% of the screen height
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TypeAheadField<dynamic>(
-              decorationBuilder: (context, child) => DecoratedBox(
-                decoration: BoxDecoration(
-                  color: CupertinoTheme.of(context)
-                      .barBackgroundColor
-                      .withOpacity(1),
-                  border: Border.all(
-                    color: CupertinoDynamicColor.resolve(
-                      CupertinoColors.systemGrey4,
-                      context,
-                    ),
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(5),
+            TextField(
+              controller: _searchController,
+              autofocus: false,
+              style: const TextStyle(color: Colors.black, fontSize: 16),
+              decoration: InputDecoration(
+                suffixIcon: Icon(Icons.search,
+                  color: Colors.black87.withOpacity(0.5), size: 20
                 ),
-                child: child,
-              ),
-              builder: (context, controller, focusNode) => TextField(
-                controller: controller,
-                focusNode: focusNode,
-                autofocus: false,
-                style: const TextStyle(color: Colors.black, fontSize: 16),
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 12, horizontal: 12),
-                  isDense: true,
-                  hintText: 'Start typing to search...',
-
-                  // rounded border
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: appcolor().greyColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                    BorderSide(color: Colors.black87.withOpacity(0.5)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                    BorderSide(color: Colors.black87.withOpacity(0.5)),
-                  ),
+                suffixIconConstraints: const BoxConstraints(
+                  minWidth: 40,
+                  minHeight: 40,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 12, horizontal: 12),
+                isDense: true,
+                hintText: 'Start typing to search...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: appcolor().greyColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide:
+                  BorderSide(color: Colors.black87.withOpacity(0.5)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide:
+                  BorderSide(color: Colors.black87.withOpacity(0.5)),
                 ),
               ),
-              suggestionsCallback: (pattern) async {
-                return product_controller.categoryList
-                    .where((category) => category['name']
-                    .toLowerCase()
-                    .contains(pattern.toLowerCase()))
-                    .toList();
-              },
-              itemBuilder: (context, dynamic suggestion) {
-                return ListTile(
-                  title: Text(suggestion['name']),
-                );
-              },
-              onSelected: (dynamic suggestion) {
-                onCategorySelected(suggestion);
-                Get.back();
-              },
-              direction: VerticalDirection.down,
-              transitionBuilder: (context, animation, child) {
-                return FadeTransition(
-                  opacity: CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.fastOutSlowIn
-                  ),
-                  child: child,
-                );
-              },
             ),
             SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
-                itemCount: categoryList.length,
-                itemBuilder: (context, index) {
-                  var category = categoryList[index];
-                  return ListTile(
-                    title: Text(category['name']),
-                    onTap: () {
-                      onCategorySelected(category);
-                      Get.back();
-                    },
-                  );
-                },
+              child: Container(
+                padding: EdgeInsets.zero ,
+                child: ListView.builder(
+                  itemCount: _filteredCategories.length,
+                  padding:  EdgeInsets.zero,
+                  itemBuilder: (context, index) {
+                    var category = _filteredCategories[index];
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 3, vertical: 0
+                      ),
+                      dense: true,
+                      title: Text(category['name']),
+                      subtitle: Text(category['description'],
+                        style: const TextStyle(color: Colors.black54),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      onTap: () {
+                        widget.onCategorySelected(category);
+                        Get.back();
+                      },
+                    );
+                  },
+                )
               ),
             ),
           ],
