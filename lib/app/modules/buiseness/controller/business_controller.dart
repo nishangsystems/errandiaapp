@@ -123,6 +123,9 @@ class business_controller extends GetxController {
         // print("total_: ${total.value}");
         itemList.addAll(data['items']);
 
+        // filter out items that have status 0
+        itemList.removeWhere((element) => element['status'] == 0);
+
         print("itemList: $itemList");
       }
     } catch (e) {

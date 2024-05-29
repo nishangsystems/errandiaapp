@@ -18,6 +18,7 @@ class apiDomain {
       'https://cznbemgsca.cloudimg.io/https://errandia.com';
   final policyUrl = "https://errandia.com/policies/privacy-policy";
   final termsUrl = "https://errandia.com/policies/terms-condition";
+  final faqUrl = "https://errandia.com/#faq:~:text=EXPERTS%20BEHIND-,ERRANDIA,-Frequently%20Asked%20Questions";
 }
 
 class api {

@@ -596,10 +596,16 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
                     Text(
                       'Featured Businesses',
                       style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
                         color: appcolor().mainColor,
                       ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.refresh, color: appcolor().mainColor, size: 20,),
+                      onPressed: () {
+                        homeController.reloadFeaturedBusinessesData();
+                      },
                     ),
                     const Spacer(),
                     TextButton(
@@ -622,12 +628,18 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
                 child: Row(
                   children: [
                     Text(
-                      'Recently Posted Errands',
+                      'Recent Errands',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
                         color: appcolor().mainColor,
                       ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.refresh, color: appcolor().mainColor, size: 20,),
+                      onPressed: () {
+                        homeController.reloadRecentlyPostedItems();
+                      },
                     ),
                     const Spacer(),
                     TextButton(

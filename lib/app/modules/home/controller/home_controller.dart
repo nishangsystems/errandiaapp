@@ -72,6 +72,10 @@ class home_controller extends GetxController {
         isFBLLoading.value = false;
         isFBLError.value = false;
         featuredBusinessData.addAll(businesses);
+
+        // filter out items that have status 0
+        featuredBusinessData.removeWhere((element) => element['status'] == 0);
+
         print("featured: ${businesses.isNotEmpty}");
       } else {
         // Handle error

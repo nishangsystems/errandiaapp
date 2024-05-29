@@ -1,21 +1,11 @@
-import 'dart:convert';
-
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
-import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
-import 'package:errandia/app/modules/auth/Register/register_ui.dart';
 import 'package:errandia/app/modules/auth/Register/service_Provider/view/Register_serviceprovider_view.dart';
-import 'package:errandia/app/modules/auth/Sign%20in/view/forget_password.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_otp_verification_screen.dart';
-import 'package:errandia/app/modules/home/view/home_view.dart';
-import 'package:errandia/auth_services/firebase_auth_services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:intl_phone_field/helpers.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class signin_view_1 extends StatefulWidget {
   const signin_view_1({super.key});

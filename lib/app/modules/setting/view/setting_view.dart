@@ -110,6 +110,17 @@ class setting_view extends StatelessWidget {
             //   indent: 0,
             // ),
 
+            // faq
+            mywidget(() {
+              mlaunchUrl(apiDomain().faqUrl);
+            }, Icons.question_answer, 'Frequently Asked Questions'),
+            Divider(
+              color: appcolor().greyColor,
+              thickness: 1,
+              height: 1,
+              indent: 0,
+            ),
+
             // review
             mywidget(() {
               Get.to(() => review_view());
