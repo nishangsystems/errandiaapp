@@ -73,8 +73,8 @@ class _NewErrandState extends State<New_Errand> {
           // Show success popup
           Get.snackbar("Info", response['message'],
               snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
+              backgroundColor: Colors.yellowAccent,
+              colorText: Colors.black,
               duration: const Duration(seconds: 5),
               margin: const EdgeInsets.symmetric(
                 horizontal: 20,
@@ -184,6 +184,7 @@ class _NewErrandState extends State<New_Errand> {
   }
 
   void createErrand() async {
+    newErrandController.isLoading.value = true;
     setState(() {
       isLoading = true;
     });
@@ -206,6 +207,7 @@ class _NewErrandState extends State<New_Errand> {
         }
         errandController.reloadMyErrands();
         homeController.reloadRecentlyPostedItems();
+        newErrandController.isLoading.value = false;
         setState(() {
           isLoading = false;
           imageController.imageList.clear();
@@ -217,31 +219,13 @@ class _NewErrandState extends State<New_Errand> {
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.green,
             colorText: Colors.white,
-            duration: const Duration(seconds: 5),
+            duration: const Duration(seconds: 3),
             margin: const EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 15,
             ));
 
         runErrandInBackground(response);
-
-        // popup = PopupBox(
-        //   title: 'Success',
-        //   description: response['message'],
-        //   type: PopupType.success,
-        //   callback: () {
-        //     // Navigator.of(context).pushAndRemoveUntil(
-        //     //   MaterialPageRoute(
-        //     //     builder: (context) => errand_view(),
-        //     //   ),
-        //     //   (route) => false,
-        //     // );
-        //     Get.back();
-        //     Get.back();
-        //     // print("response: $response");
-        //   },
-        // );
-        // popup.showPopup(context);
       } else {
         setState(() {
           isLoading = false;
@@ -495,7 +479,7 @@ class _NewErrandState extends State<New_Errand> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Region'),
+                  const Text('Region (optional)'),
                   const SizedBox(height: 5),
                   Container(
                     height: 46,
@@ -783,21 +767,30 @@ class _NewErrandState extends State<New_Errand> {
               const SizedBox(height: 30),
               Obx(() {
                 return InkWell(
-                  onTap: newErrandController.isFormFilled
+                  onTap: newErrandController.isFormFilled && !newErrandController.isLoading.value
                       ? () {
+                    // if (errandController.isTownsLoading.value) {
+                    //   newErrandController.town.value = '';
+                    //   newErrandController
+                    // }
                           createErrand();
                         }
                       : null,
                   child: Container(
                     height: 50,
                     decoration: BoxDecoration(
-                      color: newErrandController.isFormFilled
+                      color: newErrandController.isFormFilled  && !newErrandController.isLoading.value
                           ? Colors.blue[700]
                           : const Color(0xffe0e6ec),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
-                      child: Text(
+                      child: newErrandController.isLoading.value
+                          ? CircularProgressIndicator(
+                        valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.blueGrey.withOpacity(0.5)),
+                      )
+                          : Text(
                         'RUN ERRAND',
                         style: TextStyle(
                           fontSize: 18,

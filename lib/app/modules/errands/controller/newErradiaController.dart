@@ -13,6 +13,8 @@ class new_errandia_controller extends GetxController{
   RxString regionCode = ''.obs;
   RxString town = ''.obs;
 
+  var isLoading = false.obs;
+
   // Expose only the RxString values (read-only)
   String get title => _title.value;
   String get description => _description.value;
@@ -32,9 +34,7 @@ class new_errandia_controller extends GetxController{
   // Check if all fields are filled
   bool get isFormFilled =>
       _title.isNotEmpty &&
-          _description.isNotEmpty &&
-          regionCode.isNotEmpty;
-
+          _description.isNotEmpty;
   @override
   void onClose() {
     // Dispose of the text controllers
