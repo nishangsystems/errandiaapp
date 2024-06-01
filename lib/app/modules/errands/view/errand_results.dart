@@ -73,6 +73,7 @@ class _ErrandResultsState extends State<ErrandResults>
   @override
   Widget build(BuildContext context) {
     print("errand results: ${errandController.resultsList}");
+    print("errand results count: ${errandController.resultsList.length}");
     return WillPopScope(
       onWillPop: () async {
         errandController.resetErrandResults();
@@ -105,7 +106,35 @@ class _ErrandResultsState extends State<ErrandResults>
         body: SingleChildScrollView(
           child: Column(
             children: [
-              // if (widget.data == null)
+              if (errandController.resultsList.isEmpty && widget.data != null)
+                Container(
+                  padding: const EdgeInsets.all(30),
+                  height: Get.height * 0.68,
+                  child: buildErrorWidget(
+                    message: 'No results found',
+                    callback: () {
+                      errandController.reloadErrandResults(widget.errandId);
+                    },
+                  ),
+                ),
+              if (errandController.isResultsError.value)
+                Container(
+                  padding: const EdgeInsets.all(30),
+                  height: Get.height * 0.68,
+                  child: buildErrorWidget(
+                    message:
+                        'There was an error loading your errand results, please try again later',
+                    callback: () {
+                      errandController.reloadErrandResults(widget.errandId);
+                    },
+                  ),
+                ),
+              if (errandController.isResultsLoading.value)
+                SizedBox(
+                  height: Get.height * 0.68,
+                  child: buildLoadingWidget(),
+                ),
+              if (widget.data == null)
                 Obx(() {
                   if (errandController.isResultsLoading.value) {
                     return SizedBox(
