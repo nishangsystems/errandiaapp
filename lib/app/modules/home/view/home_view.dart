@@ -49,6 +49,7 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
     signInController = Get.put(signIn_controller());
     requestLocationPermission();
     homeController.checkLoginStatus();
+    homeController.fetchUnreadNotifications();
   }
 
   void requestLocationPermission() async {
@@ -97,99 +98,99 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
       },
       child: Scaffold(
         appBar: appbar(),
-        floatingActionButton: Obx(
-            () {
-              if (homeController.loggedIn.value) {
-                return SpeedDial(
-                  icon: Icons.add,
-                  backgroundColor: appcolor().mainColor,
-                  overlayColor: appcolor().darkBlueColor,
-                  activeIcon: Icons.close,
-                  spaceBetweenChildren: 12,
-                  overlayOpacity: 0.5,
-                  spacing: 3,
-                  animationCurve: Curves.elasticInOut,
-                  openCloseDial: isDialOpen,
-                  children: [
-                    SpeedDialChild(
-                      child: Image.asset(
-                        'assets/images/sidebar_icon/icon-manage-products.png',
-                        color: appcolor().mainColor,
-                        height: 30,
-                        width: 20,
-                      ),
-                      backgroundColor: Colors.white,
-                      elevation: 4,
-                      label: 'Add Product',
-                      labelStyle: const TextStyle(color: Colors.black),
-                      onTap: () {
-                        Get.to(() => add_product_view(),
+        floatingActionButton: Obx(() {
+          if (homeController.loggedIn.value) {
+            return SpeedDial(
+              icon: Icons.add,
+              backgroundColor: appcolor().mainColor,
+              overlayColor: appcolor().darkBlueColor,
+              activeIcon: Icons.close,
+              spaceBetweenChildren: 12,
+              overlayOpacity: 0.5,
+              spacing: 3,
+              animationCurve: Curves.elasticInOut,
+              openCloseDial: isDialOpen,
+              children: [
+                SpeedDialChild(
+                  child: Image.asset(
+                    'assets/images/sidebar_icon/icon-manage-products.png',
+                    color: appcolor().mainColor,
+                    height: 30,
+                    width: 20,
+                  ),
+                  backgroundColor: Colors.white,
+                  elevation: 4,
+                  label: 'Add Product',
+                  labelStyle: const TextStyle(color: Colors.black),
+                  onTap: () {
+                    Get.to(() => add_product_view(),
+                        transition: Transition.rightToLeft,
+                        duration: const Duration(milliseconds: 500));
+                  },
+                ),
+                SpeedDialChild(
+                  child: Image.asset(
+                    'assets/images/sidebar_icon/services.png',
+                    color: appcolor().mainColor,
+                    height: 30,
+                    width: 20,
+                  ),
+                  backgroundColor: Colors.white,
+                  elevation: 4,
+                  label: 'Add Service',
+                  labelStyle: const TextStyle(color: Colors.black),
+                  onTap: () {
+                    Get.to(() => add_service_view(),
+                        transition: Transition.rightToLeft,
+                        duration: const Duration(milliseconds: 500));
+                  },
+                ),
+                SpeedDialChild(
+                  child: Image.asset(
+                    'assets/images/sidebar_icon/icon-profile-errands.png',
+                    color: appcolor().mainColor,
+                    height: 30,
+                    width: 20,
+                  ),
+                  backgroundColor: Colors.white,
+                  elevation: 4,
+                  label: 'Run Errand',
+                  labelStyle: const TextStyle(color: Colors.black),
+                  onTap: () {
+                    Get.to(() => const New_Errand(),
+                        transition: Transition.rightToLeft,
+                        duration: const Duration(milliseconds: 500));
+                  },
+                ),
+                SpeedDialChild(
+                  child: Image.asset(
+                    'assets/images/sidebar_icon/create_shop.png',
+                    color: appcolor().mainColor,
+                    height: 30,
+                    width: 20,
+                  ),
+                  backgroundColor: Colors.white,
+                  elevation: 4,
+                  label: 'Add Business',
+                  labelStyle: const TextStyle(color: Colors.black),
+                  onTap: () {
+                    Get.to(() => add_business_view(),
                             transition: Transition.rightToLeft,
-                            duration: const Duration(milliseconds: 500));
-                      },
-                    ),
-                    SpeedDialChild(
-                      child: Image.asset(
-                        'assets/images/sidebar_icon/services.png',
-                        color: appcolor().mainColor,
-                        height: 30,
-                        width: 20,
-                      ),
-                      backgroundColor: Colors.white,
-                      elevation: 4,
-                      label: 'Add Service',
-                      labelStyle: const TextStyle(color: Colors.black),
-                      onTap: () {
-                        Get.to(() => add_service_view(),
-                            transition: Transition.rightToLeft,
-                            duration: const Duration(milliseconds: 500));
-                      },
-                    ),
-                    SpeedDialChild(
-                      child: Image.asset(
-                        'assets/images/sidebar_icon/icon-profile-errands.png',
-                        color: appcolor().mainColor,
-                        height: 30,
-                        width: 20,
-                      ),
-                      backgroundColor: Colors.white,
-                      elevation: 4,
-                      label: 'Run Errand',
-                      labelStyle: const TextStyle(color: Colors.black),
-                      onTap: () {
-                        Get.to(() => const New_Errand(),
-                            transition: Transition.rightToLeft,
-                            duration: const Duration(milliseconds: 500));
-                      },
-                    ),
-                    SpeedDialChild(
-                      child: Image.asset(
-                        'assets/images/sidebar_icon/create_shop.png',
-                        color: appcolor().mainColor,
-                        height: 30,
-                        width: 20,
-                      ),
-                      backgroundColor: Colors.white,
-                      elevation: 4,
-                      label: 'Add Business',
-                      labelStyle: const TextStyle(color: Colors.black),
-                      onTap: () {
-                        Get.to(() => add_business_view(), transition: Transition.rightToLeft,
-                            duration: const Duration(milliseconds: 500))?.then((_) {
-                          businessController.reloadBusinesses();
-                          profileController.reloadMyBusinesses();
-                          homeController.featuredBusinessData.clear();
-                          homeController.fetchFeaturedBusinessesData();
-                        });
-                      },
-                    )
-                  ],
-                );
-              } else {
-                return Container();
-              }
-            }
-        ),
+                            duration: const Duration(milliseconds: 500))
+                        ?.then((_) {
+                      businessController.reloadBusinesses();
+                      profileController.reloadMyBusinesses();
+                      homeController.featuredBusinessData.clear();
+                      homeController.fetchFeaturedBusinessesData();
+                    });
+                  },
+                )
+              ],
+            );
+          } else {
+            return Container();
+          }
+        }),
         endDrawer: CustomEndDrawer(
           onBusinessCreated: () {
             profileController.reloadMyBusinesses();

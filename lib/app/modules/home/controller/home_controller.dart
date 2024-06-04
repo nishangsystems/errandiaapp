@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/APi/business.dart';
+import 'package:errandia/app/APi/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +12,7 @@ class home_controller extends GetxController {
   RxBool loggedIn = false.obs;
   var isLoggedIn = false.obs;
   var currentIndex = 0.obs;
-
+  RxInt unreadNotificationsCount = 0.obs;
 
   var featuredBusinessData = List<dynamic>.empty(growable: true).obs;
   var recentlyPostedItemsData = List<dynamic>.empty(growable: true).obs;
@@ -92,6 +91,16 @@ class home_controller extends GetxController {
     }
   }
 
+  void fetchUnreadNotifications() async {
+    try {
+      var data = await NotificationsAPI.getUnreadNotifications();
+      print("response unread notifications: $data");
+      unreadNotificationsCount.value = data['total'];
+    } catch (e) {
+      print('unread notifications error: $e');
+    }
+  }
+
   // Reload function for recently posted items
   void reloadRecentlyPostedItems() {
     recentlyPostedItemsData.clear();
@@ -143,5 +152,4 @@ class home_controller extends GetxController {
     // Logic to check login status
     isLoggedIn.value = await isUserLoggedIn();
   }
-
 }
