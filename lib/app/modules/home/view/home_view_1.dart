@@ -8,25 +8,16 @@ import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/global/Widgets/errand_widget_card.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
-import 'package:errandia/app/modules/home/view/home_view.dart';
-import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../modal/Country.dart';
 import '../../../../modal/Region.dart';
-import '../../../../modal/Street.dart';
-import '../../../../modal/Town.dart';
-import '../../../../modal/category.dart';
 import '../../../../modal/subcatgeory.dart';
 import '../../categories/CategoryData.dart';
 import '../../errands/view/see_all_errands.dart';
@@ -131,26 +122,35 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
     homeController = Get.put(home_controller());
     profileController = Get.put(profile_controller());
     // CountryData();
-    RegionData();
-    // TownData();
-    // Country();
-    // street();
-    subCategoryData();
-    homeController.featuredBusinessData();
-    homeController.recentlyPostedItemsData();
-    // if (homeController.loggedIn.value) {
-    profileController.getUser();
-    // }
+
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // loadIsLoggedIn();
+      RegionData();
+      // TownData();
+      // Country();
+      // street();
+      subCategoryData();
+      homeController.featuredBusinessData();
+      homeController.recentlyPostedItemsData();
+      homeController.fetchUnreadNotifications();
+      // if (homeController.loggedIn.value) {
+      profileController.getUser();
+      // }
+    });
   }
 
   String _formatAddress(Map<String, dynamic> item) {
     print("item: $item");
     // String street = item['street'].toString() != '[]' && '';
     String townName =
-        item['town'].toString() != 'null' && item['town'].toString() != '[]'  ? item['town']['name'] : '';
-    String regionName = item['region'].toString() != 'null' && item['region'].toString() != '[]'
-        ? item['region']['name'].split(" -")[0]
-        : '';
+        item['town'].toString() != 'null' && item['town'].toString() != '[]'
+            ? item['town']['name']
+            : '';
+    String regionName =
+        item['region'].toString() != 'null' && item['region'].toString() != '[]'
+            ? item['region']['name'].split(" -")[0]
+            : '';
 
     return [townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
   }
@@ -163,6 +163,7 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      homeController.fetchUnreadNotifications();
       profileController.getUser();
     }
   }
@@ -276,17 +277,16 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
                 var data = homeController.recentlyPostedItemsData[index];
 
                 return InkWell(
-                  onTap: () {
-                    // Get.to(Product_view(item: data,name: data['name'].toString(),));
-                    // Get.back();
-                    Get.to(() => errand_detail_view(
-                          data: data,
-                        ));
-                  },
-                  child: ErrandWidgetCard(
-                    data: data,
-                  )
-                );
+                    onTap: () {
+                      // Get.to(Product_view(item: data,name: data['name'].toString(),));
+                      // Get.back();
+                      Get.to(() => errand_detail_view(
+                            data: data,
+                          ));
+                    },
+                    child: ErrandWidgetCard(
+                      data: data,
+                    ));
               },
             ),
           );
@@ -455,7 +455,7 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
             width: Get.width,
           ),
           // plus icon
-          
+
           ListView(
             // physics: (),
             children: [
@@ -602,7 +602,11 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.refresh, color: appcolor().mainColor, size: 20,),
+                      icon: Icon(
+                        Icons.refresh,
+                        color: appcolor().mainColor,
+                        size: 20,
+                      ),
                       onPressed: () {
                         homeController.reloadFeaturedBusinessesData();
                       },
@@ -636,7 +640,11 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.refresh, color: appcolor().mainColor, size: 20,),
+                      icon: Icon(
+                        Icons.refresh,
+                        color: appcolor().mainColor,
+                        size: 20,
+                      ),
                       onPressed: () {
                         homeController.reloadRecentlyPostedItems();
                       },

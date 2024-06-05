@@ -1,9 +1,7 @@
-
 import 'package:errandia/app/APi/notifications.dart';
 import 'package:get/get.dart';
 
 class notifications_controller extends GetxController {
-
   RxBool isNotificationLoading = false.obs;
   RxBool isNotificationError = false.obs;
 
@@ -15,16 +13,17 @@ class notifications_controller extends GetxController {
 
   RxInt currentPage = 1.obs;
   RxInt total = 0.obs;
-
   @override
   void onInit() {
     super.onInit();
+    fetchNotifications();
   }
 
   void fetchNotifications() async {
     print("fetching notifications");
-    if (isNotificationLoading.isTrue || (
-    notificationList.isNotEmpty && notificationList.length >= total.value)) return;
+    if (isNotificationLoading.isTrue ||
+        (notificationList.isNotEmpty && notificationList.length >= total.value))
+      return;
 
     isNotificationLoading.value = true;
 
@@ -38,6 +37,11 @@ class notifications_controller extends GetxController {
         total.value = data['total'];
         isNotificationLoading.value = false;
         isNotificationError.value = false;
+
+        // order by date
+        notificationList.sort((a, b) {
+          return b['created_at'].compareTo(a['created_at']);
+        });
       } else {
         isNotificationLoading.value = false;
         isNotificationError.value = true;
@@ -78,5 +82,4 @@ class notifications_controller extends GetxController {
     total.value = 0;
     fetchNotifications();
   }
-
 }

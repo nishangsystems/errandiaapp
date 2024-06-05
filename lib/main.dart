@@ -7,6 +7,7 @@ import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/notifications/notifications_view.dart';
 import 'package:errandia/app/modules/splashScreen/splash_screen.dart';
 import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
+import 'package:errandia/common/dependency_injection.dart';
 import 'package:errandia/common/initialize_device.dart';
 import 'package:errandia/languages/language.dart';
 import 'package:errandia/routes.dart';
@@ -19,7 +20,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 late FirebaseMessaging messaging;
 late SharedPreferences _prefs;
@@ -85,7 +85,8 @@ void _handleMessage(Map<String, dynamic> data) {
   if (data['page'] == 'received_errands') {
     Get.to(() => const errand_view())?.then((_) {
       final tabController = Get.find<errand_tab_controller>();
-      tabController.tab_controller.animateTo(1); // Set index to Received Errands tab
+      tabController.tab_controller
+          .animateTo(1); // Set index to Received Errands tab
     });
   }
 
@@ -123,6 +124,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await InitializeDevice().initialize();
   await GetStorage.init();
+  DependencyInjection.init();
   await ErrandiaApp._initializePrefs();
 
   await getActiveSubscription();

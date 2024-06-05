@@ -14,6 +14,8 @@ class home_controller extends GetxController {
   var currentIndex = 0.obs;
   RxInt unreadNotificationsCount = 0.obs;
 
+  RxBool hasUnread = false.obs;
+
   var featuredBusinessData = List<dynamic>.empty(growable: true).obs;
   var recentlyPostedItemsData = List<dynamic>.empty(growable: true).obs;
 
@@ -27,6 +29,12 @@ class home_controller extends GetxController {
   RxBool isFBLLoading = false.obs;
   RxBool isRPIError = false.obs;
   RxBool isFBLError = false.obs;
+
+  // check if user has unread notifications
+  bool hasUnreadNotifications() {
+    hasUnread.value = unreadNotificationsCount.value > 0;
+    return hasUnread.value;
+  }
 
   @override
   void onInit() {
@@ -91,11 +99,16 @@ class home_controller extends GetxController {
     }
   }
 
-  void fetchUnreadNotifications() async {
+  Future<void> fetchUnreadNotifications() async {
     try {
       var data = await NotificationsAPI.getUnreadNotifications();
       print("response unread notifications: $data");
       unreadNotificationsCount.value = data['total'];
+      hasUnread.value = unreadNotificationsCount.value > 0;
+      // if (unreadNotificationsCount.value > 0) {
+      //   notificationsController.fetchNotifications();
+      //   print('unread notifications: ${unreadNotificationsCount.value}');
+      // }
     } catch (e) {
       print('unread notifications error: $e');
     }

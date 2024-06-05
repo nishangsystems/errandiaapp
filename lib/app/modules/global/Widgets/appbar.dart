@@ -22,6 +22,7 @@ Widget mywidget = home_controller().atbusiness.value == false
 AppBar appbar() {
   homeController.loadIsLoggedIn();
   homeController.fetchUnreadNotifications();
+  homeController.hasUnreadNotifications();
 
   print(
       "unreadNotificationsCount: ${homeController.unreadNotificationsCount.value}");
@@ -55,30 +56,31 @@ AppBar appbar() {
                     ),
                     color: appcolor().mediumGreyColor,
                   ),
-                  if (homeController.unreadNotificationsCount.value > 0)
-                    Positioned(
-                      right: 13,
-                      top: 11,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 8,
-                          minHeight: 8,
-                        ),
-                        child: const Text(
-                          '',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 4,
+                  Obx(() => homeController.hasUnread.value
+                      ? Positioned(
+                          right: 13,
+                          top: 11,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 8,
+                              minHeight: 8,
+                            ),
+                            child: const Text(
+                              '',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 4,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
+                        )
+                      : Container()),
                 ],
               )
             : Container()),

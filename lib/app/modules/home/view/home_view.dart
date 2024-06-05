@@ -83,6 +83,7 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
       homeController.checkLoginStatus();
       homeController.reloadRecentlyPostedItems();
       homeController.reloadFeaturedBusinessesData();
+      homeController.fetchUnreadNotifications();
     }
   }
 
@@ -202,6 +203,7 @@ class _Home_viewState extends State<Home_view> with WidgetsBindingObserver {
             homeController.recentlyPostedItemsData.clear();
             homeController.fetchRecentlyPostedItemsData();
             profileController.reloadMyBusinesses();
+            homeController.fetchUnreadNotifications();
           },
         ),
         body: Obx(() => _buildBody()),
