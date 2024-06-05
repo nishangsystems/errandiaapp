@@ -9,6 +9,7 @@ import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/products/controller/product_controller.dart';
 import 'package:errandia/app/modules/products/view/edit_product_view.dart';
 import 'package:errandia/app/modules/services/view/service_details_view.dart';
+import 'package:errandia/main.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -202,6 +203,17 @@ class _Product_viewState extends State<Product_view>
         .trim();
   }
 
+  bool isMyProduct() {
+    String? currentUser = ErrandiaApp.prefs.getString('user');
+
+    if (currentUser != null) {
+      var user = jsonDecode(currentUser);
+      return user['id'] == widget.item['user']['id'];
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     //  print(widget.item.product_name);
@@ -329,6 +341,7 @@ class _Product_viewState extends State<Product_view>
           elevation: 0,
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
+          centerTitle: isMyProduct() ? false : true,
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new,
@@ -345,26 +358,19 @@ class _Product_viewState extends State<Product_view>
             ),
           ),
           actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.messenger_sharp,
-                size: 30,
+            if (isMyProduct())
+              IconButton(
+                onPressed: () {
+                  // Share.share('text', subject: 'hello share');
+                  showPopupMenu(context);
+                },
+                // vertical 3 dots
+                icon: const Icon(
+                  Icons.more_vert,
+                  size: 30,
+                ),
+                color: appcolor().mediumGreyColor,
               ),
-              color: appcolor().mediumGreyColor,
-            ),
-            IconButton(
-              onPressed: () {
-                // Share.share('text', subject: 'hello share');
-                showPopupMenu(context);
-              },
-              // vertical 3 dots
-              icon: const Icon(
-                Icons.more_vert,
-                size: 30,
-              ),
-              color: appcolor().mediumGreyColor,
-            ),
           ],
         ),
         body: SingleChildScrollView(
@@ -1069,7 +1075,8 @@ Widget image_select_widget(BuildContext context, final item) {
                     child: Center(
                         child: FadeInImage.assetNetwork(
                             placeholder: 'assets/images/errandia_logo.png',
-                            image: getImagePathWithSize(image['url'].toString(), width: 200, height: 200),
+                            image: getImagePathWithSize(image['url'].toString(),
+                                width: 200, height: 200),
                             fit: BoxFit.cover,
                             width: double.infinity,
                             imageErrorBuilder: (context, error, stackTrace) {

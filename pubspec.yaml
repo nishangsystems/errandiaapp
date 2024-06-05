@@ -83,6 +83,8 @@ dependencies:
   ephone_field: ^0.0.2
   flutter_typeahead: ^5.2.0
   flutter_keyboard_visibility: ^6.0.0
+  connectivity_plus: ^3.0.3
+  internet_connection_checker_plus: ^0.0.1
 
 dev_dependencies:
   flutter_test:

@@ -5,12 +5,9 @@ import 'package:errandia/app/APi/business.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/controller/errandia_business_view_controller.dart';
 import 'package:errandia/app/modules/buiseness/featured_buiseness/view/featured_list_item.dart';
-import 'package:errandia/app/modules/buiseness/verify_business_otp.dart';
-import 'package:errandia/app/modules/buiseness/view/businesses_view_with_bar.dart';
 import 'package:errandia/app/modules/buiseness/view/edit_business_view.dart';
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
-import 'package:errandia/app/modules/errands/view/search_errand_prod.dart';
 import 'package:errandia/app/modules/errands/view/see_all_errands.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
@@ -27,8 +24,6 @@ import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../products/view/product_view.dart';
 import '../../recently_posted_item.dart/view/recently_posted_list.dart';
@@ -573,19 +568,10 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
         Get.back();
         return true;
       },
-      child: Stack(
-        children: [
-          Scaffold(
+      child: Stack(children: [
+        Scaffold(
             appBar:
                 titledAppBar(capitalizeAll(widget.businessData['name'] ?? ''), [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.notifications,
-                  size: 30,
-                ),
-                color: appcolor().mediumGreyColor,
-              ),
               if (profileController.userData.value['id'] ==
                   widget.businessData['user']['id'])
                 IconButton(
@@ -606,7 +592,6 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   Container(
                     child: Row(
                       children: [
@@ -622,7 +607,8 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                         TextButton(
                           onPressed: () {
                             var data = widget.businessData;
-                            Get.to(() => ItemListWidget(data: data, isService: false));
+                            Get.to(() =>
+                                ItemListWidget(data: data, isService: false));
                           },
                           child: const Text('See All'),
                         ),
@@ -651,7 +637,8 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                         TextButton(
                           onPressed: () {
                             var data = widget.businessData;
-                            Get.to(() => ItemListWidget(data: data, isService: true));
+                            Get.to(() =>
+                                ItemListWidget(data: data, isService: true));
                           },
                           child: const Text('See All'),
                         ),
@@ -712,7 +699,6 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                 ],
               ),
             )),
-
         if (sendingOTPLoading)
           Container(
             color: Colors.black.withOpacity(0.5),
@@ -720,8 +706,7 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
               child: CircularProgressIndicator(),
             ),
           ),
-        ]
-      ),
+      ]),
     );
   }
 }

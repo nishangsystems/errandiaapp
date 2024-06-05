@@ -1,4 +1,5 @@
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
+import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -13,11 +14,12 @@ class Businesses_View extends StatelessWidget {
   Widget build(BuildContext context) {
     home_controller().atbusiness.value = true;
     return Scaffold(
+      appBar: appbar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // address widget
-          
+
           Container(
             decoration: BoxDecoration(
               color: Color.fromARGB(255, 255, 255, 255),

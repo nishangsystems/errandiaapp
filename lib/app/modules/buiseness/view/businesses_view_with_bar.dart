@@ -2,7 +2,9 @@ import 'package:errandia/app/modules/buiseness/controller/business_controller.da
 import 'package:errandia/app/modules/buiseness/view/errandia_business_view.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
+import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
+import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,13 +21,14 @@ class BusinessesViewWithBar extends StatefulWidget {
 class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
   late business_controller busi_controller;
   late ScrollController scrollController;
+  late profile_controller profileController;
+
   List<dynamic> featuredBusinessesData = [];
 
   // Reload function for featured businesses
   void _reloadFeaturedBusinessesData() {
     busi_controller.reloadBusinesses();
   }
-
 
   @override
   void initState() {
@@ -45,35 +48,47 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
   Widget build(BuildContext context) {
     home_controller().atbusiness.value = true;
 
-
     Widget _buildFBLErrorWidget(String message, VoidCallback onReload) {
-      return !busi_controller.isLoading.value ? Container(
-        height: Get.height * 0.9,
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(message),
-              ElevatedButton(
-                onPressed: onReload,
-                style: ElevatedButton.styleFrom(
-                  primary: appcolor().mainColor,
-                ),
-                child: Text('Retry',
-                  style: TextStyle(
-                      color: appcolor().lightgreyColor
-                  ),
+      return !busi_controller.isLoading.value
+          ? Container(
+              height: Get.height * 0.9,
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(message),
+                    ElevatedButton(
+                      onPressed: onReload,
+                      style: ElevatedButton.styleFrom(
+                        primary: appcolor().mainColor,
+                      ),
+                      child: Text(
+                        'Retry',
+                        style: TextStyle(color: appcolor().lightgreyColor),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ): buildLoadingWidget();
+            )
+          : buildLoadingWidget();
     }
 
-
     return Scaffold(
+      endDrawer: CustomEndDrawer(
+        onBusinessCreated: () {
+          profileController.reloadMyBusinesses();
+          homeController.closeDrawer();
+          homeController.featuredBusinessData.clear();
+          homeController.fetchFeaturedBusinessesData();
+          busi_controller.itemList.clear();
+          busi_controller.loadBusinesses();
+          homeController.recentlyPostedItemsData.clear();
+          homeController.fetchRecentlyPostedItemsData();
+          profileController.reloadMyBusinesses();
+        },
+      ),
       appBar: appbar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,7 +340,8 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
               if (busi_controller.isLoading.value == true) {
                 return buildLoadingWidget();
               } else if (busi_controller.isFBLError.value) {
-                return _buildFBLErrorWidget('Failed to load businesses', _reloadFeaturedBusinessesData);
+                return _buildFBLErrorWidget(
+                    'Failed to load businesses', _reloadFeaturedBusinessesData);
               } else if (busi_controller.itemList.isEmpty) {
                 return buildErrorWidget(
                   message: 'No businesses found',
@@ -333,154 +349,160 @@ class _BusinessesViewWithBarState extends State<BusinessesViewWithBar> {
                   callback: _reloadFeaturedBusinessesData,
                 );
               } else {
-                return RefreshIndicator(
-                    child: Obx(
-                        () {
-                          return GridView.builder(
-                            key: const PageStorageKey('businesses'),
-                            controller: scrollController,
-                            itemCount: busi_controller.isLoading.value
-                                ? busi_controller.itemList.length + 1
-                                : busi_controller.itemList.length,
-                            gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 1 / 1.47,
-                              crossAxisSpacing: 6,
-                              mainAxisSpacing: 6,
-                            ),
-                            itemBuilder: (context, index) {
-                              if (index >= busi_controller.itemList.length) {
-                                return busi_controller.isLoading.value ? const Center(child: CircularProgressIndicator()) : Container();
-                              }
-
-                              var business = busi_controller.itemList[index];
-                              return InkWell(
-                                onTap: () {
-                                  Get.to(() => errandia_business_view(
-                                    businessData: business,
-                                  ));
-                                },
-                                child: Container(
-                                  height: Get.height * 0.4,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    // border: Border.all(color: appcolor().greyColor)
-                                  ),
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 1, vertical: 1),
-                                  // width: Get.width * 0.4,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 10),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    // mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: Get.width * 0.38,
-                                        height: Get.height * 0.18,
-                                        color: appcolor().lightgreyColor,
-                                        child: FadeInImage.assetNetwork(
-                                          placeholder: 'assets/images/errandia_logo.png',
-                                          image: getImagePathWithSize(business['image'].toString(), height: 200),
-                                          fit: BoxFit.contain,
-                                          width: double.infinity,
-                                          imageErrorBuilder:  (context, error, stackTrace) {
-                                            return Image.asset('assets/images/errandia_logo.png',
-                                              fit: BoxFit.fill,
-                                              // width: double.infinity,
-                                              height: Get.height * 0.16,
-                                            );
-                                          },
-                                        ),
-                                      ),
-
-                                      SizedBox(
-                                        height: Get.height * 0.02,
-                                      ),
-                                      business['category'] != null
-                                          ? SizedBox(
-                                        width: Get.width * 0.35,
-                                        child: Text(
-                                          business['category']['name'] ?? "",
-                                          style: TextStyle(
-                                              fontSize: 11,
-                                              color: appcolor().mediumGreyColor),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )
-                                      ) : Text(
-                                        "No category provided",
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: appcolor().mediumGreyColor,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      SizedBox(
-                                        height: Get.height * 0.001,
-                                      ),
-                                      Text(
-                                        capitalizeAll(business['name'] ?? ""),
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: appcolor().mainColor,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      SizedBox(
-                                        height: Get.height * 0.001,
-                                      ),
-                                      business['street'] != null && business['street'].toString().isNotEmpty == true
-                                          ? Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                        children: [
-                                          Icon(
-                                            Icons.location_on,
-                                            size: 13,
-                                            color: appcolor().mediumGreyColor,
-                                          ),
-                                          SizedBox(
-                                            width: Get.width * 0.35,
-                                            child: Text(
-                                              business['street'].toString(),
-                                              style: TextStyle(
-                                                color: appcolor().mediumGreyColor,
-                                                fontSize: 12,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                          : Text(
-                                        "No location provided",
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: appcolor().mediumGreyColor,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ).paddingSymmetric(horizontal: 10);
-                        }
+                return RefreshIndicator(child: Obx(() {
+                  return GridView.builder(
+                    key: const PageStorageKey('businesses'),
+                    controller: scrollController,
+                    itemCount: busi_controller.isLoading.value
+                        ? busi_controller.itemList.length + 1
+                        : busi_controller.itemList.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1 / 1.47,
+                      crossAxisSpacing: 6,
+                      mainAxisSpacing: 6,
                     ),
-                    onRefresh: () async {
-                      Get.find<business_controller>().currentPage.value = 1;
-                      Get.find<business_controller>().reloadBusinesses();
-                    });
+                    itemBuilder: (context, index) {
+                      if (index >= busi_controller.itemList.length) {
+                        return busi_controller.isLoading.value
+                            ? const Center(child: CircularProgressIndicator())
+                            : Container();
+                      }
+
+                      var business = busi_controller.itemList[index];
+                      return InkWell(
+                        onTap: () {
+                          Get.to(() => errandia_business_view(
+                                businessData: business,
+                              ));
+                        },
+                        child: Container(
+                          height: Get.height * 0.4,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            // border: Border.all(color: appcolor().greyColor)
+                          ),
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 1, vertical: 1),
+                          // width: Get.width * 0.4,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            // mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: Get.width * 0.38,
+                                height: Get.height * 0.18,
+                                color: appcolor().lightgreyColor,
+                                child: FadeInImage.assetNetwork(
+                                  placeholder:
+                                      'assets/images/errandia_logo.png',
+                                  image: getImagePathWithSize(
+                                      business['image'].toString(),
+                                      height: 200),
+                                  fit: BoxFit.contain,
+                                  width: double.infinity,
+                                  imageErrorBuilder:
+                                      (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/errandia_logo.png',
+                                      fit: BoxFit.fill,
+                                      // width: double.infinity,
+                                      height: Get.height * 0.16,
+                                    );
+                                  },
+                                ),
+                              ),
+                              SizedBox(
+                                height: Get.height * 0.02,
+                              ),
+                              business['category'] != null
+                                  ? SizedBox(
+                                      width: Get.width * 0.35,
+                                      child: Text(
+                                        business['category']['name'] ?? "",
+                                        style: TextStyle(
+                                            fontSize: 11,
+                                            color: appcolor().mediumGreyColor),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ))
+                                  : Text(
+                                      "No category provided",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: appcolor().mediumGreyColor,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                              SizedBox(
+                                height: Get.height * 0.001,
+                              ),
+                              Text(
+                                capitalizeAll(business['name'] ?? ""),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: appcolor().mainColor,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(
+                                height: Get.height * 0.001,
+                              ),
+                              business['street'] != null &&
+                                      business['street']
+                                              .toString()
+                                              .isNotEmpty ==
+                                          true
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          Icons.location_on,
+                                          size: 13,
+                                          color: appcolor().mediumGreyColor,
+                                        ),
+                                        SizedBox(
+                                          width: Get.width * 0.35,
+                                          child: Text(
+                                            business['street'].toString(),
+                                            style: TextStyle(
+                                              color: appcolor().mediumGreyColor,
+                                              fontSize: 12,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Text(
+                                      "No location provided",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: appcolor().mediumGreyColor,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ).paddingSymmetric(horizontal: 10);
+                }), onRefresh: () async {
+                  Get.find<business_controller>().currentPage.value = 1;
+                  Get.find<business_controller>().reloadBusinesses();
+                });
               }
             }),
           )

@@ -4,16 +4,15 @@ import 'dart:io';
 import 'package:errandia/app/APi/product.dart';
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
+import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
 import 'package:errandia/app/modules/global/Widgets/popupBox.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/products/controller/add_product_controller.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/common/CategorySearchDialog.dart';
 import 'package:errandia/modal/Shop.dart';
-import 'package:errandia/modal/subcategory.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
@@ -122,13 +121,64 @@ class _add_product_viewState extends State<add_product_view> {
     }
   }
 
+  void showCreateShopPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("No Businesses Found!",
+              style: TextStyle(
+                color: appcolor().mainColor,
+                fontWeight: FontWeight.bold,
+              )),
+          content: const Text(
+              "You need to add at least one business before adding a product."),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "Cancel".toUpperCase(),
+                  style: TextStyle(
+                    color: appcolor().redColor,
+                  ),
+                )),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Navigate to create shop screen
+                Get.off(() => add_business_view(),
+                    transition: Transition.leftToRight,
+                    duration: const Duration(milliseconds: 200));
+              },
+              child: Text("Add Business".toUpperCase(),
+                  style: TextStyle(
+                    color: appcolor().mainColor,
+                  )),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     product_controller = Get.put(add_product_cotroller());
     profileController = Get.put(profile_controller());
     imageController = Get.put(imagePickercontroller());
-    product_controller.loadShops();
+    // Load shops and categories, then check if shops are empty
+    product_controller.loadShops().then((_) {
+      if (product_controller.shopList.isEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showCreateShopPopup(context);
+        });
+      }
+    });
+
     product_controller.loadCategories();
   }
 
@@ -336,47 +386,48 @@ class _add_product_viewState extends State<add_product_view> {
                     ),
                   ),
                   contentPadding: EdgeInsets.zero,
-                  title: Obx(
-                          () {
-                        if (product_controller.isLoadingCategories.value) {
-                          return Text('Loading Categories...',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[600],
+                  title: Obx(() {
+                    if (product_controller.isLoadingCategories.value) {
+                      return Text(
+                        'Loading Categories...',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                      );
+                    } else if (product_controller.categoryList.isEmpty) {
+                      return Text(
+                        'No Categories found',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                      );
+                    } else {
+                      return InkWell(
+                        onTap: showCategorySelectionPopup,
+                        child: InputDecorator(
+                          decoration: const InputDecoration.collapsed(
+                            hintText: 'Select a Category *',
+                            hintStyle: TextStyle(
+                              color: Colors.black,
                             ),
-                          );
-                        } else if (product_controller.categoryList.isEmpty) {
-                          return Text('No Categories found',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[600],
+                          ),
+                          child: Text(
+                            category == null
+                                ? 'Select a Category *'
+                                : product_controller.categoryList.firstWhere(
+                                    (element) =>
+                                        element['id'] == category)['name'],
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
                             ),
-                          );
-                        } else {
-                          return InkWell(
-                            onTap: showCategorySelectionPopup,
-                            child: InputDecorator(
-                              decoration: const InputDecoration.collapsed(
-                                hintText: 'Select a Category *',
-                                hintStyle: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                              child: Text(
-                                category == null
-                                    ? 'Select a Category *'
-                                    : product_controller.categoryList
-                                    .firstWhere((element) => element['id'] == category)['name'],
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                  ),
+                          ),
+                        ),
+                      );
+                    }
+                  }),
                 ),
                 Divider(
                   color: appcolor().greyColor,

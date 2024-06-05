@@ -1,4 +1,3 @@
-
 // capitalize string function
 import 'dart:convert';
 import 'dart:io';
@@ -6,13 +5,12 @@ import 'dart:io';
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/APi/subscription.dart';
 import 'package:errandia/main.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:get/get.dart';
 
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
@@ -88,7 +86,8 @@ Future<void> launchCaller(String number) async {
 
 // launch whatsapp
 Future<void> launchWhatsapp(String number) async {
-  var url =  Uri.parse("https://wa.me/$number");
+  var url = Uri.parse(
+      "https://wa.me/$number?text=${Uri.encodeComponent("\n\nSent from Errandia")}");
   if (!await launchUrl(url)) {
     throw Exception('Could not launch $url');
   }
@@ -135,7 +134,8 @@ Future<File> compressFile({required File? file}) async {
 }
 
 String formatPrice(double price) {
-  final format = NumberFormat.currency(locale: "fr_CM", symbol: "XAF", decimalDigits: 0);
+  final format =
+      NumberFormat.currency(locale: "fr_CM", symbol: "XAF", decimalDigits: 0);
   return format.format(price);
 }
 
@@ -165,7 +165,10 @@ String listToString(List<int?> list) {
 
 // check if location info is available
 bool isLocationAvailable(Map<String, dynamic> value) {
-  return value['region'] != "" && value['region'] != null && value['town'] != "" && value['town'] != null;
+  return value['region'] != "" &&
+      value['region'] != null &&
+      value['town'] != "" &&
+      value['town'] != null;
 }
 
 Future<void> getActiveSubscription() async {
@@ -185,12 +188,12 @@ Future<void> getActiveSubscription() async {
     var data = response['data'];
     print("subscription data: $data");
 
-    ErrandiaApp.prefs.setString('subscription', jsonEncode(data['data']['item']));
+    ErrandiaApp.prefs
+        .setString('subscription', jsonEncode(data['data']['item']));
   } else {
     print("error getting subscription data: ${response['data']}");
     ErrandiaApp.prefs.setString('subscription', jsonEncode({}));
   }
-
 }
 
 bool hasActiveSubscription() {
@@ -221,3 +224,10 @@ Future<void> clearPreferencesOnFirstRun() async {
     await prefs.setBool('isFirstRun', false);
   }
 }
+
+// Future<void> checkInternetConnection() async {
+//   bool isConnected = await InternetConnection().hasInternetAccess;
+//   if (!isConnected) {
+//     _showNoInternetDialog();
+//   }
+// }
