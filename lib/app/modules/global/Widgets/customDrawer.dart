@@ -1,6 +1,5 @@
 import 'package:errandia/app/modules/Dashboard/view/dashboard_view.dart';
 import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
-import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/errands/view/run_an_errand_1.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
@@ -14,6 +13,7 @@ import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import '../../buiseness/view/add_business_view.dart';
 import '../../buiseness/view/businesses_view.dart';
 import '../../buiseness/view/manage_business_view.dart';
+import '../../errands/view/manage_errands_page.dart';
 import '../../home/controller/home_controller.dart';
 
 class CustomEndDrawer extends StatelessWidget {
@@ -25,7 +25,6 @@ class CustomEndDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final profile_controller profileController = Get.put(profile_controller());
 
     return WillPopScope(
@@ -78,12 +77,12 @@ class CustomEndDrawer extends StatelessWidget {
                   )),
             Obx(() => !homeController.loggedIn.value
                 ? drawerItemWidget(
-              text: 'Search',
-              imagePath: 'assets/images/sidebar_icon/create_shop.png',
-              callback: () {
-                Get.to(() => const run_an_errand_1());
-              },
-            )
+                    text: 'Search',
+                    imagePath: 'assets/images/sidebar_icon/create_shop.png',
+                    callback: () {
+                      Get.to(() => const run_an_errand_1());
+                    },
+                  )
                 : Container()),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
@@ -102,13 +101,13 @@ class CustomEndDrawer extends StatelessWidget {
                 : Container()),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
-              text: 'Manage Businesses',
-              imagePath: 'assets/images/sidebar_icon/icon-company.png',
-              callback: () {
-                Get.back();
-                Get.to(() => manage_business_view(), popGesture: true);
-              },
-            )
+                    text: 'Manage Businesses',
+                    imagePath: 'assets/images/sidebar_icon/icon-company.png',
+                    callback: () {
+                      Get.back();
+                      Get.to(() => manage_business_view(), popGesture: true);
+                    },
+                  )
                 : Container()),
             Obx(() => homeController.loggedIn.value
                 ? drawerItemWidget(
@@ -117,9 +116,10 @@ class CustomEndDrawer extends StatelessWidget {
                         'assets/images/sidebar_icon/icon-profile-errands.png',
                     callback: () {
                       Get.back();
-                      Get.to(() => errand_view());
+                      Get.to(() => const ManageErrandsPage());
                     },
-                  ): Container()),
+                  )
+                : Container()),
             // Obx(() => homeController.loggedIn.value
             //     ? drawerItemWidget(
             //         text: 'Following',
@@ -149,7 +149,8 @@ class CustomEndDrawer extends StatelessWidget {
                     callback: () {
                       Get.back();
                       // Get.to(() => subscriber_view());
-                      Get.to(() => const subscription_view(),
+                      Get.to(
+                        () => const subscription_view(),
                         transition: Transition.fade,
                         duration: const Duration(milliseconds: 500),
                       );
@@ -179,7 +180,7 @@ class CustomEndDrawer extends StatelessWidget {
                     text: 'Logout',
                     imagePath: 'assets/images/sidebar_icon/icon-logout.png',
                     callback: () async {
-                     await AuthService.logout();
+                      await AuthService.logout();
                     },
                   )
                 : drawerItemWidget(

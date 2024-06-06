@@ -1,16 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:errandia/app/AlertDialogBox/alertBoxContent.dart';
-import 'package:http/http.dart'as http;
 import 'package:errandia/app/ImagePicker/imagePickercontroller.dart';
+import 'package:errandia/app/modules/errands/view/manage_errands_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../APi/apidomain & api.dart';
-import '../../buiseness/view/add_business_view.dart';
-import '../../errands/view/errand_view.dart';
 import '../../global/Widgets/blockButton.dart';
 import '../../global/constants/color.dart';
 
@@ -27,7 +28,7 @@ class _add_review_viewState extends State<add_review_view> {
 
   TextEditingController reviewText = TextEditingController();
   var rating = 0.0;
-  bool isLoading =false;
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     imagePickercontroller imageController = Get.put(imagePickercontroller());
@@ -165,8 +166,8 @@ class _add_review_viewState extends State<add_review_view> {
               Obx(
                 () => imageController.image_path.isEmpty
                     ? Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 0),
                         child: Column(
                           children: [
                             Row(
@@ -195,8 +196,8 @@ class _add_review_viewState extends State<add_review_view> {
                         ),
                       )
                     : Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 0),
                         height: 300,
                         child: ListView(
                           children: const [],
@@ -214,48 +215,48 @@ class _add_review_viewState extends State<add_review_view> {
                           },
                           child: Column(
                             children: [
-                          Container(
-                            color: appcolor().greyColor,
-                            height: Get.height * 0.22,
-                            child: Column(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceEvenly,
-                              children: [
-                                // SizedBox(height: Get.height*0.05,),
-                                Center(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.images,
-                                        size: 60,
-                                        color: appcolor().mediumGreyColor,
+                              Container(
+                                color: appcolor().greyColor,
+                                height: Get.height * 0.22,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    // SizedBox(height: Get.height*0.05,),
+                                    Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            FontAwesomeIcons.images,
+                                            size: 60,
+                                            color: appcolor().mediumGreyColor,
+                                          ),
+                                          Text(
+                                            '     Browse Images',
+                                            style: TextStyle(
+                                              color: appcolor().bluetextcolor,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                      Text(
-                                        '     Browse Images',
-                                        style: TextStyle(
-                                          color: appcolor().bluetextcolor,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      )
-                                    ],
-                                  ),
+                                    ),
+                                    // SizedBox(
+                                    //   height: Get.height * 0.05,
+                                    // ),
+                                    Text(
+                                      'Other variations of the main product image',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: appcolor().mediumGreyColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                // SizedBox(
-                                //   height: Get.height * 0.05,
-                                // ),
-                                Text(
-                                  'Other variations of the main product image',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: appcolor().mediumGreyColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                              ),
                             ],
                           ),
                         )
@@ -373,7 +374,8 @@ class _add_review_viewState extends State<add_review_view> {
 
               // add more images
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                 color: Colors.white,
                 height: Get.height * 0.25,
                 child: TextFormField(
@@ -395,20 +397,27 @@ class _add_review_viewState extends State<add_review_view> {
                 height: Get.height * 0.02,
               ),
               blockButton(
-                title:isLoading == false? const Text(
-                  'Submit Review',
-                  style: TextStyle(color: Colors.white),
-                ):const Center(child: CircularProgressIndicator(color: Colors.blue,),),
+                title: isLoading == false
+                    ? const Text(
+                        'Submit Review',
+                        style: TextStyle(color: Colors.white),
+                      )
+                    : const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.blue,
+                        ),
+                      ),
                 ontap: () {
                   var RatingText = reviewText.text.toString();
                   var productid = widget.review['id'].toString();
-                  if(RatingText != ''){
-                    PanDocumentInfoupload(RatingText,productid);
+                  if (RatingText != '') {
+                    PanDocumentInfoupload(RatingText, productid);
                     setState(() {
                       isLoading = true;
                     });
-                  }else{
-                    alertDialogBox(context, 'Alert', 'Please Enter fill fields ');
+                  } else {
+                    alertDialogBox(
+                        context, 'Alert', 'Please Enter fill fields ');
                   }
                 },
                 color: appcolor().mainColor,
@@ -424,16 +433,17 @@ class _add_review_viewState extends State<add_review_view> {
       ),
     );
   }
+
   Future<void> PanDocumentInfoupload(String RatingText, productid) async {
     // Create a MultipartRequest
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
 
-
-    var uri = Uri.parse('${apiDomain().domain}reviews?item_id=$productid&rating=$rating&review=${RatingText}&image_count=${imageController.imageList.length}');
+    var uri = Uri.parse(
+        '${apiDomain().domain}reviews?item_id=$productid&rating=$rating&review=${RatingText}&image_count=${imageController.imageList.length}');
     var request = http.MultipartRequest("POST", uri)
       ..headers['Authorization'] = 'Bearer $token';
-    for (int i =0; i < imageController.imageList.length; i++) {
+    for (int i = 0; i < imageController.imageList.length; i++) {
       for (var image in imageController.imageList) {
         request.files.add(
           await http.MultipartFile.fromPath(
@@ -453,7 +463,7 @@ class _add_review_viewState extends State<add_review_view> {
     try {
       var response = await request.send();
       if (response.statusCode == 200) {
-        Get.offAll(() => errand_view());
+        Get.offAll(() => const ManageErrandsPage());
         setState(() {
           isLoading = false;
           imageController.imageList.clear();
@@ -508,5 +518,4 @@ class _add_review_viewState extends State<add_review_view> {
     //   print("Error: $e");
     // }
   }
-
 }
