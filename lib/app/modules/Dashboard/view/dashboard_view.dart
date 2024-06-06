@@ -1,32 +1,25 @@
 import 'package:errandia/app/APi/apidomain%20&%20api.dart';
 import 'package:errandia/app/modules/buiseness/controller/business_controller.dart';
 import 'package:errandia/app/modules/buiseness/view/add_business_view.dart';
-import 'package:errandia/app/modules/errands/view/New_Errand.dart';
-import 'package:errandia/app/modules/errands/view/errand_view.dart';
+import 'package:errandia/app/modules/errands/view/manage_errands_page.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/account_suspended_widget.dart';
 import 'package:errandia/app/modules/global/Widgets/appbar.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
-import 'package:errandia/app/modules/global/Widgets/pill_widget.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/app/modules/home/controller/home_controller.dart';
-import 'package:errandia/app/modules/manage_review/view/manage_review_view.dart';
 import 'package:errandia/app/modules/products/view/add_product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/view/add_service_view.dart';
 import 'package:errandia/app/modules/services/view/manage_service_view.dart';
-import 'package:errandia/app/modules/sms_plan/view/sms_plan_view.dart';
-import 'package:errandia/app/modules/subscribers/view/subscriber_view.dart';
 import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
 import 'package:errandia/auth_services/firebase_auth_services.dart';
 import 'package:errandia/main.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../buiseness/view/manage_business_view.dart';
 import '../../global/Widgets/bottomsheet_item.dart';
@@ -36,7 +29,6 @@ profile_controller profileController = Get.put(profile_controller());
 home_controller homeController = Get.put(home_controller());
 business_controller businessController = Get.put(business_controller());
 
-
 class dashboard_view extends StatefulWidget {
   const dashboard_view({super.key});
 
@@ -45,7 +37,6 @@ class dashboard_view extends StatefulWidget {
 }
 
 class dashboard_viewState extends State<dashboard_view> {
-
   final isDialOpen = ValueNotifier(false);
 
   void deleteAccount(BuildContext context) {
@@ -232,12 +223,12 @@ class dashboard_viewState extends State<dashboard_view> {
                     ),
                     dashboard_widget(
                       Imagepath:
-                      'assets/images/sidebar_icon/icon-profile-errands.png',
+                          'assets/images/sidebar_icon/icon-profile-errands.png',
                       title: 'Errands',
                       belowText: '0 Errands',
                       color: Colors.blue[700],
                       callback: () {
-                        Get.to(() => const errand_view());
+                        Get.to(() => const ManageErrandsPage());
                       },
                     ),
 
@@ -265,7 +256,7 @@ class dashboard_viewState extends State<dashboard_view> {
                   children: [
                     dashboard_widget(
                         Imagepath:
-                        'assets/images/sidebar_icon/icon-dashboard-subscription-plan.png',
+                            'assets/images/sidebar_icon/icon-dashboard-subscription-plan.png',
                         title: 'Subscription',
                         belowText: 'Ongoing',
                         color: Colors.purple,
@@ -273,15 +264,13 @@ class dashboard_viewState extends State<dashboard_view> {
                           Get.to(() => const subscription_view());
                         }),
                     dashboard_widget(
-                        Imagepath:
-                        'assets/images/delete_account.png',
+                        Imagepath: 'assets/images/delete_account.png',
                         title: 'Delete Account',
                         belowText: '0 complete',
                         color: Colors.red,
                         callback: () {
                           deleteAccount(context);
-                        }
-                    ),
+                        }),
                   ],
                 ),
               ),
@@ -301,7 +290,7 @@ class dashboard_viewState extends State<dashboard_view> {
                     ),
                     children: [
                       const TextSpan(
-                        text: 'contact support at ',
+                        text: 'call us at ',
                         style: TextStyle(
                           color: Colors.grey,
                           fontSize: 12,
@@ -310,9 +299,37 @@ class dashboard_viewState extends State<dashboard_view> {
                       TextSpan(
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                             launchEmail('admin@errandia.com');
-                            },
-                        text: 'admin@errandia.com',
+                            launchCaller('+237679135426');
+                          },
+                        text: '+237 679 135 426 ',
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const TextSpan(
+                        text: 'or ',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const TextSpan(
+                        text: 'write us on ',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      // what's app
+                      TextSpan(
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            launchWhatsapp('+237679135426',
+                                message:
+                                    "Hello Errandia, \nI need help with...");
+                          },
+                        text: '\u{1F4AC} WhatsApp',
                         style: const TextStyle(
                           color: Colors.blue,
                           fontSize: 12,
@@ -325,8 +342,6 @@ class dashboard_viewState extends State<dashboard_view> {
             ],
           ),
         ).paddingSymmetric(horizontal: 10),
-
-
       ),
     );
   }
@@ -449,10 +464,10 @@ void custombottomsheet(BuildContext context) {
             callback: () {
               Get.back();
               Get.to(() => add_business_view())?.then((_) {
-               businessController.reloadBusinesses();
-               profileController.reloadMyBusinesses();
+                businessController.reloadBusinesses();
+                profileController.reloadMyBusinesses();
                 homeController.featuredBusinessData.clear();
-               homeController.fetchFeaturedBusinessesData();
+                homeController.fetchFeaturedBusinessesData();
               });
             },
           ),

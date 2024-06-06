@@ -85,9 +85,10 @@ Future<void> launchCaller(String number) async {
 }
 
 // launch whatsapp
-Future<void> launchWhatsapp(String number) async {
-  var url = Uri.parse(
-      "https://wa.me/$number?text=${Uri.encodeComponent("\n\nSent from Errandia")}");
+Future<void> launchWhatsapp(String number,
+    {String message = "\n\nSent from Errandia"}) async {
+  var url =
+      Uri.parse("https://wa.me/$number?text=${Uri.encodeComponent(message)}");
   if (!await launchUrl(url)) {
     throw Exception('Could not launch $url');
   }

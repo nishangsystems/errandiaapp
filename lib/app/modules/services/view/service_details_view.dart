@@ -11,6 +11,7 @@ import 'package:errandia/app/modules/products/controller/product_controller.dart
 import 'package:errandia/app/modules/products/view/product_view.dart';
 import 'package:errandia/app/modules/profile/controller/profile_controller.dart';
 import 'package:errandia/app/modules/services/view/edit_service_view.dart';
+import 'package:errandia/main.dart';
 import 'package:errandia/utils/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class ServiceDetailsView extends StatefulWidget {
 class _ServiceDetailsViewState extends State<ServiceDetailsView>
     with TickerProviderStateMixin {
   late final TabController tabController =
-  TabController(length: 2, vsync: this);
+      TabController(length: 2, vsync: this);
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   late profile_controller profileController;
   late PopupBox popup;
@@ -45,10 +46,10 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
     _localService = widget.service;
 
     // profileController.loadMyProducts();
-   WidgetsBinding.instance.addPostFrameCallback((_) {
-     productCtl.reload();
-     productCtl.loadOtherServices(_localService['slug']);
-     productCtl.loadOtherProducts(_localService['slug']);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      productCtl.reload();
+      productCtl.loadOtherServices(_localService['slug']);
+      productCtl.loadOtherProducts(_localService['slug']);
     });
   }
 
@@ -57,43 +58,43 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
         profileController.userData.value['id'] == _localService['user']['id'];
     List<PopupMenuEntry<String>> menuItems = userIsOwner
         ? [
-      // const PopupMenuItem<String>(
-      //     value: 'share',
-      //     child: Row(
-      //       children: [
-      //         Icon(Icons.share, size: 14, color: Colors.black),
-      //         SizedBox(
-      //           width: 5,
-      //         ),
-      //         Text('Share', style: TextStyle(fontSize: 15)),
-      //       ],
-      //     )),
-      const PopupMenuItem<String>(
-          value: 'edit',
-          child: Row(
-            children: [
-              Icon(Icons.edit, size: 14, color: Colors.black),
-              SizedBox(
-                width: 5,
-              ),
-              Text('Edit', style: TextStyle(fontSize: 15)),
-            ],
-          )),
-      const PopupMenuItem<String>(
-          value: 'delete',
-          child: Row(
-            children: [
-              Icon(Icons.delete, size: 14, color: Colors.black),
-              SizedBox(
-                width: 5,
-              ),
-              Text('Delete', style: TextStyle(fontSize: 15)),
-            ],
-          )),
-    ]
+            // const PopupMenuItem<String>(
+            //     value: 'share',
+            //     child: Row(
+            //       children: [
+            //         Icon(Icons.share, size: 14, color: Colors.black),
+            //         SizedBox(
+            //           width: 5,
+            //         ),
+            //         Text('Share', style: TextStyle(fontSize: 15)),
+            //       ],
+            //     )),
+            const PopupMenuItem<String>(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit, size: 14, color: Colors.black),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Edit', style: TextStyle(fontSize: 15)),
+                  ],
+                )),
+            const PopupMenuItem<String>(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete, size: 14, color: Colors.black),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Delete', style: TextStyle(fontSize: 15)),
+                  ],
+                )),
+          ]
         : [
-      // const PopupMenuItem<String>(value: 'share', child: Text('Share')),
-    ];
+            // const PopupMenuItem<String>(value: 'share', child: Text('Share')),
+          ];
 
     showMenu<String>(
       context: context,
@@ -106,8 +107,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
       if (value != null) {
         switch (value) {
           case 'edit':
-            Get.to(() => EditServiceView(data: _localService))
-                ?.then((value) {
+            Get.to(() => EditServiceView(data: _localService))?.then((value) {
               print("value update: $value");
               if (value != null) {
                 setState(() {
@@ -185,9 +185,9 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
               }
             });
             break;
-        // case 'share':
-        //   // Handle share action
-        //   break;
+          // case 'share':
+          //   // Handle share action
+          //   break;
         }
       }
     });
@@ -198,7 +198,21 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
     String townName = shop['town'] != null ? shop['town']['name'] : '';
     String regionName = shop['region'] != null ? shop['region']['name'] : '';
 
-    return [street, townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
+    return [street, townName, regionName]
+        .where((s) => s.isNotEmpty)
+        .join(", ")
+        .trim();
+  }
+
+  bool isMyService() {
+    String? currentUser = ErrandiaApp.prefs.getString('user');
+
+    if (currentUser != null) {
+      var user = jsonDecode(currentUser);
+      return user['id'] == widget.service['user']['id'];
+    }
+
+    return false;
   }
 
   @override
@@ -225,98 +239,103 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   _localService['shop'] != null ||
-                      _localService['shop'].toString() != "null"
+                          _localService['shop'].toString() != "null"
                       ? InkWell(
-                    onTap: () {
-                      Get.to(() => errandia_business_view(
-                        businessData: _localService['shop'],
-                      ));
-                    },
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        FaIcon(FontAwesomeIcons.store),
-                        Text(
-                          'Store',
-                          style: TextStyle(color: Colors.black, fontSize: 10),
-                        ),
-                      ],
-                    ),
-                  )
+                          onTap: () {
+                            Get.to(() => errandia_business_view(
+                                  businessData: _localService['shop'],
+                                ));
+                          },
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              FaIcon(FontAwesomeIcons.store),
+                              Text(
+                                'Store',
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 10),
+                              ),
+                            ],
+                          ),
+                        )
                       : Container(),
                   _localService['shop'] != null ||
-                      _localService['shop'].toString() != "null"
+                          _localService['shop'].toString() != "null"
                       ? const SizedBox(
-                    width: 10,
-                  )
+                          width: 10,
+                        )
                       : Container(),
-                  _localService['shop']['whatsapp'] != "" && _localService['shop']['whatsapp'] != "whatsapp" ? SizedBox(
-                    width: Get.width * 0.4,
-                    height: 50,
-                    child: blockButton(
-                      title: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.whatsapp,
-                              color: Colors.white,
-                            ),
-                            Text(
-                              '  Chat on Whatsapp',
-                              style: TextStyle(color: Colors.white, fontSize: 9),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ontap: () async {
-                        print("whatsapp: ${_localService['shop']['whatsapp']}");
-                        launchWhatsapp(_localService['shop']['whatsapp']);
-                      },
-                      color: appcolor().mainColor,
-                    ),
-                  ) : Container(),
-
-                  if (_localService['shop']['whatsapp'] !="" || _localService['shop']['whatsapp']!="whatsapp")
-                    const Spacer(),
-
-                  _localService['shop'] != null ||
-                      _localService['shop'].toString() != 'null'
+                  _localService['shop']['whatsapp'] != "" &&
+                          _localService['shop']['whatsapp'] != "whatsapp"
                       ? SizedBox(
-                    width: Get.width * 0.4,
-                    height: 50,
-                    child: blockButton(
-                      title: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.call_rounded,
-                              color: appcolor().mainColor,
-                              size: 20,
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
-                              'Call',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: appcolor().mainColor,
+                          width: Get.width * 0.4,
+                          height: 50,
+                          child: blockButton(
+                            title: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.whatsapp,
+                                    color: Colors.white,
+                                  ),
+                                  Text(
+                                    '  Chat on Whatsapp',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 9),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      ontap: () {
-                        launchCaller(_localService['shop']['phone']);
-                      },
-                      color: appcolor().skyblueColor,
-                    ),
-                  )
+                            ontap: () async {
+                              print(
+                                  "whatsapp: ${_localService['shop']['whatsapp']}");
+                              launchWhatsapp(_localService['shop']['whatsapp']);
+                            },
+                            color: appcolor().mainColor,
+                          ),
+                        )
+                      : Container(),
+                  if (_localService['shop']['whatsapp'] != "" ||
+                      _localService['shop']['whatsapp'] != "whatsapp")
+                    const Spacer(),
+                  _localService['shop'] != null ||
+                          _localService['shop'].toString() != 'null'
+                      ? SizedBox(
+                          width: Get.width * 0.4,
+                          height: 50,
+                          child: blockButton(
+                            title: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.call_rounded,
+                                    color: appcolor().mainColor,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    // 'Call ${widget.item?.shop ? widget.item['shop']['phone'] : '673580194'}',
+                                    'Call',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: appcolor().mainColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            ontap: () {
+                              launchCaller(_localService['shop']['phone']);
+                            },
+                            color: appcolor().skyblueColor,
+                          ),
+                        )
                       : Container(),
                 ],
               ),
@@ -343,26 +362,19 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
               ),
             ),
             actions: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.messenger_sharp,
-                  size: 30,
+              if (isMyService())
+                IconButton(
+                  onPressed: () {
+                    // Share.share('text', subject: 'hello share');
+                    showPopupMenu(context);
+                  },
+                  // vertical 3 dots
+                  icon: const Icon(
+                    Icons.more_vert,
+                    size: 30,
+                  ),
+                  color: appcolor().mediumGreyColor,
                 ),
-                color: appcolor().mediumGreyColor,
-              ),
-              IconButton(
-                onPressed: () {
-                  // Share.share('text', subject: 'hello share');
-                  showPopupMenu(context);
-                },
-                // vertical 3 dots
-                icon: const Icon(
-                  Icons.more_vert,
-                  size: 30,
-                ),
-                color: appcolor().mediumGreyColor,
-              ),
             ],
           ),
           body: SingleChildScrollView(
@@ -378,7 +390,8 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 child: ClipRRect(
                   child: FadeInImage.assetNetwork(
                     placeholder: 'assets/images/errandia_logo_1.jpeg',
-                    image: getImagePathWithSize(_localService['featured_image'], width: 720, height: 500),
+                    image: getImagePathWithSize(_localService['featured_image'],
+                        width: 720, height: 500),
                     fit: BoxFit.contain,
                     width: double.infinity,
                     imageErrorBuilder: (context, error, stackTrace) {
@@ -402,8 +415,8 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 decoration: BoxDecoration(
                     border: Border.symmetric(
                         horizontal: BorderSide(
-                          color: appcolor().greyColor,
-                        ))),
+                  color: appcolor().greyColor,
+                ))),
                 child: Column(
                   children: [
                     Container(
@@ -438,13 +451,15 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                     ),
                     Container(
                       color: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 15),
                       height: Get.height * 0.2,
                       child: TabBarView(
                         controller: tabController,
                         children: [
                           // Text('${widget.item['description']}'),
-                          Text(_localService['description'],
+                          Text(
+                            _localService['description'],
                             style: const TextStyle(
                               fontSize: 15,
                             ),
@@ -472,53 +487,65 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                                 width: Get.width * 0.08,
                               ),
 
-                              _localService['shop'] != null ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                       Text(
-                                        'Business Name',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.grey[700]
+                              _localService['shop'] != null
+                                  ? Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Business Name',
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.grey[700]),
                                         ),
-                                      ),
-                                      Text(
-                                        capitalizeAll(_localService['shop']['name']),
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-
-                                      SizedBox(
-                                        height: Get.height * 0.01,
-                                      ),
-
-                                      (_localService['shop']['street'] != "" || _localService['shop']['street'] != null)  || _localService['shop']['town'] != null || _localService['shop']['region'] != null ? Text(
-                                        'Address',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.grey[700]
-                                        ),
-                                      ) : Container(),
-
-                                    SizedBox(
-                                        width: Get.width * 0.5,
-                                        child: Text(
-                                          _formatAddress(_localService['shop']),
+                                        Text(
+                                          capitalizeAll(
+                                              _localService['shop']['name']),
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w400,
                                           ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
-                                    ],
-                                  ): Container(),
+                                        SizedBox(
+                                          height: Get.height * 0.01,
+                                        ),
+                                        (_localService['shop']['street'] !=
+                                                        "" ||
+                                                    _localService['shop']
+                                                            ['street'] !=
+                                                        null) ||
+                                                _localService['shop']['town'] !=
+                                                    null ||
+                                                _localService['shop']
+                                                        ['region'] !=
+                                                    null
+                                            ? Text(
+                                                'Address',
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.grey[700]),
+                                              )
+                                            : Container(),
+                                        SizedBox(
+                                          width: Get.width * 0.5,
+                                          child: Text(
+                                            _formatAddress(
+                                                _localService['shop']),
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Container(),
                             ],
                           ),
                         ],
@@ -740,7 +767,8 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
               // ),
 
               const Padding(
-                padding: EdgeInsets.only(left: 20, right: 15, top: 0, bottom: 10),
+                padding:
+                    EdgeInsets.only(left: 20, right: 15, top: 0, bottom: 10),
                 child: Text(
                   'More products from this supplier',
                   style: TextStyle(
@@ -749,57 +777,57 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 ),
               ),
 
-              Obx(
-                      () {
-                    if (productCtl.isProductLoading.value == true) {
-                      return SizedBox(
-                        height: Get.height * 0.3,
-                        child: buildLoadingWidget(),
-                      );
-                    } else if (productCtl.productList.isEmpty) {
-                      return SizedBox(
-                        height: Get.height * 0.3,
-                        child: Center(
-                          child: Text(
-                            'No products found',
-                            style: TextStyle(
-                              color: appcolor().mediumGreyColor,
-                              fontSize: 15,
-                            ),
-                          ),
+              Obx(() {
+                if (productCtl.isProductLoading.value == true) {
+                  return SizedBox(
+                    height: Get.height * 0.3,
+                    child: buildLoadingWidget(),
+                  );
+                } else if (productCtl.productList.isEmpty) {
+                  return SizedBox(
+                    height: Get.height * 0.3,
+                    child: Center(
+                      child: Text(
+                        'No products found',
+                        style: TextStyle(
+                          color: appcolor().mediumGreyColor,
+                          fontSize: 15,
                         ),
-                      );
-                    } else {
-                      return SizedBox(
-                        height: Get.height * 0.3,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: productCtl.productList.length,
-                          itemBuilder: (context, index) {
-                            var item = productCtl.productList[index];
-                            return GestureDetector(
-                                onTap: () {
-                                  if (kDebugMode) {
-                                    print("product item clicked: ${item['name']}");
-                                  }
-                                  Get.to(() => Product_view(item: item));
-                                },
-                                child: errandia_widget(
-                                  cost: item['unit_price'].toString(),
-                                  imagePath: item['featured_image'],
-                                  name: item['name'],
-                                  location: item['shop'] != null ? item['shop']['street'] : "",
-                                ));
-                          },
-                        ),
-                      );
-                    }
-                  }
-              ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return SizedBox(
+                    height: Get.height * 0.3,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: productCtl.productList.length,
+                      itemBuilder: (context, index) {
+                        var item = productCtl.productList[index];
+                        return GestureDetector(
+                            onTap: () {
+                              if (kDebugMode) {
+                                print("product item clicked: ${item['name']}");
+                              }
+                              Get.to(() => Product_view(item: item));
+                            },
+                            child: errandia_widget(
+                              cost: item['unit_price'].toString(),
+                              imagePath: item['featured_image'],
+                              name: item['name'],
+                              location: item['shop'] != null
+                                  ? item['shop']['street']
+                                  : "",
+                            ));
+                      },
+                    ),
+                  );
+                }
+              }),
 
               const Padding(
                 padding:
-                EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
+                    EdgeInsets.only(left: 20, right: 15, top: 10, bottom: 10),
                 child: Text(
                   'More Services Offered by this Supplier',
                   style: TextStyle(
@@ -808,62 +836,60 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                 ),
               ),
 
-              Obx(
-                      () {
-                    if (productCtl.isServiceLoading.value == true) {
-                      return SizedBox(
-                        height: Get.height * 0.3,
-                        child: buildLoadingWidget(),
-                      );
-                    } else if (productCtl.serviceList.isEmpty) {
-                      return SizedBox(
-                        height: Get.height * 0.3,
-                        child: Center(
-                          child: Text(
-                            'No services found',
-                            style: TextStyle(
-                              color: appcolor().mediumGreyColor,
-                              fontSize: 15,
-                            ),
-                          ),
+              Obx(() {
+                if (productCtl.isServiceLoading.value == true) {
+                  return SizedBox(
+                    height: Get.height * 0.3,
+                    child: buildLoadingWidget(),
+                  );
+                } else if (productCtl.serviceList.isEmpty) {
+                  return SizedBox(
+                    height: Get.height * 0.3,
+                    child: Center(
+                      child: Text(
+                        'No services found',
+                        style: TextStyle(
+                          color: appcolor().mediumGreyColor,
+                          fontSize: 15,
                         ),
-                      );
-                    } else {
-                      return SizedBox(
-                        height: Get.height * 0.3,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: productCtl.serviceList.length,
-                          itemBuilder: (context, index) {
-                            var item = productCtl.serviceList[index];
-                            return GestureDetector(
-                              onTap: () {
-                                if (kDebugMode) {
-                                  print("service item: ${item['name']}");
-                                }
-                                // Get.to(() => ServiceDetailsView(service: item));
-                                Get.offNamed('/service_view', arguments: item,
-                                  preventDuplicates: false
-                                );
-                              },
-                              child: errandia_widget(
-                                cost: item['unit_price'].toString(),
-                                imagePath: item['featured_image'],
-                                name: item['name'],
-                                location: item['shop'] != null ? item['shop']['street'] : "",
-                              ),
-                            );
+                      ),
+                    ),
+                  );
+                } else {
+                  return SizedBox(
+                    height: Get.height * 0.3,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: productCtl.serviceList.length,
+                      itemBuilder: (context, index) {
+                        var item = productCtl.serviceList[index];
+                        return GestureDetector(
+                          onTap: () {
+                            if (kDebugMode) {
+                              print("service item: ${item['name']}");
+                            }
+                            // Get.to(() => ServiceDetailsView(service: item));
+                            Get.offNamed('/service_view',
+                                arguments: item, preventDuplicates: false);
                           },
-                        ),
-                      );
-                    }
-                  }
-              ),
+                          child: errandia_widget(
+                            cost: item['unit_price'].toString(),
+                            imagePath: item['featured_image'],
+                            name: item['name'],
+                            location: item['shop'] != null
+                                ? item['shop']['street']
+                                : "",
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+              }),
 
               SizedBox(
                 height: Get.height * 0.1,
               )
-
             ],
           ))),
     );

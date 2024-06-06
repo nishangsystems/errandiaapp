@@ -544,12 +544,14 @@ class _errandia_business_viewState extends State<errandia_business_view>
                           children: [
                             _localBusinessData['phone_verified'] == 0
                                 ? Padding(
-                                    padding: const EdgeInsets.only(right: 8),
-                                    child: Text(
-                                      "Business phone number is unverified!",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: appcolor().redColor,
+                                    padding: const EdgeInsets.only(right: 3),
+                                    child: RichText(
+                                      text: const TextSpan(
+                                        text: "Unverified contact details!",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.red,
+                                        ),
                                       ),
                                     ),
                                   )
@@ -571,7 +573,9 @@ class _errandia_business_viewState extends State<errandia_business_view>
                                   )
                                 : const Icon(Icons.info_outline,
                                     color: Colors.red, size: 17),
+
                             const Spacer(),
+
                             // verify now link
                             _localBusinessData['phone_verified'] == 0
                                 ? InkWell(

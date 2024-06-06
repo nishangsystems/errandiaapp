@@ -35,7 +35,6 @@ class errand_view extends StatefulWidget {
 
   @override
   _errand_viewState createState() => _errand_viewState();
-
 }
 
 class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
@@ -52,7 +51,6 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
   late PopupBox popup;
   late business_controller businessController;
   late profile_controller profileController;
-
 
   @override
   void initState() {
@@ -75,7 +73,8 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
     });
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
         errandController.fetchMyErrands();
       }
     });
@@ -95,9 +94,9 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
         ? item['town']['name']
         : '';
     String regionName =
-    item['region'].toString() != '[]' && item['region'] != ""
-        ? item['region']['name'].split(" -")[0]
-        : '';
+        item['region'].toString() != '[]' && item['region'] != ""
+            ? item['region']['name'].split(" -")[0]
+            : '';
 
     return [townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
   }
@@ -174,7 +173,9 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
             onConfirm: () {
               // delete product
               print("reject errand: ${data['errand_received_id']}");
-              ErrandsAPI.rejectReceivedErrand(data['errand_received_id'].toString()).then((response_) {
+              ErrandsAPI.rejectReceivedErrand(
+                      data['errand_received_id'].toString())
+                  .then((response_) {
                 if (response_ != null) {
                   response = jsonDecode(response_);
                   print("reject business response: $response");
@@ -244,7 +245,6 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
     });
   }
 
-
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -261,7 +261,6 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
       errandController.reloadReceivedErrands();
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -356,23 +355,24 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                         height: Get.height * 0.06,
                         child: data_['images'].length > 0
                             ? FadeInImage.assetNetwork(
-                          placeholder: 'assets/images/errandia_logo.png',
-                          image: getImagePathWithSize(
-                              data_['images'][0]['image_path'],
-                              width: 200,
-                              height: 180),
-                          fit: BoxFit.fill,
-                          imageErrorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              'assets/images/errandia_logo.png',
-                              fit: BoxFit.fill,
-                            );
-                          },
-                        )
+                                placeholder: 'assets/images/errandia_logo.png',
+                                image: getImagePathWithSize(
+                                    data_['images'][0]['image_path'],
+                                    width: 200,
+                                    height: 180),
+                                fit: BoxFit.fill,
+                                imageErrorBuilder:
+                                    (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/errandia_logo.png',
+                                    fit: BoxFit.fill,
+                                  );
+                                },
+                              )
                             : Image.asset(
-                          'assets/images/errandia_logo.png',
-                          fit: BoxFit.fill,
-                        ),
+                                'assets/images/errandia_logo.png',
+                                fit: BoxFit.fill,
+                              ),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,7 +399,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                             child: Text(
                               data_['description'].length >= 30
                                   ? '${data_['description'] + '..'}'
-                                  .substring(0, 30)
+                                      .substring(0, 30)
                                   : data_['description'].toString(),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -443,7 +443,8 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                           Get.bottomSheet(
                             // backgroundColor: Colors.white,
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
                               color: Colors.white,
                               child: Wrap(
                                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -464,12 +465,12 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                       }
                                       Get.back();
                                       Get.to(
-                                              () => EditErrand(
-                                            data: data_,
-                                          ),
+                                          () => EditErrand(
+                                                data: data_,
+                                              ),
                                           transition: Transition.rightToLeft,
-                                          duration:
-                                          const Duration(milliseconds: 500));
+                                          duration: const Duration(
+                                              milliseconds: 500));
                                     },
                                   ),
                                   managebottomSheetWidgetitem(
@@ -497,8 +498,8 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                     callback: () {
                                       Get.back();
                                       Get.to(() => ErrandResults(
-                                        errandId: data_['id'].toString(),
-                                      ));
+                                            errandId: data_['id'].toString(),
+                                          ));
                                     },
                                   ),
 
@@ -514,7 +515,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                           return CustomAlertDialog(
                                               title: "Delete Errand",
                                               message:
-                                              "Are you sure you want to delete this errand?\n"
+                                                  "Are you sure you want to delete this errand?\n"
                                                   "This action cannot be undone.\n",
                                               dialogType: MyDialogType.error,
                                               onConfirm: () {
@@ -522,7 +523,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                                 print(
                                                     "delete errand: ${data_['id']}");
                                                 ErrandsAPI.deleteErrand(
-                                                    data_['id'].toString())
+                                                        data_['id'].toString())
                                                     .then((response_) {
                                                   if (response_ != null) {
                                                     response =
@@ -540,28 +541,29 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                                             .reloadRecentlyPostedItems();
 
                                                         Navigator.of(
-                                                            dialogContext)
+                                                                dialogContext)
                                                             .pop(); // Close the dialog
 
                                                         // Show success popup
                                                         popup = PopupBox(
                                                           title: 'Success',
                                                           description:
-                                                          response['data']
-                                                          ['message'],
-                                                          type: PopupType.success,
+                                                              response['data']
+                                                                  ['message'],
+                                                          type:
+                                                              PopupType.success,
                                                         );
                                                       } else {
                                                         Navigator.of(
-                                                            dialogContext)
+                                                                dialogContext)
                                                             .pop(); // Close the dialog
 
                                                         // Show error popup
                                                         popup = PopupBox(
                                                           title: 'Error',
                                                           description:
-                                                          response['data']
-                                                          ['data'],
+                                                              response['data']
+                                                                  ['data'],
                                                           type: PopupType.error,
                                                         );
                                                       }
@@ -666,11 +668,13 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                 var date1 = date[0].split('-');
                 return GestureDetector(
                   onTap: () {
-                    Get.to(() => errand_detail_view(
-                      data: data_, received: true,
-                    ), transition: Transition.fadeIn,
-                        duration: const Duration(milliseconds: 500)
-                    );
+                    Get.to(
+                        () => errand_detail_view(
+                              data: data_,
+                              received: true,
+                            ),
+                        transition: Transition.fadeIn,
+                        duration: const Duration(milliseconds: 500));
                   },
                   child: Container(
                     // height: Get.height * 0.15,
@@ -707,26 +711,27 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                 radius: 50,
                                 // backgroundColor: Colors.white,
                                 backgroundImage: data_['user']['photo'] == "" ||
-                                    data_['user']['photo'] == null
+                                        data_['user']['photo'] == null
                                     ? const AssetImage(
-                                    'assets/images/errandia_logo.png') // Fallback image
+                                        'assets/images/errandia_logo.png') // Fallback image
                                     : NetworkImage(getImagePath(
-                                    data_['user']['photo'].toString()))
-                                as ImageProvider,
+                                            data_['user']['photo'].toString()))
+                                        as ImageProvider,
                                 child: data_['user']['photo'] == "" ||
-                                    data_['user']['photo'] == null
+                                        data_['user']['photo'] == null
                                     ? Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                        BorderRadius.circular(100),
-                                        border: Border.all(
-                                            width: 0.5,
-                                            color: appcolor().darkBlueColor)),
-                                    child: ClipRRect(
-                                        borderRadius:
-                                        BorderRadius.circular(100),
-                                        child: Image.asset(
-                                            'assets/images/errandia_logo.png')))
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            border: Border.all(
+                                                width: 0.5,
+                                                color:
+                                                    appcolor().darkBlueColor)),
+                                        child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            child: Image.asset(
+                                                'assets/images/errandia_logo.png')))
                                     : null, // Only show the icon if there is no photo
                               ),
                             ),
@@ -759,7 +764,8 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                 width: Get.width * 0.01,
                                 height: Get.height * 0.01,
                                 decoration: BoxDecoration(
-                                  color: appcolor().darkBlueColor.withOpacity(0.5),
+                                  color:
+                                      appcolor().darkBlueColor.withOpacity(0.5),
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -834,7 +840,8 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                   Container(
                                     child: Icon(
                                       Icons.delete_forever_outlined,
-                                      color: appcolor().redColor.withOpacity(0.6),
+                                      color:
+                                          appcolor().redColor.withOpacity(0.6),
                                       size: 14,
                                     ),
                                   ),
@@ -845,7 +852,9 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                     'Reject',
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: appcolor().redColor.withOpacity(0.6),
+                                        color: appcolor()
+                                            .redColor
+                                            .withOpacity(0.6),
                                         fontWeight: FontWeight.w600),
                                   ),
                                 ],
@@ -900,170 +909,171 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                           height: Get.height * 0.013,
                         ),
                         // bottom row
-                        Row(
-                            children: [
-                              // call button
-                              // if (isPhoneAvailable(data_['user']) || !isEmailAvailable(data_['user']))
-                              if (hasActiveSubscription() && isPhoneAvailable(data_['user']))
-                                InkWell(
-                                  onTap: () {
-                                    launchCaller(data_['user']['phone'].toString());
-                                  },
-                                  child: Container(
-                                      padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                      decoration: BoxDecoration(
-                                        color: appcolor().amberColor,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          color: Colors.orangeAccent,
-                                        ),
-                                        gradient: Gradient.lerp(
-                                          LinearGradient(
-                                            colors: [
-                                              appcolor().skyblueColor,
-                                              appcolor().amberColor,
-                                            ],
-                                          ),
-                                          LinearGradient(
-                                            colors: [
-                                              appcolor().amberColor,
-                                              appcolor().skyblueColor,
-                                            ],
-                                          ),
-                                          0.5,
-                                        ),
+                        Row(children: [
+                          // call button
+                          // if (isPhoneAvailable(data_['user']) || !isEmailAvailable(data_['user']))
+                          if (hasActiveSubscription() &&
+                              isPhoneAvailable(data_['user']))
+                            InkWell(
+                              onTap: () {
+                                launchCaller(data_['user']['phone'].toString());
+                              },
+                              child: Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 5, bottom: 5, left: 8, right: 8),
+                                  decoration: BoxDecoration(
+                                    color: appcolor().amberColor,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      color: Colors.orangeAccent,
+                                    ),
+                                    gradient: Gradient.lerp(
+                                      LinearGradient(
+                                        colors: [
+                                          appcolor().skyblueColor,
+                                          appcolor().amberColor,
+                                        ],
                                       ),
-                                      child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.call,
-                                              color: appcolor().darkBlueColor,
-                                              size: 14,
-                                            ),
-                                            SizedBox(
-                                              width: Get.width * 0.01,
-                                            ),
-                                            Text(
-                                              'Call Now',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: appcolor().darkBlueColor,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ]
-                                      )
-                                  ),
-                                ),
-
-                              if (!hasActiveSubscription())
-                              // a button to subscribe
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(() => const subscription_view(),
-                                        transition: Transition.rightToLeft,
-                                        duration: const Duration(milliseconds: 500));
-                                  },
-                                  child: Container(
-                                      padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.transparent,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          color: Colors.redAccent,
-                                        ),
+                                      LinearGradient(
+                                        colors: [
+                                          appcolor().amberColor,
+                                          appcolor().skyblueColor,
+                                        ],
                                       ),
-                                      child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.payment,
-                                              color: appcolor().redColor,
-                                              size: 14,
-                                            ),
-                                            SizedBox(
-                                              width: Get.width * 0.01,
-                                            ),
-                                            Text(
-                                              'Subscribe',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: appcolor().redColor,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ]
-                                      )
+                                      0.5,
+                                    ),
                                   ),
-                                ),
+                                  child: Row(children: [
+                                    Icon(
+                                      Icons.call,
+                                      color: appcolor().darkBlueColor,
+                                      size: 14,
+                                    ),
+                                    SizedBox(
+                                      width: Get.width * 0.01,
+                                    ),
+                                    Text(
+                                      'Call Now',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: appcolor().darkBlueColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ])),
+                            ),
 
-                              // posted when
-                              const Spacer(),
-                              Text(
-                                data_['when'],
-                                style: TextStyle(
-                                  color: appcolor().mainColor,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                          if (!hasActiveSubscription())
+                            // a button to subscribe
+                            InkWell(
+                              onTap: () {
+                                Get.to(() => const subscription_view(),
+                                    transition: Transition.rightToLeft,
+                                    duration:
+                                        const Duration(milliseconds: 500));
+                              },
+                              child: Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 5, bottom: 5, left: 8, right: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      color: Colors.redAccent,
+                                    ),
+                                  ),
+                                  child: Row(children: [
+                                    Icon(
+                                      Icons.payment,
+                                      color: appcolor().redColor,
+                                      size: 14,
+                                    ),
+                                    SizedBox(
+                                      width: Get.width * 0.01,
+                                    ),
+                                    Text(
+                                      'Subscribe',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: appcolor().redColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ])),
+                            ),
 
-                              // message button
-                              if (hasActiveSubscription() && isWhatsAppAvailable(data_['user']))
-                                const Spacer(),
+                          // posted when
+                          const Spacer(),
+                          Text(
+                            data_['when'],
+                            style: TextStyle(
+                              color: appcolor().mainColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
 
-                              if (hasActiveSubscription() && isWhatsAppAvailable(data_['user']))
-                                InkWell(
-                                  onTap: () {
-                                    launchWhatsapp(data_['user']['whatsapp_number'].toString());
-                                  },
-                                  child: Container(
-                                      padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                      decoration: BoxDecoration(
+                          // message button
+                          if (hasActiveSubscription() &&
+                              isWhatsAppAvailable(data_['user']))
+                            const Spacer(),
+
+                          if (hasActiveSubscription() &&
+                              isWhatsAppAvailable(data_['user']))
+                            InkWell(
+                              onTap: () {
+                                launchWhatsapp(data_['user']['whatsapp_number']
+                                    .toString());
+                              },
+                              child: Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 5, bottom: 5, left: 8, right: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      color: Colors.green[700]!,
+                                    ),
+                                    gradient: Gradient.lerp(
+                                      LinearGradient(
+                                        colors: [
+                                          appcolor()
+                                              .greenColor
+                                              .withOpacity(0.8),
+                                          appcolor().greenColor,
+                                        ],
+                                      ),
+                                      LinearGradient(
+                                        colors: [
+                                          appcolor().mainColor,
+                                          appcolor()
+                                              .greenColor
+                                              .withOpacity(0.5),
+                                        ],
+                                      ),
+                                      0.5,
+                                    ),
+                                  ),
+                                  child: Row(children: [
+                                    const Icon(
+                                      FontAwesomeIcons.whatsapp,
+                                      color: Colors.white,
+                                      size: 14,
+                                    ),
+                                    SizedBox(
+                                      width: Get.width * 0.01,
+                                    ),
+                                    const Text(
+                                      'Message',
+                                      style: TextStyle(
+                                        fontSize: 12,
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          color: Colors.green[700]!,
-                                        ),
-                                        gradient: Gradient.lerp(
-                                          LinearGradient(
-                                            colors: [
-                                              appcolor().greenColor.withOpacity(0.8),
-                                              appcolor().greenColor,
-                                            ],
-                                          ),
-                                          LinearGradient(
-                                            colors: [
-                                              appcolor().mainColor,
-                                              appcolor().greenColor.withOpacity(0.5),
-                                            ],
-                                          ),
-                                          0.5,
-                                        ),
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                      child: Row(
-                                          children: [
-                                            const Icon(
-                                              FontAwesomeIcons.whatsapp,
-                                              color: Colors.white,
-                                              size: 14,
-                                            ),
-                                            SizedBox(
-                                              width: Get.width * 0.01,
-                                            ),
-                                            const Text(
-                                              'Message',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ]
-                                      )
-                                  ),
-                                ),
-                            ]
-                        )
+                                    ),
+                                  ])),
+                            ),
+                        ])
                       ],
                     ),
                   ),

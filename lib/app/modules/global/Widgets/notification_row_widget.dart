@@ -1,17 +1,13 @@
 import 'package:errandia/app/modules/global/constants/color.dart';
 import 'package:errandia/modal/Notification.dart';
 import 'package:errandia/utils/helper.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class NotificationRowWidget extends StatelessWidget {
   final NotificationItem item;
 
-  const NotificationRowWidget({
-    Key? key,
-    required this.item
-  }) : super(key: key);
+  const NotificationRowWidget({Key? key, required this.item}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +20,16 @@ class NotificationRowWidget extends StatelessWidget {
       ),
       title: Row(
         children: [
-          Text(
-            item.title,
-            style: TextStyle(
-              color: appcolor().mediumGreyColor,
-              fontWeight: FontWeight.w400,
-              fontSize: 12
+          SizedBox(
+            width: Get.width * 0.4,
+            child: Text(
+              item.title,
+              style: TextStyle(
+                  color: appcolor().mediumGreyColor,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           const Spacer(),
@@ -44,7 +44,8 @@ class NotificationRowWidget extends StatelessWidget {
       ).paddingOnly(top: 3),
       subtitle: Text(
         item.message,
-        style: TextStyle(color: Colors.black.withOpacity(0.6),
+        style: TextStyle(
+          color: Colors.black.withOpacity(0.6),
           fontSize: 15,
           fontWeight: FontWeight.w500,
         ),

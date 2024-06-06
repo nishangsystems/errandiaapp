@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
-import 'package:errandia/app/modules/errands/view/errand_view.dart';
+import 'package:errandia/app/modules/errands/view/received_errands_view.dart';
 import 'package:errandia/app/modules/notifications/notifications_view.dart';
 import 'package:errandia/app/modules/splashScreen/splash_screen.dart';
 import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
@@ -25,6 +25,7 @@ late FirebaseMessaging messaging;
 late SharedPreferences _prefs;
 AndroidNotificationChannel? channel;
 FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
+final tabController = Get.put(errand_tab_controller());
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 AndroidNotificationDetails androidPlatformChannelSpecifics =
     AndroidNotificationDetails(
@@ -68,29 +69,26 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
 
 Future<dynamic> onSelectNotification(payload) async {
   Map<String, dynamic> action = jsonDecode(payload);
+  print('onSelectNotification payload: $action');
   _handleMessage(action);
 }
 
 Future<void> setupInteractedMessage() async {
-  await FirebaseMessaging.instance
-      .getInitialMessage()
-      .then((value) => _handleMessage(value != null ? value.data : Map()));
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    // Wait for the app to be ready
+    await Future.delayed(Duration(seconds: 1)); // Adjust duration as needed
+    _handleMessage(initialMessage.data);
+  }
 }
 
 void _handleMessage(Map<String, dynamic> data) {
+  print('Handling message: $data');
   if (data['page'] == "subscription") {
     Get.to(() => const subscription_view());
-  }
-
-  if (data['page'] == 'received_errands') {
-    Get.to(() => const errand_view())?.then((_) {
-      final tabController = Get.find<errand_tab_controller>();
-      tabController.tab_controller
-          .animateTo(1); // Set index to Received Errands tab
-    });
-  }
-
-  if (data['page'] == 'notification') {
+  } else if (data['page'] == 'received_errands') {
+    Get.to(() => const ReceivedErrandsView());
+  } else if (data['page'] == 'notification') {
     print("notification rx: $data");
     print("notification id: ${data['id']}");
     Get.to(() => NotificationDetailView(
@@ -176,10 +174,14 @@ Future<void> main() async {
 
   FirebaseMessaging.onMessage.listen(_showNotifications);
 
-  FirebaseMessaging.onMessageOpenedApp
-      .listen((message) => _handleMessage(message.data));
+  FirebaseMessaging.onMessageOpenedApp.listen((message) => {
+        print('Message being handled!'),
+        _handleMessage(message.data),
+      });
 
   await clearPreferencesOnFirstRun();
+
+  await setupInteractedMessage(); // Add this call to handle initial messages
 
   runApp(const ErrandiaApp());
 }
