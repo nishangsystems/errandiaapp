@@ -84,6 +84,7 @@ Future<void> setupInteractedMessage() async {
 
 void _handleMessage(Map<String, dynamic> data) {
   print('Handling message: $data');
+  getActiveSubscription();
   if (data['page'] == "subscription") {
     Get.to(() => const subscription_view());
   } else if (data['page'] == 'received_errands') {

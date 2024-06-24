@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:errandia/app/APi/errands.dart';
+import 'package:errandia/app/modules/auth/Sign%20in/view/signin_view.dart';
 import 'package:errandia/app/modules/errands/controller/errand_controller.dart';
 import 'package:errandia/app/modules/errands/controller/errandia_detail_view_controller.dart';
 import 'package:errandia/app/modules/errands/view/errand_results.dart';
@@ -14,13 +15,10 @@ import 'package:errandia/app/modules/profile/controller/profile_controller.dart'
 import 'package:errandia/app/modules/subscription/view/manage_subscription_view.dart';
 import 'package:errandia/main.dart';
 import 'package:errandia/utils/helper.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class errand_detail_view extends StatefulWidget {
   final data;
@@ -100,9 +98,9 @@ class _errand_detail_viewState extends State<errand_detail_view> {
         ? item['town']['name']
         : '';
     String regionName =
-    item['region'].toString() != '[]' && item['region'] != ""
-        ? item['region']['name'].split(" -")[0]
-        : '';
+        item['region'].toString() != '[]' && item['region'] != ""
+            ? item['region']['name'].split(" -")[0]
+            : '';
 
     return [townName, regionName].where((s) => s.isNotEmpty).join(", ").trim();
   }
@@ -152,7 +150,8 @@ class _errand_detail_viewState extends State<errand_detail_view> {
   //
   // }
 
-  void getErrandResultsInBackground(String errandId, Map<String, dynamic> data) async {
+  void getErrandResultsInBackground(
+      String errandId, Map<String, dynamic> data) async {
     const config = FlutterBackgroundAndroidConfig(
       notificationTitle: 'Errandia',
       notificationText: 'Your errand is running in the background',
@@ -177,7 +176,8 @@ class _errand_detail_viewState extends State<errand_detail_view> {
 
     if (hasPermissions) {
       if (hasPermissions) {
-        final backgroundExecution = await FlutterBackground.enableBackgroundExecution();
+        final backgroundExecution =
+            await FlutterBackground.enableBackgroundExecution();
 
         if (backgroundExecution) {
           Future.delayed(const Duration(seconds: 5), () {
@@ -214,7 +214,8 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                     errandController.reloadMyErrands();
                     homeController.reloadRecentlyPostedItems();
 
-                    getErrandResultsInBackground(id.toString(), response['data']);
+                    getErrandResultsInBackground(
+                        id.toString(), response['data']);
 
                     Navigator.of(dialogContext).pop(); // Close the dialog
 
@@ -303,7 +304,10 @@ class _errand_detail_viewState extends State<errand_detail_view> {
           size: 30,
         ),
         actions: [
-          if (!widget.received && homeController.loggedIn.value && hasActiveSubscription() && isMyErrand())
+          if (!widget.received &&
+              homeController.loggedIn.value &&
+              hasActiveSubscription() &&
+              isMyErrand())
             IconButton(
               onPressed: () {
                 // rerun an errand
@@ -452,10 +456,10 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                       backgroundColor: appcolor().mainColor,
                       backgroundImage: widget.data['user']['photo'] == ""
                           ? const AssetImage(
-                          'assets/images/errandia_logo.png') // Fallback image
+                              'assets/images/errandia_logo.png') // Fallback image
                           : NetworkImage(getImagePath(
-                          widget.data['user']['photo'].toString()))
-                      as ImageProvider,
+                                  widget.data['user']['photo'].toString()))
+                              as ImageProvider,
                     ),
                   ),
                   SizedBox(
@@ -493,7 +497,6 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                         SizedBox(
                           height: Get.height * 0.015,
                         ),
-
                       Container(
                         width: Get.width * 0.71,
                         padding: const EdgeInsets.symmetric(
@@ -512,15 +515,17 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                                   color: appcolor().mainColor,
                                 ),
                               ),
-
                               Row(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    if (isPhoneAvailable(widget.data['user']) && hasActiveSubscription() && homeController.loggedIn.value)
+                                    if (isPhoneAvailable(widget.data['user']) &&
+                                        hasActiveSubscription() &&
+                                        homeController.loggedIn.value)
                                       InkWell(
                                         onTap: () {
-                                          launchCaller(widget.data['user']['phone']);
+                                          launchCaller(
+                                              widget.data['user']['phone']);
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
@@ -529,31 +534,36 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                                           ),
                                           decoration: BoxDecoration(
                                             color: Colors.transparent,
-                                            borderRadius: BorderRadius.circular(15),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
                                             border: Border.all(
                                                 color: Colors.green,
-                                                width: 1.5
-                                            ),
+                                                width: 1.5),
                                           ),
                                           child: Row(
                                             children: [
-                                              Icon(
-                                                  Icons.call,
-                                                  color: appcolor().greenColor.withOpacity(0.9),
-                                                  size: 16
-                                              ),
+                                              Icon(Icons.call,
+                                                  color: appcolor()
+                                                      .greenColor
+                                                      .withOpacity(0.9),
+                                                  size: 16),
                                             ],
                                           ),
                                         ),
                                       ),
-                                    if (isEmailAvailable(widget.data['user']) && hasActiveSubscription() && homeController.loggedIn.value)
+                                    if (isEmailAvailable(widget.data['user']) &&
+                                        hasActiveSubscription() &&
+                                        homeController.loggedIn.value)
                                       SizedBox(
                                         width: Get.width * 0.02,
                                       ),
-                                    if (isEmailAvailable(widget.data['user']) && hasActiveSubscription() && homeController.loggedIn.value)
+                                    if (isEmailAvailable(widget.data['user']) &&
+                                        hasActiveSubscription() &&
+                                        homeController.loggedIn.value)
                                       InkWell(
                                         onTap: () {
-                                          launchEmail(widget.data['user']['email']);
+                                          launchEmail(
+                                              widget.data['user']['email']);
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
@@ -562,67 +572,111 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                                           ),
                                           decoration: BoxDecoration(
                                             color: Colors.transparent,
-                                            borderRadius: BorderRadius.circular(15),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
                                             border: Border.all(
                                                 color: appcolor().mainColor,
-                                                width: 1.5
-                                            ),
+                                                width: 1.5),
                                           ),
                                           child: Row(
                                             children: [
-                                              Icon(
-                                                  Icons.email,
+                                              Icon(Icons.email,
                                                   color: appcolor().mainColor,
-                                                  size: 16
-                                              ),
+                                                  size: 16),
                                             ],
                                           ),
                                         ),
                                       ),
-
-                                    if (!hasActiveSubscription())
-                                    // a button to subscribe
+                                    if (!hasActiveSubscription() &&
+                                        homeController.loggedIn.value)
+                                      // a button to subscribe
                                       InkWell(
                                         onTap: () {
-                                          Get.to(() => const subscription_view(),
-                                              transition: Transition.rightToLeft,
-                                              duration: const Duration(milliseconds: 500));
+                                          Get.to(
+                                              () => const subscription_view(),
+                                              transition:
+                                                  Transition.rightToLeft,
+                                              duration: const Duration(
+                                                  milliseconds: 500));
                                         },
                                         child: Container(
-                                            padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                                            padding: const EdgeInsets.only(
+                                                top: 5,
+                                                bottom: 5,
+                                                left: 8,
+                                                right: 8),
                                             decoration: BoxDecoration(
                                               color: Colors.transparent,
-                                              borderRadius: BorderRadius.circular(5),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
                                               border: Border.all(
                                                 color: Colors.redAccent,
                                               ),
                                             ),
-                                            child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.payment,
-                                                    color: appcolor().redColor,
-                                                    size: 14,
-                                                  ),
-                                                  SizedBox(
-                                                    width: Get.width * 0.01,
-                                                  ),
-                                                  Text(
-                                                    'Subscribe',
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: appcolor().redColor,
-                                                      fontWeight: FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ]
-                                            )
-                                        ),
+                                            child: Row(children: [
+                                              Icon(
+                                                Icons.payment,
+                                                color: appcolor().redColor,
+                                                size: 14,
+                                              ),
+                                              SizedBox(
+                                                width: Get.width * 0.01,
+                                              ),
+                                              Text(
+                                                'Subscribe',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: appcolor().redColor,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ])),
                                       ),
-                                  ]
-                              )
-                            ]
-                        ),
+                                    if (!homeController.loggedIn.value)
+                                      // a button to login
+                                      InkWell(
+                                        onTap: () {
+                                          Get.to(() => const signin_view(),
+                                              transition:
+                                                  Transition.rightToLeft,
+                                              duration: const Duration(
+                                                  milliseconds: 500));
+                                        },
+                                        child: Container(
+                                            padding: const EdgeInsets.only(
+                                                top: 5,
+                                                bottom: 5,
+                                                left: 8,
+                                                right: 8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              border: Border.all(
+                                                color: Colors.redAccent,
+                                              ),
+                                            ),
+                                            child: Row(children: [
+                                              Icon(
+                                                Icons.login,
+                                                color: appcolor().redColor,
+                                                size: 14,
+                                              ),
+                                              SizedBox(
+                                                width: Get.width * 0.01,
+                                              ),
+                                              Text(
+                                                'Login',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: appcolor().redColor,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ])),
+                                      ),
+                                  ])
+                            ]),
                       )
                     ],
                   ),
@@ -636,21 +690,21 @@ class _errand_detail_viewState extends State<errand_detail_view> {
 
             //photo container
             if (!isPhotosEmpty(widget.data['images']))
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                 Text(
-                  'Photos',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: appcolor().darkBlueColor.withOpacity(0.5),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Photos',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: appcolor().darkBlueColor.withOpacity(0.5),
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                SizedBox(
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  SizedBox(
                     height: 100,
                     child: ListView.builder(
                       controller: _scrollController,
@@ -675,11 +729,9 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                             ),
                             child: Center(
                               child: FadeInImage.assetNetwork(
-                                placeholder:
-                                    'assets/images/errandia_logo.png',
+                                placeholder: 'assets/images/errandia_logo.png',
                                 image: getImagePathWithSize(
-                                    widget.data['images'][index]
-                                        ['image_path'],
+                                    widget.data['images'][index]['image_path'],
                                     width: 100,
                                     height: 100),
                                 fit: BoxFit.contain,
@@ -697,8 +749,8 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                       },
                     ),
                   )
-              ],
-            ),
+                ],
+              ),
           ],
         ).paddingOnly(
           left: 20,

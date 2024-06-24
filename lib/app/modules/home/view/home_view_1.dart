@@ -136,6 +136,8 @@ class _home_view_1State extends State<home_view_1> with WidgetsBindingObserver {
       homeController.fetchUnreadNotifications();
       // if (homeController.loggedIn.value) {
       profileController.getUser();
+      getActiveSubscription();
+
       // }
     });
   }

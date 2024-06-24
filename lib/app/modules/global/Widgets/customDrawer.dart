@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
 import '../../buiseness/view/add_business_view.dart';
-import '../../buiseness/view/businesses_view.dart';
+import '../../buiseness/view/businesses_view_with_bar.dart';
 import '../../buiseness/view/manage_business_view.dart';
 import '../../errands/view/manage_errands_page.dart';
 import '../../home/controller/home_controller.dart';
@@ -72,7 +72,7 @@ class CustomEndDrawer extends StatelessWidget {
                     text: 'Businesses',
                     imagePath: 'assets/images/sidebar_icon/create_shop.png',
                     callback: () {
-                      Get.to(() => Businesses_View());
+                      Get.to(() => BusinessesViewWithBar());
                     },
                   )),
             Obx(() => !homeController.loggedIn.value
