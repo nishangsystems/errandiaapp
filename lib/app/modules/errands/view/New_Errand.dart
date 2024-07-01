@@ -17,9 +17,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 import '../../../../modal/Region.dart';
-import '../../../../modal/Street.dart';
 import '../controller/newErradiaController.dart';
-import '2nd_screen_new_errand.dart';
 
 class New_Errand extends StatefulWidget {
   const New_Errand({super.key});
@@ -80,10 +78,9 @@ class _NewErrandState extends State<New_Errand> {
                 horizontal: 20,
                 vertical: 15,
               ));
-          print("errand Id: ${ data['data']['item']['id'].toString()}");
+          print("errand Id: ${data['data']['item']['id'].toString()}");
           getErrandResultsInBackground(
               data['data']['item']['id'].toString(), response['data']);
-
         } else {
           // Navigator.of(dialogContext).pop(); // Close the dialog
           Get.back();
@@ -174,7 +171,8 @@ class _NewErrandState extends State<New_Errand> {
         if (backgroundExecution) {
           print("still errandId: $errandId");
           Future.delayed(const Duration(seconds: 10), () {
-            print("Navigating to ErrandResults with errandId: $errandId and data: $data");
+            print(
+                "Navigating to ErrandResults with errandId: $errandId and data: $data");
 
             Get.to(() => ErrandResults(data: data, errandId: errandId));
           });
@@ -227,6 +225,7 @@ class _NewErrandState extends State<New_Errand> {
 
         runErrandInBackground(response);
       } else {
+        newErrandController.isLoading.value = false;
         setState(() {
           isLoading = false;
         });
@@ -237,6 +236,7 @@ class _NewErrandState extends State<New_Errand> {
         print("Error creating errand: $error");
       }
       setState(() {
+        newErrandController.isLoading.value = false;
         isLoading = false;
       });
       alertDialogBox(context, "Error", "Failed to create errand");
@@ -491,11 +491,12 @@ class _NewErrandState extends State<New_Errand> {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Obx(() {
                       return DropdownButton<dynamic>(
-                        value:  newErrandController.regionCode.value.isNotEmpty
+                        value: newErrandController.regionCode.value.isNotEmpty
                             ? newErrandController.regionCode.value
                             : null,
                         onChanged: (value) {
-                          newErrandController.regionCode.value = value as String;
+                          newErrandController.regionCode.value =
+                              value as String;
                           newErrandController.town.value = '';
                           print(
                               "regionCode: ${newErrandController.regionCode.value}");
@@ -519,13 +520,13 @@ class _NewErrandState extends State<New_Errand> {
                         icon: Icon(Icons.keyboard_arrow_down,
                             color: Colors.black87.withOpacity(0.5)),
                         items: Regions.Items.map((e) => DropdownMenuItem(
-                          value: e.id.toString(),
-                          child: Text(
-                            e.name.toString(),
-                            style: const TextStyle(
-                                fontSize: 15, color: Colors.black),
-                          ),
-                        )).toList(),
+                              value: e.id.toString(),
+                              child: Text(
+                                e.name.toString(),
+                                style: const TextStyle(
+                                    fontSize: 15, color: Colors.black),
+                              ),
+                            )).toList(),
                       );
                     }),
                   )
@@ -561,20 +562,23 @@ class _NewErrandState extends State<New_Errand> {
                             }
                           },
                           child: AbsorbPointer(
-                            absorbing: newErrandController.regionCode.value.isEmpty,
+                            absorbing:
+                                newErrandController.regionCode.value.isEmpty,
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
                               child: DropdownButton<String>(
                                 value: newErrandController.town.value.isNotEmpty
                                     ? newErrandController.town.value
                                     : null,
                                 onChanged: (value) async {
                                   newErrandController.town.value = value!;
-                                  print("townId: ${newErrandController.town.value}");
+                                  print(
+                                      "townId: ${newErrandController.town.value}");
                                   newErrandController.update();
                                 },
                                 underline: const SizedBox(),
@@ -596,7 +600,8 @@ class _NewErrandState extends State<New_Errand> {
                                     value: e['id'].toString(),
                                     child: Text(
                                       e['name'].toString(),
-                                      style: const TextStyle(fontSize: 15, color: Colors.black),
+                                      style: const TextStyle(
+                                          fontSize: 15, color: Colors.black),
                                     ),
                                   );
                                 }).toList(),
@@ -767,19 +772,21 @@ class _NewErrandState extends State<New_Errand> {
               const SizedBox(height: 30),
               Obx(() {
                 return InkWell(
-                  onTap: newErrandController.isFormFilled && !newErrandController.isLoading.value
+                  onTap: newErrandController.isFormFilled &&
+                          !newErrandController.isLoading.value
                       ? () {
-                    // if (errandController.isTownsLoading.value) {
-                    //   newErrandController.town.value = '';
-                    //   newErrandController
-                    // }
+                          // if (errandController.isTownsLoading.value) {
+                          //   newErrandController.town.value = '';
+                          //   newErrandController
+                          // }
                           createErrand();
                         }
                       : null,
                   child: Container(
                     height: 50,
                     decoration: BoxDecoration(
-                      color: newErrandController.isFormFilled  && !newErrandController.isLoading.value
+                      color: newErrandController.isFormFilled &&
+                              !newErrandController.isLoading.value
                           ? Colors.blue[700]
                           : const Color(0xffe0e6ec),
                       borderRadius: BorderRadius.circular(10),
@@ -787,19 +794,19 @@ class _NewErrandState extends State<New_Errand> {
                     child: Center(
                       child: newErrandController.isLoading.value
                           ? CircularProgressIndicator(
-                        valueColor:
-                        AlwaysStoppedAnimation<Color>(Colors.blueGrey.withOpacity(0.5)),
-                      )
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.blueGrey.withOpacity(0.5)),
+                            )
                           : Text(
-                        'RUN ERRAND',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: newErrandController.isFormFilled
-                              ? Colors.white
-                              : Colors.blueGrey,
-                        ),
-                      ),
+                              'RUN ERRAND',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: newErrandController.isFormFilled
+                                    ? Colors.white
+                                    : Colors.blueGrey,
+                              ),
+                            ),
                     ),
                   ),
                 );

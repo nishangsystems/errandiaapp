@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -121,17 +122,73 @@ Widget buildLoadingWidget() {
 Future<File> compressFile({required File? file}) async {
   final filePath = file!.path;
 
-  // Create output file path
-  // eg:- "Volume/VM/abcd_out.jpeg"
-  final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
-  final splitted = filePath.substring(0, (lastIndex));
-  final outPath = '${splitted}_out${filePath.substring(lastIndex)}';
-  var result = await FlutterImageCompress.compressAndGetFile(
-    file.path,
-    outPath,
-    quality: 80,
-  );
-  return File(result!.path);
+  // check the file type
+  if (filePath.endsWith('.png')) {
+    // Create output file path
+    // eg:- "Volume/VM/abcd_out.jpeg"
+    final lastIndex = filePath.lastIndexOf(RegExp(r'.png'));
+    final splitted = filePath.substring(0, (lastIndex));
+    final outPath = '${splitted}_out${filePath.substring(lastIndex)}';
+    var result = await FlutterImageCompress.compressAndGetFile(
+        file.path, outPath,
+        quality: 80, format: CompressFormat.png);
+    return File(result!.path);
+  } else if (filePath.endsWith('.jpeg') || filePath.endsWith('.jpg')) {
+    // Create output file path
+    // eg:- "Volume/VM/abcd_out.jpeg"
+    final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+    final splitted = filePath.substring(0, (lastIndex));
+    final outPath = '${splitted}_out${filePath.substring(lastIndex)}';
+    var result = await FlutterImageCompress.compressAndGetFile(
+        file.path, outPath,
+        quality: 80, format: CompressFormat.jpeg);
+    return File(result!.path);
+  } else if (filePath.endsWith('.webp')) {
+    // Create output file path
+    // eg:- "Volume/VM/abcd_out.jpeg"
+    final lastIndex = filePath.lastIndexOf(RegExp(r'.webp'));
+    final splitted = filePath.substring(0, (lastIndex));
+    final outPath = '${splitted}_out${filePath.substring(lastIndex)}';
+    var result = await FlutterImageCompress.compressAndGetFile(
+        file.path, outPath,
+        quality: 80, format: CompressFormat.webp);
+    return File(result!.path);
+  } else {
+    return file;
+  }
+}
+
+Future<File?> compressImageToMaxSize(File imageFile) async {
+  final dir = await getTemporaryDirectory();
+  final targetPath = '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+  // File original = File(imageFile!.path);
+  int quality = 100;
+  File? result;
+  int maxSizeInBytes = 2 * 1024 * 1024;
+
+  do {
+    var compressedImage = await FlutterImageCompress.compressAndGetFile(
+      imageFile.absolute.path,
+      targetPath,
+      quality: quality,
+      format: CompressFormat.jpeg,
+    );
+
+    if (compressedImage == null) {
+      return null;
+    }
+
+    result = File(compressedImage.path);
+
+    if (result.lengthSync() <= maxSizeInBytes || quality <= 10) {
+      break;
+    }
+
+    quality -= 10;
+  } while (result.lengthSync() > maxSizeInBytes);
+
+  return result;
 }
 
 String formatPrice(double price) {

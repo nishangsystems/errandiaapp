@@ -41,10 +41,13 @@ class imagePickercontroller extends GetxController {
     if (image != null) {
       File imageFile = File(image.path);
 
-      print("original file size: ${imageFile.lengthSync()}");
+      print("comp: original file size: ${imageFile.lengthSync()}");
+      // calculate file size in bytes or megabytes
+      double fileSize = imageFile.lengthSync() / (1024 * 1024);
+      print("File size: $fileSize MB");
 
       try {
-        imageFile = (await compressFile(file: imageFile));
+        imageFile = (await compressImageToMaxSize(imageFile))!;
         print("Compressed file size: ${imageFile.lengthSync()}");
       } catch (e) {
         print("Error compressing file: $e");
@@ -66,7 +69,7 @@ class imagePickercontroller extends GetxController {
     if (image != null) {
       image_path.value = image.path.toString();
       return image_path.value;
-     // imageList.add(image);
+      // imageList.add(image);
     }
   }
 
@@ -76,7 +79,19 @@ class imagePickercontroller extends GetxController {
 
     if (image != null) {
       image_path.value = image.path.toString();
-       imageList.add(image);
+
+      // compress image file
+      File imageFile = File(image.path);
+
+      print("cam: original file size: ${getFileSize(imageFile)}");
+      try {
+        imageFile = (await compressImageToMaxSize(imageFile))!;
+        print("cam: Compressed file size: ${getFileSize(imageFile)}");
+      } catch (e) {
+        print("Error compressing file: $e");
+      }
+
+      imageList.add(image);
     }
   }
 
@@ -114,7 +129,8 @@ class imagePickercontroller extends GetxController {
         if (imageList[index]['id'] != null && imageList[index] is Map) {
           print("image to replace: ${imageList[index]['id']}");
 
-          await deleteOneImageById(itemSlug, imageList[index]['id'].toString()).then((_) {
+          await deleteOneImageById(itemSlug, imageList[index]['id'].toString())
+              .then((_) {
             print("image deleted ====");
           });
         }
@@ -151,15 +167,25 @@ class imagePickercontroller extends GetxController {
     }
   }
 
-
   Future getmultipleImage() async {
     final ImagePicker _picker = ImagePicker();
-    final selectedImages = await _picker.pickMultiImage(
+    final List<XFile> selectedImages = await _picker.pickMultiImage(
       imageQuality: 100,
     );
-print("selectedImages: $selectedImages");
+
+    print("selectedImages: $selectedImages");
     if (selectedImages.isNotEmpty) {
       for (int i = 0; i < selectedImages.length; i++) {
+        // compress the images first
+        File imageFile = File(selectedImages[i].path);
+        print("compressed: original file size: ${getFileSize(imageFile)}");
+        try {
+          imageFile = (await compressImageToMaxSize(imageFile))!;
+          print("Compressed file size: ${getFileSize(imageFile)}");
+        } catch (e) {
+          print("Error compressing file: $e");
+        }
+
         imageList.add(selectedImages[i]);
         imagePaths.add(selectedImages[i].path);
         uploadStatusList.add(UploadStatus.pending);
@@ -239,7 +265,7 @@ print("selectedImages: $selectedImages");
       print("original file size: ${imageFile.lengthSync()}");
 
       try {
-        imageFile = (await compressFile(file: imageFile));
+        imageFile = (await compressImageToMaxSize(imageFile))!;
         print("Compressed file size: ${imageFile.lengthSync()}");
       } catch (e) {
         print("Error compressing file: $e");
@@ -267,10 +293,10 @@ print("selectedImages: $selectedImages");
     if (image != null) {
       File imageFile = File(image.path);
 
-      print("original file size: ${imageFile.lengthSync()}");
+      print("camera: original file size: ${imageFile.lengthSync()}");
 
       try {
-        imageFile = (await compressFile(file: imageFile));
+        imageFile = (await compressImageToMaxSize(imageFile))!;
         print("Compressed file size: ${imageFile.lengthSync()}");
       } catch (e) {
         print("Error compressing file: $e");
@@ -291,7 +317,8 @@ print("selectedImages: $selectedImages");
   }
 
   // upload errand image and update the upload status
-  Future<void> uploadErrandImage(String imagePath, String itemId, int index) async {
+  Future<void> uploadErrandImage(
+      String imagePath, String itemId, int index) async {
     try {
       final response = await ErrandsAPI.uploadErrandImage(itemId, imagePath);
       final data = jsonDecode(response);
@@ -307,7 +334,6 @@ print("selectedImages: $selectedImages");
           "id": data['data']['item']['id'],
           "image_path": data['data']['item']['image']
         };
-
       } else {
         uploadStatusList[index] = UploadStatus.failed;
       }
@@ -317,7 +343,6 @@ print("selectedImages: $selectedImages");
       print("Error during image upload: $e");
       // Handle exception
       // uploadStatusList[index] = UploadStatus.failed; // Update status on error
-
     }
   }
 
@@ -338,7 +363,6 @@ print("selectedImages: $selectedImages");
           "id": data['data']['data']['image']['id'],
           "url": data['data']['data']['image']['image']
         };
-
       } else {
         uploadStatusList[index] = UploadStatus.failed;
       }
@@ -348,7 +372,6 @@ print("selectedImages: $selectedImages");
       print("Error during image upload: $e");
       // Handle exception
       // uploadStatusList[index] = UploadStatus.failed; // Update status on error
-
     }
   }
 
@@ -444,14 +467,19 @@ print("selectedImages: $selectedImages");
       }
       if (imageList.isEmpty) {
         Get.snackbar("Info", "All images deleted successfully");
-        return {"status": "success", "message": "All images deleted successfully"};
+        return {
+          "status": "success",
+          "message": "All images deleted successfully"
+        };
       } else {
-        Get.snackbar("Error", "Failed to delete images", snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+        Get.snackbar("Error", "Failed to delete images",
+            snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
         return {"status": "error", "message": "Failed to delete images"};
       }
     } catch (e) {
       print("Error during image deletion: $e");
-      Get.snackbar("Error", "Failed to delete images", snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
+      Get.snackbar("Error", "Failed to delete images",
+          snackPosition: SnackPosition.TOP, backgroundColor: Colors.red);
     }
   }
 
@@ -464,9 +492,14 @@ print("selectedImages: $selectedImages");
   //   _listener.userImage(croppedFile);
   // }
 
+  // file size in MB
+  String getFileSize(File file) {
+    double fileSize = file.lengthSync() / (1024 * 1024);
+    return fileSize.toStringAsFixed(2);
+  }
+
   void resetImageList() {
     imageList.clear();
     uploadStatusList.clear();
   }
-
 }
