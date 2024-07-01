@@ -398,7 +398,7 @@ class _PostedErrandsViewState extends State<PostedErrandsView>
                                                   "Are you sure you want to delete this errand?\n"
                                                   "This action cannot be undone.\n",
                                               dialogType: MyDialogType.error,
-                                              onConfirm: () {
+                                              onConfirm: () async {
                                                 // delete product
                                                 print(
                                                     "delete errand: ${data_['id']}");

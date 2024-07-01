@@ -201,7 +201,7 @@ class _errand_detail_viewState extends State<errand_detail_view> {
                 "This action will rerun the errand and send notifications to corresponding businesses. \n"
                 "Are you willing to proceed?\n",
             dialogType: MyDialogType.info,
-            onConfirm: () {
+            onConfirm: () async {
               // delete product
               print("rerun errand: $id");
               ErrandsAPI.runErrand(id.toString()).then((response_) {

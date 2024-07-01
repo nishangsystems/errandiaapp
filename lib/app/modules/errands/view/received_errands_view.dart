@@ -103,61 +103,55 @@ class _ReceivedErrandsViewState extends State<ReceivedErrandsView>
             message: "Are you sure you want to reject this errand?\n"
                 "This action cannot be undone.\n",
             dialogType: MyDialogType.error,
-            onConfirm: () {
-              // delete product
-              print("reject errand: ${data['errand_received_id']}");
-              ErrandsAPI.rejectReceivedErrand(
-                      data['errand_received_id'].toString())
-                  .then((response_) {
+            onConfirm: () async {
+              try {
+                var response_ = await ErrandsAPI.rejectReceivedErrand(
+                    data['errand_received_id'].toString());
                 if (response_ != null) {
                   response = jsonDecode(response_);
                   print("reject business response: $response");
 
-                  if (mounted) {
-                    // Check if the widget is still in the tree
-                    if (response["status"] == 'success') {
-                      errandController.reloadReceivedErrands();
-                      homeController.reloadRecentlyPostedItems();
+                  if (response["status"] == 'success') {
+                    errandController.reloadReceivedErrands();
+                    homeController.reloadRecentlyPostedItems();
 
-                      // Close the dialog
+                    // Close the dialog
+                    Navigator.of(dialogContext).pop();
 
-                      // Show success popup
-                      Get.snackbar(
-                        'Success',
-                        response['message'],
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.green,
-                        colorText: Colors.white,
-                        duration: const Duration(seconds: 5),
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 15,
-                        ),
-                      );
+                    // Show success popup
+                    Get.snackbar(
+                      'Success',
+                      response['message'],
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                      duration: const Duration(seconds: 5),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 15,
+                      ),
+                    );
+                  } else {
+                    Navigator.of(dialogContext).pop(); // Close the dialog
 
-                      Navigator.of(dialogContext).pop();
-                    } else {
-                      Navigator.of(dialogContext).pop(); // Close the dialog
-
-                      // Show error popup
-                      Get.snackbar(
-                        'Error',
-                        response['message'],
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.red,
-                        colorText: Colors.white,
-                        duration: const Duration(seconds: 5),
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 15,
-                        ),
-                      );
-                    }
-
-                    // popup.showPopup(context); // Show the popup
+                    // Show error popup
+                    Get.snackbar(
+                      'Error',
+                      response['message'],
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      duration: const Duration(seconds: 5),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 15,
+                      ),
+                    );
                   }
                 }
-              });
+              } catch (e) {
+                print("Error: $e");
+              }
             },
             onCancel: () {
               // cancel delete

@@ -4,6 +4,7 @@ import 'package:errandia/app/modules/buiseness/controller/business_controller.da
 import 'package:errandia/app/modules/buiseness/controller/errandia_business_view_controller.dart';
 import 'package:errandia/app/modules/buiseness/verify_business_otp.dart';
 import 'package:errandia/app/modules/buiseness/view/visit_shop.dart';
+import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
 import 'package:errandia/app/modules/global/Widgets/customDrawer.dart';
 import 'package:errandia/app/modules/global/constants/color.dart';
@@ -16,7 +17,6 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../APi/business.dart';
-import '../../global/Widgets/CustomDialog.dart';
 import '../../global/Widgets/bottomsheet_item.dart';
 import '../../global/Widgets/popupBox.dart';
 import 'edit_business_view.dart';
@@ -153,7 +153,7 @@ class _errandia_business_viewState extends State<errandia_business_view>
                     title: "Delete Business",
                     message: "Are you sure you want to delete this business?",
                     dialogType: MyDialogType.error,
-                    onConfirm: () {
+                    onConfirm: () async {
                       // delete product
                       print("delete business: ${_localBusinessData['slug']}");
                       BusinessAPI.deleteBusiness(_localBusinessData['slug'])

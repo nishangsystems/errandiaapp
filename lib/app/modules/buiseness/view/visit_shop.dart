@@ -141,7 +141,7 @@ class _VisitShopState extends State<VisitShop> with WidgetsBindingObserver {
                     title: "Delete Business",
                     message: "Are you sure you want to delete this business?",
                     dialogType: MyDialogType.error,
-                    onConfirm: () {
+                    onConfirm: () async {
                       // delete product
                       print("delete business: ${widget.businessData['slug']}");
                       BusinessAPI.deleteBusiness(widget.businessData['slug'])

@@ -99,13 +99,12 @@ class _manage_business_viewState extends State<manage_business_view>
           return Center(child: buildLoadingWidget());
         } else if (profileController.isError.isTrue) {
           return Center(
-            child: buildErrorWidget(
-              message: 'An error occurred',
-              callback: () {
-                profileController.reloadMyBusinesses();
-              },
-            )
-          );
+              child: buildErrorWidget(
+            message: 'An error occurred',
+            callback: () {
+              profileController.reloadMyBusinesses();
+            },
+          ));
         } else if (profileController.itemList.isEmpty) {
           return Center(
             child: Text(
@@ -229,7 +228,7 @@ class _manage_business_viewState extends State<manage_business_view>
                                               message:
                                                   "Are you sure you want to delete this business?",
                                               dialogType: MyDialogType.error,
-                                              onConfirm: () {
+                                              onConfirm: () async {
                                                 // delete product
                                                 print(
                                                     "delete business: ${data['slug']}");

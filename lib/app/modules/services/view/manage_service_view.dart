@@ -20,7 +20,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
-import '../../global/Widgets/blockButton.dart';
 import '../../global/constants/color.dart';
 
 class manage_service_view extends StatefulWidget {
@@ -30,10 +29,12 @@ class manage_service_view extends StatefulWidget {
   State<manage_service_view> createState() => _manage_service_viewState();
 }
 
-class _manage_service_viewState extends State<manage_service_view> with WidgetsBindingObserver {
+class _manage_service_viewState extends State<manage_service_view>
+    with WidgetsBindingObserver {
   manage_service_tab_controller tabController =
       Get.put(manage_service_tab_controller());
-  manage_service_controller service_controller = Get.put(manage_service_controller());
+  manage_service_controller service_controller =
+      Get.put(manage_service_controller());
 
   late profile_controller profileController;
   late ScrollController scrollController;
@@ -41,7 +42,6 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   late business_controller businessController;
   late home_controller homeController;
-
 
   @override
   void initState() {
@@ -62,7 +62,6 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
         profileController.loadMyServices();
       }
     });
-
   }
 
   @override
@@ -81,194 +80,213 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
 
   @override
   Widget build(BuildContext context) {
-
     Widget allServices(BuildContext ctx) {
-      return Obx(
-              () {
-            if (profileController.isServiceLoading.isTrue) {
-              return Center(
-                child: buildLoadingWidget(),
-              );
-            } else if (profileController.isServiceError.value) {
-              return Center(
-                child: buildErrorWidget(
-                  message: 'An error occurred while fetching services',
-                  callback: () {
-                    profileController.reloadMyServices();
-                  },
-                ),
-              );
-            } else if (profileController.serviceItemList.isEmpty) {
-              return Center(
-                child: Text(
-                  'No Services found',
-                  style: TextStyle(
-                    color: appcolor().mediumGreyColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              );
-            } else {
-              return Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      key: const PageStorageKey('allMyServices'),
-                      controller: scrollController,
-                      itemCount: profileController.serviceItemList.length,
-                      itemBuilder: (context, index) {
-                        var data = profileController.serviceItemList[index];
-                        return GestureDetector(
+      return Obx(() {
+        if (profileController.isServiceLoading.isTrue) {
+          return Center(
+            child: buildLoadingWidget(),
+          );
+        } else if (profileController.isServiceError.value) {
+          return Center(
+            child: buildErrorWidget(
+              message: 'An error occurred while fetching services',
+              callback: () {
+                profileController.reloadMyServices();
+              },
+            ),
+          );
+        } else if (profileController.serviceItemList.isEmpty) {
+          return Center(
+            child: Text(
+              'No Services found',
+              style: TextStyle(
+                color: appcolor().mediumGreyColor,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          );
+        } else {
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  key: const PageStorageKey('allMyServices'),
+                  controller: scrollController,
+                  itemCount: profileController.serviceItemList.length,
+                  itemBuilder: (context, index) {
+                    var data = profileController.serviceItemList[index];
+                    return GestureDetector(
+                        onTap: () {
+                          Get.to(
+                            () => ServiceDetailsView(service: data),
+                            transition: Transition.fadeIn,
+                            duration: const Duration(milliseconds: 500),
+                          );
+                        },
+                        child: RowItemWidget(
+                          name: data['name'],
+                          price: data['unit_price'].toString(),
+                          image: data['featured_image'],
+                          index: index,
                           onTap: () {
-                            Get.to(() => ServiceDetailsView(service: data),
-                              transition: Transition.fadeIn,
-                              duration: const Duration(milliseconds: 500),
+                            Get.bottomSheet(
+                              // backgroundColor: Colors.white,
+                              Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                color: Colors.white,
+                                child: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    const Center(
+                                      child: Icon(
+                                        Icons.horizontal_rule,
+                                        size: 25,
+                                      ),
+                                    ),
+                                    // Text(index.toString()),
+                                    managebottomSheetWidgetitem(
+                                      title: 'Edit Service',
+                                      icondata: Icons.edit,
+                                      callback: () async {
+                                        print('tapped');
+                                        Get.back();
+                                        Get.to(
+                                            () => EditServiceView(data: data));
+                                      },
+                                    ),
+                                    // managebottomSheetWidgetitem(
+                                    //   title: 'Edit Photo',
+                                    //   icondata: FontAwesomeIcons.fileImage,
+                                    //   callback: () {
+                                    //     Get.back();
+                                    //   },
+                                    // ),
+                                    // managebottomSheetWidgetitem(
+                                    //   title: 'UnPublish Product',
+                                    //   icondata: FontAwesomeIcons.minusCircle,
+                                    //   callback: () {},
+                                    // ),
+                                    managebottomSheetWidgetitem(
+                                      title: 'Move to trash',
+                                      icondata: Icons.delete,
+                                      callback: () {
+                                        Get.back();
+
+                                        showDialog(
+                                          context: context,
+                                          builder:
+                                              (BuildContext dialogContext) {
+                                            // Use dialogContext
+                                            var response;
+                                            return CustomAlertDialog(
+                                                title: "Delete Service",
+                                                message:
+                                                    "Are you sure you want to delete this service?",
+                                                dialogType: MyDialogType.error,
+                                                onConfirm: () async {
+                                                  // delete product
+                                                  print(
+                                                      "delete product: ${data['slug']}");
+                                                  ProductAPI
+                                                          .deleteProductOrService(
+                                                              data['slug'])
+                                                      .then((response_) {
+                                                    if (response_ != null) {
+                                                      response =
+                                                          jsonDecode(response_);
+                                                      print(
+                                                          "delete service response: $response");
+
+                                                      if (mounted) {
+                                                        // Check if the widget is still in the tree
+                                                        if (response[
+                                                                "status"] ==
+                                                            'success') {
+                                                          Navigator.of(
+                                                                  dialogContext)
+                                                              .pop(); // Close the dialog
+
+                                                          // Show success popup
+                                                          popup = PopupBox(
+                                                            title: 'Success',
+                                                            description:
+                                                                response['data']
+                                                                    ['message'],
+                                                            type: PopupType
+                                                                .success,
+                                                          );
+                                                        } else {
+                                                          Navigator.of(
+                                                                  dialogContext)
+                                                              .pop(); // Close the dialog
+
+                                                          // Show error popup
+                                                          popup = PopupBox(
+                                                            title: 'Error',
+                                                            description:
+                                                                response['data']
+                                                                    ['data'],
+                                                            type:
+                                                                PopupType.error,
+                                                          );
+                                                        }
+
+                                                        popup.showPopup(
+                                                            context); // Show the popup
+                                                      }
+                                                    }
+                                                  });
+                                                },
+                                                onCancel: () {
+                                                  // cancel delete
+                                                  print("cancel delete");
+                                                  Navigator.of(dialogContext)
+                                                      .pop(); // Close the dialog
+                                                });
+                                          },
+                                        ).then((_) {
+                                          if (mounted) {
+                                            try {
+                                              popup.dismissPopup(navigatorKey
+                                                  .currentContext!); // Dismiss the popup
+                                            } catch (e) {
+                                              print(
+                                                  "error dismissing popup: $e");
+                                            }
+                                            profileController
+                                                .reloadMyServices();
+                                            Get.back();
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              enableDrag: true,
                             );
                           },
-
-                          child: RowItemWidget(
-                            name: data['name'],
-                            price: data['unit_price'].toString(),
-                            image: data['featured_image'],
-                            index: index,
-                            onTap: () {
-                              Get.bottomSheet(
-                                // backgroundColor: Colors.white,
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  color: Colors.white,
-                                  child: Wrap(
-                                    crossAxisAlignment: WrapCrossAlignment.center,
-                                    children: [
-                                      const Center(
-                                        child: Icon(
-                                          Icons.horizontal_rule,
-                                          size: 25,
-                                        ),
-                                      ),
-                                      // Text(index.toString()),
-                                      managebottomSheetWidgetitem(
-                                        title: 'Edit Service',
-                                        icondata: Icons.edit,
-                                        callback: () async {
-                                          print('tapped');
-                                          Get.back();
-                                          Get.to(() => EditServiceView(data: data));
-                                        },
-                                      ),
-                                      // managebottomSheetWidgetitem(
-                                      //   title: 'Edit Photo',
-                                      //   icondata: FontAwesomeIcons.fileImage,
-                                      //   callback: () {
-                                      //     Get.back();
-                                      //   },
-                                      // ),
-                                      // managebottomSheetWidgetitem(
-                                      //   title: 'UnPublish Product',
-                                      //   icondata: FontAwesomeIcons.minusCircle,
-                                      //   callback: () {},
-                                      // ),
-                                      managebottomSheetWidgetitem(
-                                        title: 'Move to trash',
-                                        icondata: Icons.delete,
-                                        callback: () {
-                                          Get.back();
-
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext dialogContext) {
-                                              // Use dialogContext
-                                              var response;
-                                              return CustomAlertDialog(
-                                                  title: "Delete Service",
-                                                  message: "Are you sure you want to delete this service?",
-                                                  dialogType: MyDialogType.error,
-                                                  onConfirm: () {
-                                                    // delete product
-                                                    print("delete product: ${data['slug']}");
-                                                    ProductAPI.deleteProductOrService(data['slug'])
-                                                        .then((response_) {
-                                                      if (response_ != null) {
-                                                        response = jsonDecode(response_);
-                                                        print("delete service response: $response");
-
-                                                        if (mounted) {
-                                                          // Check if the widget is still in the tree
-                                                          if (response["status"] == 'success') {
-                                                            Navigator.of(dialogContext)
-                                                                .pop(); // Close the dialog
-
-                                                            // Show success popup
-                                                            popup = PopupBox(
-                                                              title: 'Success',
-                                                              description: response['data']['message'],
-                                                              type: PopupType.success,
-                                                            );
-                                                          } else {
-                                                            Navigator.of(dialogContext)
-                                                                .pop(); // Close the dialog
-
-                                                            // Show error popup
-                                                            popup = PopupBox(
-                                                              title: 'Error',
-                                                              description: response['data']['data'],
-                                                              type: PopupType.error,
-                                                            );
-                                                          }
-
-                                                          popup.showPopup(context); // Show the popup
-                                                        }
-                                                      }
-                                                    });
-                                                  },
-                                                  onCancel: () {
-                                                    // cancel delete
-                                                    print("cancel delete");
-                                                    Navigator.of(dialogContext).pop(); // Close the dialog
-                                                  });
-                                            },
-                                          ).then((_) {
-                                            if (mounted) {
-                                              try {
-                                                popup.dismissPopup(
-                                                    navigatorKey.currentContext!); // Dismiss the popup
-                                              } catch (e) {
-                                                print("error dismissing popup: $e");
-                                              }
-                                              profileController.reloadMyServices();
-                                              Get.back();
-                                            }
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                enableDrag: true,
-                              );
-                            },
-                          )
-                        );
-                      },
-                    ),
-                  )
-                ],
-              );
-            }
-          }
-      );
+                        ));
+                  },
+                ),
+              )
+            ],
+          );
+        }
+      });
     }
 
     Widget Trashed(BuildContext ctx) {
       return Column(
         children: [
           filter_sort_container(
-                () {
+            () {
               Get.to(filter_product_view());
             },
-                () {
+            () {
               Get.bottomSheet(
                 Container(
                   color: const Color.fromRGBO(255, 255, 255, 1),
@@ -307,12 +325,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                           ),
                           Spacer(),
                           Obx(
-                                () => Radio(
+                            () => Radio(
                               value: 'sort descending',
                               groupValue: service_controller
                                   .manage_service_sort_group_value.value,
                               onChanged: (val) {
-                                service_controller.manage_service_sort_group_value
+                                service_controller
+                                    .manage_service_sort_group_value
                                     .value = val.toString();
                               },
                             ),
@@ -344,12 +363,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                           ),
                           Spacer(),
                           Obx(
-                                () => Radio(
+                            () => Radio(
                               value: 'sort ascending',
                               groupValue: service_controller
                                   .manage_service_sort_group_value.value,
                               onChanged: (val) {
-                                service_controller.manage_service_sort_group_value
+                                service_controller
+                                    .manage_service_sort_group_value
                                     .value = val.toString();
                               },
                             ),
@@ -364,26 +384,27 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                               text: TextSpan(
                                   style: TextStyle(fontSize: 16),
                                   children: [
-                                    TextSpan(
-                                      text: 'Date',
-                                      style: TextStyle(
-                                        color: appcolor().mainColor,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Last Modified',
-                                    ),
-                                  ])),
+                                TextSpan(
+                                  text: 'Date',
+                                  style: TextStyle(
+                                    color: appcolor().mainColor,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'Last Modified',
+                                ),
+                              ])),
                           Spacer(),
                           Obx(() => Radio(
-                            value: 'Date Last modified ',
-                            groupValue: service_controller
-                                .manage_service_sort_group_value.value,
-                            onChanged: (val) {
-                              service_controller.manage_service_sort_group_value
-                                  .value = val.toString();
-                            },
-                          ))
+                                value: 'Date Last modified ',
+                                groupValue: service_controller
+                                    .manage_service_sort_group_value.value,
+                                onChanged: (val) {
+                                  service_controller
+                                      .manage_service_sort_group_value
+                                      .value = val.toString();
+                                },
+                              ))
                         ],
                       ),
 
@@ -402,12 +423,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                           ),
                           Spacer(),
                           Obx(
-                                () => Radio(
+                            () => Radio(
                               value: 'Price',
                               groupValue: service_controller
                                   .manage_service_sort_group_value.value,
                               onChanged: (val) {
-                                service_controller.manage_service_sort_group_value
+                                service_controller
+                                    .manage_service_sort_group_value
                                     .value = val.toString();
                                 print(val.toString());
                               },
@@ -423,7 +445,7 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                 ),
               );
             },
-                () {
+            () {
               Scaffold.of(ctx).openEndDrawer();
             },
           ),
@@ -603,10 +625,10 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
       return Column(
         children: [
           filter_sort_container(
-                () {
+            () {
               Get.to(filter_product_view());
             },
-                () {
+            () {
               Get.bottomSheet(
                 Container(
                   color: const Color.fromRGBO(255, 255, 255, 1),
@@ -645,12 +667,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                           ),
                           Spacer(),
                           Obx(
-                                () => Radio(
+                            () => Radio(
                               value: 'sort descending',
                               groupValue: service_controller
                                   .manage_service_sort_group_value.value,
                               onChanged: (val) {
-                                service_controller.manage_service_sort_group_value
+                                service_controller
+                                    .manage_service_sort_group_value
                                     .value = val.toString();
                               },
                             ),
@@ -682,12 +705,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                           ),
                           Spacer(),
                           Obx(
-                                () => Radio(
+                            () => Radio(
                               value: 'sort ascending',
                               groupValue: service_controller
                                   .manage_service_sort_group_value.value,
                               onChanged: (val) {
-                                service_controller.manage_service_sort_group_value
+                                service_controller
+                                    .manage_service_sort_group_value
                                     .value = val.toString();
                               },
                             ),
@@ -702,26 +726,27 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                               text: TextSpan(
                                   style: TextStyle(fontSize: 16),
                                   children: [
-                                    TextSpan(
-                                      text: 'Date',
-                                      style: TextStyle(
-                                        color: appcolor().mainColor,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Last Modified',
-                                    ),
-                                  ])),
+                                TextSpan(
+                                  text: 'Date',
+                                  style: TextStyle(
+                                    color: appcolor().mainColor,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'Last Modified',
+                                ),
+                              ])),
                           Spacer(),
                           Obx(() => Radio(
-                            value: 'Date Last modified ',
-                            groupValue: service_controller
-                                .manage_service_sort_group_value.value,
-                            onChanged: (val) {
-                              service_controller.manage_service_sort_group_value
-                                  .value = val.toString();
-                            },
-                          ))
+                                value: 'Date Last modified ',
+                                groupValue: service_controller
+                                    .manage_service_sort_group_value.value,
+                                onChanged: (val) {
+                                  service_controller
+                                      .manage_service_sort_group_value
+                                      .value = val.toString();
+                                },
+                              ))
                         ],
                       ),
 
@@ -740,12 +765,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                           ),
                           Spacer(),
                           Obx(
-                                () => Radio(
+                            () => Radio(
                               value: 'Price',
                               groupValue: service_controller
                                   .manage_service_sort_group_value.value,
                               onChanged: (val) {
-                                service_controller.manage_service_sort_group_value
+                                service_controller
+                                    .manage_service_sort_group_value
                                     .value = val.toString();
                                 print(val.toString());
                               },
@@ -761,7 +787,7 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                 ),
               );
             },
-                () {
+            () {
               Scaffold.of(ctx).openEndDrawer();
             },
           ),
@@ -924,10 +950,10 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
       return Column(
         children: [
           filter_sort_container(
-                () {
+            () {
               Get.to(filter_product_view());
             },
-                () {
+            () {
               Get.bottomSheet(
                 Container(
                   color: const Color.fromRGBO(255, 255, 255, 1),
@@ -966,12 +992,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                           ),
                           Spacer(),
                           Obx(
-                                () => Radio(
+                            () => Radio(
                               value: 'sort descending',
                               groupValue: service_controller
                                   .manage_service_sort_group_value.value,
                               onChanged: (val) {
-                                service_controller.manage_service_sort_group_value
+                                service_controller
+                                    .manage_service_sort_group_value
                                     .value = val.toString();
                               },
                             ),
@@ -1003,12 +1030,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                           ),
                           Spacer(),
                           Obx(
-                                () => Radio(
+                            () => Radio(
                               value: 'sort ascending',
                               groupValue: service_controller
                                   .manage_service_sort_group_value.value,
                               onChanged: (val) {
-                                service_controller.manage_service_sort_group_value
+                                service_controller
+                                    .manage_service_sort_group_value
                                     .value = val.toString();
                               },
                             ),
@@ -1023,26 +1051,27 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                               text: TextSpan(
                                   style: TextStyle(fontSize: 16),
                                   children: [
-                                    TextSpan(
-                                      text: 'Date',
-                                      style: TextStyle(
-                                        color: appcolor().mainColor,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Last Modified',
-                                    ),
-                                  ])),
+                                TextSpan(
+                                  text: 'Date',
+                                  style: TextStyle(
+                                    color: appcolor().mainColor,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'Last Modified',
+                                ),
+                              ])),
                           Spacer(),
                           Obx(() => Radio(
-                            value: 'Date Last modified ',
-                            groupValue: service_controller
-                                .manage_service_sort_group_value.value,
-                            onChanged: (val) {
-                              service_controller.manage_service_sort_group_value
-                                  .value = val.toString();
-                            },
-                          ))
+                                value: 'Date Last modified ',
+                                groupValue: service_controller
+                                    .manage_service_sort_group_value.value,
+                                onChanged: (val) {
+                                  service_controller
+                                      .manage_service_sort_group_value
+                                      .value = val.toString();
+                                },
+                              ))
                         ],
                       ),
 
@@ -1061,12 +1090,13 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                           ),
                           Spacer(),
                           Obx(
-                                () => Radio(
+                            () => Radio(
                               value: 'Price',
                               groupValue: service_controller
                                   .manage_service_sort_group_value.value,
                               onChanged: (val) {
-                                service_controller.manage_service_sort_group_value
+                                service_controller
+                                    .manage_service_sort_group_value
                                     .value = val.toString();
                                 print(val.toString());
                               },
@@ -1082,7 +1112,7 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
                 ),
               );
             },
-                () {
+            () {
               Scaffold.of(ctx).openEndDrawer();
             },
           ),
@@ -1242,11 +1272,11 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
     }
 
     return WillPopScope(
-      onWillPop: () async {
-        Get.back();
-        return true;
-      },
-      child: Scaffold(
+        onWillPop: () async {
+          Get.back();
+          return true;
+        },
+        child: Scaffold(
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               Get.to(() => add_service_view());
@@ -1274,7 +1304,7 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
             backgroundColor: Colors.orange,
             elevation: 2,
             leading: IconButton(
-              icon: const  Icon(
+              icon: const Icon(
                 Icons.arrow_back_ios,
                 // size: 30,
               ),
@@ -1295,8 +1325,7 @@ class _manage_service_viewState extends State<manage_service_view> with WidgetsB
             ),
           ),
           body: allServices(context),
-      )
-    );
+        ));
   }
 }
 

@@ -1,15 +1,14 @@
 import 'package:errandia/app/modules/global/Widgets/blockButton.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum MyDialogType { error, success, info }
 
-class CustomAlertDialog extends StatelessWidget {
+class CustomAlertDialog extends StatefulWidget {
   final String title;
   final String message;
   final MyDialogType dialogType;
-  final VoidCallback onConfirm;
+  final Future<void> Function() onConfirm;
   final VoidCallback onCancel;
 
   const CustomAlertDialog({
@@ -22,20 +21,37 @@ class CustomAlertDialog extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    Color getDialogColor() {
-      switch (dialogType) {
-        case MyDialogType.error:
-          return Colors.red;
-        case MyDialogType.success:
-          return Colors.green;
-        case MyDialogType.info:
-          return Colors.cyan;
-        default:
-          return Colors.grey;
-      }
-    }
+  _CustomAlertDialogState createState() => _CustomAlertDialogState();
+}
 
+class _CustomAlertDialogState extends State<CustomAlertDialog> {
+  bool isLoading = false;
+
+  Color getDialogColor() {
+    switch (widget.dialogType) {
+      case MyDialogType.error:
+        return Colors.red;
+      case MyDialogType.success:
+        return Colors.green;
+      case MyDialogType.info:
+        return Colors.cyan;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  void handleConfirm() async {
+    setState(() {
+      isLoading = true;
+    });
+    await widget.onConfirm();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 10),
       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
@@ -47,7 +63,7 @@ class CustomAlertDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              title,
+              widget.title,
               style: TextStyle(
                 color: getDialogColor(),
                 fontSize: 20,
@@ -57,17 +73,26 @@ class CustomAlertDialog extends StatelessWidget {
             Container(
               margin: const EdgeInsets.symmetric(vertical: 15),
               child: Text(
-                message,
+                widget.message,
                 textAlign: TextAlign.start,
               ),
             ),
             SizedBox(height: Get.height * 0.02),
             blockButton(
-              title: const Text(
-                'Confirm',
-                style: TextStyle(color: Colors.white),
-              ),
-              ontap: onConfirm,
+              title: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      'Confirm',
+                      style: TextStyle(color: Colors.white),
+                    ),
+              ontap: isLoading ? () {} : handleConfirm,
               color: getDialogColor(),
             ),
             SizedBox(height: Get.height * 0.015),
@@ -76,7 +101,7 @@ class CustomAlertDialog extends StatelessWidget {
                 'Cancel',
                 style: TextStyle(color: getDialogColor()),
               ),
-              ontap: onCancel,
+              ontap: isLoading ? () {} : handleConfirm,
               color: const Color(0xfffafafa),
             ),
           ],

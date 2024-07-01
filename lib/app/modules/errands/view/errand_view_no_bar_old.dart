@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:errandia/app/APi/errands.dart';
 import 'package:errandia/app/modules/errands/view/edit_errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
-import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
@@ -17,7 +16,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
-import '../../../APi/apidomain & api.dart';
 import '../../global/Widgets/blockButton.dart';
 import '../../global/constants/color.dart';
 import '../controller/errand_controller.dart';
@@ -343,7 +341,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                                 "Are you sure you want to delete this errand?\n"
                                                 "This action cannot be undone.\n",
                                             dialogType: MyDialogType.error,
-                                            onConfirm: () {
+                                            onConfirm: () async {
                                               // delete product
                                               print(
                                                   "delete errand: ${data_['id']}");
@@ -677,7 +675,8 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                           Container(
                             width: Get.width * 0.7,
                             child: Text(
-                              capitalizeAll(data_['title'] + " lsl slskieowiut eowieo wowieieow eoei"),
+                              capitalizeAll(data_['title'] +
+                                  " lsl slskieowiut eowieo wowieieow eoei"),
                               softWrap: false,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,

@@ -20,7 +20,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
-import '../../global/Widgets/blockButton.dart';
 import '../../global/constants/color.dart';
 
 manage_product_controller manageProductController =
@@ -186,7 +185,7 @@ class _manage_product_viewState extends State<manage_product_view>
                                               message:
                                                   "Are you sure you want to delete this product?",
                                               dialogType: MyDialogType.error,
-                                              onConfirm: () {
+                                              onConfirm: () async {
                                                 // delete product
                                                 print(
                                                     "delete product: ${data['slug']}");

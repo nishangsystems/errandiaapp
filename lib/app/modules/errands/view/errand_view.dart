@@ -21,8 +21,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
-import '../../../APi/apidomain & api.dart';
-import '../../global/Widgets/blockButton.dart';
 import '../../global/constants/color.dart';
 import '../controller/errand_controller.dart';
 import 'New_Errand.dart';
@@ -170,7 +168,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
             message: "Are you sure you want to reject this errand?\n"
                 "This action cannot be undone.\n",
             dialogType: MyDialogType.error,
-            onConfirm: () {
+            onConfirm: () async {
               // delete product
               print("reject errand: ${data['errand_received_id']}");
               ErrandsAPI.rejectReceivedErrand(
@@ -518,7 +516,7 @@ class _errand_viewState extends State<errand_view> with WidgetsBindingObserver {
                                                   "Are you sure you want to delete this errand?\n"
                                                   "This action cannot be undone.\n",
                                               dialogType: MyDialogType.error,
-                                              onConfirm: () {
+                                              onConfirm: () async {
                                                 // delete product
                                                 print(
                                                     "delete errand: ${data_['id']}");

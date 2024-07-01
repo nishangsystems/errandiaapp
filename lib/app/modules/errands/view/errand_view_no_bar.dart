@@ -4,7 +4,6 @@ import 'package:errandia/app/APi/errands.dart';
 import 'package:errandia/app/modules/errands/view/edit_errand.dart';
 import 'package:errandia/app/modules/errands/view/errand_detail_view.dart';
 import 'package:errandia/app/modules/errands/view/errand_results.dart';
-import 'package:errandia/app/modules/errands/view/errand_view.dart';
 import 'package:errandia/app/modules/global/Widgets/CustomDialog.dart';
 import 'package:errandia/app/modules/global/Widgets/buildErrorWidget.dart';
 import 'package:errandia/app/modules/global/Widgets/filter_product_view.dart';
@@ -18,13 +17,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../APi/apidomain & api.dart';
 import '../../global/Widgets/blockButton.dart';
 import '../../global/constants/color.dart';
 import '../controller/errand_controller.dart';
-import 'New_Errand.dart';
 
 manage_service_controller service_controller =
     Get.put(manage_service_controller());
@@ -164,10 +160,12 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
             message: "Are you sure you want to reject this errand?\n"
                 "This action cannot be undone.\n",
             dialogType: MyDialogType.error,
-            onConfirm: () {
+            onConfirm: () async {
               // delete product
               print("reject errand: ${data['errand_received_id']}");
-              ErrandsAPI.rejectReceivedErrand(data['errand_received_id'].toString()).then((response_) {
+              ErrandsAPI.rejectReceivedErrand(
+                      data['errand_received_id'].toString())
+                  .then((response_) {
                 if (response_ != null) {
                   response = jsonDecode(response_);
                   print("reject business response: $response");
@@ -178,7 +176,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                       errandController.reloadReceivedErrands();
                       homeController.reloadRecentlyPostedItems();
 
-                       // Close the dialog
+                      // Close the dialog
 
                       // Show success popup
                       Get.snackbar(
@@ -231,7 +229,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
       //   } catch (e) {
       //     print("error dismissing popup: $e");
       //   }
-        errandController.reloadReceivedErrands();
+      errandController.reloadReceivedErrands();
       //   Get.back();
       // }
     });
@@ -353,7 +351,8 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                     width: 200,
                                     height: 180),
                                 fit: BoxFit.fill,
-                                imageErrorBuilder: (context, error, stackTrace) {
+                                imageErrorBuilder:
+                                    (context, error, stackTrace) {
                                   return Image.asset(
                                     'assets/images/errandia_logo.png',
                                     fit: BoxFit.fill,
@@ -422,7 +421,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                 width: Get.width * 0.04,
                               ),
                               if (data_['status'] == 1)
-                              found_pending_cancel(index, 3),
+                                found_pending_cancel(index, 3),
                             ],
                           ),
                         ],
@@ -434,7 +433,8 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                           Get.bottomSheet(
                             // backgroundColor: Colors.white,
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
                               color: Colors.white,
                               child: Wrap(
                                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -459,8 +459,8 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                                 data: data_,
                                               ),
                                           transition: Transition.rightToLeft,
-                                          duration:
-                                              const Duration(milliseconds: 500));
+                                          duration: const Duration(
+                                              milliseconds: 500));
                                     },
                                   ),
                                   managebottomSheetWidgetitem(
@@ -508,7 +508,7 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                                   "Are you sure you want to delete this errand?\n"
                                                   "This action cannot be undone.\n",
                                               dialogType: MyDialogType.error,
-                                              onConfirm: () {
+                                              onConfirm: () async {
                                                 // delete product
                                                 print(
                                                     "delete errand: ${data_['id']}");
@@ -540,7 +540,8 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                                           description:
                                                               response['data']
                                                                   ['message'],
-                                                          type: PopupType.success,
+                                                          type:
+                                                              PopupType.success,
                                                         );
                                                       } else {
                                                         Navigator.of(
@@ -657,11 +658,13 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                 var date1 = date[0].split('-');
                 return GestureDetector(
                   onTap: () {
-                    Get.to(() => errand_detail_view(
-                          data: data_, received: true,
-                        ), transition: Transition.fadeIn,
-                      duration: const Duration(milliseconds: 500)
-                    );
+                    Get.to(
+                        () => errand_detail_view(
+                              data: data_,
+                              received: true,
+                            ),
+                        transition: Transition.fadeIn,
+                        duration: const Duration(milliseconds: 500));
                   },
                   child: Container(
                     // height: Get.height * 0.15,
@@ -712,7 +715,8 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                                 BorderRadius.circular(100),
                                             border: Border.all(
                                                 width: 0.5,
-                                                color: appcolor().darkBlueColor)),
+                                                color:
+                                                    appcolor().darkBlueColor)),
                                         child: ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(100),
@@ -750,7 +754,8 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                 width: Get.width * 0.01,
                                 height: Get.height * 0.01,
                                 decoration: BoxDecoration(
-                                  color: appcolor().darkBlueColor.withOpacity(0.5),
+                                  color:
+                                      appcolor().darkBlueColor.withOpacity(0.5),
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -825,7 +830,8 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                   Container(
                                     child: Icon(
                                       Icons.delete_forever_outlined,
-                                      color: appcolor().redColor.withOpacity(0.6),
+                                      color:
+                                          appcolor().redColor.withOpacity(0.6),
                                       size: 14,
                                     ),
                                   ),
@@ -836,7 +842,9 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                     'Reject',
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: appcolor().redColor.withOpacity(0.6),
+                                        color: appcolor()
+                                            .redColor
+                                            .withOpacity(0.6),
                                         fontWeight: FontWeight.w600),
                                   ),
                                 ],
@@ -891,17 +899,18 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                           height: Get.height * 0.013,
                         ),
                         // bottom row
-                        Row(
-                            children: [
-                              // call button
-                              // if (isPhoneAvailable(data_['user']) || !isEmailAvailable(data_['user']))
-                              if (hasActiveSubscription() && isPhoneAvailable(data_['user']))
-                              InkWell(
-                                onTap: () {
-                                  launchCaller(data_['user']['phone'].toString());
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                        Row(children: [
+                          // call button
+                          // if (isPhoneAvailable(data_['user']) || !isEmailAvailable(data_['user']))
+                          if (hasActiveSubscription() &&
+                              isPhoneAvailable(data_['user']))
+                            InkWell(
+                              onTap: () {
+                                launchCaller(data_['user']['phone'].toString());
+                              },
+                              child: Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 5, bottom: 5, left: 8, right: 8),
                                   decoration: BoxDecoration(
                                     color: appcolor().amberColor,
                                     borderRadius: BorderRadius.circular(5),
@@ -924,91 +933,91 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                       0.5,
                                     ),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.call,
+                                  child: Row(children: [
+                                    Icon(
+                                      Icons.call,
+                                      color: appcolor().darkBlueColor,
+                                      size: 14,
+                                    ),
+                                    SizedBox(
+                                      width: Get.width * 0.01,
+                                    ),
+                                    Text(
+                                      'Call Now',
+                                      style: TextStyle(
+                                        fontSize: 12,
                                         color: appcolor().darkBlueColor,
-                                        size: 14,
-                                      ),
-                                      SizedBox(
-                                        width: Get.width * 0.01,
-                                      ),
-                                      Text(
-                                        'Call Now',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: appcolor().darkBlueColor,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ]
-                                  )
-                                ),
-                              ),
-
-                              if (!hasActiveSubscription())
-                                // a button to subscribe
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(() => const subscription_view(),
-                                        transition: Transition.rightToLeft,
-                                        duration: const Duration(milliseconds: 500));
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(
-                                        color: Colors.redAccent,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.payment,
-                                          color: appcolor().redColor,
-                                          size: 14,
-                                        ),
-                                        SizedBox(
-                                          width: Get.width * 0.01,
-                                        ),
-                                        Text(
-                                          'Subscribe',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: appcolor().redColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ]
-                                    )
+                                  ])),
+                            ),
+
+                          if (!hasActiveSubscription())
+                            // a button to subscribe
+                            InkWell(
+                              onTap: () {
+                                Get.to(() => const subscription_view(),
+                                    transition: Transition.rightToLeft,
+                                    duration:
+                                        const Duration(milliseconds: 500));
+                              },
+                              child: Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 5, bottom: 5, left: 8, right: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      color: Colors.redAccent,
+                                    ),
                                   ),
-                                ),
+                                  child: Row(children: [
+                                    Icon(
+                                      Icons.payment,
+                                      color: appcolor().redColor,
+                                      size: 14,
+                                    ),
+                                    SizedBox(
+                                      width: Get.width * 0.01,
+                                    ),
+                                    Text(
+                                      'Subscribe',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: appcolor().redColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ])),
+                            ),
 
-                              // posted when
-                              const Spacer(),
-                              Text(
-                                data_['when'],
-                                style: TextStyle(
-                                  color: appcolor().mainColor,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                          // posted when
+                          const Spacer(),
+                          Text(
+                            data_['when'],
+                            style: TextStyle(
+                              color: appcolor().mainColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
 
-                              // message button
-                              if (hasActiveSubscription() && isWhatsAppAvailable(data_['user']))
-                                const Spacer(),
+                          // message button
+                          if (hasActiveSubscription() &&
+                              isWhatsAppAvailable(data_['user']))
+                            const Spacer(),
 
-                              if (hasActiveSubscription() && isWhatsAppAvailable(data_['user']))
-                                InkWell(
-                                onTap: () {
-                                 launchWhatsapp(data_['user']['whatsapp_number'].toString());
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                          if (hasActiveSubscription() &&
+                              isWhatsAppAvailable(data_['user']))
+                            InkWell(
+                              onTap: () {
+                                launchWhatsapp(data_['user']['whatsapp_number']
+                                    .toString());
+                              },
+                              child: Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 5, bottom: 5, left: 8, right: 8),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(5),
@@ -1018,43 +1027,43 @@ class ErrandViewWithoutBarState extends State<ErrandViewWithoutBar>
                                     gradient: Gradient.lerp(
                                       LinearGradient(
                                         colors: [
-                                          appcolor().greenColor.withOpacity(0.8),
+                                          appcolor()
+                                              .greenColor
+                                              .withOpacity(0.8),
                                           appcolor().greenColor,
                                         ],
                                       ),
                                       LinearGradient(
                                         colors: [
                                           appcolor().mainColor,
-                                          appcolor().greenColor.withOpacity(0.5),
+                                          appcolor()
+                                              .greenColor
+                                              .withOpacity(0.5),
                                         ],
                                       ),
                                       0.5,
                                     ),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        FontAwesomeIcons.whatsapp,
+                                  child: Row(children: [
+                                    const Icon(
+                                      FontAwesomeIcons.whatsapp,
+                                      color: Colors.white,
+                                      size: 14,
+                                    ),
+                                    SizedBox(
+                                      width: Get.width * 0.01,
+                                    ),
+                                    const Text(
+                                      'Message',
+                                      style: TextStyle(
+                                        fontSize: 12,
                                         color: Colors.white,
-                                        size: 14,
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                      SizedBox(
-                                        width: Get.width * 0.01,
-                                      ),
-                                      const Text(
-                                        'Message',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ]
-                                  )
-                                ),
-                              ),
-                            ]
-                        )
+                                    ),
+                                  ])),
+                            ),
+                        ])
                       ],
                     ),
                   ),

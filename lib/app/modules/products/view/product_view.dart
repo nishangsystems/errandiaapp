@@ -125,7 +125,7 @@ class _Product_viewState extends State<Product_view>
                     title: "Delete Product",
                     message: "Are you sure you want to delete this product?",
                     dialogType: MyDialogType.error,
-                    onConfirm: () {
+                    onConfirm: () async {
                       // delete product
                       print("delete product: ${widget.item['slug']}");
                       ProductAPI.deleteProductOrService(widget.item['slug'])

@@ -126,7 +126,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView>
                     title: "Delete Service",
                     message: "Are you sure you want to delete this service?",
                     dialogType: MyDialogType.error,
-                    onConfirm: () {
+                    onConfirm: () async {
                       // delete product
                       print("delete product: ${_localService['slug']}");
                       ProductAPI.deleteProductOrService(_localService['slug'])
